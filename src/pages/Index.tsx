@@ -1,184 +1,153 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
-import HeroSection from '../components/HeroSection';
-import CategoryFilter from '../components/CategoryFilter';
-import TrendCard from '../components/TrendCard';
-import IdeasGenerator from '../components/IdeasGenerator';
-import AIAssistant from '../components/AIAssistant';
+import { ExpenseTable } from '../components/ExpenseTable';
+import { FinancialDashboard } from '../components/FinancialDashboard';
+import { ExpenseFilters } from '../components/ExpenseFilters';
+import { SavingSuggestions } from '../components/SavingSuggestions';
 
-// Dados mockados para fins de demonstração
-const generateGrowthData = () => {
-  const data = [];
-  let value = Math.floor(Math.random() * 10) + 5;
-  
-  for (let i = 0; i < 10; i++) {
-    value = value + Math.floor(Math.random() * 15) - 2;
-    value = Math.max(0, value);
-    data.push({ value });
-  }
-  
-  return data;
-};
-
-const mockTrends = [
+// Mock data for development
+const mockExpenses = [
   {
-    id: 1,
-    name: "Inteligência Artificial Generativa",
-    growthData: generateGrowthData(),
-    competition: "medium" as const,
-    category: "Tecnologia"
+    id: '1',
+    date: '2023-04-01',
+    amount: 50,
+    category: 'Food',
+    description: 'Grocery shopping'
   },
   {
-    id: 2,
-    name: "Sustentabilidade na Moda",
-    growthData: generateGrowthData(),
-    competition: "low" as const,
-    category: "Moda",
-    isHot: true
+    id: '2',
+    date: '2023-04-02',
+    amount: 1200,
+    category: 'Housing',
+    description: 'Rent'
   },
   {
-    id: 3,
-    name: "Educação Híbrida",
-    growthData: generateGrowthData(),
-    competition: "high" as const,
-    category: "Educação"
+    id: '3',
+    date: '2023-04-03',
+    amount: 25,
+    category: 'Transportation',
+    description: 'Uber ride'
   },
   {
-    id: 4,
-    name: "Bem-estar Mental",
-    growthData: generateGrowthData(),
-    competition: "medium" as const,
-    category: "Saúde",
-    isHot: true
+    id: '4',
+    date: '2023-04-05',
+    amount: 15,
+    category: 'Entertainment',
+    description: 'Movie ticket'
   },
   {
-    id: 5,
-    name: "Negócios Digitais",
-    growthData: generateGrowthData(),
-    competition: "high" as const,
-    category: "Negócios"
-  },
-  {
-    id: 6,
-    name: "Design Generativo",
-    growthData: generateGrowthData(),
-    competition: "low" as const,
-    category: "Criatividade",
-    isHot: true
-  },
-  {
-    id: 7,
-    name: "Minimalismo Digital",
-    growthData: generateGrowthData(),
-    competition: "low" as const,
-    category: "Lifestyle"
-  },
-  {
-    id: 8,
-    name: "Investimentos Sustentáveis",
-    growthData: generateGrowthData(),
-    competition: "medium" as const,
-    category: "Finanças"
+    id: '5',
+    date: '2023-04-08',
+    amount: 35,
+    category: 'Food',
+    description: 'Restaurant'
   }
 ];
 
-// Dados mockados de ideias de conteúdo
-const mockContentIdeas = [
-  "10 ferramentas de IA que vão revolucionar seu workflow em 2025",
-  "Como a moda sustentável está transformando o consumo consciente",
-  "Estratégias para criar um ambiente de educação híbrida eficiente"
-];
-
-const mockAIPrompts = [
-  "Crie uma imagem no estilo ilustrativo mostrando um profissional usando ferramentas de IA em seu trabalho",
-  "Escreva um artigo de 800 palavras sobre como implementar práticas sustentáveis em uma marca de moda iniciante",
-  "Crie um roteiro para um vídeo de 5 minutos sobre as tendências de educação híbrida em 2025"
+// Categories with icons
+export const expenseCategories = [
+  { value: 'Food', label: 'Food' },
+  { value: 'Housing', label: 'Housing' },
+  { value: 'Transportation', label: 'Transportation' },
+  { value: 'Entertainment', label: 'Entertainment' },
+  { value: 'Shopping', label: 'Shopping' },
+  { value: 'Utilities', label: 'Utilities' },
+  { value: 'Health', label: 'Health' },
+  { value: 'Education', label: 'Education' },
+  { value: 'Personal', label: 'Personal' },
+  { value: 'Other', label: 'Other' }
 ];
 
 const Index = () => {
-  const [activeCategory, setActiveCategory] = useState("Todos");
-  const [selectedTrend, setSelectedTrend] = useState<number | null>(null);
-  const [filteredTrends, setFilteredTrends] = useState(mockTrends);
-  
-  // Filtrar tendências quando a categoria muda
-  useEffect(() => {
-    if (activeCategory === "Todos") {
-      setFilteredTrends(mockTrends);
-    } else {
-      setFilteredTrends(mockTrends.filter(trend => trend.category === activeCategory));
-    }
-  }, [activeCategory]);
-  
-  // Selecionar uma tendência para mostrar ideias
-  const handleSelectTrend = (id: number) => {
-    setSelectedTrend(id === selectedTrend ? null : id);
+  const [expenses, setExpenses] = useState(mockExpenses);
+  const [activeFilter, setActiveFilter] = useState({
+    timeRange: 'all',
+    category: 'all',
+    minAmount: '',
+    maxAmount: ''
+  });
+
+  // Function to filter expenses based on active filters
+  const getFilteredExpenses = () => {
+    return expenses.filter(expense => {
+      // Filter by category
+      if (activeFilter.category !== 'all' && expense.category !== activeFilter.category) {
+        return false;
+      }
+      
+      // Filter by amount range
+      if (activeFilter.minAmount && expense.amount < parseFloat(activeFilter.minAmount)) {
+        return false;
+      }
+      
+      if (activeFilter.maxAmount && expense.amount > parseFloat(activeFilter.maxAmount)) {
+        return false;
+      }
+      
+      // Filter by time range
+      if (activeFilter.timeRange !== 'all') {
+        const expenseDate = new Date(expense.date);
+        const today = new Date();
+        
+        switch (activeFilter.timeRange) {
+          case 'today':
+            return expenseDate.toDateString() === today.toDateString();
+          case 'week':
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return expenseDate >= weekAgo;
+          case 'month':
+            const monthAgo = new Date();
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return expenseDate >= monthAgo;
+          default:
+            return true;
+        }
+      }
+      
+      return true;
+    });
   };
-  
-  // Encontrar a tendência selecionada
-  const selectedTrendData = mockTrends.find(trend => trend.id === selectedTrend);
-  
+
+  const filteredExpenses = getFilteredExpenses();
+
   return (
-    <div className="min-h-screen flex flex-col bg-trend-gray-light/30">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main>
-        <HeroSection />
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Financial Dashboard</h1>
+          <p className="text-gray-600">Track your expenses and get insights to save more.</p>
+        </div>
         
-        <div className="container mx-auto px-4 pb-16">
-          <div className="flex flex-col md:flex-row gap-6">
-            <CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
-            
-            <div className="flex-1">
-              {/* Alerta de oportunidade */}
-              <div className="bg-white border border-trend-green p-4 rounded-lg mb-6 shadow-sm flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-trend-green/10 flex items-center justify-center text-trend-green">
-                  🚀
-                </div>
-                <div>
-                  <h3 className="font-montserrat font-semibold text-lg">Alerta de oportunidade!</h3>
-                  <p className="text-sm text-trend-gray-dark">Detectamos trends em ascensão com baixa concorrência. Expanda seu público agora!</p>
-                </div>
-              </div>
-              
-              {/* Ideias de conteúdo para a trend selecionada */}
-              {selectedTrendData && (
-                <div className="mb-6">
-                  <IdeasGenerator
-                    trend={selectedTrendData.name}
-                    contentIdeas={mockContentIdeas}
-                    aiPrompts={mockAIPrompts}
-                  />
-                </div>
-              )}
-              
-              {/* Grid de tendências */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredTrends.map((trend) => (
-                  <TrendCard
-                    key={trend.id}
-                    name={trend.name}
-                    growthData={trend.growthData}
-                    competition={trend.competition}
-                    isHot={trend.isHot}
-                    onSelect={() => handleSelectTrend(trend.id)}
-                  />
-                ))}
-              </div>
-              
-              {/* Mensagem caso não haja tendências na categoria */}
-              {filteredTrends.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-trend-gray-dark">Nenhuma tendência encontrada nesta categoria.</p>
-                </div>
-              )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <FinancialDashboard expenses={filteredExpenses} />
+          </div>
+          
+          <div className="bg-white p-4 rounded-lg shadow">
+            <SavingSuggestions expenses={filteredExpenses} />
+          </div>
+        </div>
+        
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-semibold">Your Expenses</h2>
             </div>
+            
+            <ExpenseFilters 
+              activeFilter={activeFilter} 
+              setActiveFilter={setActiveFilter} 
+              categories={expenseCategories}
+            />
+            
+            <ExpenseTable expenses={filteredExpenses} />
           </div>
         </div>
       </main>
-      
-      {/* Assistente de IA */}
-      <AIAssistant />
     </div>
   );
 };
