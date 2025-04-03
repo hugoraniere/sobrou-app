@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// TrendMap AI colors
+				trend: {
+					blue: '#4361EE',
+					green: '#38B000',
+					orange: '#FF9F1C',
+					gray: {
+						light: '#F5F7FA',
+						medium: '#E9ECEF',
+						dark: '#8A898C'
+					}
 				}
 			},
 			borderRadius: {
@@ -84,11 +96,26 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-light': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.7' }
+				},
+				'scanning': {
+					'0%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(100%)' },
+					'100%': { transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-light': 'pulse-light 2s ease-in-out infinite',
+				'scanning': 'scanning 2s ease-in-out infinite'
+			},
+			fontFamily: {
+				inter: ['Inter', 'sans-serif'],
+				montserrat: ['Montserrat', 'sans-serif']
 			}
 		}
 	},
