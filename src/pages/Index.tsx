@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { ExpenseTable } from '../components/ExpenseTable';
 import { FinancialDashboard } from '../components/FinancialDashboard';
@@ -9,6 +8,8 @@ import LandingPage from '../components/LandingPage';
 import OnboardingPanel from '../components/OnboardingPanel';
 import ManualEntryForm from '../components/ManualEntryForm';
 import EmptyDashboard from '../components/EmptyDashboard';
+import { useAuth } from '../contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 // Mock data for development
 const mockExpenses = [
@@ -64,8 +65,9 @@ export const expenseCategories = [
 ];
 
 const Index = () => {
-  // In a real app, we would get these states from user context/auth
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const { isAuthenticated } = useAuth();
+  
+  // In a real app, we would get WhatsApp connection status from user data
   const [whatsAppConnected, setWhatsAppConnected] = useState(false);
   
   // For demo purposes, we'll use local state to store expenses
@@ -83,7 +85,6 @@ const Index = () => {
   };
 
   // For demo purposes, toggle states
-  const toggleLogin = () => setIsLoggedIn(!isLoggedIn);
   const toggleWhatsApp = () => setWhatsAppConnected(!whatsAppConnected);
 
   // Function to filter expenses based on active filters
@@ -134,23 +135,14 @@ const Index = () => {
   // For development purposes, render a small control panel
   const renderDevControls = () => (
     <div className="bg-gray-100 p-2 text-xs fixed bottom-0 right-0 z-50">
-      <button onClick={toggleLogin} className="mr-2 bg-gray-200 px-2 py-1 rounded">
-        Toggle {isLoggedIn ? "Logout" : "Login"}
-      </button>
       <button onClick={toggleWhatsApp} className="bg-gray-200 px-2 py-1 rounded">
         Toggle WhatsApp {whatsAppConnected ? "Off" : "On"}
       </button>
     </div>
   );
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <LandingPage />
-        {renderDevControls()}
-      </div>
-    );
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
   }
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
@@ -7,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Check, PhoneCall, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useAuth } from '../contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 const WhatsAppIntegration = () => {
+  const { isAuthenticated } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -36,6 +38,10 @@ const WhatsAppIntegration = () => {
       setIsConnecting(false);
     }
   };
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
