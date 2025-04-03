@@ -1,18 +1,39 @@
 
 import React, { useState } from 'react';
 import Header from '../components/Header';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Check, PhoneCall, MessageSquare } from "lucide-react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const WhatsAppIntegration = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
-  const handleConnect = (e: React.FormEvent) => {
+  const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (phoneNumber.trim()) {
-      // In a real application, this would initiate a WhatsApp connection flow
-      // For demo purposes, we're just simulating success
+    
+    if (!phoneNumber || phoneNumber.length < 10) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+    
+    setIsConnecting(true);
+    
+    // Simulate API call
+    try {
+      // In a real app, this would be an actual API call to connect WhatsApp
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       setIsConnected(true);
+      toast.success("WhatsApp connected successfully!");
+    } catch (error) {
+      toast.error("Failed to connect WhatsApp. Please try again.");
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -20,81 +41,122 @@ const WhatsAppIntegration = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Connect WhatsApp</h1>
-          <p className="text-gray-600">
-            Link your WhatsApp account to start tracking your expenses via chat.
-          </p>
-        </div>
-        
-        <div className="max-w-md mx-auto">
-          <div className="bg-white p-6 rounded-lg shadow">
-            {isConnected ? (
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-semibold mb-2">WhatsApp Connected!</h2>
-                <p className="text-gray-600 mb-6">
-                  Your WhatsApp account has been successfully connected to FinanceBot.
-                </p>
-                <div className="border-t pt-4">
-                  <h3 className="font-medium mb-2">Start Tracking Expenses</h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    Send messages like these to start tracking your expenses:
-                  </p>
-                  <div className="bg-gray-50 p-3 rounded mb-4 text-left">
-                    <p className="mb-1">💬 <span className="font-medium">Spent 50 on groceries</span></p>
-                    <p className="mb-1">💬 <span className="font-medium">Rent 1200</span></p>
-                    <p>💬 <span className="font-medium">15.50 coffee yesterday</span></p>
-                  </div>
-                </div>
-                <Button variant="outline" onClick={() => setIsConnected(false)} className="mt-2">
-                  Disconnect
-                </Button>
-              </div>
-            ) : (
-              <>
-                <h2 className="text-xl font-semibold mb-4">Connect your WhatsApp</h2>
-                <p className="text-gray-600 mb-6">
-                  Enter your phone number to connect WhatsApp with FinanceBot. You'll receive a verification code.
-                </p>
-                
-                <form onSubmit={handleConnect}>
-                  <div className="mb-4">
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                      Your Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="+1 (555) 123-4567"
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                      required
-                    />
+      <main className="container mx-auto px-4 py-12">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Connect Your WhatsApp</h1>
+            <p className="text-gray-600">Link your WhatsApp to start tracking expenses automatically</p>
+          </div>
+          
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>WhatsApp Connection</CardTitle>
+              <CardDescription>
+                Enter your phone number to receive a verification message
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!isConnected ? (
+                <form onSubmit={handleConnect} className="space-y-4">
+                  <div>
+                    <div className="flex">
+                      <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md">
+                        <PhoneCall className="h-4 w-4 text-gray-500" />
+                      </div>
+                      <Input
+                        type="tel"
+                        placeholder="Your WhatsApp phone number"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="rounded-l-none"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Include country code (e.g. +1 for US)
+                    </p>
                   </div>
                   
-                  <Button type="submit" className="w-full">
-                    Connect WhatsApp
+                  <Button type="submit" disabled={isConnecting} className="w-full">
+                    {isConnecting ? "Connecting..." : "Connect WhatsApp"}
                   </Button>
                 </form>
-                
-                <div className="mt-6 border-t pt-4">
-                  <h3 className="text-sm font-medium mb-2">How it works</h3>
-                  <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-600">
-                    <li>Enter your phone number and click "Connect WhatsApp"</li>
-                    <li>You'll receive a message from our WhatsApp business account</li>
-                    <li>Reply to confirm the connection</li>
-                    <li>Start sending your expenses directly in chat</li>
-                  </ol>
+              ) : (
+                <div className="py-4">
+                  <div className="flex items-center space-x-2 text-green-600 mb-4">
+                    <Check className="h-6 w-6" />
+                    <span className="font-medium">WhatsApp Connected Successfully!</span>
+                  </div>
+                  
+                  <p className="text-gray-600 mb-4">
+                    Your WhatsApp account is now linked to FinanceBot. You can start sending your
+                    expenses right away.
+                  </p>
+                  
+                  <Link to="/">
+                    <Button className="w-full">
+                      Go to Dashboard
+                    </Button>
+                  </Link>
                 </div>
-              </>
-            )}
+              )}
+            </CardContent>
+          </Card>
+          
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">How it works</h2>
+            
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
+                  1
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">Send messages with your expenses</h3>
+                  <p className="text-gray-600">
+                    Simply text your expenses like "Spent $25 on dinner" or "Uber ride $12"
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
+                  2
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">AI categorizes expenses automatically</h3>
+                  <p className="text-gray-600">
+                    We'll extract the amount, category, and description from your message
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
+                  3
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">View your financial dashboard</h3>
+                  <p className="text-gray-600">
+                    See your spending patterns, get insights, and receive saving suggestions
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+              <div className="flex">
+                <MessageSquare className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-blue-800 mb-1">Example messages</h4>
+                  <ul className="text-sm text-blue-600 space-y-1">
+                    <li>"Spent $45.50 on groceries at Walmart"</li>
+                    <li>"$12 lunch today"</li>
+                    <li>"Rent payment $1200"</li>
+                    <li>"Uber ride yesterday $18.75"</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>

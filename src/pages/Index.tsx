@@ -5,6 +5,10 @@ import { ExpenseTable } from '../components/ExpenseTable';
 import { FinancialDashboard } from '../components/FinancialDashboard';
 import { ExpenseFilters } from '../components/ExpenseFilters';
 import { SavingSuggestions } from '../components/SavingSuggestions';
+import LandingPage from '../components/LandingPage';
+import OnboardingPanel from '../components/OnboardingPanel';
+import ManualEntryForm from '../components/ManualEntryForm';
+import EmptyDashboard from '../components/EmptyDashboard';
 
 // Mock data for development
 const mockExpenses = [
@@ -60,13 +64,27 @@ export const expenseCategories = [
 ];
 
 const Index = () => {
-  const [expenses, setExpenses] = useState(mockExpenses);
+  // In a real app, we would get these states from user context/auth
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [whatsAppConnected, setWhatsAppConnected] = useState(false);
+  
+  // For demo purposes, we'll use local state to store expenses
+  const [expenses, setExpenses] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState({
     timeRange: 'all',
     category: 'all',
     minAmount: '',
     maxAmount: ''
   });
+
+  // Add a new expense from manual entry
+  const handleExpenseAdded = (newExpense: any) => {
+    setExpenses(prev => [...prev, newExpense]);
+  };
+
+  // For demo purposes, toggle states
+  const toggleLogin = () => setIsLoggedIn(!isLoggedIn);
+  const toggleWhatsApp = () => setWhatsAppConnected(!whatsAppConnected);
 
   // Function to filter expenses based on active filters
   const getFilteredExpenses = () => {
@@ -111,6 +129,29 @@ const Index = () => {
   };
 
   const filteredExpenses = getFilteredExpenses();
+  const hasExpenses = expenses.length > 0;
+
+  // For development purposes, render a small control panel
+  const renderDevControls = () => (
+    <div className="bg-gray-100 p-2 text-xs fixed bottom-0 right-0 z-50">
+      <button onClick={toggleLogin} className="mr-2 bg-gray-200 px-2 py-1 rounded">
+        Toggle {isLoggedIn ? "Logout" : "Login"}
+      </button>
+      <button onClick={toggleWhatsApp} className="bg-gray-200 px-2 py-1 rounded">
+        Toggle WhatsApp {whatsAppConnected ? "Off" : "On"}
+      </button>
+    </div>
+  );
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <LandingPage />
+        {renderDevControls()}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -122,9 +163,19 @@ const Index = () => {
           <p className="text-gray-600">Track your expenses and get insights to save more.</p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Onboarding Panel for new users */}
+        <OnboardingPanel whatsAppConnected={whatsAppConnected} />
+
+        {/* Manual Entry Form for users to try out */}
+        <ManualEntryForm onExpenseAdded={handleExpenseAdded} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            <FinancialDashboard expenses={filteredExpenses} />
+            {hasExpenses ? (
+              <FinancialDashboard expenses={filteredExpenses} />
+            ) : (
+              <EmptyDashboard />
+            )}
           </div>
           
           <div className="bg-white p-4 rounded-lg shadow">
@@ -148,6 +199,7 @@ const Index = () => {
           </div>
         </div>
       </main>
+      {renderDevControls()}
     </div>
   );
 };
