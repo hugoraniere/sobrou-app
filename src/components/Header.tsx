@@ -26,7 +26,9 @@ const Header = () => {
             <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
             WhatsApp Connected
           </Button>
-          <Button size="sm">Login</Button>
+          <Link to="/auth">
+            <Button size="sm">Login</Button>
+          </Link>
         </div>
       </div>
     </header>
