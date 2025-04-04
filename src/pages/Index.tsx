@@ -1,54 +1,19 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { ExpenseTable } from '../components/ExpenseTable';
 import { FinancialDashboard } from '../components/FinancialDashboard';
 import { ExpenseFilters } from '../components/ExpenseFilters';
 import { SavingSuggestions } from '../components/SavingSuggestions';
-import LandingPage from '../components/LandingPage';
 import OnboardingPanel from '../components/OnboardingPanel';
-import ManualEntryForm from '../components/ManualEntryForm';
-import EmptyDashboard from '../components/EmptyDashboard';
+import AIPromptInput from '../components/AIPromptInput';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-
-// Mock data for development
-const mockExpenses = [
-  {
-    id: '1',
-    date: '2023-04-01',
-    amount: 50,
-    category: 'Food',
-    description: 'Grocery shopping'
-  },
-  {
-    id: '2',
-    date: '2023-04-02',
-    amount: 1200,
-    category: 'Housing',
-    description: 'Rent'
-  },
-  {
-    id: '3',
-    date: '2023-04-03',
-    amount: 25,
-    category: 'Transportation',
-    description: 'Uber ride'
-  },
-  {
-    id: '4',
-    date: '2023-04-05',
-    amount: 15,
-    category: 'Entertainment',
-    description: 'Movie ticket'
-  },
-  {
-    id: '5',
-    date: '2023-04-08',
-    amount: 35,
-    category: 'Food',
-    description: 'Restaurant'
-  }
-];
+import { TransactionService, Transaction } from '../services/TransactionService';
+import { SavingsService, SavingGoal } from '../services/SavingsService';
+import TransactionsTable from '../components/TransactionsTable';
+import SavingGoals from '../components/SavingGoals';
+import EmptyDashboard from '../components/EmptyDashboard';
 
 // Categories with icons
 export const expenseCategories = [
@@ -60,7 +25,8 @@ export const expenseCategories = [
   { value: 'Utilities', label: 'Utilities' },
   { value: 'Health', label: 'Health' },
   { value: 'Education', label: 'Education' },
-  { value: 'Personal', label: 'Personal' },
+  { value: 'Income', label: 'Income' },
+  { value: 'Savings', label: 'Savings' },
   { value: 'Other', label: 'Other' }
 ];
 
@@ -70,56 +36,66 @@ const Index = () => {
   // In a real app, we would get WhatsApp connection status from user data
   const [whatsAppConnected, setWhatsAppConnected] = useState(false);
   
-  // For demo purposes, we'll use local state to store expenses
-  const [expenses, setExpenses] = useState<any[]>([]);
+  // State for transactions and saving goals
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Filters state
   const [activeFilter, setActiveFilter] = useState({
     timeRange: 'all',
     category: 'all',
     minAmount: '',
     maxAmount: ''
   });
-
-  // Add a new expense from manual entry
-  const handleExpenseAdded = (newExpense: any) => {
-    setExpenses(prev => [...prev, newExpense]);
+  
+  // Fetch transactions and saving goals
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [fetchedTransactions, fetchedSavingGoals] = await Promise.all([
+        TransactionService.getTransactions(),
+        SavingsService.getSavingGoals()
+      ]);
+      
+      setTransactions(fetchedTransactions);
+      setSavingGoals(fetchedSavingGoals);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
+  
+  // Initial data fetch
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated]);
+  
   // For demo purposes, toggle states
   const toggleWhatsApp = () => setWhatsAppConnected(!whatsAppConnected);
-
+  
   // Function to filter expenses based on active filters
-  const getFilteredExpenses = () => {
-    return expenses.filter(expense => {
-      // Filter by category
-      if (activeFilter.category !== 'all' && expense.category !== activeFilter.category) {
-        return false;
-      }
-      
-      // Filter by amount range
-      if (activeFilter.minAmount && expense.amount < parseFloat(activeFilter.minAmount)) {
-        return false;
-      }
-      
-      if (activeFilter.maxAmount && expense.amount > parseFloat(activeFilter.maxAmount)) {
-        return false;
-      }
-      
+  const getFilteredTransactions = () => {
+    return transactions.filter(transaction => {
       // Filter by time range
       if (activeFilter.timeRange !== 'all') {
-        const expenseDate = new Date(expense.date);
+        const transactionDate = new Date(transaction.date);
         const today = new Date();
         
         switch (activeFilter.timeRange) {
           case 'today':
-            return expenseDate.toDateString() === today.toDateString();
+            return transactionDate.toDateString() === today.toDateString();
           case 'week':
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
-            return expenseDate >= weekAgo;
+            return transactionDate >= weekAgo;
           case 'month':
             const monthAgo = new Date();
             monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return expenseDate >= monthAgo;
+            return transactionDate >= monthAgo;
           default:
             return true;
         }
@@ -128,10 +104,10 @@ const Index = () => {
       return true;
     });
   };
-
-  const filteredExpenses = getFilteredExpenses();
-  const hasExpenses = expenses.length > 0;
-
+  
+  const filteredTransactions = getFilteredTransactions();
+  const hasTransactions = transactions.length > 0;
+  
   // For development purposes, render a small control panel
   const renderDevControls = () => (
     <div className="bg-gray-100 p-2 text-xs fixed bottom-0 right-0 z-50">
@@ -140,11 +116,11 @@ const Index = () => {
       </button>
     </div>
   );
-
+  
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -157,28 +133,39 @@ const Index = () => {
         
         {/* Onboarding Panel for new users */}
         <OnboardingPanel whatsAppConnected={whatsAppConnected} />
-
-        {/* Manual Entry Form for users to try out */}
-        <ManualEntryForm onExpenseAdded={handleExpenseAdded} />
+        
+        {/* AI-powered prompt input */}
+        <AIPromptInput 
+          onTransactionAdded={fetchData}
+          onSavingAdded={fetchData}
+        />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            {hasExpenses ? (
-              <FinancialDashboard expenses={filteredExpenses} />
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : hasTransactions ? (
+              <FinancialDashboard expenses={filteredTransactions} />
             ) : (
               <EmptyDashboard />
             )}
           </div>
           
           <div className="bg-white p-4 rounded-lg shadow">
-            <SavingSuggestions expenses={filteredExpenses} />
+            <SavingGoals 
+              savingGoals={savingGoals}
+              onGoalAdded={fetchData}
+              onGoalUpdated={fetchData}
+            />
           </div>
         </div>
         
         <div className="mt-8">
           <div className="bg-white rounded-lg shadow">
-            <div className="p-4 border-b">
-              <h2 className="text-xl font-semibold">Your Expenses</h2>
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Your Transactions</h2>
             </div>
             
             <ExpenseFilters 
@@ -187,7 +174,23 @@ const Index = () => {
               categories={expenseCategories}
             />
             
-            <ExpenseTable expenses={filteredExpenses} />
+            {hasTransactions ? (
+              <TransactionsTable 
+                transactions={filteredTransactions}
+                filters={{
+                  category: activeFilter.category,
+                  type: 'all', // Default to showing all types
+                  dateRange: activeFilter.timeRange,
+                  minAmount: activeFilter.minAmount,
+                  maxAmount: activeFilter.maxAmount
+                }}
+              />
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                <p>No transactions found.</p>
+                <p className="text-sm mt-2">Start by adding a transaction using the input above.</p>
+              </div>
+            )}
           </div>
         </div>
       </main>

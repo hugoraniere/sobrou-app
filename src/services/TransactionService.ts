@@ -1,0 +1,125 @@
+
+import { supabase } from "@/integrations/supabase/client";
+
+export interface Transaction {
+  id: string;
+  user_id: string;
+  amount: number;
+  description: string;
+  category: string;
+  type: 'expense' | 'income';
+  date: string;
+  created_at: string;
+}
+
+export interface ParsedExpense {
+  amount: number;
+  type: string;
+  category: string;
+  date: string;
+  description: string;
+  isSaving: boolean;
+  savingGoal: string | null;
+}
+
+export const TransactionService = {
+  // Parse expense text using the edge function
+  async parseExpenseText(text: string): Promise<ParsedExpense> {
+    try {
+      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/parse-expense`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.supabaseKey}`
+        },
+        body: JSON.stringify({ text })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to parse expense text');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error parsing expense text:', error);
+      throw error;
+    }
+  },
+  
+  // Get all transactions for the current user
+  async getTransactions(): Promise<Transaction[]> {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .order('date', { ascending: false });
+      
+    if (error) {
+      console.error('Error fetching transactions:', error);
+      throw error;
+    }
+    
+    return data || [];
+  },
+  
+  // Add a new transaction
+  async addTransaction(transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at'>): Promise<Transaction> {
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert([transaction])
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error adding transaction:', error);
+      throw error;
+    }
+    
+    return data;
+  },
+  
+  // Get transactions by date range
+  async getTransactionsByDateRange(startDate: string, endDate: string): Promise<Transaction[]> {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: false });
+      
+    if (error) {
+      console.error('Error fetching transactions by date range:', error);
+      throw error;
+    }
+    
+    return data || [];
+  },
+  
+  // Get summary stats for a given date range
+  async getTransactionSummary(startDate: string, endDate: string) {
+    const transactions = await this.getTransactionsByDateRange(startDate, endDate);
+    
+    const totalIncome = transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+      
+    const totalExpenses = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+      
+    const netBalance = totalIncome - totalExpenses;
+    
+    const expensesByCategory = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((acc, t) => {
+        acc[t.category] = (acc[t.category] || 0) + t.amount;
+        return acc;
+      }, {} as Record<string, number>);
+      
+    return {
+      totalIncome,
+      totalExpenses,
+      netBalance,
+      expensesByCategory
+    };
+  }
+};
