@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { SavingGoal, SavingsService } from '../services/SavingsService';
+import { Plus, Check, X, PiggyBank } from "lucide-react";
 
 interface SavingGoalsProps {
   savingGoals: SavingGoal[];
@@ -20,6 +21,8 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({
   const [isAddingGoal, setIsAddingGoal] = useState(false);
   const [newGoalName, setNewGoalName] = useState('');
   const [newGoalAmount, setNewGoalAmount] = useState('');
+  const [isAddingToGoal, setIsAddingToGoal] = useState<string | null>(null);
+  const [amountToAdd, setAmountToAdd] = useState('');
   
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +55,30 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({
     }
   };
   
+  const handleAddToGoal = async (goalId: string) => {
+    if (!amountToAdd) {
+      toast.error("Please enter an amount to add");
+      return;
+    }
+    
+    const amount = parseFloat(amountToAdd);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+    
+    try {
+      await SavingsService.addToSavingGoal(goalId, amount, new Date().toISOString().split('T')[0]);
+      toast.success(`Added $${amount.toFixed(2)} to your savings!`);
+      setIsAddingToGoal(null);
+      setAmountToAdd('');
+      onGoalUpdated();
+    } catch (error) {
+      console.error('Error adding to goal:', error);
+      toast.error("Could not add to savings goal. Please try again.");
+    }
+  };
+  
   const handleToggleComplete = async (goalId: string, currentStatus: boolean) => {
     try {
       await SavingsService.toggleSavingGoalCompletion(goalId, !currentStatus);
@@ -77,7 +104,11 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({
           onClick={() => setIsAddingGoal(!isAddingGoal)}
           variant={isAddingGoal ? "outline" : "default"}
         >
-          {isAddingGoal ? "Cancel" : "Add Goal"}
+          {isAddingGoal ? "Cancel" : (
+            <>
+              <Plus className="mr-1 h-4 w-4" /> Add Goal
+            </>
+          )}
         </Button>
       </div>
       
@@ -112,12 +143,13 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({
             />
           </div>
           
-          <Button type="submit">Create Saving Goal</Button>
+          <Button type="submit" className="w-full">Create Saving Goal</Button>
         </form>
       )}
       
       {savingGoals.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <PiggyBank className="h-12 w-12 mx-auto text-gray-400 mb-3" />
           <p className="text-gray-500">You don't have any saving goals yet.</p>
           <p className="text-gray-500 text-sm mt-1">
             Create a goal or try saying "Saved $100 for vacation"
@@ -141,18 +173,58 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({
               
               <Progress value={calculateProgress(goal.current_amount, goal.target_amount)} className="h-2 mb-3" />
               
-              <div className="flex justify-between items-center">
+              <div className="flex flex-wrap justify-between items-center gap-2">
                 <div className="text-sm text-gray-500">
                   {calculateProgress(goal.current_amount, goal.target_amount).toFixed(0)}% complete
                 </div>
                 
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleToggleComplete(goal.id, goal.completed)}
-                >
-                  {goal.completed ? "Mark Incomplete" : "Mark Complete"}
-                </Button>
+                <div className="flex space-x-2">
+                  {isAddingToGoal === goal.id ? (
+                    <div className="flex items-center space-x-1">
+                      <Input
+                        type="number"
+                        value={amountToAdd}
+                        onChange={(e) => setAmountToAdd(e.target.value)}
+                        placeholder="Amount"
+                        className="w-24 h-8 text-sm"
+                        min="1"
+                        step="1"
+                      />
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => handleAddToGoal(goal.id)}
+                        className="h-8 w-8"
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => setIsAddingToGoal(null)}
+                        className="h-8 w-8"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setIsAddingToGoal(goal.id)}
+                    >
+                      Add to Goal
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    variant={goal.completed ? "outline" : "default"}
+                    size="sm"
+                    onClick={() => handleToggleComplete(goal.id, goal.completed)}
+                  >
+                    {goal.completed ? "Mark Incomplete" : "Mark Complete"}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

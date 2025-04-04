@@ -16,7 +16,20 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Transaction } from '../services/TransactionService';
+import { Transaction, TransactionService } from '../services/TransactionService';
+import { 
+  ChevronDown, 
+  ChevronUp, 
+  RepeatIcon,
+  MoreHorizontal 
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -27,13 +40,21 @@ interface TransactionsTableProps {
     minAmount: string;
     maxAmount: string;
   };
+  onTransactionUpdated: () => void;
 }
+
+type SortConfig = {
+  key: keyof Transaction | '';
+  direction: 'asc' | 'desc';
+};
 
 const TransactionsTable: React.FC<TransactionsTableProps> = ({ 
   transactions,
-  filters
+  filters,
+  onTransactionUpdated
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'date', direction: 'desc' });
   const itemsPerPage = 10;
   
   // Apply filters to transactions
@@ -57,15 +78,28 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
       return false;
     }
     
-    // Filter by date range is handled elsewhere (when fetching transactions)
-    
     return true;
   });
   
+  // Sort transactions
+  const sortedTransactions = React.useMemo(() => {
+    if (!sortConfig.key) return filteredTransactions;
+    
+    return [...filteredTransactions].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [filteredTransactions, sortConfig]);
+  
   // Calculate pagination
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedTransactions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedTransactions = sortedTransactions.slice(startIndex, startIndex + itemsPerPage);
   
   // Format date
   const formatDate = (dateString: string) => {
@@ -73,8 +107,41 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     return date.toLocaleDateString();
   };
   
+  // Handle sort
+  const handleSort = (key: keyof Transaction) => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+  
+  // Render sort icon
+  const renderSortIcon = (key: keyof Transaction) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === 'asc' ? <ChevronUp className="inline h-4 w-4" /> : <ChevronDown className="inline h-4 w-4" />;
+  };
+  
+  // Toggle recurring status
+  const handleToggleRecurring = async (id: string, isRecurring: boolean) => {
+    try {
+      await TransactionService.updateTransaction(id, { 
+        is_recurring: !isRecurring,
+        recurrence_interval: !isRecurring ? 'monthly' : undefined
+      });
+      onTransactionUpdated();
+      toast.success(!isRecurring ? 'Marked as recurring' : 'Removed recurring status');
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+      toast.error('Failed to update transaction');
+    }
+  };
+  
   return (
-    <div className="w-full overflow-auto">
+    <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="p-4 border-b">
+        <h3 className="text-lg font-semibold">Your Transactions</h3>
+      </div>
+      
       {filteredTransactions.length === 0 ? (
         <div className="py-8 text-center text-gray-500">
           No transactions found with the current filters.
@@ -84,11 +151,38 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="w-full">Description</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead 
+                  className="cursor-pointer"
+                  onClick={() => handleSort('date')}
+                >
+                  Date {renderSortIcon('date')}
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer"
+                  onClick={() => handleSort('type')}
+                >
+                  Type {renderSortIcon('type')}
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer"
+                  onClick={() => handleSort('category')}
+                >
+                  Category {renderSortIcon('category')}
+                </TableHead>
+                <TableHead 
+                  className="w-full cursor-pointer"
+                  onClick={() => handleSort('description')}
+                >
+                  Description {renderSortIcon('description')}
+                </TableHead>
+                <TableHead 
+                  className="text-right cursor-pointer"
+                  onClick={() => handleSort('amount')}
+                >
+                  Amount {renderSortIcon('amount')}
+                </TableHead>
+                <TableHead className="w-10">Recurring</TableHead>
+                <TableHead className="w-10">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -109,23 +203,44 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   }`}>
                     {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
                   </TableCell>
+                  <TableCell>
+                    {transaction.is_recurring && (
+                      <div className="flex items-center justify-center">
+                        <RepeatIcon className="h-4 w-4 text-blue-500" />
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem 
+                          onClick={() => handleToggleRecurring(transaction.id, !!transaction.is_recurring)}
+                        >
+                          {transaction.is_recurring ? 'Remove recurring' : 'Mark as recurring'}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
           
           {totalPages > 1 && (
-            <div className="mt-4">
+            <div className="p-4 border-t">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    {currentPage === 1 ? (
-                      <PaginationPrevious className="pointer-events-none opacity-50" />
-                    ) : (
-                      <PaginationPrevious 
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      />
-                    )}
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
+                    />
                   </PaginationItem>
                   
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -160,13 +275,10 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   )}
                   
                   <PaginationItem>
-                    {currentPage === totalPages ? (
-                      <PaginationNext className="pointer-events-none opacity-50" />
-                    ) : (
-                      <PaginationNext 
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      />
-                    )}
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
+                    />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

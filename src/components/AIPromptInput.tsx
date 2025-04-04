@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { TransactionService } from '../services/TransactionService';
 import { SavingsService } from '../services/SavingsService';
+import { CalendarIcon } from "lucide-react";
 
 interface AIPromptInputProps {
   onTransactionAdded: () => void;
@@ -55,7 +56,8 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
           description: parsedData.description,
           category: parsedData.category,
           type: parsedData.type as 'expense' | 'income',
-          date: parsedData.date
+          date: parsedData.date,
+          is_recurring: false
         });
         
         toast.success(
@@ -77,24 +79,25 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   };
   
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8 sticky top-4 z-10">
-      <h2 className="text-lg font-semibold mb-4">Enter your transaction</h2>
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6 sticky top-4 z-10">
+      <h2 className="text-xl font-semibold mb-4">Enter your transaction</h2>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-grow">
+        <div className="flex-grow relative">
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="e.g. Spent $35 on groceries yesterday"
-            className="w-full"
+            className="w-full pr-10"
             disabled={isProcessing}
           />
+          <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
         </div>
-        <Button type="submit" disabled={isProcessing}>
+        <Button type="submit" disabled={isProcessing} className="min-w-[100px]">
           {isProcessing ? "Processing..." : "Add"}
         </Button>
       </form>
       <p className="text-sm text-gray-500 mt-2">
-        Try: "Spent $25 on dinner", "Received $1500 salary", or "Saved $100 for vacation"
+        Try: "Received $1500 salary", or "Saved $100 for vacation"
       </p>
     </div>
   );

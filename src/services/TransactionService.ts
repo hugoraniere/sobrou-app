@@ -10,6 +10,8 @@ export interface Transaction {
   type: 'expense' | 'income';
   date: string;
   created_at: string;
+  is_recurring?: boolean;
+  recurrence_interval?: string;
 }
 
 export interface ParsedExpense {
@@ -20,6 +22,8 @@ export interface ParsedExpense {
   description: string;
   isSaving: boolean;
   savingGoal: string | null;
+  is_recurring?: boolean;
+  recurrence_interval?: string;
 }
 
 export const TransactionService = {
@@ -102,6 +106,23 @@ export const TransactionService = {
     }
     
     return data as Transaction[] || [];
+  },
+  
+  // Update a transaction (for marking as recurring)
+  async updateTransaction(id: string, updates: Partial<Transaction>): Promise<Transaction> {
+    const { data, error } = await supabase
+      .from('transactions')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error updating transaction:', error);
+      throw error;
+    }
+    
+    return data as Transaction;
   },
   
   // Get summary stats for a given date range

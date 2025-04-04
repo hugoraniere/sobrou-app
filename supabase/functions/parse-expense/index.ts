@@ -16,9 +16,12 @@ function parseExpenseText(text: string) {
   // Determine type (expense or income)
   const incomeKeywords = ["received", "earned", "salary", "income", "payment", "paid me", "freelance", "bonus"];
   const savingKeywords = ["saved", "saving", "savings", "put aside", "fund", "goal"];
+  const recurringKeywords = ["monthly", "weekly", "recurring", "every month", "subscription", "bill"];
   
   let type = "expense"; // default
   let isSaving = false;
+  let isRecurring = false;
+  let recurrenceInterval = null;
   
   for (const keyword of incomeKeywords) {
     if (text.includes(keyword)) {
@@ -30,6 +33,22 @@ function parseExpenseText(text: string) {
   for (const keyword of savingKeywords) {
     if (text.includes(keyword)) {
       isSaving = true;
+      break;
+    }
+  }
+  
+  for (const keyword of recurringKeywords) {
+    if (text.includes(keyword)) {
+      isRecurring = true;
+      if (text.includes("weekly")) {
+        recurrenceInterval = "weekly";
+      } else if (text.includes("monthly")) {
+        recurrenceInterval = "monthly";
+      } else if (text.includes("yearly") || text.includes("annual")) {
+        recurrenceInterval = "yearly";
+      } else {
+        recurrenceInterval = "monthly"; // default
+      }
       break;
     }
   }
@@ -115,7 +134,9 @@ function parseExpenseText(text: string) {
     date,
     description,
     isSaving,
-    savingGoal
+    savingGoal,
+    is_recurring: isRecurring,
+    recurrence_interval: recurrenceInterval
   };
 }
 
