@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from '../../contexts/AuthContext';
+import { useSearchParams } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -30,7 +32,17 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
   const { login } = useAuth();
+
+  // Check for verification success in URL params
+  useEffect(() => {
+    const verification = searchParams.get('verification');
+    if (verification === 'success') {
+      setVerificationSuccess(true);
+    }
+  }, [searchParams]);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -44,13 +56,21 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
     try {
       await login(values.email, values.password);
       toast.success("Login successful!");
-    } catch (error) {
-      toast.error("Login failed. Please check your credentials.");
+    } catch (error: any) {
+      toast.error(error.message || "Login failed. Please check your credentials.");
     }
   };
 
   return (
     <Form {...form}>
+      {verificationSuccess && (
+        <Alert className="mb-4 bg-green-50 border-green-200">
+          <AlertDescription className="text-green-800">
+            Email verified successfully! You can now log in.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
         <FormField
           control={form.control}

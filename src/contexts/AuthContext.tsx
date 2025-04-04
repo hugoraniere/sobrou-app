@@ -1,144 +1,193 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '../integrations/supabase/client';
+import { Session, User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
-type User = {
+type UserProfile = {
   id: string;
-  email: string;
   fullName: string;
+  email: string;
 };
 
 type AuthContextType = {
-  user: User | null;
+  user: UserProfile | null;
+  session: Session | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (fullName: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if user is already logged in (from localStorage in this example)
+  // Initialize the auth state
   useEffect(() => {
-    const storedUser = localStorage.getItem('financebot_user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
-    }
-    
-    // Handle routing based on auth state
-    handleInitialRouting();
+    // Set up the auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        setSession(currentSession);
+        setIsAuthenticated(!!currentSession);
+        
+        if (currentSession?.user) {
+          // Format user data for our app
+          setUser({
+            id: currentSession.user.id,
+            email: currentSession.user.email || '',
+            fullName: currentSession.user.user_metadata.full_name || ''
+          });
+        } else {
+          setUser(null);
+        }
+
+        setIsLoading(false);
+      }
+    );
+
+    // Get the initial session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        setSession(initialSession);
+        setIsAuthenticated(!!initialSession);
+        
+        if (initialSession?.user) {
+          // Format user data for our app
+          setUser({
+            id: initialSession.user.id,
+            email: initialSession.user.email || '',
+            fullName: initialSession.user.user_metadata.full_name || ''
+          });
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    // Cleanup
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  // Handle routing when authentication state changes
+  // Handle protected routes
   useEffect(() => {
-    handleProtectedRoutes();
-  }, [location.pathname, isAuthenticated]);
+    if (isLoading) return;
 
-  const handleInitialRouting = () => {
-    // Initial routing logic when app first loads
-    const storedUser = localStorage.getItem('financebot_user');
-    const isAuth = !!storedUser;
-    
-    // If logged in and trying to access auth pages, redirect to dashboard
-    if (isAuth && (location.pathname === '/auth')) {
-      navigate('/');
-    }
-  };
-  
-  const handleProtectedRoutes = () => {
-    // Don't redirect during initial load
-    if (location.key === 'default') return;
-    
-    // Redirect unauthenticated users trying to access protected routes
-    const protectedRoutes = ['/', '/integration'];
-    const authRoutes = ['/auth'];
-    const currentPath = location.pathname;
-    
-    if (!isAuthenticated && protectedRoutes.includes(currentPath)) {
-      navigate('/auth');
-    }
-    
-    if (isAuthenticated && authRoutes.includes(currentPath)) {
-      navigate('/');
-    }
-  };
+    const handleRouteProtection = () => {
+      const publicRoutes = ['/auth'];
+      const isPublicRoute = publicRoutes.includes(location.pathname);
+
+      // Redirect authenticated users away from auth pages
+      if (isAuthenticated && isPublicRoute) {
+        navigate('/');
+      }
+      
+      // Redirect unauthenticated users to the auth page
+      if (!isAuthenticated && !isPublicRoute) {
+        navigate('/auth');
+      }
+    };
+
+    handleRouteProtection();
+  }, [isAuthenticated, isLoading, location.pathname, navigate]);
 
   const login = async (email: string, password: string) => {
     try {
-      // Simulate API call for login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create mock user (in a real app, this would come from your backend)
-      const mockUser = {
-        id: '123456',
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        fullName: 'Demo User'
-      };
-      
-      // Store user in localStorage
-      localStorage.setItem('financebot_user', JSON.stringify(mockUser));
-      
-      // Update state
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      
-      // Redirect to dashboard
+        password
+      });
+
+      if (error) {
+        // Check for unverified email error
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('Please verify your email before logging in.');
+        }
+        throw new Error(error.message);
+      }
+
+      // After successful login
       navigate('/');
-    } catch (error) {
+      return;
+    } catch (error: any) {
       console.error('Login failed:', error);
-      throw new Error('Login failed. Please check your credentials.');
+      throw new Error(error.message || 'Login failed. Please check your credentials.');
     }
   };
 
   const signup = async (fullName: string, email: string, password: string) => {
     try {
-      // Simulate API call for signup
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create new user
-      const newUser = {
-        id: `user_${Date.now()}`,
+      const { data, error } = await supabase.auth.signUp({
         email,
-        fullName
-      };
-      
-      // Store user in localStorage
-      localStorage.setItem('financebot_user', JSON.stringify(newUser));
-      
-      // Update state
-      setUser(newUser);
-      setIsAuthenticated(true);
-      
-      // Redirect to dashboard
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          },
+          emailRedirectTo: `${window.location.origin}/auth?verification=success`
+        }
+      });
+
+      if (error) throw new Error(error.message);
+
+      // Return early if email confirmation is required
+      if (data.user?.identities?.length === 0) {
+        throw new Error('This email is already registered.');
+      }
+
+      // Check if email confirmation is needed
+      if (data.user && !data.user.confirmed_at) {
+        toast.success('Registration successful! Please check your email to verify your account.');
+        return;
+      }
+
+      // If no email confirmation needed, user is logged in automatically
       navigate('/');
-    } catch (error) {
+      return;
+    } catch (error: any) {
       console.error('Signup failed:', error);
-      throw new Error('Signup failed. Please try again.');
+      throw new Error(error.message || 'Registration failed. Please try again.');
     }
   };
 
-  const logout = () => {
-    // Remove user from localStorage
-    localStorage.removeItem('financebot_user');
-    
-    // Update state
-    setUser(null);
-    setIsAuthenticated(false);
-    
-    // Redirect to landing page
-    navigate('/auth');
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw new Error(error.message);
+      
+      // Auth state listener will handle clearing user state
+      navigate('/auth');
+    } catch (error: any) {
+      console.error('Logout failed:', error);
+      throw new Error('Logout failed. Please try again.');
+    }
   };
   
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, signup, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session,
+      isAuthenticated, 
+      isLoading,
+      login, 
+      signup, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

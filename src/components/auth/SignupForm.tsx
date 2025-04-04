@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from '../../contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -36,6 +37,7 @@ interface SignupFormProps {
 const SignupForm: React.FC<SignupFormProps> = ({ setActiveTab }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { signup } = useAuth();
 
   const form = useForm<SignupFormValues>({
@@ -51,9 +53,10 @@ const SignupForm: React.FC<SignupFormProps> = ({ setActiveTab }) => {
   const handleSignup = async (values: SignupFormValues) => {
     try {
       await signup(values.fullName, values.email, values.password);
-      toast.success("Account created successfully!");
-    } catch (error) {
-      toast.error("Failed to create account. Please try again.");
+      setEmailSent(true);
+      form.reset();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account. Please try again.");
     }
   };
 
@@ -64,6 +67,26 @@ const SignupForm: React.FC<SignupFormProps> = ({ setActiveTab }) => {
     if (password.length >= 8) return { label: "Strong", color: "text-green-500" };
     return null;
   };
+
+  if (emailSent) {
+    return (
+      <div className="space-y-4">
+        <Alert className="bg-blue-50 border-blue-200">
+          <AlertDescription className="text-blue-800">
+            <p className="mb-2 font-medium">Verification email sent!</p>
+            <p>We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.</p>
+          </AlertDescription>
+        </Alert>
+        <Button 
+          variant="outline" 
+          className="w-full"
+          onClick={() => setActiveTab("login")}
+        >
+          Return to Login
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>

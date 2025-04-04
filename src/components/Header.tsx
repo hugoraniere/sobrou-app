@@ -13,8 +13,12 @@ const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
   
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
   
   return (

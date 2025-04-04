@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
 import LoginForm from '../components/auth/LoginForm';
@@ -11,13 +11,22 @@ import SignupForm from '../components/auth/SignupForm';
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+
+  // Check for verification parameter in URL
+  useEffect(() => {
+    const verification = searchParams.get('verification');
+    if (verification === 'success') {
+      setActiveTab('login');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!isLoading && isAuthenticated) {
       navigate('/');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50">
