@@ -26,11 +26,11 @@ export const TransactionService = {
   // Parse expense text using the edge function
   async parseExpenseText(text: string): Promise<ParsedExpense> {
     try {
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/parse-expense`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jevsazpwfowhmjupuuzw.supabase.co'}/functions/v1/parse-expense`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnNhenB3Zm93aG1qdXB1dXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3Njg5MjcsImV4cCI6MjA1OTM0NDkyN30.ZvIahA6EAPrVKSEUoRXDFJn6LeyqF-7_QM-Qv5O8Pn8'}`
         },
         body: JSON.stringify({ text })
       });
@@ -58,7 +58,7 @@ export const TransactionService = {
       throw error;
     }
     
-    return data || [];
+    return data as Transaction[] || [];
   },
   
   // Add a new transaction
@@ -74,7 +74,7 @@ export const TransactionService = {
       throw error;
     }
     
-    return data;
+    return data as Transaction;
   },
   
   // Get transactions by date range
@@ -91,7 +91,7 @@ export const TransactionService = {
       throw error;
     }
     
-    return data || [];
+    return data as Transaction[] || [];
   },
   
   // Get summary stats for a given date range

@@ -33,7 +33,7 @@ export const SavingsService = {
       throw error;
     }
     
-    return data || [];
+    return data as SavingGoal[] || [];
   },
   
   // Add a new saving goal
@@ -54,7 +54,7 @@ export const SavingsService = {
       throw error;
     }
     
-    return data;
+    return data as SavingGoal;
   },
   
   // Add money to a saving goal
@@ -85,8 +85,9 @@ export const SavingsService = {
       throw goalError;
     }
     
-    const newAmount = goal.current_amount + amount;
-    const completed = newAmount >= goal.target_amount;
+    const typedGoal = goal as SavingGoal;
+    const newAmount = typedGoal.current_amount + amount;
+    const completed = newAmount >= typedGoal.target_amount;
     
     const { data: updatedGoal, error: updateError } = await supabase
       .from('saving_goals')
@@ -104,7 +105,7 @@ export const SavingsService = {
       throw updateError;
     }
     
-    return updatedGoal;
+    return updatedGoal as SavingGoal;
   },
   
   // Find or create a saving goal by name
@@ -123,7 +124,7 @@ export const SavingsService = {
     
     // If found, return the first match
     if (existingGoals && existingGoals.length > 0) {
-      return existingGoals[0];
+      return existingGoals[0] as SavingGoal;
     }
     
     // Otherwise, create a new goal
@@ -146,7 +147,7 @@ export const SavingsService = {
       throw error;
     }
     
-    return data || [];
+    return data as SavingTransaction[] || [];
   },
   
   // Mark a saving goal as complete or incomplete
@@ -166,7 +167,7 @@ export const SavingsService = {
       throw error;
     }
     
-    return data;
+    return data as SavingGoal;
   },
   
   // Get total savings amount
@@ -180,6 +181,6 @@ export const SavingsService = {
       throw error;
     }
     
-    return data?.reduce((total, goal) => total + goal.current_amount, 0) || 0;
+    return (data as SavingGoal[])?.reduce((total, goal) => total + goal.current_amount, 0) || 0;
   }
 };

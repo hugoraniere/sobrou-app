@@ -119,10 +119,13 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                    />
+                    {currentPage === 1 ? (
+                      <PaginationPrevious className="pointer-events-none opacity-50" />
+                    ) : (
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      />
+                    )}
                   </PaginationItem>
                   
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -157,10 +160,13 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   )}
                   
                   <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                    />
+                    {currentPage === totalPages ? (
+                      <PaginationNext className="pointer-events-none opacity-50" />
+                    ) : (
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      />
+                    )}
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
