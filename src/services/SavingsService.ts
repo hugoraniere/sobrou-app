@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export interface SavingGoal {
@@ -38,13 +39,21 @@ export const SavingsService = {
   
   // Add a new saving goal
   async addSavingGoal(goal: Pick<SavingGoal, 'name' | 'target_amount'>): Promise<SavingGoal> {
+    // Get the current user's ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('You must be logged in to create a saving goal');
+    }
+    
     const { data, error } = await supabase
       .from('saving_goals')
       .insert([{
         name: goal.name,
         target_amount: goal.target_amount,
         current_amount: 0,
-        completed: false
+        completed: false,
+        user_id: user.id
       }])
       .select()
       .single();
@@ -59,13 +68,21 @@ export const SavingsService = {
   
   // Add money to a saving goal
   async addToSavingGoal(goalId: string, amount: number, date: string): Promise<SavingGoal> {
+    // Get the current user's ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('You must be logged in to update a saving goal');
+    }
+    
     // First, add the transaction
     const { error: transactionError } = await supabase
       .from('saving_transactions')
       .insert([{
         saving_goal_id: goalId,
         amount,
-        date
+        date,
+        user_id: user.id
       }]);
       
     if (transactionError) {

@@ -63,9 +63,19 @@ export const TransactionService = {
   
   // Add a new transaction
   async addTransaction(transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at'>): Promise<Transaction> {
+    // Get the current user's ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('You must be logged in to add a transaction');
+    }
+    
     const { data, error } = await supabase
       .from('transactions')
-      .insert([transaction])
+      .insert([{
+        ...transaction,
+        user_id: user.id
+      }])
       .select()
       .single();
       
