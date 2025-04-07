@@ -32,6 +32,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     try {
       // Use AI to parse the text input
       const parsedData = await TransactionService.parseExpenseText(inputValue);
+      console.log("Parsed data:", parsedData);
       
       if (parsedData.amount <= 0) {
         toast.error("Could not detect a valid amount. Please include a number in your description.");
@@ -57,7 +58,8 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
           category: parsedData.category,
           type: parsedData.type as 'expense' | 'income',
           date: parsedData.date,
-          is_recurring: false
+          is_recurring: parsedData.is_recurring,
+          recurrence_interval: parsedData.recurrence_interval
         });
         
         toast.success(

@@ -7,11 +7,13 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
  */
 function parseExpenseText(text: string) {
   text = text.toLowerCase();
+  console.log("Parsing text:", text);
   
   // Extract amount
   const amountRegex = /(\$|r\$)?(\d+(\.\d+)?)/i;
   const amountMatch = text.match(amountRegex);
   const amount = amountMatch ? parseFloat(amountMatch[2]) : 0;
+  console.log("Extracted amount:", amount);
   
   // Determine type (expense or income)
   const incomeKeywords = ["received", "earned", "salary", "income", "payment", "paid me", "freelance", "bonus"];
@@ -127,7 +129,7 @@ function parseExpenseText(text: string) {
     description = description.substring(0, 47) + "...";
   }
   
-  return {
+  const result = {
     amount,
     type,
     category,
@@ -138,16 +140,30 @@ function parseExpenseText(text: string) {
     is_recurring: isRecurring,
     recurrence_interval: recurrenceInterval
   };
+  
+  console.log("Parsed result:", result);
+  return result;
 }
 
 serve(async (req) => {
   try {
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+    
+    // Handle CORS preflight requests
+    if (req.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
+    
     const { text } = await req.json();
+    console.log("Received text to parse:", text);
     
     if (!text) {
       return new Response(
         JSON.stringify({ error: "Text input is required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
@@ -155,9 +171,10 @@ serve(async (req) => {
     
     return new Response(
       JSON.stringify(parsedData),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    console.error("Error in parse-expense function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { "Content-Type": "application/json" } }

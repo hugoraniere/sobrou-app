@@ -30,6 +30,7 @@ export const TransactionService = {
   // Parse expense text using the edge function
   async parseExpenseText(text: string): Promise<ParsedExpense> {
     try {
+      console.log("Sending text to parse-expense function:", text);
       const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jevsazpwfowhmjupuuzw.supabase.co'}/functions/v1/parse-expense`, {
         method: 'POST',
         headers: {
@@ -40,10 +41,14 @@ export const TransactionService = {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to parse expense text');
+        const errorData = await response.json();
+        console.error('Parse expense error response:', errorData);
+        throw new Error(`Failed to parse expense text: ${response.status} ${response.statusText}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      console.log("Parsed expense data:", data);
+      return data;
     } catch (error) {
       console.error('Error parsing expense text:', error);
       throw error;
@@ -73,6 +78,8 @@ export const TransactionService = {
     if (!user) {
       throw new Error('You must be logged in to add a transaction');
     }
+    
+    console.log("Adding transaction:", { ...transaction, user_id: user.id });
     
     const { data, error } = await supabase
       .from('transactions')
