@@ -10,8 +10,6 @@ export interface Transaction {
   type: 'expense' | 'income';
   date: string;
   created_at: string;
-  is_recurring?: boolean;
-  recurrence_interval?: string;
 }
 
 export interface ParsedExpense {
@@ -22,8 +20,6 @@ export interface ParsedExpense {
   description: string;
   isSaving: boolean;
   savingGoal: string | null;
-  is_recurring?: boolean;
-  recurrence_interval?: string;
 }
 
 export const TransactionService = {
@@ -80,12 +76,15 @@ export const TransactionService = {
       throw new Error('You must be logged in to add a transaction');
     }
     
-    console.log("Adding transaction:", { ...transaction, user_id: user.id });
+    // Remove the fields that don't exist in the database schema
+    const { is_recurring, recurrence_interval, ...transactionData } = transaction as any;
+    
+    console.log("Adding transaction:", { ...transactionData, user_id: user.id });
     
     const { data, error } = await supabase
       .from('transactions')
       .insert([{
-        ...transaction,
+        ...transactionData,
         user_id: user.id
       }])
       .select()
@@ -116,7 +115,7 @@ export const TransactionService = {
     return data as Transaction[] || [];
   },
   
-  // Update a transaction (for marking as recurring)
+  // Update a transaction
   async updateTransaction(id: string, updates: Partial<Transaction>): Promise<Transaction> {
     const { data, error } = await supabase
       .from('transactions')

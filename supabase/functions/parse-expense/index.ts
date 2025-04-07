@@ -3,22 +3,45 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 /**
  * Simple NLP function to parse expense information from user text input
- * In a real application, this would use a more sophisticated NLP model
+ * Now with support for Portuguese and improved currency handling
  */
 function parseExpenseText(text: string) {
   text = text.toLowerCase();
   console.log("Parsing text:", text);
   
-  // Extract amount
-  const amountRegex = /(\$|r\$)?(\d+(\.\d+)?)/i;
+  // Extract amount - now with support for comma as decimal separator (European/Brazilian format)
+  // and currency symbols for BRL (R$)
+  const amountRegex = /(r\$|\$)?(\d+(?:[.,]\d+)?)/i;
   const amountMatch = text.match(amountRegex);
-  const amount = amountMatch ? parseFloat(amountMatch[2]) : 0;
+  let amount = 0;
+  
+  if (amountMatch) {
+    // Replace comma with dot for proper parsing
+    amount = parseFloat(amountMatch[2].replace(',', '.'));
+  }
   console.log("Extracted amount:", amount);
   
   // Determine type (expense or income)
-  const incomeKeywords = ["received", "earned", "salary", "income", "payment", "paid me", "freelance", "bonus"];
-  const savingKeywords = ["saved", "saving", "savings", "put aside", "fund", "goal"];
-  const recurringKeywords = ["monthly", "weekly", "recurring", "every month", "subscription", "bill"];
+  const incomeKeywords = [
+    // English
+    "received", "earned", "salary", "income", "payment", "paid me", "freelance", "bonus",
+    // Portuguese
+    "recebi", "ganhei", "salário", "salario", "pagamento", "me pagou", "freelancer", "bônus", "bonus", "pix"
+  ];
+  
+  const savingKeywords = [
+    // English
+    "saved", "saving", "savings", "put aside", "fund", "goal",
+    // Portuguese
+    "economizei", "poupei", "guardar", "guardei", "poupança", "poupanca", "reserva"
+  ];
+  
+  const recurringKeywords = [
+    // English
+    "monthly", "weekly", "recurring", "every month", "subscription", "bill",
+    // Portuguese
+    "mensal", "semanal", "recorrente", "todo mês", "todo mes", "assinatura", "conta"
+  ];
   
   let type = "expense"; // default
   let isSaving = false;
@@ -42,11 +65,11 @@ function parseExpenseText(text: string) {
   for (const keyword of recurringKeywords) {
     if (text.includes(keyword)) {
       isRecurring = true;
-      if (text.includes("weekly")) {
+      if (text.includes("weekly") || text.includes("semanal")) {
         recurrenceInterval = "weekly";
-      } else if (text.includes("monthly")) {
+      } else if (text.includes("monthly") || text.includes("mensal")) {
         recurrenceInterval = "monthly";
-      } else if (text.includes("yearly") || text.includes("annual")) {
+      } else if (text.includes("yearly") || text.includes("annual") || text.includes("anual")) {
         recurrenceInterval = "yearly";
       } else {
         recurrenceInterval = "monthly"; // default
@@ -59,15 +82,15 @@ function parseExpenseText(text: string) {
   const today = new Date();
   let date = today.toISOString().split('T')[0];
   
-  if (text.includes("yesterday")) {
+  if (text.includes("yesterday") || text.includes("ontem")) {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     date = yesterday.toISOString().split('T')[0];
-  } else if (text.includes("last week")) {
+  } else if (text.includes("last week") || text.includes("semana passada")) {
     const lastWeek = new Date(today);
     lastWeek.setDate(lastWeek.getDate() - 7);
     date = lastWeek.toISOString().split('T')[0];
-  } else if (text.includes("last month")) {
+  } else if (text.includes("last month") || text.includes("mês passado") || text.includes("mes passado")) {
     const lastMonth = new Date(today);
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     date = lastMonth.toISOString().split('T')[0];
@@ -77,16 +100,66 @@ function parseExpenseText(text: string) {
   let category = "Other";
   
   const categoryMapping: Record<string, string[]> = {
-    "Food": ["food", "grocery", "groceries", "restaurant", "lunch", "dinner", "breakfast", "meal", "snack", "coffee"],
-    "Transportation": ["transport", "uber", "lyft", "taxi", "bus", "train", "gas", "fuel", "car", "ride"],
-    "Housing": ["rent", "mortgage", "apartment", "house", "housing"],
-    "Entertainment": ["movie", "game", "entertainment", "concert", "theatre", "theater", "show"],
-    "Shopping": ["clothes", "clothing", "shop", "shopping", "mall", "store", "amazon"],
-    "Utilities": ["electricity", "water", "bill", "utility", "utilities", "internet", "phone", "subscription"],
-    "Health": ["doctor", "medical", "medicine", "health", "healthcare", "hospital", "therapy"],
-    "Education": ["book", "course", "class", "tuition", "education", "school", "college", "university"],
-    "Income": ["salary", "wage", "payment", "income", "freelance", "contract", "bonus", "received"],
-    "Savings": ["saving", "saved", "fund", "emergency"]
+    "Food": [
+      // English
+      "food", "grocery", "groceries", "restaurant", "lunch", "dinner", "breakfast", "meal", "snack", "coffee",
+      // Portuguese
+      "comida", "mercado", "restaurante", "almoço", "almoco", "jantar", "café da manhã", "cafe da manha", "lanche", "café", "cafe"
+    ],
+    "Transportation": [
+      // English
+      "transport", "uber", "lyft", "taxi", "bus", "train", "gas", "fuel", "car", "ride",
+      // Portuguese
+      "transporte", "táxi", "taxi", "ônibus", "onibus", "trem", "metrô", "metro", "gasolina", "combustível", "combustivel", "carro", "corrida"
+    ],
+    "Housing": [
+      // English
+      "rent", "mortgage", "apartment", "house", "housing",
+      // Portuguese
+      "aluguel", "hipoteca", "apartamento", "casa", "moradia", "condomínio", "condominio"
+    ],
+    "Entertainment": [
+      // English
+      "movie", "game", "entertainment", "concert", "theatre", "theater", "show",
+      // Portuguese
+      "filme", "cinema", "jogo", "entretenimento", "concerto", "teatro", "show"
+    ],
+    "Shopping": [
+      // English
+      "clothes", "clothing", "shop", "shopping", "mall", "store", "amazon",
+      // Portuguese
+      "roupa", "roupas", "compra", "compras", "shopping", "loja", "lojinha"
+    ],
+    "Utilities": [
+      // English
+      "electricity", "water", "bill", "utility", "utilities", "internet", "phone", "subscription",
+      // Portuguese
+      "eletricidade", "água", "agua", "conta", "utilidade", "utilidades", "internet", "telefone", "celular", "assinatura"
+    ],
+    "Health": [
+      // English
+      "doctor", "medical", "medicine", "health", "healthcare", "hospital", "therapy",
+      // Portuguese
+      "médico", "medico", "remédio", "remedio", "saúde", "saude", "hospital", "terapia", "farmácia", "farmacia"
+    ],
+    "Education": [
+      // English
+      "book", "course", "class", "tuition", "education", "school", "college", "university",
+      // Portuguese
+      "livro", "curso", "aula", "mensalidade", "educação", "educacao", "escola", "faculdade", "universidade"
+    ],
+    "Income": [
+      // English
+      "salary", "wage", "payment", "income", "freelance", "contract", "bonus", "received",
+      // Portuguese
+      "salário", "salario", "pagamento", "renda", "freelancer", "contrato", "bônus", "bonus", "recebi"
+    ],
+    "Savings": [
+      // English
+      "saving", "saved", "fund", "emergency",
+      // Portuguese
+      "poupança", "poupanca", "economizei", "fundo", "emergência", "emergencia"
+    ]
   };
   
   for (const [cat, keywords] of Object.entries(categoryMapping)) {
@@ -107,7 +180,8 @@ function parseExpenseText(text: string) {
   // Extract saving goal name if it's a saving
   let savingGoal = null;
   if (isSaving) {
-    const savingWords = ["for", "to", "in", "into"];
+    // Try to find phrases like "for vacation" or "para férias"
+    const savingWords = ["for", "to", "in", "into", "para", "em"];
     for (const word of savingWords) {
       const regex = new RegExp(`${word} ([\\w\\s]+)`, "i");
       const match = text.match(regex);
@@ -136,9 +210,7 @@ function parseExpenseText(text: string) {
     date,
     description,
     isSaving,
-    savingGoal,
-    is_recurring: isRecurring,
-    recurrence_interval: recurrenceInterval
+    savingGoal
   };
   
   console.log("Parsed result:", result);
