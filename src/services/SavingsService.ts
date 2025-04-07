@@ -92,9 +92,25 @@ export const SavingsService = {
     }
     
     // 2. Update the saving goal's current amount
+    // First get the current amount
+    const { data: goalData, error: getGoalError } = await supabase
+      .from('saving_goals')
+      .select('current_amount')
+      .eq('id', goalId)
+      .single();
+      
+    if (getGoalError) {
+      console.error('Error getting saving goal:', getGoalError);
+      throw getGoalError;
+    }
+    
+    const currentAmount = goalData.current_amount as number;
+    const newAmount = currentAmount + amount;
+    
+    // Then update the goal with the new amount
     const { data: goal, error: updateError } = await supabase
       .from('saving_goals')
-      .update({ current_amount: supabase.rpc('increment_amount', { row_id: goalId, amount }) })
+      .update({ current_amount: newAmount })
       .eq('id', goalId)
       .select()
       .single();
