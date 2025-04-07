@@ -39,10 +39,7 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({
     }
     
     try {
-      await SavingsService.addSavingGoal({
-        name: newGoalName,
-        target_amount: amount
-      });
+      await SavingsService.createSavingGoal(newGoalName, amount);
       
       toast.success(`Created new saving goal: ${newGoalName}`);
       setNewGoalName('');

@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export interface SavingGoal {
@@ -146,6 +147,11 @@ export const SavingsService = {
     }
     
     return data as SavingGoal;
+  },
+  
+  // Toggle the completion status of a saving goal
+  async toggleSavingGoalCompletion(id: string, completed: boolean): Promise<SavingGoal> {
+    return this.updateSavingGoal(id, { completed });
   },
   
   // Get all transactions for a saving goal
