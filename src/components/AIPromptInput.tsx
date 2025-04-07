@@ -34,7 +34,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       const parsedData = await TransactionService.parseExpenseText(inputValue);
       console.log("Parsed data:", parsedData);
       
-      if (parsedData.amount <= 0) {
+      if (!parsedData || parsedData.amount <= 0) {
         toast.error("Could not detect a valid amount. Please include a number in your description.");
         setIsProcessing(false);
         return;
@@ -42,32 +42,42 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       
       // Handle saving entries differently
       if (parsedData.isSaving && parsedData.savingGoal) {
-        // Find or create the saving goal
-        const goal = await SavingsService.findOrCreateSavingGoal(parsedData.savingGoal);
-        
-        // Add money to the goal
-        await SavingsService.addToSavingGoal(goal.id, parsedData.amount, parsedData.date);
-        
-        toast.success(`Added $${parsedData.amount.toFixed(2)} to your ${goal.name} savings!`);
-        onSavingAdded();
+        try {
+          // Find or create the saving goal
+          const goal = await SavingsService.findOrCreateSavingGoal(parsedData.savingGoal);
+          
+          // Add money to the goal
+          await SavingsService.addToSavingGoal(goal.id, parsedData.amount, parsedData.date);
+          
+          toast.success(`Added $${parsedData.amount.toFixed(2)} to your ${goal.name} savings!`);
+          onSavingAdded();
+        } catch (savingError) {
+          console.error('Error processing saving:', savingError);
+          toast.error("Could not add to savings. Please try again.");
+        }
       } else {
-        // Add as a regular transaction
-        await TransactionService.addTransaction({
-          amount: parsedData.amount,
-          description: parsedData.description,
-          category: parsedData.category,
-          type: parsedData.type as 'expense' | 'income',
-          date: parsedData.date,
-          is_recurring: parsedData.is_recurring,
-          recurrence_interval: parsedData.recurrence_interval
-        });
-        
-        toast.success(
-          parsedData.type === 'income' 
-            ? `Recorded income of $${parsedData.amount.toFixed(2)}` 
-            : `Recorded expense of $${parsedData.amount.toFixed(2)}`
-        );
-        onTransactionAdded();
+        try {
+          // Add as a regular transaction
+          await TransactionService.addTransaction({
+            amount: parsedData.amount,
+            description: parsedData.description,
+            category: parsedData.category,
+            type: parsedData.type as 'expense' | 'income',
+            date: parsedData.date,
+            is_recurring: parsedData.is_recurring,
+            recurrence_interval: parsedData.recurrence_interval
+          });
+          
+          toast.success(
+            parsedData.type === 'income' 
+              ? `Recorded income of $${parsedData.amount.toFixed(2)}` 
+              : `Recorded expense of $${parsedData.amount.toFixed(2)}`
+          );
+          onTransactionAdded();
+        } catch (transactionError) {
+          console.error('Error adding transaction:', transactionError);
+          toast.error("Could not add the transaction. Please try again.");
+        }
       }
       
       // Reset the form
