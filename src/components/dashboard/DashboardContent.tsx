@@ -1,0 +1,105 @@
+
+import React from 'react';
+import { FinancialDashboard } from '../FinancialDashboard';
+import SavingGoals from '../SavingGoals';
+import EmptyDashboard from '../EmptyDashboard';
+import { Transaction } from '@/services/TransactionService';
+import { SavingGoal } from '@/services/SavingsService';
+import TransactionsTable from '../TransactionsTable';
+import OnboardingPanel from '../OnboardingPanel';
+import { X } from 'lucide-react';
+
+interface DashboardContentProps {
+  transactions: Transaction[];
+  filteredTransactions: Transaction[];
+  savingGoals: SavingGoal[];
+  filters: {
+    category: string;
+    type: string;
+    dateRange: string;
+    minAmount: string;
+    maxAmount: string;
+  };
+  isLoading: boolean;
+  hasTransactions: boolean;
+  onTransactionUpdated: () => void;
+  showOnboarding: boolean;
+  setShowOnboarding: (show: boolean) => void;
+  whatsAppConnected: boolean;
+  onSavingGoalAdded: () => void;
+  onSavingGoalUpdated: () => void;
+}
+
+const DashboardContent: React.FC<DashboardContentProps> = ({
+  transactions,
+  filteredTransactions,
+  savingGoals,
+  filters,
+  isLoading,
+  hasTransactions,
+  onTransactionUpdated,
+  showOnboarding,
+  setShowOnboarding,
+  whatsAppConnected,
+  onSavingGoalAdded,
+  onSavingGoalUpdated
+}) => {
+  return (
+    <>
+      {/* Transactions Table */}
+      <div className="mb-8">
+        <TransactionsTable 
+          transactions={filteredTransactions}
+          filters={{
+            category: filters.category,
+            type: filters.type,
+            dateRange: filters.dateRange,
+            minAmount: filters.minAmount,
+            maxAmount: filters.maxAmount
+          }}
+          onTransactionUpdated={onTransactionUpdated}
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : hasTransactions ? (
+            <FinancialDashboard expenses={filteredTransactions} />
+          ) : (
+            <EmptyDashboard />
+          )}
+        </div>
+        
+        <div className="space-y-6">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <SavingGoals 
+              savingGoals={savingGoals}
+              onGoalAdded={onSavingGoalAdded}
+              onGoalUpdated={onSavingGoalUpdated}
+            />
+          </div>
+          
+          {/* Onboarding Panel for new users - moved to sidebar */}
+          {showOnboarding && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 relative">
+              <button 
+                onClick={() => setShowOnboarding(false)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                aria-label="Dismiss"
+              >
+                <X size={16} />
+              </button>
+              <OnboardingPanel whatsAppConnected={whatsAppConnected} />
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default DashboardContent;
