@@ -10,6 +10,8 @@ export interface Transaction {
   type: 'expense' | 'income';
   date: string;
   created_at: string;
+  is_recurring?: boolean;
+  recurrence_interval?: 'weekly' | 'monthly' | 'yearly';
 }
 
 export interface ParsedExpense {
