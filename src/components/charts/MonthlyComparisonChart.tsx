@@ -15,6 +15,7 @@ import {
   Legend,
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
+import { useTranslation } from 'react-i18next';
 
 interface MonthlyComparisonChartProps {
   expenses: Transaction[];
@@ -25,6 +26,8 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   expenses,
   chartConfig
 }) => {
+  const { t } = useTranslation();
+  
   // Helper function to get data for bar chart (month-to-month comparison)
   const getMonthlyComparison = () => {
     const monthMap = new Map<string, number>();
@@ -52,8 +55,7 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   const monthlyComparison = getMonthlyComparison();
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow md:col-span-2">
-      <h3 className="text-lg font-semibold mb-2">Monthly Comparison</h3>
+    <div className="h-[300px]">
       {monthlyComparison.length > 0 ? (
         <ChartContainer className="h-[300px]" config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
@@ -70,13 +72,13 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
                 ) : null}
               />
               <Legend />
-              <Bar dataKey="amount" name="Expenses" fill="#36A2EB" />
+              <Bar dataKey="amount" name={t('common.expense')} fill="#36A2EB" />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
       ) : (
         <div className="h-[300px] flex items-center justify-center text-gray-400">
-          No expense data to display
+          {t('dashboard.charts.noData')}
         </div>
       )}
     </div>

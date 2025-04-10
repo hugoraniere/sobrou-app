@@ -194,18 +194,13 @@ const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.categoryBreakdown')}</h3>
-          <div className="h-[300px]">
-            {/* We'll display the existing expenses by category chart here */}
-            <ExpensesByCategoryChart expenses={transactions} chartConfig={{}} />
-          </div>
+          <ExpensesByCategoryChart expenses={transactions} chartConfig={{}} />
         </div>
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow">
         <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.balanceEvolution')}</h3>
-        <div className="h-[300px]">
-          <MonthlyComparisonChart expenses={transactions} chartConfig={{}} />
-        </div>
+        <MonthlyComparisonChart expenses={transactions} chartConfig={{}} />
       </div>
 
       {/* Alerts and Recommendations Section */}

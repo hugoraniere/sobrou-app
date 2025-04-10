@@ -10,6 +10,13 @@
     "lastMonth": "Last Month",
     "upcoming": "Upcoming"
   },
+  "header": {
+    "dashboard": "Dashboard",
+    "addExpense": "Add Transaction",
+    "settings": "Settings",
+    "whatsappSetup": "WhatsApp Setup",
+    "logout": "Logout"
+  },
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Track your finances and savings",

@@ -10,6 +10,13 @@
     "lastMonth": "Mês Passado",
     "upcoming": "Em breve"
   },
+  "header": {
+    "dashboard": "Painel",
+    "addExpense": "Nova Transação",
+    "settings": "Configurações",
+    "whatsappSetup": "Configurar WhatsApp",
+    "logout": "Sair"
+  },
   "dashboard": {
     "title": "Painel",
     "subtitle": "Acompanhe suas finanças e economias",
