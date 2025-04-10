@@ -1,79 +1,66 @@
 
 {
   "common": {
-    "loading": "Carregando...",
-    "save": "Salvar",
-    "cancel": "Cancelar",
-    "delete": "Excluir",
-    "edit": "Editar",
-    "submit": "Enviar"
-  },
-  "header": {
-    "dashboard": "Painel",
-    "addExpense": "Adicionar Despesa",
-    "settings": "Configurações",
-    "whatsappSetup": "Configurar WhatsApp",
-    "logout": "Sair"
+    "income": "Receita",
+    "expense": "Despesa",
+    "balance": "Saldo",
+    "savings": "Poupança",
+    "today": "Hoje",
+    "thisMonth": "Este Mês",
+    "lastMonth": "Mês Passado",
+    "upcoming": "Em breve"
   },
   "dashboard": {
-    "title": "Painel Financeiro",
-    "subtitle": "Acompanhe suas despesas e obtenha insights para economizar mais.",
-    "filters": {
-      "dateRange": "Período",
-      "category": "Categoria",
-      "type": "Tipo",
-      "minAmount": "Valor Mínimo",
-      "maxAmount": "Valor Máximo",
-      "income": "Receita",
-      "expense": "Despesa",
-      "all": "Todos",
-      "reset": "Limpar Filtros"
+    "title": "Painel",
+    "subtitle": "Acompanhe suas finanças e economias",
+    "tabs": {
+      "home": "Início",
+      "transactions": "Transações",
+      "analytics": "Análises"
     },
-    "emptyState": {
-      "title": "Nenhuma transação ainda",
-      "subtitle": "Adicione sua primeira transação para começar a acompanhar suas finanças."
+    "bigNumbers": {
+      "availableBalance": "Saldo Disponível",
+      "availableBalanceTooltip": "Seu saldo disponível atual",
+      "today": "Hoje",
+      "monthlyExpenses": "Despesas do Mês",
+      "monthlyExpensesTooltip": "Total de despesas do mês atual",
+      "thisMonth": "Este Mês",
+      "monthlyIncome": "Receitas do Mês",
+      "monthlyIncomeTooltip": "Total de receitas do mês atual",
+      "pendingBalance": "Saldo Pendente",
+      "pendingBalanceTooltip": "Transações futuras agendadas",
+      "upcoming": "Em breve",
+      "totalSavings": "Economias Totais",
+      "totalSavingsTooltip": "Total acumulado em economias",
+      "accumulated": "Acumulado"
     },
-    "transactions": {
-      "title": "Transações Recentes",
-      "date": "Data",
-      "description": "Descrição",
-      "category": "Categoria",
+    "charts": {
+      "dailyEvolution": "Evolução Diária (Mês Atual)",
+      "categoryBreakdown": "Para Onde Foi Seu Dinheiro Este Mês",
+      "balanceEvolution": "Evolução do Saldo (Últimos 6 Meses)",
+      "day": "Dia",
       "amount": "Valor",
-      "actions": "Ações",
-      "income": "Receita",
-      "expense": "Despesa",
-      "recurring": "Recorrente",
-      "oneTime": "Única"
+      "noData": "Sem dados para exibir"
     },
-    "insights": {
+    "alerts": {
       "title": "Insights Financeiros",
-      "byCategory": "Despesas por Categoria",
-      "overtime": "Despesas ao Longo do Tempo",
-      "monthlyComparison": "Comparação Mensal"
+      "budget": "Alerta de Orçamento",
+      "budgetDescription": "Você já gastou 80% do seu orçamento de alimentação este mês",
+      "fixedExpenses": "Despesas Fixas",
+      "fixedExpensesDescription": "Suas despesas fixas representam 65% da sua receita",
+      "balance": "Oportunidade de Saldo",
+      "balanceDescription": "Você pode antecipar algumas despesas para equilibrar o orçamento deste mês"
     },
-    "savingGoals": {
-      "title": "Metas de Economia",
-      "add": "Adicionar Meta",
-      "target": "Objetivo",
-      "current": "Atual",
-      "remaining": "Restante",
-      "progress": "Progresso"
-    }
-  },
-  "onboarding": {
-    "title": "Começar",
-    "steps": {
-      "connect": "Conectar WhatsApp",
-      "track": "Registrar Despesas",
-      "insights": "Ver Insights"
-    }
-  },
-  "ai": {
-    "placeholder": "Pergunte-me qualquer coisa sobre suas finanças ou adicione uma transação...",
-    "examples": {
-      "addExpense": "Adicionar uma despesa de almoço de R$25",
-      "trackSavings": "Acompanhar minha meta de economia para férias",
-      "analyze": "Analisar meus gastos do mês passado"
+    "recommendations": {
+      "title": "Metas e Recomendações",
+      "savingsGoal": "Progresso da Meta de Poupança",
+      "savingsGoalDescription": "Você está 40% mais perto da sua meta de poupança de R$ 5.000",
+      "monthlySavings": "Melhoria na Poupança Mensal",
+      "monthlySavingsDescription": "Este mês você economizou 30% a mais do que no mês passado",
+      "tip": "Dica Financeira",
+      "tipDescription": "Considere criar um fundo de emergência com 3-6 meses de despesas",
+      "investment": "Oportunidade de Investimento",
+      "investmentDescription": "Com base no seu perfil, considere diversificar seus investimentos"
     }
   }
 }

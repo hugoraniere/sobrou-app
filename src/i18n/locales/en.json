@@ -1,79 +1,66 @@
 
 {
   "common": {
-    "loading": "Loading...",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "submit": "Submit"
-  },
-  "header": {
-    "dashboard": "Dashboard",
-    "addExpense": "Add Expense",
-    "settings": "Settings",
-    "whatsappSetup": "WhatsApp Setup",
-    "logout": "Logout"
+    "income": "Income",
+    "expense": "Expense",
+    "balance": "Balance",
+    "savings": "Savings",
+    "today": "Today",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "upcoming": "Upcoming"
   },
   "dashboard": {
-    "title": "Financial Dashboard",
-    "subtitle": "Track your expenses and get insights to save more.",
-    "filters": {
-      "dateRange": "Date Range",
-      "category": "Category",
-      "type": "Type",
-      "minAmount": "Min Amount",
-      "maxAmount": "Max Amount",
-      "income": "Income",
-      "expense": "Expense",
-      "all": "All",
-      "reset": "Reset Filters"
+    "title": "Dashboard",
+    "subtitle": "Track your finances and savings",
+    "tabs": {
+      "home": "Home",
+      "transactions": "Transactions",
+      "analytics": "Analytics"
     },
-    "emptyState": {
-      "title": "No transactions yet",
-      "subtitle": "Add your first transaction to start tracking your finances."
+    "bigNumbers": {
+      "availableBalance": "Available Balance",
+      "availableBalanceTooltip": "Your current available balance",
+      "today": "Today",
+      "monthlyExpenses": "Monthly Expenses",
+      "monthlyExpensesTooltip": "Total expenses for the current month",
+      "thisMonth": "This Month",
+      "monthlyIncome": "Monthly Income",
+      "monthlyIncomeTooltip": "Total income for the current month",
+      "pendingBalance": "Pending Balance",
+      "pendingBalanceTooltip": "Future scheduled transactions",
+      "upcoming": "Upcoming",
+      "totalSavings": "Total Savings",
+      "totalSavingsTooltip": "Total accumulated savings",
+      "accumulated": "Accumulated"
     },
-    "transactions": {
-      "title": "Recent Transactions",
-      "date": "Date",
-      "description": "Description",
-      "category": "Category",
+    "charts": {
+      "dailyEvolution": "Daily Evolution (Current Month)",
+      "categoryBreakdown": "Where Your Money Went This Month",
+      "balanceEvolution": "Balance Evolution (Last 6 Months)",
+      "day": "Day",
       "amount": "Amount",
-      "actions": "Actions",
-      "income": "Income",
-      "expense": "Expense",
-      "recurring": "Recurring",
-      "oneTime": "One-time"
+      "noData": "No data to display"
     },
-    "insights": {
+    "alerts": {
       "title": "Financial Insights",
-      "byCategory": "Expenses by Category",
-      "overtime": "Expenses Over Time",
-      "monthlyComparison": "Monthly Comparison"
+      "budget": "Budget Alert",
+      "budgetDescription": "You've already spent 80% of your food budget this month",
+      "fixedExpenses": "Fixed Expenses",
+      "fixedExpensesDescription": "Your fixed expenses represent 65% of your income",
+      "balance": "Balance Opportunity",
+      "balanceDescription": "You can anticipate some expenses to balance this month's budget"
     },
-    "savingGoals": {
-      "title": "Saving Goals",
-      "add": "Add Goal",
-      "target": "Target",
-      "current": "Current",
-      "remaining": "Remaining",
-      "progress": "Progress"
-    }
-  },
-  "onboarding": {
-    "title": "Get Started",
-    "steps": {
-      "connect": "Connect WhatsApp",
-      "track": "Track Expenses",
-      "insights": "View Insights"
-    }
-  },
-  "ai": {
-    "placeholder": "Ask me anything about your finances or add a transaction...",
-    "examples": {
-      "addExpense": "Add a $25 lunch expense",
-      "trackSavings": "Track my savings goal for vacation",
-      "analyze": "Analyze my spending last month"
+    "recommendations": {
+      "title": "Goals & Recommendations",
+      "savingsGoal": "Savings Goal Progress",
+      "savingsGoalDescription": "You're 40% closer to your savings goal of $5,000",
+      "monthlySavings": "Monthly Savings Improvement",
+      "monthlySavingsDescription": "This month you saved 30% more than last month",
+      "tip": "Financial Tip",
+      "tipDescription": "Consider setting up an emergency fund with 3-6 months of expenses",
+      "investment": "Investment Opportunity",
+      "investmentDescription": "Based on your profile, consider diversifying your investments"
     }
   }
 }

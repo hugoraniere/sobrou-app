@@ -3,9 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Header from '../Header';
 import AIPromptInput from '../AIPromptInput';
-import OnboardingPanel from '../OnboardingPanel';
 import FilterBar from '../FilterBar';
-import { X } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -56,13 +54,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           onSavingAdded={onSavingAdded}
         />
         
-        {/* Filter Bar */}
-        <FilterBar 
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          categories={categories}
-          onResetFilters={handleResetFilters}
-        />
+        {/* Filter Bar - Only show on transactions tab */}
+        <div id="filters-container">
+          <FilterBar 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            categories={categories}
+            onResetFilters={handleResetFilters}
+          />
+        </div>
         
         {children}
       </main>
