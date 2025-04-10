@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FinancialDashboard } from '../FinancialDashboard';
 import SavingGoals from '../SavingGoals';
 import EmptyDashboard from '../EmptyDashboard';
@@ -44,6 +45,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   onSavingGoalAdded,
   onSavingGoalUpdated
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <>
       {/* Transactions Table */}

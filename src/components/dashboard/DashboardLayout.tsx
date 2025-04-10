@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Header from '../Header';
 import AIPromptInput from '../AIPromptInput';
 import OnboardingPanel from '../OnboardingPanel';
@@ -37,14 +38,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   onTransactionAdded,
   onSavingAdded
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Financial Dashboard</h1>
-          <p className="text-gray-600">Track your expenses and get insights to save more.</p>
+          <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
+          <p className="text-gray-600">{t('dashboard.subtitle')}</p>
         </div>
         
         {/* AI-powered prompt input at the top */}

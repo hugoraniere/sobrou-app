@@ -1,0 +1,79 @@
+
+{
+  "common": {
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "submit": "Enviar"
+  },
+  "header": {
+    "dashboard": "Painel",
+    "addExpense": "Adicionar Despesa",
+    "settings": "Configurações",
+    "whatsappSetup": "Configurar WhatsApp",
+    "logout": "Sair"
+  },
+  "dashboard": {
+    "title": "Painel Financeiro",
+    "subtitle": "Acompanhe suas despesas e obtenha insights para economizar mais.",
+    "filters": {
+      "dateRange": "Período",
+      "category": "Categoria",
+      "type": "Tipo",
+      "minAmount": "Valor Mínimo",
+      "maxAmount": "Valor Máximo",
+      "income": "Receita",
+      "expense": "Despesa",
+      "all": "Todos",
+      "reset": "Limpar Filtros"
+    },
+    "emptyState": {
+      "title": "Nenhuma transação ainda",
+      "subtitle": "Adicione sua primeira transação para começar a acompanhar suas finanças."
+    },
+    "transactions": {
+      "title": "Transações Recentes",
+      "date": "Data",
+      "description": "Descrição",
+      "category": "Categoria",
+      "amount": "Valor",
+      "actions": "Ações",
+      "income": "Receita",
+      "expense": "Despesa",
+      "recurring": "Recorrente",
+      "oneTime": "Única"
+    },
+    "insights": {
+      "title": "Insights Financeiros",
+      "byCategory": "Despesas por Categoria",
+      "overtime": "Despesas ao Longo do Tempo",
+      "monthlyComparison": "Comparação Mensal"
+    },
+    "savingGoals": {
+      "title": "Metas de Economia",
+      "add": "Adicionar Meta",
+      "target": "Objetivo",
+      "current": "Atual",
+      "remaining": "Restante",
+      "progress": "Progresso"
+    }
+  },
+  "onboarding": {
+    "title": "Começar",
+    "steps": {
+      "connect": "Conectar WhatsApp",
+      "track": "Registrar Despesas",
+      "insights": "Ver Insights"
+    }
+  },
+  "ai": {
+    "placeholder": "Pergunte-me qualquer coisa sobre suas finanças ou adicione uma transação...",
+    "examples": {
+      "addExpense": "Adicionar uma despesa de almoço de R$25",
+      "trackSavings": "Acompanhar minha meta de economia para férias",
+      "analyze": "Analisar meus gastos do mês passado"
+    }
+  }
+}

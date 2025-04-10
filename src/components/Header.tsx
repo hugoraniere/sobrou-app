@@ -4,6 +4,8 @@ import { Button } from "./ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { LogOut, Home, PlusCircle, Settings } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface HeaderProps {
   isPublic?: boolean;
@@ -12,6 +14,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const handleLogout = async () => {
     try {
@@ -36,18 +39,18 @@ const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
           <nav className="hidden md:flex items-center space-x-6 text-sm">
             <Link to="/" className="font-medium hover:text-blue-500 transition-colors flex items-center gap-1">
               <Home size={16} />
-              Dashboard
+              {t('header.dashboard')}
             </Link>
             <Link to="/" className="font-medium hover:text-blue-500 transition-colors flex items-center gap-1">
               <PlusCircle size={16} />
-              Add Expense
+              {t('header.addExpense')}
             </Link>
             <Link to="/settings" className="font-medium hover:text-blue-500 transition-colors flex items-center gap-1">
               <Settings size={16} />
-              Settings
+              {t('header.settings')}
             </Link>
             <Link to="/integration" className="font-medium hover:text-blue-500 transition-colors">
-              WhatsApp Setup
+              {t('header.whatsappSetup')}
             </Link>
           </nav>
         ) : (
@@ -58,6 +61,9 @@ const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
         )}
         
         <div className="flex items-center space-x-4">
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+          
           {isAuthenticated ? (
             <>
               <Button variant="outline" size="sm" className="hidden sm:inline-flex">
@@ -66,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
               </Button>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                {t('header.logout')}
               </Button>
             </>
           ) : (
