@@ -1,4 +1,3 @@
-
 {
   "common": {
     "income": "Receita",
@@ -18,56 +17,51 @@
     "logout": "Sair"
   },
   "dashboard": {
-    "title": "Painel",
-    "subtitle": "Acompanhe suas finanças e economias",
+    "title": "Painel de Controle",
+    "subtitle": "Acompanhe suas finanças e analise seus hábitos de gastos",
     "tabs": {
-      "home": "Início",
+      "overview": "Visão Geral",
       "transactions": "Transações",
       "analytics": "Análises"
     },
-    "bigNumbers": {
-      "availableBalance": "Saldo Disponível",
-      "availableBalanceTooltip": "Seu saldo disponível atual",
-      "today": "Hoje",
-      "monthlyExpenses": "Despesas do Mês",
-      "monthlyExpensesTooltip": "Total de despesas do mês atual",
-      "thisMonth": "Este Mês",
-      "monthlyIncome": "Receitas do Mês",
-      "monthlyIncomeTooltip": "Total de receitas do mês atual",
-      "pendingBalance": "Saldo Pendente",
-      "pendingBalanceTooltip": "Transações futuras agendadas",
-      "upcoming": "Em breve",
-      "totalSavings": "Economias Totais",
-      "totalSavingsTooltip": "Total acumulado em economias",
-      "accumulated": "Acumulado"
-    },
     "charts": {
-      "dailyEvolution": "Evolução Diária (Mês Atual)",
-      "categoryBreakdown": "Para Onde Foi Seu Dinheiro Este Mês",
-      "balanceEvolution": "Evolução do Saldo (Últimos 6 Meses)",
+      "categoryBreakdown": "Para onde foi seu dinheiro este mês",
+      "incomeByType": "Fontes de receita",
+      "dailyEvolution": "Movimentações diárias",
+      "balanceByAccount": "Saldo por conta/cartão",
+      "revenueVsExpense": "Receita vs Despesa (últimos 6 meses)",
+      "financialGoals": "Progresso de metas financeiras",
+      "balanceEvolution": "Evolução do saldo",
+      "noData": "Sem dados para exibir",
+      "noGoals": "Nenhuma meta de economia encontrada",
+      "createGoal": "Criar uma meta",
       "day": "Dia",
-      "amount": "Valor",
-      "noData": "Sem dados para exibir"
+      "amount": "Valor"
     },
     "alerts": {
-      "title": "Insights Financeiros",
-      "budget": "Alerta de Orçamento",
-      "budgetDescription": "Você já gastou 80% do seu orçamento de alimentação este mês",
-      "fixedExpenses": "Despesas Fixas",
+      "title": "Alertas financeiros",
+      "budget": "Alerta de orçamento",
+      "budgetDescription": "Você já usou 80% do seu orçamento de alimentação para este mês",
+      "fixedExpenses": "Despesas fixas",
       "fixedExpensesDescription": "Suas despesas fixas representam 65% da sua receita",
-      "balance": "Oportunidade de Saldo",
-      "balanceDescription": "Você pode antecipar algumas despesas para equilibrar o orçamento deste mês"
+      "balance": "Saldo positivo",
+      "balanceDescription": "Você tem um saldo positivo neste mês, bom trabalho!"
     },
     "recommendations": {
-      "title": "Metas e Recomendações",
-      "savingsGoal": "Progresso da Meta de Poupança",
-      "savingsGoalDescription": "Você está 40% mais perto da sua meta de poupança de R$ 5.000",
-      "monthlySavings": "Melhoria na Poupança Mensal",
-      "monthlySavingsDescription": "Este mês você economizou 30% a mais do que no mês passado",
-      "tip": "Dica Financeira",
-      "tipDescription": "Considere criar um fundo de emergência com 3-6 meses de despesas",
-      "investment": "Oportunidade de Investimento",
-      "investmentDescription": "Com base no seu perfil, considere diversificar seus investimentos"
+      "savingsGoal": "Meta de economia",
+      "savingsGoalDescription": "Você está 40% mais perto de atingir sua meta de R$ 5.000",
+      "monthlySavings": "Economia mensal",
+      "monthlySavingsDescription": "Este mês você economizou 30% a mais que no mês passado",
+      "tip": "Dica financeira",
+      "tipDescription": "Considere automatizar suas economias para atingir suas metas mais rapidamente",
+      "investment": "Oportunidade de investimento",
+      "investmentDescription": "Confira estas opções de investimento para fazer seu dinheiro trabalhar para você"
     }
+  },
+  "accounts": {
+    "mainAccount": "Conta Principal",
+    "savings": "Poupança",
+    "creditCard": "Cartão de Crédito",
+    "investments": "Investimentos"
   }
 }

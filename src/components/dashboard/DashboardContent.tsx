@@ -8,7 +8,7 @@ import { Transaction } from '@/services/TransactionService';
 import { SavingGoal } from '@/services/SavingsService';
 import TransactionsTable from '../TransactionsTable';
 import OnboardingPanel from '../OnboardingPanel';
-import HomeDashboard from './HomeDashboard';
+import OverviewDashboard from './OverviewDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { X } from 'lucide-react';
 
@@ -48,7 +48,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   onSavingGoalUpdated
 }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState("overview");
   
   // Show/hide filters based on active tab
   useEffect(() => {
@@ -60,21 +60,21 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   
   return (
     <>
-      <Tabs defaultValue="home" className="mb-8" onValueChange={setActiveTab}>
+      <Tabs defaultValue="overview" className="mb-8" onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="home">{t('dashboard.tabs.home')}</TabsTrigger>
+          <TabsTrigger value="overview">{t('dashboard.tabs.overview')}</TabsTrigger>
           <TabsTrigger value="transactions">{t('dashboard.tabs.transactions')}</TabsTrigger>
           <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
         </TabsList>
         
-        {/* Home Dashboard Tab */}
-        <TabsContent value="home">
+        {/* Overview Dashboard Tab */}
+        <TabsContent value="overview">
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : hasTransactions ? (
-            <HomeDashboard 
+            <OverviewDashboard 
               transactions={transactions}
               savingGoals={savingGoals}
             />
@@ -129,7 +129,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       </Tabs>
       
       {/* Onboarding Panel */}
-      {showOnboarding && activeTab === "home" && (
+      {showOnboarding && activeTab === "overview" && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 relative mb-8">
           <button 
             onClick={() => setShowOnboarding(false)}
