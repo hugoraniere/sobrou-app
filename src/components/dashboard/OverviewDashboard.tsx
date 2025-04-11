@@ -75,11 +75,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Welcome Message */}
-      <div className="text-center mb-6">
-        <p className="text-md text-gray-600">{t('dashboard.welcome')}</p>
-      </div>
-
       {/* Big Numbers */}
       <DashboardBigNumbers 
         transactions={transactions} 
@@ -152,7 +147,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-semibold">{t('dashboard.charts.financialGoals')}</h3>
           </div>
-          {hasSavingGoals || true ? (
+          {hasSavingGoals ? (
             <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
           ) : (
             <EmptyStateMessage message={t('dashboard.charts.noGoals')} />

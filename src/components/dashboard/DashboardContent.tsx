@@ -11,6 +11,7 @@ import OnboardingPanel from '../OnboardingPanel';
 import OverviewDashboard from './OverviewDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { X } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface DashboardContentProps {
   transactions: Transaction[];
@@ -85,24 +86,22 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         
         {/* Transactions Tab */}
         <TabsContent value="transactions">
-          <div className="mb-8">
-            <TransactionsTable 
-              transactions={filteredTransactions}
-              filters={{
-                category: filters.category,
-                type: filters.type,
-                dateRange: filters.dateRange,
-                minAmount: filters.minAmount,
-                maxAmount: filters.maxAmount
-              }}
-              onTransactionUpdated={onTransactionUpdated}
-            />
-          </div>
+          <TransactionsTable 
+            transactions={filteredTransactions}
+            filters={{
+              category: filters.category,
+              type: filters.type,
+              dateRange: filters.dateRange,
+              minAmount: filters.minAmount,
+              maxAmount: filters.maxAmount
+            }}
+            onTransactionUpdated={onTransactionUpdated}
+          />
         </TabsContent>
         
         {/* Analytics Tab */}
         <TabsContent value="analytics">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               {isLoading ? (
                 <div className="flex justify-center items-center h-64">
@@ -115,14 +114,16 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
               )}
             </div>
             
-            <div className="space-y-6">
-              <div className="bg-white p-4 rounded-lg shadow">
-                <SavingGoals 
-                  savingGoals={savingGoals}
-                  onGoalAdded={onSavingGoalAdded}
-                  onGoalUpdated={onSavingGoalUpdated}
-                />
-              </div>
+            <div>
+              <Card>
+                <CardContent className="pt-6">
+                  <SavingGoals 
+                    savingGoals={savingGoals}
+                    onGoalAdded={onSavingGoalAdded}
+                    onGoalUpdated={onSavingGoalUpdated}
+                  />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </TabsContent>

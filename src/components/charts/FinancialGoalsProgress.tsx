@@ -7,6 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface FinancialGoalsProgressProps {
   savingGoals: SavingGoal[];
@@ -77,7 +88,6 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
           size="sm" 
           onClick={() => setIsAddingGoal(!isAddingGoal)}
           variant={isAddingGoal ? "outline" : "default"}
-          className="ml-auto"
         >
           {isAddingGoal ? (
             <X className="h-4 w-4 mr-1" />
@@ -121,12 +131,27 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
         <div className="space-y-4">
           {goalsWithProgress.map(goal => (
             <div key={goal.id} className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-sm">{goal.name}</span>
-                <span className="text-sm text-gray-500">
-                  {goal.progressPercent}%
-                </span>
-              </div>
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <div className="flex justify-between items-center cursor-help">
+                    <span className="font-medium text-sm">{goal.name}</span>
+                    <span className="text-sm text-gray-500">
+                      {goal.progressPercent}%
+                    </span>
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium">{goal.name}</span>
+                    <span className="text-green-600 font-medium">{goal.progressPercent}% complete</span>
+                  </div>
+                  <div className="text-sm text-gray-500 mb-2">
+                    <p>Current: {formatCurrency(goal.current_amount)}</p>
+                    <p>Target: {formatCurrency(goal.target_amount)}</p>
+                    <p>Remaining: {formatCurrency(goal.target_amount - goal.current_amount)}</p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
               <div className="space-y-1">
                 <Progress value={goal.progressPercent} className="h-2" />
                 <div className="flex justify-between text-xs text-gray-500">
