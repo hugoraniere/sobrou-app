@@ -42,7 +42,7 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
           {goalsWithProgress.map(goal => (
             <div key={goal.id} className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="font-medium text-sm">{goal.title}</span>
+                <span className="font-medium text-sm">{goal.name}</span>
                 <span className="text-sm text-gray-500">
                   {goal.progressPercent}%
                 </span>
