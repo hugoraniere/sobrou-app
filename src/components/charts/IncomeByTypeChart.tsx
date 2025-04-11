@@ -9,7 +9,8 @@ import {
   Pie,
   ResponsiveContainer,
   PieChart,
-  Cell
+  Cell,
+  Legend
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +48,31 @@ const IncomeByTypeChart: React.FC<IncomeByTypeChartProps> = ({
   
   const incomesByType = getIncomesByType();
 
+  // Custom label with positioned text to avoid overlapping
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }: any) => {
+    // Don't render labels for small segments
+    if (percent < 0.05) return null;
+    
+    const RADIAN = Math.PI / 180;
+    // Position label outside the pie chart
+    const radius = outerRadius * 1.1;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#000"
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        fontSize={12}
+      >
+        {`${name} (${(percent * 100).toFixed(0)}%)`}
+      </text>
+    );
+  };
+
   return (
     <div className="h-[300px]">
       {incomesByType.length > 0 ? (
@@ -57,16 +83,17 @@ const IncomeByTypeChart: React.FC<IncomeByTypeChartProps> = ({
                 data={incomesByType}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                outerRadius={80}
+                labelLine={true}
+                outerRadius={70}
                 fill="#8884d8"
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={renderCustomizedLabel}
               >
                 {incomesByType.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
+              <Legend layout="horizontal" verticalAlign="bottom" align="center" />
               <ChartTooltip
                 content={({ active, payload }) => active && payload && payload.length ? (
                   <ChartTooltipContent payload={payload} />

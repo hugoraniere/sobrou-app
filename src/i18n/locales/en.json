@@ -22,6 +22,7 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Track your finances and analyze your spending habits",
+    "welcome": "Welcome to your financial dashboard! Here you can track your finances at a glance.",
     "tabs": {
       "overview": "Overview",
       "transactions": "Transactions",
@@ -33,7 +34,7 @@
       "dailyEvolution": "Daily movements",
       "balanceByAccount": "Balance by account/card",
       "revenueVsExpense": "Income vs Expenses (last 6 months)",
-      "financialGoals": "Financial goals progress",
+      "financialGoals": "Financial goals",
       "balanceEvolution": "Balance evolution",
       "noData": "No data to display",
       "noGoals": "No savings goals found",
@@ -51,6 +52,7 @@
       "balanceDescription": "You have a positive balance this month, good job!"
     },
     "recommendations": {
+      "title": "Recommendations",
       "savingsGoal": "Savings goal",
       "savingsGoalDescription": "You are 40% closer to reaching your savings goal of $5,000",
       "monthlySavings": "Monthly savings",
@@ -81,6 +83,9 @@
       "amountInput": "Target amount",
       "create": "Create Goal",
       "addToGoal": "Add to Goal"
+    },
+    "emptyState": {
+      "message": "Start tracking to see your data"
     }
   },
   "accounts": {

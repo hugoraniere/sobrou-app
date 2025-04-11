@@ -11,6 +11,13 @@ import RevenueVsExpenseChart from '../charts/RevenueVsExpenseChart';
 import FinancialGoalsProgress from '../charts/FinancialGoalsProgress';
 import FinancialAlerts from './FinancialAlerts';
 import DashboardBigNumbers from './DashboardBigNumbers';
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import EmptyStateMessage from './EmptyStateMessage';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -22,6 +29,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   savingGoals
 }) => {
   const { t } = useTranslation();
+  const hasTransactions = transactions.length > 0;
+  const hasSavingGoals = savingGoals.length > 0;
 
   // Calculate total savings from savings goals
   const totalSavings = savingGoals.reduce((total, goal) => total + goal.current_amount, 0);
@@ -66,21 +75,46 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Welcome Message */}
+      <div className="text-center mb-6">
+        <p className="text-md text-gray-600">{t('dashboard.welcome')}</p>
+      </div>
+
       {/* Big Numbers */}
       <DashboardBigNumbers 
         transactions={transactions} 
         totalSavings={totalSavings} 
       />
 
+      {/* Financial Alerts as Accordion */}
+      <Accordion type="single" collapsible className="bg-white p-4 rounded-lg shadow">
+        <AccordionItem value="alerts" className="border-b-0">
+          <AccordionTrigger className="py-2">
+            <h3 className="text-lg font-semibold">{t('dashboard.alerts.title')}</h3>
+          </AccordionTrigger>
+          <AccordionContent>
+            <FinancialAlerts alerts={sampleAlerts} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
       {/* Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.categoryBreakdown')}</h3>
-          <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
+          {hasTransactions ? (
+            <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={t('dashboard.charts.noData')} />
+          )}
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.incomeByType')}</h3>
-          <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
+          {hasTransactions ? (
+            <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={t('dashboard.charts.noData')} />
+          )}
         </div>
       </div>
 
@@ -88,11 +122,19 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.dailyEvolution')}</h3>
-          <DailyBarChart transactions={transactions} />
+          {hasTransactions ? (
+            <DailyBarChart transactions={transactions} />
+          ) : (
+            <EmptyStateMessage message={t('dashboard.charts.noData')} />
+          )}
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.balanceByAccount')}</h3>
-          <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
+          {hasTransactions ? (
+            <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={t('dashboard.charts.noData')} />
+          )}
         </div>
       </div>
 
@@ -100,17 +142,22 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.revenueVsExpense')}</h3>
-          <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+          {hasTransactions ? (
+            <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={t('dashboard.charts.noData')} />
+          )}
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.financialGoals')}</h3>
-          <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold">{t('dashboard.charts.financialGoals')}</h3>
+          </div>
+          {hasSavingGoals || true ? (
+            <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
+          )}
         </div>
-      </div>
-
-      {/* Row 4 - Full width */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <FinancialAlerts alerts={sampleAlerts} />
       </div>
     </div>
   );

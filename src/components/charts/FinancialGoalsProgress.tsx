@@ -73,11 +73,11 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
   return (
     <div className="h-[300px] overflow-y-auto">
       <div className="flex justify-between items-center mb-4">
-        <div className="flex-1"></div>
         <Button 
           size="sm" 
           onClick={() => setIsAddingGoal(!isAddingGoal)}
           variant={isAddingGoal ? "outline" : "default"}
+          className="ml-auto"
         >
           {isAddingGoal ? (
             <X className="h-4 w-4 mr-1" />

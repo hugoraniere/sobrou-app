@@ -102,7 +102,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={dailyData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
@@ -110,8 +110,9 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
                 label={{ 
                   value: t('dashboard.charts.day'), 
                   position: 'insideBottom',
-                  offset: -5
+                  offset: -10
                 }}
+                height={50}
               />
               <YAxis 
                 tickFormatter={formatCurrency}
@@ -121,6 +122,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
                   position: 'insideLeft',
                   offset: -5
                 }}
+                width={80}
               />
               <ChartTooltip
                 content={({ active, payload }) => 
@@ -132,7 +134,11 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
                   ) : null
                 }
               />
-              <Legend />
+              <Legend 
+                wrapperStyle={{ paddingTop: 10 }}
+                verticalAlign="bottom"
+                height={36}
+              />
               <Bar dataKey="income" name={t('common.income')} fill="#0ea5e9" />
               <Bar dataKey="expense" name={t('common.expense')} fill="#ef4444" />
             </BarChart>

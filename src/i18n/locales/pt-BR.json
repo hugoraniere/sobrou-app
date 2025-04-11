@@ -1,3 +1,4 @@
+
 {
   "common": {
     "income": "Receita",
@@ -7,7 +8,9 @@
     "today": "Hoje",
     "thisMonth": "Este Mês",
     "lastMonth": "Mês Passado",
-    "upcoming": "Em breve"
+    "upcoming": "Em breve",
+    "accumulated": "Acumulado",
+    "cancel": "Cancelar"
   },
   "header": {
     "dashboard": "Painel",
@@ -19,6 +22,7 @@
   "dashboard": {
     "title": "Painel de Controle",
     "subtitle": "Acompanhe suas finanças e analise seus hábitos de gastos",
+    "welcome": "Bem-vindo ao seu painel financeiro! Aqui você pode acompanhar suas finanças de forma rápida.",
     "tabs": {
       "overview": "Visão Geral",
       "transactions": "Transações",
@@ -30,7 +34,7 @@
       "dailyEvolution": "Movimentações diárias",
       "balanceByAccount": "Saldo por conta/cartão",
       "revenueVsExpense": "Receita vs Despesa (últimos 6 meses)",
-      "financialGoals": "Progresso de metas financeiras",
+      "financialGoals": "Metas financeiras",
       "balanceEvolution": "Evolução do saldo",
       "noData": "Sem dados para exibir",
       "noGoals": "Nenhuma meta de economia encontrada",
@@ -48,6 +52,7 @@
       "balanceDescription": "Você tem um saldo positivo neste mês, bom trabalho!"
     },
     "recommendations": {
+      "title": "Recomendações",
       "savingsGoal": "Meta de economia",
       "savingsGoalDescription": "Você está 40% mais perto de atingir sua meta de R$ 5.000",
       "monthlySavings": "Economia mensal",
@@ -56,6 +61,31 @@
       "tipDescription": "Considere automatizar suas economias para atingir suas metas mais rapidamente",
       "investment": "Oportunidade de investimento",
       "investmentDescription": "Confira estas opções de investimento para fazer seu dinheiro trabalhar para você"
+    },
+    "bigNumbers": {
+      "availableBalance": "Saldo Disponível",
+      "availableBalanceTooltip": "Seu saldo disponível atual em todas as contas",
+      "monthlyExpenses": "Despesas Mensais",
+      "monthlyExpensesTooltip": "Total de despesas do mês atual",
+      "monthlyIncome": "Receita Mensal",
+      "monthlyIncomeTooltip": "Total de receitas do mês atual",
+      "pendingBalance": "Saldo Pendente",
+      "pendingBalanceTooltip": "Transações agendadas futuras",
+      "totalSavings": "Total de Economias",
+      "totalSavingsTooltip": "Suas economias acumuladas em todas as metas",
+      "today": "Hoje",
+      "thisMonth": "Este Mês",
+      "upcoming": "Em breve",
+      "accumulated": "Acumulado"
+    },
+    "goals": {
+      "nameInput": "Nome da meta",
+      "amountInput": "Valor desejado",
+      "create": "Criar Meta",
+      "addToGoal": "Adicionar à Meta"
+    },
+    "emptyState": {
+      "message": "Comece a registrar para ver seus dados"
     }
   },
   "accounts": {
