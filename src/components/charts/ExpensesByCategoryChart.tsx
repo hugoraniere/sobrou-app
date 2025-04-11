@@ -1,23 +1,15 @@
 
 import React from 'react';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart";
-import {
-  Pie,
-  ResponsiveContainer,
-  PieChart,
-  Cell,
-  Legend
-} from "recharts";
-import { Transaction } from '@/services/TransactionService';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useTranslation } from 'react-i18next';
+import { Transaction } from '@/services/TransactionService';
+import EmptyStateMessage from '../dashboard/EmptyStateMessage';
+import { transactionCategories } from '@/data/categories';
 
 interface ExpensesByCategoryChartProps {
   expenses: Transaction[];
-  chartConfig: Record<string, any>;
+  chartConfig: any;
 }
 
 const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({ 
@@ -26,86 +18,114 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
 }) => {
   const { t } = useTranslation();
   
-  // Generate unique colors for pie chart
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A259FF', '#4BC0C0', '#FF6384', '#36A2EB', '#FB6340'];
-  
-  // Helper function to get data for pie chart (expenses by category)
-  const getExpensesByCategory = () => {
+  // Process data for the chart
+  const processData = () => {
     const categoryMap = new Map<string, number>();
     
-    expenses.forEach(expense => {
-      const currentAmount = categoryMap.get(expense.category) || 0;
-      categoryMap.set(expense.category, currentAmount + expense.amount);
-    });
+    expenses
+      .filter(expense => expense.type === 'expense')
+      .forEach(expense => {
+        const currentAmount = categoryMap.get(expense.category) || 0;
+        categoryMap.set(expense.category, currentAmount + expense.amount);
+      });
     
-    return Array.from(categoryMap.entries()).map(([name, value]) => ({
-      name,
-      value
-    }));
+    return Array.from(categoryMap.entries()).map(([category, value]) => {
+      const categoryInfo = transactionCategories.find(cat => cat.id === category);
+      return {
+        name: categoryInfo?.name || category,
+        value,
+        id: category
+      };
+    }).sort((a, b) => b.value - a.value); // Sort by value, descending
   };
   
-  const expensesByCategory = getExpensesByCategory();
-
-  // Custom label with positioned text to avoid overlapping
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }: any) => {
-    // Don't render labels for small segments
-    if (percent < 0.05) return null;
-    
-    const RADIAN = Math.PI / 180;
-    // Position label outside the pie chart
-    const radius = outerRadius * 1.1;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-    
-    return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="#000"
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize={12}
-      >
-        {`${name} (${(percent * 100).toFixed(0)}%)`}
-      </text>
-    );
-  };
-
-  return (
-    <div className="h-[300px]">
-      {expensesByCategory.length > 0 ? (
-        <ChartContainer className="h-[300px]" config={chartConfig}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={expensesByCategory}
-                cx="50%"
-                cy="50%"
-                labelLine={true}
-                outerRadius={70}
-                fill="#8884d8"
-                dataKey="value"
-                label={renderCustomizedLabel}
-              >
-                {expensesByCategory.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend layout="horizontal" verticalAlign="bottom" align="center" />
-              <ChartTooltip
-                content={({ active, payload }) => active && payload && payload.length ? (
-                  <ChartTooltipContent payload={payload} />
-                ) : null}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      ) : (
-        <div className="h-[300px] flex items-center justify-center text-gray-400">
-          {t('dashboard.charts.noData')}
+  const data = processData();
+  
+  // Generate colors for pie chart segments
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
+  
+  // Custom tooltip component
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const total = expenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+      const percentage = ((data.value / total) * 100).toFixed(1);
+      
+      return (
+        <div className="custom-tooltip bg-white p-3 border rounded shadow-sm">
+          <p className="font-medium">{data.name}</p>
+          <p className="text-sm text-gray-600">
+            {`R$ ${data.value.toFixed(2)} (${percentage}%)`}
+          </p>
         </div>
-      )}
-    </div>
+      );
+    }
+    
+    return null;
+  };
+  
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle>{t('dashboard.charts.expensesByCategory')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {data.length > 0 ? (
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  innerRadius={30}
+                  fill="#8884d8"
+                  dataKey="value"
+                  nameKey="name"
+                >
+                  {data.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={COLORS[index % COLORS.length]} 
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <EmptyStateMessage message={t('dashboard.charts.noData')} />
+        )}
+        
+        {/* Legend */}
+        {data.length > 0 && (
+          <div className="grid grid-cols-1 gap-1 mt-2">
+            {data.slice(0, 5).map((entry, index) => (
+              <div key={entry.id} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div 
+                    className="w-3 h-3 rounded-full mr-2" 
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  ></div>
+                  <span className="text-xs truncate">{entry.name}</span>
+                </div>
+                <span className="text-xs font-medium">
+                  R$ {entry.value.toFixed(2)}
+                </span>
+              </div>
+            ))}
+            {data.length > 5 && (
+              <div className="text-xs text-center text-gray-500 mt-1">
+                +{data.length - 5} outras categorias
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

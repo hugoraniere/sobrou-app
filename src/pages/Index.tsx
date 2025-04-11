@@ -7,12 +7,7 @@ import DashboardContent from '../components/dashboard/DashboardContent';
 import DeveloperControls from '../components/dashboard/DeveloperControls';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
-
-// Categories with icons
-export const expenseCategories = [
-  'Food', 'Housing', 'Transportation', 'Entertainment', 'Shopping', 
-  'Utilities', 'Health', 'Education', 'Income', 'Savings', 'Other'
-];
+import { transactionCategories } from '@/data/categories';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
@@ -47,6 +42,9 @@ const Index = () => {
     return <Navigate to="/auth" replace />;
   }
   
+  // Extrair os nomes das categorias para os filtros
+  const categoryIds = transactionCategories.map(cat => cat.id);
+  
   return (
     <>
       <DashboardLayout
@@ -56,7 +54,7 @@ const Index = () => {
         filters={filters}
         handleFilterChange={handleFilterChange}
         handleResetFilters={handleResetFilters}
-        categories={expenseCategories}
+        categories={categoryIds}
         onTransactionAdded={fetchData}
         onSavingAdded={fetchData}
       >

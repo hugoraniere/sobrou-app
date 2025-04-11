@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { getCategoryByKeyword } from "@/data/categories";
 
 export interface Transaction {
   id: string;
@@ -7,7 +8,7 @@ export interface Transaction {
   amount: number;
   description: string;
   category: string;
-  type: 'expense' | 'income';
+  type: 'expense' | 'income' | 'transfer';
   date: string;
   created_at: string;
   is_recurring?: boolean;
@@ -47,6 +48,15 @@ export const TransactionService = {
       
       const data = await response.json();
       console.log("Parsed expense data:", data);
+      
+      // Try to determine category based on keywords if not provided
+      if (!data.category || data.category === 'Other') {
+        const detectedCategory = getCategoryByKeyword(data.description);
+        if (detectedCategory) {
+          data.category = detectedCategory.id;
+        }
+      }
+      
       return data;
     } catch (error) {
       console.error('Error parsing expense text:', error);
@@ -76,6 +86,14 @@ export const TransactionService = {
     
     if (!user) {
       throw new Error('You must be logged in to add a transaction');
+    }
+    
+    // Try to determine category based on keywords if not provided
+    if (!transaction.category || transaction.category === 'other') {
+      const detectedCategory = getCategoryByKeyword(transaction.description);
+      if (detectedCategory) {
+        transaction.category = detectedCategory.id;
+      }
     }
     
     // Remove the fields that don't exist in the database schema

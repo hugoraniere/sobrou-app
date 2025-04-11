@@ -76,22 +76,22 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
         recurrence_interval: !isRecurring ? 'monthly' : undefined
       });
       onTransactionUpdated();
-      toast.success(!isRecurring ? 'Marked as recurring' : 'Removed recurring status');
+      toast.success(!isRecurring ? 'Marcado como recorrente' : 'Status de recorrência removido');
     } catch (error) {
-      console.error('Error updating transaction:', error);
-      toast.error('Failed to update transaction');
+      console.error('Erro ao atualizar transação:', error);
+      toast.error('Falha ao atualizar transação');
     }
   };
   
   return (
     <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-4 border-b">
-        <h3 className="text-lg font-semibold">Your Transactions</h3>
+        <h3 className="text-lg font-semibold">Suas Transações</h3>
       </div>
       
       {filteredTransactions.length === 0 ? (
         <div className="py-8 text-center text-gray-500">
-          No transactions found with the current filters.
+          Nenhuma transação encontrada com os filtros atuais.
         </div>
       ) : (
         <>
@@ -107,6 +107,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   transaction={transaction}
                   onToggleRecurring={handleToggleRecurring}
                   formatDate={formatDate}
+                  onTransactionUpdated={onTransactionUpdated}
                 />
               ))}
             </TableBody>

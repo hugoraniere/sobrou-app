@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FinancialDashboard } from '../FinancialDashboard';
 import SavingGoals from '../SavingGoals';
 import EmptyDashboard from '../EmptyDashboard';
 import { Transaction } from '@/services/TransactionService';
@@ -12,6 +11,7 @@ import OverviewDashboard from './OverviewDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import FinancialInsights from './FinancialInsights';
 
 interface DashboardContentProps {
   transactions: Transaction[];
@@ -65,7 +65,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         <TabsList>
           <TabsTrigger value="overview">{t('dashboard.tabs.overview')}</TabsTrigger>
           <TabsTrigger value="transactions">{t('dashboard.tabs.transactions')}</TabsTrigger>
-          <TabsTrigger value="analytics">{t('dashboard.tabs.analytics')}</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
         </TabsList>
         
         {/* Overview Dashboard Tab */}
@@ -99,8 +99,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           />
         </TabsContent>
         
-        {/* Analytics Tab */}
-        <TabsContent value="analytics">
+        {/* Insights Tab (replacing Analytics) */}
+        <TabsContent value="insights">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               {isLoading ? (
@@ -108,7 +108,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : hasTransactions ? (
-                <FinancialDashboard expenses={filteredTransactions} />
+                <FinancialInsights transactions={transactions} />
               ) : (
                 <EmptyDashboard />
               )}

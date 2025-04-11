@@ -1,74 +1,71 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent } from '@/components/ui/card';
-import { Target, Gift, TrendingUp } from 'lucide-react';
-
-interface Recommendation {
-  id: string;
-  title: string;
-  description: string;
-  type: 'goal' | 'saving' | 'tip';
-  progress?: number;
-}
+import { Lightbulb, Target, TrendingUp } from 'lucide-react';
 
 interface GoalsRecommendationsProps {
-  recommendations: Recommendation[];
+  recommendations: {
+    id: string;
+    title: string;
+    description: string;
+    type: 'goal' | 'saving' | 'tip';
+    progress?: number;
+  }[];
 }
 
-const GoalsRecommendations: React.FC<GoalsRecommendationsProps> = ({ 
-  recommendations 
-}) => {
+const GoalsRecommendations: React.FC<GoalsRecommendationsProps> = ({ recommendations }) => {
   const { t } = useTranslation();
   
-  if (!recommendations || recommendations.length === 0) {
-    return null;
-  }
-  
-  // Function to get the right icon based on recommendation type
-  const getIcon = (type: 'goal' | 'saving' | 'tip') => {
+  const getRecommendationIcon = (type: string) => {
     switch (type) {
       case 'goal':
-        return <Target className="h-5 w-5 text-blue-500" />;
+        return <Target className="h-5 w-5 text-purple-500" />;
       case 'saving':
         return <TrendingUp className="h-5 w-5 text-green-500" />;
       case 'tip':
-        return <Gift className="h-5 w-5 text-purple-500" />;
+        return <Lightbulb className="h-5 w-5 text-amber-500" />;
       default:
-        return <Target className="h-5 w-5 text-blue-500" />;
+        return <Lightbulb className="h-5 w-5 text-gray-500" />;
     }
   };
-
+  
   return (
-    <div className="space-y-3">
-      <h3 className="text-lg font-semibold">{t('dashboard.recommendations.title')}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {recommendations.map(recommendation => (
-          <Card key={recommendation.id} className="overflow-hidden">
-            <CardContent className="p-4">
-              <div className="flex items-start space-x-3">
-                <div className="mt-1">
-                  {getIcon(recommendation.type)}
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle>{t('dashboard.recommendations.title')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {recommendations.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            {t('dashboard.recommendations.noRecommendations')}
+          </p>
+        ) : (
+          <ul className="space-y-4">
+            {recommendations.map((recommendation) => (
+              <li key={recommendation.id}>
+                <div className="flex gap-3 items-start">
+                  {getRecommendationIcon(recommendation.type)}
+                  <div className="w-full">
+                    <h4 className="text-sm font-medium">{recommendation.title}</h4>
+                    <p className="text-sm text-muted-foreground no-underline hover:no-underline">
+                      {recommendation.description}
+                    </p>
+                    {recommendation.progress !== undefined && (
+                      <div className="mt-2">
+                        <Progress value={recommendation.progress} className="h-2" />
+                        <p className="text-xs text-right mt-1">{recommendation.progress}%</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-1 flex-1">
-                  <h4 className="font-medium text-sm">{recommendation.title}</h4>
-                  <p className="text-xs text-muted-foreground">{recommendation.description}</p>
-                  
-                  {recommendation.progress !== undefined && (
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                      <div 
-                        className="bg-blue-500 h-1.5 rounded-full" 
-                        style={{ width: `${recommendation.progress}%` }}
-                      ></div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

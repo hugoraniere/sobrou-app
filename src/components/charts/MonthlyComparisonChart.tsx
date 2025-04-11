@@ -1,87 +1,166 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart";
-import {
-  Bar,
-  ResponsiveContainer,
   BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
-} from "recharts";
-import { Transaction } from '@/services/TransactionService';
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { useTranslation } from 'react-i18next';
+import { Transaction } from '@/services/TransactionService';
+import EmptyStateMessage from '../dashboard/EmptyStateMessage';
+import { useTheme } from 'next-themes';
 
 interface MonthlyComparisonChartProps {
   expenses: Transaction[];
-  chartConfig: Record<string, any>;
+  chartConfig: any;
 }
 
-const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({ 
+const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   expenses,
   chartConfig
 }) => {
   const { t } = useTranslation();
+  const { resolvedTheme } = useTheme();
   
-  // Helper function to get data for bar chart (month-to-month comparison)
-  const getMonthlyComparison = () => {
-    const monthMap = new Map<string, number>();
+  // Process data for the chart
+  const processData = () => {
+    // Create a map of months to total expenses
+    const monthMap: Map<string, { expenses: number, income: number }> = new Map();
     
-    expenses.forEach(expense => {
-      const date = new Date(expense.date);
-      const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
-      const currentAmount = monthMap.get(monthYear) || 0;
-      monthMap.set(monthYear, currentAmount + expense.amount);
+    // Group by month
+    expenses.forEach(transaction => {
+      try {
+        const date = new Date(transaction.date);
+        const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        
+        const currentData = monthMap.get(monthKey) || { expenses: 0, income: 0 };
+        
+        if (transaction.type === 'expense') {
+          currentData.expenses += transaction.amount;
+        } else if (transaction.type === 'income') {
+          currentData.income += transaction.amount;
+        }
+        
+        monthMap.set(monthKey, currentData);
+      } catch (error) {
+        console.error(`Error processing date: ${transaction.date}`, error);
+      }
     });
     
+    // Convert to array of objects for Recharts
     return Array.from(monthMap.entries())
-      .map(([month, amount]) => ({ month, amount }))
+      .map(([monthKey, data]) => {
+        // Parse year and month from the key
+        const [year, month] = monthKey.split('-').map(Number);
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        
+        const balance = data.income - data.expenses;
+        
+        return {
+          month: `${monthNames[month - 1]}/${year}`,
+          expenses: data.expenses,
+          income: data.income,
+          balance
+        };
+      })
       .sort((a, b) => {
-        const [monthA, yearA] = a.month.split(' ');
-        const [monthB, yearB] = b.month.split(' ');
+        // Sort by year and month
+        const [monthA, yearA] = a.month.split('/');
+        const [monthB, yearB] = b.month.split('/');
         
-        if (yearA !== yearB) return Number(yearA) - Number(yearB);
+        const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        return months.indexOf(monthA) - months.indexOf(monthB);
+        if (yearA !== yearB) {
+          return Number(yearA) - Number(yearB);
+        }
+        
+        return monthNames.indexOf(monthA) - monthNames.indexOf(monthB);
       });
   };
   
-  const monthlyComparison = getMonthlyComparison();
-
-  return (
-    <div className="h-[300px]">
-      {monthlyComparison.length > 0 ? (
-        <ChartContainer className="h-[300px]" config={chartConfig}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={monthlyComparison}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+  const data = processData();
+  
+  // Custom tooltip
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip bg-white p-3 border rounded shadow-sm">
+          <p className="font-medium">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p 
+              key={`item-${index}`} 
+              className="text-sm" 
+              style={{ color: entry.color }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <ChartTooltip
-                content={({ active, payload }) => active && payload && payload.length ? (
-                  <ChartTooltipContent payload={payload} />
-                ) : null}
-              />
-              <Legend />
-              <Bar dataKey="amount" name={t('common.expense')} fill="#36A2EB" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      ) : (
-        <div className="h-[300px] flex items-center justify-center text-gray-400">
-          {t('dashboard.charts.noData')}
+              {`${entry.name}: R$ ${entry.value.toFixed(2)}`}
+            </p>
+          ))}
         </div>
-      )}
-    </div>
+      );
+    }
+    
+    return null;
+  };
+  
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle>{t('dashboard.charts.monthlyComparison')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {data.length > 0 ? (
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis 
+                  dataKey="month" 
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) => `R$${value}`}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar 
+                  dataKey="expenses" 
+                  name="Despesas" 
+                  fill="#FF8042" 
+                  radius={[4, 4, 0, 0]} 
+                />
+                <Bar 
+                  dataKey="income" 
+                  name="Receitas" 
+                  fill="#00C49F" 
+                  radius={[4, 4, 0, 0]} 
+                />
+                <Bar 
+                  dataKey="balance" 
+                  name="Saldo" 
+                  fill="#0088FE" 
+                  radius={[4, 4, 0, 0]} 
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <EmptyStateMessage message={t('dashboard.charts.noData')} />
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
