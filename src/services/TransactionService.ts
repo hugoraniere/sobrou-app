@@ -151,6 +151,19 @@ export const TransactionService = {
     
     return data as Transaction;
   },
+
+  // Delete a transaction
+  async deleteTransaction(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      console.error('Error deleting transaction:', error);
+      throw error;
+    }
+  },
   
   // Get summary stats for a given date range
   async getTransactionSummary(startDate: string, endDate: string) {

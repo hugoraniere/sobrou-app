@@ -1,7 +1,7 @@
 
 import { 
   ShoppingCart, Home, Car, Clapperboard, Heart, Book, Briefcase, 
-  Bank, LineChart, CreditCard, Gift, FileText, Sparkles, 
+  Landmark, LineChart, CreditCard, Gift, FileText, Sparkles, 
   Repeat, ArrowLeftRight, PiggyBank 
 } from "lucide-react";
 
@@ -66,7 +66,7 @@ export const transactionCategories: TransactionCategory[] = [
   {
     id: "salary",
     name: "Salário",
-    icon: Bank,
+    icon: Landmark,
     keywords: ["salário", "empresa", "pagamento fixo", "contracheque", "holerite"],
     type: "income"
   },

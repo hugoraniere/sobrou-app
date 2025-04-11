@@ -16,6 +16,16 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,10 +36,9 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { MoreHorizontal, RepeatIcon, PencilIcon } from "lucide-react";
+import { MoreHorizontal, RepeatIcon, PencilIcon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { transactionCategories } from '@/data/categories';
-import { format } from 'date-fns';
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -45,6 +54,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   onTransactionUpdated
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editedTransaction, setEditedTransaction] = useState<Transaction>({...transaction});
 
   const handleEdit = () => {
@@ -76,6 +86,18 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     } catch (error) {
       console.error('Erro ao atualizar transação:', error);
       toast.error('Falha ao atualizar transação');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await TransactionService.deleteTransaction(transaction.id);
+      setIsDeleteDialogOpen(false);
+      onTransactionUpdated();
+      toast.success('Transação excluída com sucesso');
+    } catch (error) {
+      console.error('Erro ao excluir transação:', error);
+      toast.error('Falha ao excluir transação');
     }
   };
 
@@ -139,6 +161,16 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
               >
                 <RepeatIcon className="h-4 w-4 mr-2" />
                 {transaction.is_recurring ? 'Remover recorrência' : 'Marcar como recorrente'}
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-red-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsDeleteDialogOpen(true);
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -253,6 +285,24 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Transaction Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Transação</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
