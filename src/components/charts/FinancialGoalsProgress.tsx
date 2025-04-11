@@ -1,8 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/progress';
-import { SavingGoal } from '@/services/SavingsService';
+import { SavingGoal, SavingsService } from '@/services/SavingsService';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus, Check, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface FinancialGoalsProgressProps {
   savingGoals: SavingGoal[];
@@ -14,6 +18,9 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
   chartConfig 
 }) => {
   const { t, i18n } = useTranslation();
+  const [isAddingGoal, setIsAddingGoal] = useState(false);
+  const [newGoalName, setNewGoalName] = useState('');
+  const [newGoalAmount, setNewGoalAmount] = useState('');
   
   // Format currency based on locale
   const formatCurrency = (value: number) => {
@@ -35,8 +42,81 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
     };
   });
 
+  const handleAddGoal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newGoalName.trim()) {
+      toast.error("Please enter a name for your saving goal");
+      return;
+    }
+    
+    const amount = parseFloat(newGoalAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Please enter a valid target amount");
+      return;
+    }
+    
+    try {
+      await SavingsService.createSavingGoal(newGoalName, amount);
+      toast.success(`Created new saving goal: ${newGoalName}`);
+      setNewGoalName('');
+      setNewGoalAmount('');
+      setIsAddingGoal(false);
+      // We should refresh the goals here, but since we don't have a direct callback,
+      // the parent component should handle that in the future
+    } catch (error) {
+      console.error('Error adding saving goal:', error);
+      toast.error("Could not create saving goal. Please try again.");
+    }
+  };
+
   return (
     <div className="h-[300px] overflow-y-auto">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex-1"></div>
+        <Button 
+          size="sm" 
+          onClick={() => setIsAddingGoal(!isAddingGoal)}
+          variant={isAddingGoal ? "outline" : "default"}
+        >
+          {isAddingGoal ? (
+            <X className="h-4 w-4 mr-1" />
+          ) : (
+            <Plus className="h-4 w-4 mr-1" />
+          )}
+          {isAddingGoal ? t('common.cancel') : t('dashboard.charts.createGoal')}
+        </Button>
+      </div>
+
+      {isAddingGoal && (
+        <form onSubmit={handleAddGoal} className="mb-4 p-3 bg-gray-50 rounded-md">
+          <div className="space-y-3">
+            <div>
+              <Input
+                value={newGoalName}
+                onChange={(e) => setNewGoalName(e.target.value)}
+                placeholder={t('dashboard.goals.nameInput')}
+                className="w-full mb-2"
+              />
+            </div>
+            <div>
+              <Input
+                type="number"
+                value={newGoalAmount}
+                onChange={(e) => setNewGoalAmount(e.target.value)}
+                placeholder={t('dashboard.goals.amountInput')}
+                min="1"
+                step="0.01"
+                className="w-full"
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              <Check className="h-4 w-4 mr-2" /> {t('dashboard.goals.create')}
+            </Button>
+          </div>
+        </form>
+      )}
+      
       {goalsWithProgress.length > 0 ? (
         <div className="space-y-4">
           {goalsWithProgress.map(goal => (
@@ -60,9 +140,6 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
       ) : (
         <div className="h-full flex flex-col items-center justify-center text-gray-400">
           <p>{t('dashboard.charts.noGoals')}</p>
-          <button className="mt-4 px-4 py-2 bg-primary text-white rounded-md text-sm">
-            {t('dashboard.charts.createGoal')}
-          </button>
         </div>
       )}
     </div>

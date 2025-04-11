@@ -10,6 +10,7 @@ import BalanceByAccountChart from '../charts/BalanceByAccountChart';
 import RevenueVsExpenseChart from '../charts/RevenueVsExpenseChart';
 import FinancialGoalsProgress from '../charts/FinancialGoalsProgress';
 import FinancialAlerts from './FinancialAlerts';
+import DashboardBigNumbers from './DashboardBigNumbers';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -21,6 +22,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   savingGoals
 }) => {
   const { t } = useTranslation();
+
+  // Calculate total savings from savings goals
+  const totalSavings = savingGoals.reduce((total, goal) => total + goal.current_amount, 0);
 
   // Default chart config
   const chartConfig = {
@@ -62,6 +66,12 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Big Numbers */}
+      <DashboardBigNumbers 
+        transactions={transactions} 
+        totalSavings={totalSavings} 
+      />
+
       {/* Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded-lg shadow">
@@ -100,7 +110,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
       {/* Row 4 - Full width */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-2">{t('dashboard.alerts.title')}</h3>
         <FinancialAlerts alerts={sampleAlerts} />
       </div>
     </div>

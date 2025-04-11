@@ -1,3 +1,4 @@
+
 {
   "common": {
     "income": "Income",
@@ -7,7 +8,9 @@
     "today": "Today",
     "thisMonth": "This Month",
     "lastMonth": "Last Month",
-    "upcoming": "Upcoming"
+    "upcoming": "Upcoming",
+    "accumulated": "Accumulated",
+    "cancel": "Cancel"
   },
   "header": {
     "dashboard": "Dashboard",
@@ -56,6 +59,28 @@
       "tipDescription": "Consider automating your savings to reach your goals faster",
       "investment": "Investment opportunity",
       "investmentDescription": "Check out these investment options to make your money work for you"
+    },
+    "bigNumbers": {
+      "availableBalance": "Available Balance",
+      "availableBalanceTooltip": "Your current available balance across all accounts",
+      "monthlyExpenses": "Monthly Expenses",
+      "monthlyExpensesTooltip": "Total expenses for the current month",
+      "monthlyIncome": "Monthly Income",
+      "monthlyIncomeTooltip": "Total income for the current month",
+      "pendingBalance": "Pending Balance",
+      "pendingBalanceTooltip": "Upcoming scheduled transactions",
+      "totalSavings": "Total Savings",
+      "totalSavingsTooltip": "Your accumulated savings across all goals",
+      "today": "Today",
+      "thisMonth": "This Month",
+      "upcoming": "Upcoming",
+      "accumulated": "Accumulated"
+    },
+    "goals": {
+      "nameInput": "Goal name",
+      "amountInput": "Target amount",
+      "create": "Create Goal",
+      "addToGoal": "Add to Goal"
     }
   },
   "accounts": {
