@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Transaction } from '@/services/TransactionService';
-import { RepeatIcon, PencilIcon, Trash2 } from "lucide-react";
 import { transactionCategories } from '@/data/categories';
 import TransactionActions from './TransactionActions';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
+import { RepeatIcon } from "lucide-react";
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -57,7 +57,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         }`}>
           {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
         </TableCell>
-        <TableCell>
+        <TableCell className="text-center">
           {transaction.is_recurring && (
             <div className="flex items-center justify-center">
               <RepeatIcon className="h-4 w-4 text-blue-500" />

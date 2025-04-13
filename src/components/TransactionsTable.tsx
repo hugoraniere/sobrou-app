@@ -8,7 +8,6 @@ import TransactionRow from './transactions/TransactionRow';
 import TransactionPagination from './transactions/TransactionPagination';
 import { useTransactionSorter } from '@/hooks/useTransactionSorter';
 import TransactionFilters from './transactions/TransactionFilters';
-import { transactionCategories } from '@/data/categories';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -31,7 +30,6 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const [localFilters, setLocalFilters] = useState({
     ...filters,
     searchTerm: '',
-    customDate: '' // Add customDate property to localFilters
   });
   const itemsPerPage = 10;
   
@@ -102,17 +100,6 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
         case 'thisYear': {
           return transactionDate.getFullYear() === today.getFullYear();
         }
-        case 'custom': {
-          if (localFilters.customDate) {
-            const customDate = new Date(localFilters.customDate);
-            return (
-              transactionDate.getDate() === customDate.getDate() &&
-              transactionDate.getMonth() === customDate.getMonth() &&
-              transactionDate.getFullYear() === customDate.getFullYear()
-            );
-          }
-          return true;
-        }
         default:
           return true;
       }
@@ -153,7 +140,6 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
       minAmount: '',
       maxAmount: '',
       searchTerm: '',
-      customDate: '' // Include customDate in reset
     });
     setCurrentPage(1);
   };
@@ -176,15 +162,15 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
       <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 border-b">
           <h3 className="text-lg font-semibold">Suas Transações</h3>
-        </div>
-        
-        {/* Single filter positioned above the transaction table */}
-        <div className="px-4 py-3 border-b">
-          <TransactionFilters 
-            filters={localFilters}
-            onFilterChange={handleFilterChange}
-            onResetFilters={handleResetFilters}
-          />
+          
+          {/* Single filter positioned above the transaction table */}
+          <div className="mt-3">
+            <TransactionFilters 
+              filters={localFilters}
+              onFilterChange={handleFilterChange}
+              onResetFilters={handleResetFilters}
+            />
+          </div>
         </div>
         
         {filteredTransactions.length === 0 ? (

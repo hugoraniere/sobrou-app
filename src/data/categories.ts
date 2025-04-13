@@ -1,142 +1,32 @@
 
-import { 
-  ShoppingCart, Home, Car, Clapperboard, Heart, Book, Briefcase, 
-  Landmark, LineChart, CreditCard, Gift, FileText, Sparkles, 
-  Repeat, ArrowLeftRight, PiggyBank 
-} from "lucide-react";
+import { BarChartBig, CreditCard, Home, ShoppingBag, Coffee, Car, Utensils, Train, Plane, HeartPulse, Landmark, GraduationCap, Gift, PartyPopper, Zap, Droplets, Wifi, Phone, DollarSign, Wallet } from "lucide-react";
 
 export interface TransactionCategory {
   id: string;
   name: string;
-  icon: any; // Componente do Lucide React
-  keywords: string[];
-  type?: 'expense' | 'income' | 'transfer' | 'all';
-  color?: string; // Added color property
+  icon: React.ComponentType;
+  color: string; // Adicionando a propriedade color exigida
 }
 
 export const transactionCategories: TransactionCategory[] = [
-  {
-    id: "food",
-    name: "Alimentação",
-    icon: ShoppingCart,
-    keywords: ["mercado", "supermercado", "feira", "sacolão", "pão", "leite", "frutas", "comida", "alimentação", "marmita", "hortifruti"],
-    type: "expense"
-  },
-  {
-    id: "housing",
-    name: "Moradia",
-    icon: Home,
-    keywords: ["aluguel", "condomínio", "luz", "água", "energia", "gás", "IPTU", "residência", "faxina", "eletricidade"],
-    type: "expense"
-  },
-  {
-    id: "transportation",
-    name: "Transporte",
-    icon: Car,
-    keywords: ["uber", "99", "metrô", "ônibus", "gasolina", "combustível", "corrida", "transporte", "carro"],
-    type: "expense"
-  },
-  {
-    id: "entertainment",
-    name: "Lazer",
-    icon: Clapperboard,
-    keywords: ["cinema", "bar", "pizza", "restaurante", "rolê", "festa", "balada", "viagem", "show", "netflix", "streaming"],
-    type: "expense"
-  },
-  {
-    id: "health",
-    name: "Saúde",
-    icon: Heart,
-    keywords: ["farmácia", "remédio", "médico", "consulta", "exame", "dentista", "hospital", "plano de saúde"],
-    type: "expense"
-  },
-  {
-    id: "education",
-    name: "Educação",
-    icon: Book,
-    keywords: ["curso", "faculdade", "escola", "mensalidade", "aula", "workshop", "inscrição", "EAD"],
-    type: "expense"
-  },
-  {
-    id: "work",
-    name: "Trabalho",
-    icon: Briefcase,
-    keywords: ["freelance", "job", "cliente", "projeto", "comissão", "extra", "prestação de serviço"],
-    type: "income"
-  },
-  {
-    id: "salary",
-    name: "Salário",
-    icon: Landmark,
-    keywords: ["salário", "empresa", "pagamento fixo", "contracheque", "holerite"],
-    type: "income"
-  },
-  {
-    id: "investments",
-    name: "Investimentos",
-    icon: LineChart,
-    keywords: ["ação", "dividendos", "aplicação", "fundo", "CDB", "tesouro", "cripto", "BTC", "rendimento", "poupança"],
-    type: "income"
-  },
-  {
-    id: "credit_card",
-    name: "Cartão de Crédito",
-    icon: CreditCard,
-    keywords: ["fatura", "parcela", "limite", "dívida", "cartão", "cobrança", "juros"],
-    type: "expense"
-  },
-  {
-    id: "gifts",
-    name: "Presentes",
-    icon: Gift,
-    keywords: ["presente", "doação", "mimo", "caridade", "cesta", "contribuir"],
-    type: "expense"
-  },
-  {
-    id: "taxes",
-    name: "Taxas e Impostos",
-    icon: FileText,
-    keywords: ["taxa", "multa", "IOF", "IR", "INSS", "imposto", "tarifa"],
-    type: "expense"
-  },
-  {
-    id: "personal_care",
-    name: "Cuidados Pessoais",
-    icon: Sparkles,
-    keywords: ["cabelo", "salão", "manicure", "spa", "estética", "autocuidado", "beleza"],
-    type: "expense"
-  },
-  {
-    id: "subscriptions",
-    name: "Assinaturas",
-    icon: Repeat,
-    keywords: ["spotify", "netflix", "youtube", "adobe", "plano mensal", "assinatura", "recorrente"],
-    type: "expense"
-  },
-  {
-    id: "transfers",
-    name: "Transferências",
-    icon: ArrowLeftRight,
-    keywords: ["pix", "TED", "DOC", "saque", "depósito", "entre contas", "transferência"],
-    type: "transfer"
-  },
-  {
-    id: "savings",
-    name: "Poupança",
-    icon: PiggyBank,
-    keywords: ["guardar", "reserva", "cofrinho", "meta", "economia", "sobra"],
-    type: "expense"
-  }
+  { id: 'salary', name: 'Salário', icon: Wallet, color: '#4CAF50' },
+  { id: 'investment', name: 'Investimento', icon: DollarSign, color: '#2196F3' },
+  { id: 'extra_income', name: 'Renda Extra', icon: CreditCard, color: '#673AB7' },
+  { id: 'housing', name: 'Moradia', icon: Home, color: '#795548' },
+  { id: 'shopping', name: 'Compras', icon: ShoppingBag, color: '#FF5722' },
+  { id: 'food', name: 'Alimentação', icon: Utensils, color: '#FF9800' },
+  { id: 'coffee', name: 'Café', icon: Coffee, color: '#A52A2A' },
+  { id: 'transportation', name: 'Transporte', icon: Car, color: '#607D8B' },
+  { id: 'public_transport', name: 'Transporte Público', icon: Train, color: '#3F51B5' },
+  { id: 'travel', name: 'Viagem', icon: Plane, color: '#00BCD4' },
+  { id: 'health', name: 'Saúde', icon: HeartPulse, color: '#E91E63' },
+  { id: 'banking', name: 'Bancos', icon: Landmark, color: '#9C27B0' },
+  { id: 'education', name: 'Educação', icon: GraduationCap, color: '#FFC107' },
+  { id: 'gift', name: 'Presentes', icon: Gift, color: '#E040FB' },
+  { id: 'entertainment', name: 'Entretenimento', icon: PartyPopper, color: '#8BC34A' },
+  { id: 'utilities', name: 'Utilidades', icon: Zap, color: '#F44336' },
+  { id: 'water', name: 'Água', icon: Droplets, color: '#03A9F4' },
+  { id: 'internet', name: 'Internet', icon: Wifi, color: '#009688' },
+  { id: 'phone', name: 'Telefone', icon: Phone, color: '#FF4081' },
+  { id: 'other', name: 'Outros', icon: BarChartBig, color: '#9E9E9E' }
 ];
-
-export const getCategoryById = (id: string): TransactionCategory | undefined => {
-  return transactionCategories.find(cat => cat.id === id);
-};
-
-export const getCategoryByKeyword = (text: string): TransactionCategory | undefined => {
-  const lowerText = text.toLowerCase();
-  
-  return transactionCategories.find(category => 
-    category.keywords.some(keyword => lowerText.includes(keyword.toLowerCase()))
-  );
-};
