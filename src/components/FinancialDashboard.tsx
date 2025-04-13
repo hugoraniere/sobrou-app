@@ -11,41 +11,55 @@ interface FinancialDashboardProps {
 }
 
 export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({ expenses }) => {
-  // Chart configuration
+  // Chart configuration with consistent colors
   const chartConfig = {
     food: {
-      label: "Food",
+      label: "Alimentação",
       theme: {
-        light: "#FFBB28",
-        dark: "#FFBB28"
+        light: "#FF8042",
+        dark: "#FF8042"
       }
     },
     housing: {
-      label: "Housing",
+      label: "Moradia",
       theme: {
         light: "#0088FE",
         dark: "#0088FE"
       }
     },
     transportation: {
-      label: "Transportation",
+      label: "Transporte",
       theme: {
         light: "#00C49F",
         dark: "#00C49F"
       }
     },
     entertainment: {
-      label: "Entertainment",
+      label: "Lazer",
       theme: {
-        light: "#FF8042",
-        dark: "#FF8042"
+        light: "#FFBB28",
+        dark: "#FFBB28"
       }
     },
-    other: {
-      label: "Other",
+    health: {
+      label: "Saúde",
+      theme: {
+        light: "#FF0000",
+        dark: "#FF0000"
+      }
+    },
+    education: {
+      label: "Educação",
       theme: {
         light: "#A259FF",
         dark: "#A259FF"
+      }
+    },
+    other: {
+      label: "Outros",
+      theme: {
+        light: "#8884D8",
+        dark: "#8884D8"
       }
     }
   };

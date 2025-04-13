@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -16,7 +15,7 @@ import { Transaction } from '@/services/TransactionService';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
-import { useI18n } from '@/hooks/use-mobile';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface ExpensesOverTimeChartProps {
   expenses: Transaction[];
@@ -32,19 +31,14 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
   
   const dateLocale = locale === 'pt-BR' ? ptBR : enUS;
   
-  // Process data for the chart
   const processData = () => {
-    // Create a map of dates to total expenses
     const dateMap: Map<string, number> = new Map();
     
-    // Filter to only expenses
     const onlyExpenses = expenses.filter(expense => expense.type === 'expense');
     
-    // Group by date
     onlyExpenses.forEach(expense => {
       try {
-        // Format the date to YYYY-MM-DD to use as a key
-        const dateKey = expense.date.substring(0, 10); // Get only YYYY-MM-DD part
+        const dateKey = expense.date.substring(0, 10);
         const currentAmount = dateMap.get(dateKey) || 0;
         dateMap.set(dateKey, currentAmount + expense.amount);
       } catch (error) {
@@ -52,7 +46,6 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
       }
     });
     
-    // Convert to array of objects for Recharts
     return Array.from(dateMap.entries())
       .map(([date, amount]) => ({
         date,
@@ -67,7 +60,6 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
   
   const data = processData();
   
-  // Custom tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const date = parseISO(label);
@@ -87,7 +79,6 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
     return null;
   };
   
-  // Format X axis date ticks
   const formatXAxis = (dateString: string) => {
     try {
       const date = parseISO(dateString);

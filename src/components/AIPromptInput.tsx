@@ -89,7 +89,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   };
   
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6 sticky top-4 z-10">
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4">Inserir sua transação</h2>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <div className="flex-grow relative">

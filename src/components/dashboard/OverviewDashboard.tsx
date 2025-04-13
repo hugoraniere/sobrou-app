@@ -18,6 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import EmptyStateMessage from './EmptyStateMessage';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -35,19 +36,35 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   // Calculate total savings from savings goals
   const totalSavings = savingGoals.reduce((total, goal) => total + goal.current_amount, 0);
 
-  // Default chart config
+  // Default chart config with consistent colors
   const chartConfig = {
     income: {
       label: t('common.income'),
-      theme: { light: "#0ea5e9", dark: "#0ea5e9" }
+      theme: { light: "#0088FE", dark: "#0088FE" }
     },
     expense: {
       label: t('common.expense'),
-      theme: { light: "#ef4444", dark: "#ef4444" }
+      theme: { light: "#FF8042", dark: "#FF8042" }
     },
     savings: {
       label: t('common.savings'),
-      theme: { light: "#22c55e", dark: "#22c55e" }
+      theme: { light: "#00C49F", dark: "#00C49F" }
+    },
+    food: {
+      label: "Alimentação",
+      theme: { light: "#FF8042", dark: "#FF8042" }
+    },
+    housing: {
+      label: "Moradia",
+      theme: { light: "#0088FE", dark: "#0088FE" }
+    },
+    transportation: {
+      label: "Transporte",
+      theme: { light: "#00C49F", dark: "#00C49F" }
+    },
+    entertainment: {
+      label: "Lazer",
+      theme: { light: "#FFBB28", dark: "#FFBB28" }
     }
   };
 
@@ -95,64 +112,77 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
       {/* Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.categoryBreakdown')}</h3>
-          {hasTransactions ? (
-            <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={t('dashboard.charts.noData')} />
-          )}
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.incomeByType')}</h3>
-          {hasTransactions ? (
-            <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={t('dashboard.charts.noData')} />
-          )}
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.categoryBreakdown')}</h3>
+            {hasTransactions ? (
+              <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
+            {hasTransactions ? (
+              <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.dailyEvolution')}</h3>
-          {hasTransactions ? (
-            <DailyBarChart transactions={transactions} />
-          ) : (
-            <EmptyStateMessage message={t('dashboard.charts.noData')} />
-          )}
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.balanceByAccount')}</h3>
-          {hasTransactions ? (
-            <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={t('dashboard.charts.noData')} />
-          )}
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.dailyEvolution')}</h3>
+            {hasTransactions ? (
+              <DailyBarChart transactions={transactions} />
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.balanceByAccount')}</h3>
+            {hasTransactions ? (
+              <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Row 3 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.revenueVsExpense')}</h3>
-          {hasTransactions ? (
-            <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={t('dashboard.charts.noData')} />
-          )}
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-semibold">{t('dashboard.charts.financialGoals')}</h3>
-          </div>
-          {hasSavingGoals ? (
-            <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
-          )}
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.revenueVsExpense')}</h3>
+            {hasTransactions ? (
+              <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.financialGoals')}</h3>
+            {hasSavingGoals ? (
+              <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

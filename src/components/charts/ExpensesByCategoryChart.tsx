@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { Transaction } from '@/services/TransactionService';
@@ -65,64 +65,61 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   };
   
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle>{t('dashboard.charts.expensesByCategory')}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Card className="h-full">
+      <CardContent className="p-6">
         {data.length > 0 ? (
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  innerRadius={30}
-                  fill="#8884d8"
-                  dataKey="value"
-                  nameKey="name"
-                >
-                  {data.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={COLORS[index % COLORS.length]} 
-                    />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    innerRadius={30}
+                    fill="#8884d8"
+                    dataKey="value"
+                    nameKey="name"
+                  >
+                    {data.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS[index % COLORS.length]} 
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Legend */}
+            <div className="grid grid-cols-1 gap-1 mt-4">
+              {data.slice(0, 5).map((entry, index) => (
+                <div key={entry.id} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div 
+                      className="w-3 h-3 rounded-full mr-2" 
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    ></div>
+                    <span className="text-sm truncate">{entry.name}</span>
+                  </div>
+                  <span className="text-sm font-medium">
+                    R$ {entry.value.toFixed(2)}
+                  </span>
+                </div>
+              ))}
+              {data.length > 5 && (
+                <div className="text-xs text-center text-gray-500 mt-1">
+                  +{data.length - 5} outras categorias
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <EmptyStateMessage message={t('dashboard.charts.noData')} />
-        )}
-        
-        {/* Legend */}
-        {data.length > 0 && (
-          <div className="grid grid-cols-1 gap-1 mt-2">
-            {data.slice(0, 5).map((entry, index) => (
-              <div key={entry.id} className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div 
-                    className="w-3 h-3 rounded-full mr-2" 
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                  ></div>
-                  <span className="text-xs truncate">{entry.name}</span>
-                </div>
-                <span className="text-xs font-medium">
-                  R$ {entry.value.toFixed(2)}
-                </span>
-              </div>
-            ))}
-            {data.length > 5 && (
-              <div className="text-xs text-center text-gray-500 mt-1">
-                +{data.length - 5} outras categorias
-              </div>
-            )}
-          </div>
         )}
       </CardContent>
     </Card>
