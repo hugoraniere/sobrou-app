@@ -11,7 +11,7 @@ import Auth from "./pages/Auth";
 import { AuthProvider } from "./contexts/AuthContext";
 import PublicLanding from "./pages/PublicLanding";
 import ProtectedRoute from "./components/ProtectedRoute";
-import * as React from "react"; // Make sure we explicitly import everything from React
+import React from "react"; // Proper React import
 
 const App = () => {
   // Create QueryClient inside the component

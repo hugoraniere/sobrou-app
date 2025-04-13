@@ -7,6 +7,8 @@ import TransactionTableHeader from './transactions/TransactionTableHeader';
 import TransactionRow from './transactions/TransactionRow';
 import TransactionPagination from './transactions/TransactionPagination';
 import { useTransactionSorter } from '@/hooks/useTransactionSorter';
+import TransactionFilters from './transactions/TransactionFilters';
+import { transactionCategories } from '@/data/categories';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -26,29 +28,93 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   onTransactionUpdated
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [localFilters, setLocalFilters] = useState({
+    ...filters,
+    searchTerm: ''
+  });
   const itemsPerPage = 10;
   
   const { sortConfig, handleSort, sortedTransactions } = useTransactionSorter('date', 'desc');
   
   // Apply filters to transactions
   const filteredTransactions = transactions.filter(transaction => {
+    // Filter by search term
+    if (localFilters.searchTerm) {
+      const searchTermLower = localFilters.searchTerm.toLowerCase();
+      const matchesDescription = transaction.description.toLowerCase().includes(searchTermLower);
+      const matchesAmount = transaction.amount.toString().includes(localFilters.searchTerm);
+      
+      if (!matchesDescription && !matchesAmount) {
+        return false;
+      }
+    }
+    
     // Filter by category
-    if (filters.category !== 'all' && transaction.category !== filters.category) {
+    if (localFilters.category !== 'all' && transaction.category !== localFilters.category) {
       return false;
     }
     
     // Filter by type
-    if (filters.type !== 'all' && transaction.type !== filters.type) {
+    if (localFilters.type !== 'all' && transaction.type !== localFilters.type) {
       return false;
     }
     
     // Filter by amount range
-    if (filters.minAmount && transaction.amount < parseFloat(filters.minAmount)) {
+    if (localFilters.minAmount && transaction.amount < parseFloat(localFilters.minAmount)) {
       return false;
     }
     
-    if (filters.maxAmount && transaction.amount > parseFloat(filters.maxAmount)) {
+    if (localFilters.maxAmount && transaction.amount > parseFloat(localFilters.maxAmount)) {
       return false;
+    }
+    
+    // Filter by date range
+    if (localFilters.dateRange !== 'all') {
+      const transactionDate = new Date(transaction.date);
+      const today = new Date();
+      
+      switch (localFilters.dateRange) {
+        case '7days': {
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return transactionDate >= weekAgo;
+        }
+        case '30days': {
+          const monthAgo = new Date();
+          monthAgo.setDate(monthAgo.getDate() - 30);
+          return transactionDate >= monthAgo;
+        }
+        case 'thisMonth': {
+          return (
+            transactionDate.getMonth() === today.getMonth() &&
+            transactionDate.getFullYear() === today.getFullYear()
+          );
+        }
+        case 'lastMonth': {
+          const lastMonth = new Date();
+          lastMonth.setMonth(lastMonth.getMonth() - 1);
+          return (
+            transactionDate.getMonth() === lastMonth.getMonth() &&
+            transactionDate.getFullYear() === lastMonth.getFullYear()
+          );
+        }
+        case 'thisYear': {
+          return transactionDate.getFullYear() === today.getFullYear();
+        }
+        case 'custom': {
+          if (localFilters.customDate) {
+            const customDate = new Date(localFilters.customDate);
+            return (
+              transactionDate.getDate() === customDate.getDate() &&
+              transactionDate.getMonth() === customDate.getMonth() &&
+              transactionDate.getFullYear() === customDate.getFullYear()
+            );
+          }
+          return true;
+        }
+        default:
+          return true;
+      }
     }
     
     return true;
@@ -68,15 +134,36 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     return date.toLocaleDateString();
   };
   
+  // Handle filter changes
+  const handleFilterChange = (key: string, value: string) => {
+    setLocalFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+  
+  // Reset filters
+  const handleResetFilters = () => {
+    setLocalFilters({
+      category: 'all',
+      type: 'all',
+      dateRange: '30days',
+      minAmount: '',
+      maxAmount: '',
+      searchTerm: '',
+      customDate: undefined
+    });
+    setCurrentPage(1);
+  };
+  
   // Toggle recurring status
   const handleToggleRecurring = async (id: string, isRecurring: boolean) => {
     try {
-      await TransactionService.updateTransaction(id, { 
-        is_recurring: !isRecurring,
-        recurrence_interval: !isRecurring ? 'monthly' : undefined
-      });
-      onTransactionUpdated();
-      toast.success(!isRecurring ? 'Marcado como recorrente' : 'Status de recorrência removido');
+      // Since is_recurring column doesn't exist in the database, we need to handle this differently
+      // For now, let's just show a toast message instead of trying to update the database
+      toast.success(!isRecurring ? 'Marcado como recorrente (simulado)' : 'Status de recorrência removido (simulado)');
+      // In a real implementation, you would need to add the is_recurring column to your database table
     } catch (error) {
       console.error('Erro ao atualizar transação:', error);
       toast.error('Falha ao atualizar transação');
@@ -84,42 +171,51 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   };
   
   return (
-    <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="p-4 border-b">
-        <h3 className="text-lg font-semibold">Suas Transações</h3>
-      </div>
+    <div className="space-y-4">
+      {/* Add filter bar here */}
+      <TransactionFilters 
+        filters={localFilters}
+        onFilterChange={handleFilterChange}
+        onResetFilters={handleResetFilters}
+      />
       
-      {filteredTransactions.length === 0 ? (
-        <div className="py-8 text-center text-gray-500">
-          Nenhuma transação encontrada com os filtros atuais.
+      <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-4 border-b">
+          <h3 className="text-lg font-semibold">Suas Transações</h3>
         </div>
-      ) : (
-        <>
-          <Table>
-            <TransactionTableHeader 
-              sortConfig={sortConfig}
-              onSort={handleSort}
+        
+        {filteredTransactions.length === 0 ? (
+          <div className="py-8 text-center text-gray-500">
+            Nenhuma transação encontrada com os filtros atuais.
+          </div>
+        ) : (
+          <>
+            <Table>
+              <TransactionTableHeader 
+                sortConfig={sortConfig}
+                onSort={handleSort}
+              />
+              <TableBody>
+                {paginatedTransactions.map((transaction) => (
+                  <TransactionRow 
+                    key={transaction.id}
+                    transaction={transaction}
+                    onToggleRecurring={handleToggleRecurring}
+                    formatDate={formatDate}
+                    onTransactionUpdated={onTransactionUpdated}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+            
+            <TransactionPagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
             />
-            <TableBody>
-              {paginatedTransactions.map((transaction) => (
-                <TransactionRow 
-                  key={transaction.id}
-                  transaction={transaction}
-                  onToggleRecurring={handleToggleRecurring}
-                  formatDate={formatDate}
-                  onTransactionUpdated={onTransactionUpdated}
-                />
-              ))}
-            </TableBody>
-          </Table>
-          
-          <TransactionPagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
