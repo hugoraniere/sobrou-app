@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { 
   Select, 
   SelectContent, 
@@ -28,6 +27,7 @@ interface TransactionFiltersProps {
     minAmount: string;
     maxAmount: string;
     searchTerm?: string;
+    customDate?: string;
   };
   onFilterChange: (key: string, value: string) => void;
   onResetFilters: () => void;
@@ -38,7 +38,9 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   onFilterChange,
   onResetFilters
 }) => {
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [date, setDate] = React.useState<Date | undefined>(
+    filters.customDate ? new Date(filters.customDate) : new Date()
+  );
   
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
@@ -48,44 +50,39 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   };
   
   return (
-    <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium">Filtros</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-sm font-medium">Filtros</h4>
         <Button
           variant="ghost"
           size="sm"
           onClick={onResetFilters}
-          className="h-8 px-2"
+          className="h-8 px-2 text-xs"
         >
-          <X className="h-4 w-4 mr-1" />
+          <X className="h-3 w-3 mr-1" />
           Limpar filtros
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         {/* Search */}
-        <div className="space-y-2">
-          <Label htmlFor="search">Pesquisar</Label>
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="search"
-              placeholder="Descrição, valor..."
-              value={filters.searchTerm || ''}
-              onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-              className="pl-8"
-            />
-          </div>
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar..."
+            value={filters.searchTerm || ''}
+            onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+            className="pl-8"
+          />
         </div>
         
         {/* Category Filter */}
-        <div className="space-y-2">
-          <Label htmlFor="category">Categoria</Label>
+        <div>
           <Select
             value={filters.category}
             onValueChange={(value) => onFilterChange('category', value)}
           >
-            <SelectTrigger id="category">
+            <SelectTrigger>
               <SelectValue placeholder="Todas categorias" />
             </SelectTrigger>
             <SelectContent>
@@ -100,13 +97,12 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         </div>
         
         {/* Transaction Type */}
-        <div className="space-y-2">
-          <Label htmlFor="type">Tipo</Label>
+        <div>
           <Select
             value={filters.type}
             onValueChange={(value) => onFilterChange('type', value)}
           >
-            <SelectTrigger id="type">
+            <SelectTrigger>
               <SelectValue placeholder="Todos tipos" />
             </SelectTrigger>
             <SelectContent>
@@ -119,13 +115,12 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         </div>
         
         {/* Date Range */}
-        <div className="space-y-2">
-          <Label htmlFor="dateRange">Período</Label>
+        <div>
           <Select
             value={filters.dateRange}
             onValueChange={(value) => onFilterChange('dateRange', value)}
           >
-            <SelectTrigger id="dateRange">
+            <SelectTrigger>
               <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
@@ -143,7 +138,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             <div className="mt-2">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                  <Button variant="outline" className="w-full justify-start text-left font-normal text-sm">
                     <Calendar className="mr-2 h-4 w-4" />
                     {date ? format(date, 'dd/MM/yyyy') : 'Selecione uma data'}
                   </Button>
@@ -162,23 +157,22 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         </div>
         
         {/* Amount Range */}
-        <div className="space-y-2 md:col-span-2">
-          <Label>Faixa de valor</Label>
-          <div className="flex items-center space-x-2">
-            <Input
-              type="number"
-              placeholder="Valor mínimo"
-              value={filters.minAmount}
-              onChange={(e) => onFilterChange('minAmount', e.target.value)}
-            />
-            <span>a</span>
-            <Input
-              type="number"
-              placeholder="Valor máximo"
-              value={filters.maxAmount}
-              onChange={(e) => onFilterChange('maxAmount', e.target.value)}
-            />
-          </div>
+        <div className="flex items-center space-x-2">
+          <Input
+            type="number"
+            placeholder="Min"
+            value={filters.minAmount}
+            onChange={(e) => onFilterChange('minAmount', e.target.value)}
+            className="w-full"
+          />
+          <span>-</span>
+          <Input
+            type="number"
+            placeholder="Max"
+            value={filters.maxAmount}
+            onChange={(e) => onFilterChange('maxAmount', e.target.value)}
+            className="w-full"
+          />
         </div>
       </div>
     </div>

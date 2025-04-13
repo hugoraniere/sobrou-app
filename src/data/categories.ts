@@ -11,6 +11,7 @@ export interface TransactionCategory {
   icon: any; // Componente do Lucide React
   keywords: string[];
   type?: 'expense' | 'income' | 'transfer' | 'all';
+  color?: string; // Added color property
 }
 
 export const transactionCategories: TransactionCategory[] = [

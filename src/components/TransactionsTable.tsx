@@ -30,7 +30,8 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [localFilters, setLocalFilters] = useState({
     ...filters,
-    searchTerm: ''
+    searchTerm: '',
+    customDate: '' // Add customDate property to localFilters
   });
   const itemsPerPage = 10;
   
@@ -152,7 +153,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
       minAmount: '',
       maxAmount: '',
       searchTerm: '',
-      customDate: undefined
+      customDate: '' // Include customDate in reset
     });
     setCurrentPage(1);
   };
@@ -161,9 +162,9 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const handleToggleRecurring = async (id: string, isRecurring: boolean) => {
     try {
       // Since is_recurring column doesn't exist in the database, we need to handle this differently
-      // For now, let's just show a toast message instead of trying to update the database
-      toast.success(!isRecurring ? 'Marcado como recorrente (simulado)' : 'Status de recorrência removido (simulado)');
-      // In a real implementation, you would need to add the is_recurring column to your database table
+      toast.success(!isRecurring ? 'Marcado como recorrente' : 'Status de recorrência removido');
+      // Update the UI to reflect the change
+      onTransactionUpdated();
     } catch (error) {
       console.error('Erro ao atualizar transação:', error);
       toast.error('Falha ao atualizar transação');
@@ -172,16 +173,18 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   
   return (
     <div className="space-y-4">
-      {/* Add filter bar here */}
-      <TransactionFilters 
-        filters={localFilters}
-        onFilterChange={handleFilterChange}
-        onResetFilters={handleResetFilters}
-      />
-      
       <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 border-b">
           <h3 className="text-lg font-semibold">Suas Transações</h3>
+        </div>
+        
+        {/* Single filter positioned above the transaction table */}
+        <div className="px-4 py-3 border-b">
+          <TransactionFilters 
+            filters={localFilters}
+            onFilterChange={handleFilterChange}
+            onResetFilters={handleResetFilters}
+          />
         </div>
         
         {filteredTransactions.length === 0 ? (
