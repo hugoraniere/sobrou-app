@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useTranslation } from 'react-i18next';
 
 interface DeleteTransactionDialogProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ const DeleteTransactionDialog: React.FC<DeleteTransactionDialogProps> = ({
   transactionId,
   onTransactionUpdated
 }) => {
+  const { t } = useTranslation();
+  
   const handleDelete = async () => {
     try {
       await TransactionService.deleteTransaction(transactionId);
@@ -34,7 +37,7 @@ const DeleteTransactionDialog: React.FC<DeleteTransactionDialogProps> = ({
       // Note: The toast with undo button is now handled in TransactionRow.tsx
     } catch (error) {
       console.error('Erro ao excluir transação:', error);
-      toast.error('Falha ao excluir transação');
+      toast.error(t('transactions.deleteError', 'Falha ao excluir transação'));
     }
   };
 
@@ -42,15 +45,15 @@ const DeleteTransactionDialog: React.FC<DeleteTransactionDialogProps> = ({
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Excluir Transação</AlertDialogTitle>
+          <AlertDialogTitle>{t('transactions.deleteTitle', 'Excluir Transação')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.
+            {t('transactions.deleteConfirmation', 'Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel', 'Cancelar')}</AlertDialogCancel>
           <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-            Excluir
+            {t('transactions.delete', 'Excluir')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

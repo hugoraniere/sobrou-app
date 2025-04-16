@@ -8,9 +8,12 @@ import DeveloperControls from '../components/dashboard/DeveloperControls';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { transactionCategories } from '@/data/categories';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   
   const {
     transactions,
@@ -47,6 +50,10 @@ const Index = () => {
   
   return (
     <>
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSwitcher />
+      </div>
+      
       <DashboardLayout
         whatsAppConnected={whatsAppConnected}
         showOnboarding={showOnboarding}

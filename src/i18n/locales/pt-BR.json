@@ -23,6 +23,7 @@
     "title": "Painel de Controle",
     "subtitle": "Acompanhe suas finanças e analise seus hábitos de gastos",
     "welcome": "Bem-vindo ao seu painel financeiro! Aqui você pode acompanhar suas finanças de forma rápida.",
+    "fromLastMonth": "do mês anterior",
     "tabs": {
       "overview": "Visão Geral",
       "transactions": "Transações",
@@ -93,5 +94,33 @@
     "savings": "Poupança",
     "creditCard": "Cartão de Crédito",
     "investments": "Investimentos"
+  },
+  "transactions": {
+    "date": "Data",
+    "type": "Tipo",
+    "category": "Categoria",
+    "description": "Descrição",
+    "amount": "Valor",
+    "actions": "Ações",
+    "addNew": "Adicionar Nova Transação",
+    "editTitle": "Editar Transação",
+    "editDescription": "Modifique os detalhes da transação abaixo",
+    "deleteTitle": "Excluir Transação",
+    "deleteConfirmation": "Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.",
+    "delete": "Excluir",
+    "deleteSuccess": "Transação excluída",
+    "deleteDescription": "Sua transação foi excluída.",
+    "deleteError": "Falha ao excluir transação",
+    "updateSuccess": "Transação atualizada com sucesso",
+    "updateError": "Falha ao atualizar transação",
+    "save": "Salvar alterações",
+    "undo": "Desfazer",
+    "restoreSuccess": "Transação restaurada",
+    "restoreDescription": "Sua transação foi restaurada.",
+    "removeRecurring": "Clique para remover recorrência",
+    "setRecurring": "Clique para definir como recorrente",
+    "selectType": "Selecione o tipo",
+    "selectCategory": "Selecione a categoria",
+    "transfer": "Transferência"
   }
 }

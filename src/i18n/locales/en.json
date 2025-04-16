@@ -23,6 +23,7 @@
     "title": "Dashboard",
     "subtitle": "Track your finances and analyze your spending habits",
     "welcome": "Welcome to your financial dashboard! Here you can track your finances at a glance.",
+    "fromLastMonth": "from last month",
     "tabs": {
       "overview": "Overview",
       "transactions": "Transactions",
@@ -93,5 +94,33 @@
     "savings": "Savings",
     "creditCard": "Credit Card",
     "investments": "Investments"
+  },
+  "transactions": {
+    "date": "Date",
+    "type": "Type",
+    "category": "Category",
+    "description": "Description",
+    "amount": "Amount",
+    "actions": "Actions",
+    "addNew": "Add New Transaction",
+    "editTitle": "Edit Transaction",
+    "editDescription": "Modify transaction details below",
+    "deleteTitle": "Delete Transaction",
+    "deleteConfirmation": "Are you sure you want to delete this transaction? This action cannot be undone.",
+    "delete": "Delete",
+    "deleteSuccess": "Transaction deleted",
+    "deleteDescription": "Your transaction has been deleted.",
+    "deleteError": "Failed to delete transaction",
+    "updateSuccess": "Transaction updated successfully",
+    "updateError": "Failed to update transaction",
+    "save": "Save changes",
+    "undo": "Undo",
+    "restoreSuccess": "Transaction restored",
+    "restoreDescription": "Your transaction has been restored.",
+    "removeRecurring": "Click to remove recurring",
+    "setRecurring": "Click to set as recurring",
+    "selectType": "Select type",
+    "selectCategory": "Select category",
+    "transfer": "Transfer"
   }
 }

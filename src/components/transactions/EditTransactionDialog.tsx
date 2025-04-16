@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { transactionCategories } from '@/data/categories';
+import { useTranslation } from 'react-i18next';
 
 interface EditTransactionDialogProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   onTransactionUpdated
 }) => {
   const [editedTransaction, setEditedTransaction] = useState<Transaction>({...transaction});
+  const { t } = useTranslation();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,10 +59,10 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
       await TransactionService.updateTransaction(transaction.id, editedTransaction);
       setIsOpen(false);
       onTransactionUpdated();
-      toast.success('Transação atualizada com sucesso');
+      toast.success(t('transactions.updateSuccess', 'Transação atualizada com sucesso'));
     } catch (error) {
       console.error('Erro ao atualizar transação:', error);
-      toast.error('Falha ao atualizar transação');
+      toast.error(t('transactions.updateError', 'Falha ao atualizar transação'));
     }
   };
 
@@ -68,16 +70,16 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Editar Transação</DialogTitle>
+          <DialogTitle>{t('transactions.editTitle', 'Editar Transação')}</DialogTitle>
           <DialogDescription>
-            Modifique os detalhes da transação abaixo
+            {t('transactions.editDescription', 'Modifique os detalhes da transação abaixo')}
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="date" className="text-right">
-              Data
+              {t('transactions.date', 'Data')}
             </Label>
             <Input
               id="date"
@@ -91,7 +93,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="type" className="text-right">
-              Tipo
+              {t('transactions.type', 'Tipo')}
             </Label>
             <Select 
               name="type" 
@@ -99,19 +101,19 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               onValueChange={(value) => handleSelectChange('type', value)}
             >
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Selecione o tipo" />
+                <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="income">Receita</SelectItem>
-                <SelectItem value="expense">Despesa</SelectItem>
-                <SelectItem value="transfer">Transferência</SelectItem>
+                <SelectItem value="income">{t('common.income', 'Receita')}</SelectItem>
+                <SelectItem value="expense">{t('common.expense', 'Despesa')}</SelectItem>
+                <SelectItem value="transfer">{t('transactions.transfer', 'Transferência')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="category" className="text-right">
-              Categoria
+              {t('transactions.category', 'Categoria')}
             </Label>
             <Select 
               name="category" 
@@ -119,7 +121,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               onValueChange={(value) => handleSelectChange('category', value)}
             >
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Selecione a categoria" />
+                <SelectValue placeholder={t('transactions.selectCategory', 'Selecione a categoria')} />
               </SelectTrigger>
               <SelectContent>
                 {transactionCategories.map((category) => (
@@ -136,7 +138,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="description" className="text-right">
-              Descrição
+              {t('transactions.description', 'Descrição')}
             </Label>
             <Input
               id="description"
@@ -149,7 +151,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
           
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="amount" className="text-right">
-              Valor
+              {t('transactions.amount', 'Valor')}
             </Label>
             <Input
               id="amount"
@@ -164,10 +166,10 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
         
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
-            Cancelar
+            {t('common.cancel', 'Cancelar')}
           </Button>
           <Button onClick={handleSave}>
-            Salvar alterações
+            {t('transactions.save', 'Salvar alterações')}
           </Button>
         </DialogFooter>
       </DialogContent>

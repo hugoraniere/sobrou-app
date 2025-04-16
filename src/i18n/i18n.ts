@@ -20,7 +20,7 @@ i18n
         translation: ptBRTranslation
       }
     },
-    fallbackLng: 'en',
+    fallbackLng: 'pt-BR',
     debug: process.env.NODE_ENV === 'development',
     
     // Save the detected language to localStorage
