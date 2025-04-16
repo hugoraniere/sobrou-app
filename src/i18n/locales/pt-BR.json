@@ -10,7 +10,8 @@
     "lastMonth": "Mês Passado",
     "upcoming": "Em breve",
     "accumulated": "Acumulado",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "error": "Erro"
   },
   "header": {
     "dashboard": "Painel",
@@ -102,6 +103,7 @@
     "description": "Descrição",
     "amount": "Valor",
     "actions": "Ações",
+    "recurring": "Recorrente",
     "addNew": "Adicionar Nova Transação",
     "editTitle": "Editar Transação",
     "editDescription": "Modifique os detalhes da transação abaixo",
@@ -113,6 +115,7 @@
     "deleteError": "Falha ao excluir transação",
     "updateSuccess": "Transação atualizada com sucesso",
     "updateError": "Falha ao atualizar transação",
+    "restoreError": "Erro ao restaurar transação",
     "save": "Salvar alterações",
     "undo": "Desfazer",
     "restoreSuccess": "Transação restaurada",

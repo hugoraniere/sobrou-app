@@ -3,6 +3,7 @@ import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Transaction } from '@/services/TransactionService';
+import { useTranslation } from 'react-i18next';
 
 type SortConfig = {
   key: keyof Transaction | '';
@@ -18,6 +19,8 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
   sortConfig, 
   onSort 
 }) => {
+  const { t } = useTranslation();
+  
   // Render sort icon
   const renderSortIcon = (key: keyof Transaction) => {
     if (sortConfig.key !== key) return null;
@@ -33,34 +36,34 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
           className="cursor-pointer"
           onClick={() => onSort('date')}
         >
-          Date {renderSortIcon('date')}
+          {t('transactions.date', 'Data')} {renderSortIcon('date')}
         </TableHead>
         <TableHead 
           className="cursor-pointer"
           onClick={() => onSort('type')}
         >
-          Type {renderSortIcon('type')}
+          {t('transactions.type', 'Tipo')} {renderSortIcon('type')}
         </TableHead>
         <TableHead 
           className="cursor-pointer"
           onClick={() => onSort('category')}
         >
-          Category {renderSortIcon('category')}
+          {t('transactions.category', 'Categoria')} {renderSortIcon('category')}
         </TableHead>
         <TableHead 
           className="w-full cursor-pointer"
           onClick={() => onSort('description')}
         >
-          Description {renderSortIcon('description')}
+          {t('transactions.description', 'Descrição')} {renderSortIcon('description')}
         </TableHead>
         <TableHead 
           className="text-right cursor-pointer"
           onClick={() => onSort('amount')}
         >
-          Amount {renderSortIcon('amount')}
+          {t('transactions.amount', 'Valor')} {renderSortIcon('amount')}
         </TableHead>
-        <TableHead className="w-10">Recurring</TableHead>
-        <TableHead className="w-10">Actions</TableHead>
+        <TableHead className="w-10">{t('transactions.recurring', 'Recorrente')}</TableHead>
+        <TableHead className="w-10">{t('transactions.actions', 'Ações')}</TableHead>
       </TableRow>
     </TableHeader>
   );

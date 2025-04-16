@@ -34,23 +34,24 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
   setIsOpen,
   onTransactionAdded
 }) => {
-  const { t } = useTranslation();
   const today = new Date().toISOString().split('T')[0];
+  const { t } = useTranslation();
   
   const [newTransaction, setNewTransaction] = useState({
-    date: today,
-    type: 'expense' as 'expense' | 'income' | 'transfer',
-    category: 'groceries',
+    amount: '',
     description: '',
-    amount: 0,
-    is_recurring: false
+    category: 'other',
+    type: 'expense',
+    date: today
   });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewTransaction(prev => ({
       ...prev,
-      [name]: name === 'amount' ? parseFloat(value) : value
+      [name]: value
     }));
   };
 
@@ -61,23 +62,51 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
     }));
   };
 
-  const handleSave = async () => {
+  const handleSubmit = async () => {
+    if (!newTransaction.amount || !newTransaction.description) {
+      toast.error("Por favor, preencha todos os campos");
+      return;
+    }
+
+    const amountValue = parseFloat(newTransaction.amount);
+    if (isNaN(amountValue) || amountValue <= 0) {
+      toast.error("Por favor, insira um valor válido");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      await TransactionService.addTransaction(newTransaction);
+      await TransactionService.addTransaction({
+        amount: amountValue,
+        description: newTransaction.description,
+        category: newTransaction.category,
+        type: newTransaction.type as 'expense' | 'income',
+        date: newTransaction.date
+      });
+
+      toast.success(
+        newTransaction.type === 'income' 
+          ? `Receita de R$${amountValue.toFixed(2)} adicionada` 
+          : `Despesa de R$${amountValue.toFixed(2)} adicionada`
+      );
+      
       setIsOpen(false);
       onTransactionAdded();
+      
+      // Reset form
       setNewTransaction({
-        date: today,
-        type: 'expense' as 'expense' | 'income' | 'transfer',
-        category: 'groceries',
+        amount: '',
         description: '',
-        amount: 0,
-        is_recurring: false
+        category: 'other',
+        type: 'expense',
+        date: today
       });
-      toast.success(t('transactions.addSuccess', 'Transação adicionada com sucesso'));
     } catch (error) {
       console.error('Erro ao adicionar transação:', error);
-      toast.error(t('transactions.addError', 'Falha ao adicionar transação'));
+      toast.error("Falha ao adicionar transação");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -85,9 +114,9 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('transactions.addTitle', 'Inserir sua transação')}</DialogTitle>
+          <DialogTitle>{t('transactions.addNew', 'Adicionar Nova Transação')}</DialogTitle>
           <DialogDescription>
-            {t('transactions.addDescription', 'Informe os detalhes da nova transação abaixo')}
+            Preencha os detalhes da transação abaixo
           </DialogDescription>
         </DialogHeader>
         
@@ -113,7 +142,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
             <Select 
               name="type" 
               value={newTransaction.type}
-              onValueChange={(value: 'income' | 'expense' | 'transfer') => handleSelectChange('type', value)}
+              onValueChange={(value) => handleSelectChange('type', value)}
             >
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
@@ -141,7 +170,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
               <SelectContent>
                 {transactionCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {category.icon && React.createElement(category.icon, { className: "h-4 w-4 mr-2 inline" })}
+                    {category.icon && React.createElement(category.icon, { size: 16, className: "mr-2 inline" })}
                     {category.name}
                   </SelectItem>
                 ))}
@@ -181,8 +210,8 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             {t('common.cancel', 'Cancelar')}
           </Button>
-          <Button onClick={handleSave}>
-            {t('transactions.save', 'Salvar')}
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Processando..." : t('transactions.addNew', 'Adicionar')}
           </Button>
         </DialogFooter>
       </DialogContent>

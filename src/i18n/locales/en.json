@@ -10,7 +10,8 @@
     "lastMonth": "Last Month",
     "upcoming": "Upcoming",
     "accumulated": "Accumulated",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "error": "Error"
   },
   "header": {
     "dashboard": "Dashboard",
@@ -102,6 +103,7 @@
     "description": "Description",
     "amount": "Amount",
     "actions": "Actions",
+    "recurring": "Recurring",
     "addNew": "Add New Transaction",
     "editTitle": "Edit Transaction",
     "editDescription": "Modify transaction details below",
@@ -113,6 +115,7 @@
     "deleteError": "Failed to delete transaction",
     "updateSuccess": "Transaction updated successfully",
     "updateError": "Failed to update transaction",
+    "restoreError": "Error restoring transaction",
     "save": "Save changes",
     "undo": "Undo",
     "restoreSuccess": "Transaction restored",

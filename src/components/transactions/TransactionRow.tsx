@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Transaction } from '@/services/TransactionService';
+import { Transaction, TransactionService } from '@/services/TransactionService';
 import { transactionCategories } from '@/data/categories';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
-import { RepeatIcon, Trash2 } from "lucide-react";
+import { RepeatIcon, Trash2, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [deletedTransaction, setDeletedTransaction] = useState<Transaction | null>(null);
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -34,11 +35,49 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
 
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
+    // Armazenar a transação a ser excluída para possível restauração
+    setDeletedTransaction({ ...transaction });
   };
 
-  const handleToggleRecurring = (e: React.MouseEvent) => {
+  const handleToggleRecurring = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    onToggleRecurring(transaction.id, !transaction.is_recurring);
+    try {
+      const updatedTransaction = await TransactionService.updateTransaction(
+        transaction.id, 
+        { is_recurring: !transaction.is_recurring }
+      );
+      onToggleRecurring(transaction.id, !transaction.is_recurring);
+    } catch (error) {
+      console.error('Erro ao atualizar recorrência:', error);
+      toast({
+        title: t('transactions.updateError', 'Erro ao atualizar recorrência'),
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUndoDelete = async () => {
+    if (deletedTransaction) {
+      try {
+        // Recriar a transação excluída
+        const { id, created_at, user_id, ...transactionData } = deletedTransaction;
+        await TransactionService.addTransaction(transactionData);
+        
+        toast({
+          title: t('transactions.restoreSuccess', "Transação restaurada"),
+          description: t('transactions.restoreDescription', "Sua transação foi restaurada.")
+        });
+        
+        onTransactionUpdated();
+      } catch (error) {
+        console.error('Erro ao restaurar transação:', error);
+        toast({
+          title: t('common.error', "Erro"),
+          description: t('transactions.restoreError', "Erro ao restaurar transação"),
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const CategoryIcon = transactionCategories.find(cat => cat.id === transaction.category)?.icon;
@@ -112,23 +151,16 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         onTransactionUpdated={() => {
           onTransactionUpdated();
           
-          // Show toast with undo button
+          // Show toast with undo button that will actually restore the transaction
           toast({
-            title: t('transactions.deleteSuccess', "Transaction deleted"),
-            description: t('transactions.deleteDescription', "Your transaction has been deleted."),
+            title: t('transactions.deleteSuccess', "Transação excluída"),
+            description: t('transactions.deleteDescription', "Sua transação foi excluída."),
             action: (
               <button
-                onClick={() => {
-                  // The undo functionality would be implemented here
-                  // In a real implementation, you would restore the transaction
-                  toast({
-                    title: t('transactions.restoreSuccess', "Transaction restored"),
-                    description: t('transactions.restoreDescription', "Your transaction has been restored.")
-                  });
-                }}
+                onClick={handleUndoDelete}
                 className="text-blue-500 underline hover:text-blue-700"
               >
-                {t('transactions.undo', "Undo")}
+                {t('transactions.undo', "Desfazer")}
               </button>
             ),
             duration: 10000, // 10 seconds

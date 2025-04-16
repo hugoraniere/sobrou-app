@@ -6,7 +6,6 @@ import TransactionTableHeader from './transactions/TransactionTableHeader';
 import TransactionRow from './transactions/TransactionRow';
 import TransactionPagination from './transactions/TransactionPagination';
 import { useTransactionSorter } from '@/hooks/useTransactionSorter';
-import TransactionFilters from './transactions/TransactionFilters';
 import { useTransactionFilter } from '@/hooks/useTransactionFilter';
 
 interface TransactionsTableProps {
@@ -73,14 +72,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
         <div className="p-4 border-b">
           <h3 className="text-lg font-semibold">Suas Transações</h3>
           
-          {/* Transaction filters */}
-          <div className="mt-3">
-            <TransactionFilters 
-              filters={filterState}
-              onFilterChange={handleFilterChangeWithPageReset}
-              onResetFilters={handleResetFilters}
-            />
-          </div>
+          {/* Removemos o filtro conforme solicitado */}
         </div>
         
         {filteredTransactions.length === 0 ? (
