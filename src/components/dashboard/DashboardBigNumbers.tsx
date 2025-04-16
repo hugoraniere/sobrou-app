@@ -120,48 +120,40 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
       <BigNumberCard
-        title={t('dashboard.bigNumbers.availableBalance')}
+        title={t('dashboard.bigNumbers.availableBalance', 'Saldo Atual')}
         value={calculateBalance()}
         icon={Wallet}
-        color="#3b82f6" // Blue for balance
-        tooltip={t('dashboard.bigNumbers.availableBalanceTooltip')}
-        subtitle={t('dashboard.bigNumbers.today')}
+        color="#3b82f6" // Azul para saldo
+        tooltip={t('dashboard.bigNumbers.availableBalanceTooltip', 'Total disponível (receitas - despesas)')}
+        subtitle={t('dashboard.bigNumbers.today', 'Hoje')}
       />
       <BigNumberCard
-        title={t('dashboard.bigNumbers.monthlyIncome')}
+        title={t('dashboard.bigNumbers.monthlyIncome', 'Receitas do Mês')}
         value={calculateMonthlyIncome()}
         icon={TrendingUp}
-        color="#22c55e" // Green for income
-        tooltip={t('dashboard.bigNumbers.monthlyIncomeTooltip')}
-        subtitle={t('dashboard.bigNumbers.thisMonth')}
+        color="#22c55e" // Verde para receitas
+        tooltip={t('dashboard.bigNumbers.monthlyIncomeTooltip', 'Total de receitas no mês atual')}
+        subtitle={t('dashboard.bigNumbers.thisMonth', 'Este mês')}
         trend={calculateTrend('income')}
       />
       <BigNumberCard
-        title={t('dashboard.bigNumbers.monthlyExpenses')}
+        title={t('dashboard.bigNumbers.monthlyExpenses', 'Despesas do Mês')}
         value={calculateMonthlyExpenses()}
         icon={Receipt}
-        color="#ef4444" // Red for expenses
-        tooltip={t('dashboard.bigNumbers.monthlyExpensesTooltip')}
-        subtitle={t('dashboard.bigNumbers.thisMonth')}
+        color="#ef4444" // Vermelho para despesas
+        tooltip={t('dashboard.bigNumbers.monthlyExpensesTooltip', 'Total de despesas no mês atual')}
+        subtitle={t('dashboard.bigNumbers.thisMonth', 'Este mês')}
         trend={calculateTrend('expense')}
       />
       <BigNumberCard
-        title={t('dashboard.bigNumbers.pendingBalance')}
+        title={t('dashboard.bigNumbers.pendingBalance', 'Saldo Previsto')}
         value={calculatePendingBalance()}
         icon={Clock}
-        color="#f97316"
-        tooltip={t('dashboard.bigNumbers.pendingBalanceTooltip')}
-        subtitle={t('dashboard.bigNumbers.upcoming')}
-      />
-      <BigNumberCard
-        title={t('dashboard.bigNumbers.totalSavings')}
-        value={totalSavings}
-        icon={Database}
-        color="#8b5cf6"
-        tooltip={t('dashboard.bigNumbers.totalSavingsTooltip')}
-        subtitle={t('dashboard.bigNumbers.accumulated')}
+        color="#3b82f6" // Azul para saldo previsto
+        tooltip={t('dashboard.bigNumbers.pendingBalanceTooltip', 'Saldo incluindo transações futuras')}
+        subtitle={t('dashboard.bigNumbers.upcoming', 'Pendentes')}
       />
     </div>
   );

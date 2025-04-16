@@ -41,7 +41,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             <SelectValue placeholder={t('filters.typeAll', 'Todos os tipos')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('filters.typeAll', 'Todos os tipos')}</SelectItem>
+            <SelectItem value="all">{t('filters.typeAll', 'Todos os tipos')}</SelectItem>
             <SelectItem value="income">{t('common.income', 'Receita')}</SelectItem>
             <SelectItem value="expense">{t('common.expense', 'Despesa')}</SelectItem>
           </SelectContent>
@@ -55,7 +55,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             <SelectValue placeholder={t('filters.dateAll', 'Todas as datas')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('filters.dateAll', 'Todas as datas')}</SelectItem>
+            <SelectItem value="all">{t('filters.dateAll', 'Todas as datas')}</SelectItem>
             <SelectItem value="thisMonth">{t('filters.thisMonth', 'Este mês')}</SelectItem>
             <SelectItem value="lastMonth">{t('filters.lastMonth', 'Último mês')}</SelectItem>
             <SelectItem value="thisYear">{t('filters.thisYear', 'Este ano')}</SelectItem>

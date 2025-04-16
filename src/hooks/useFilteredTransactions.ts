@@ -2,91 +2,94 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Transaction } from '@/services/TransactionService';
 
+interface TransactionFilters {
+  category: string;
+  type: string;
+  dateRange: string;
+  minAmount: string;
+  maxAmount: string;
+}
+
 export const useFilteredTransactions = (transactions: Transaction[]) => {
-  const [filters, setFilters] = useState({
-    dateRange: '30days',
-    category: 'all',
+  const [filters, setFilters] = useState<TransactionFilters>({
+    category: '',
     type: 'all',
+    dateRange: 'all',
     minAmount: '',
-    maxAmount: ''
+    maxAmount: '',
   });
-  
-  // Handle filter changes
+
+  // Handle updating individual filter values
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
-  
-  // Reset filters
+
+  // Reset all filters to default values
   const handleResetFilters = () => {
     setFilters({
-      dateRange: '30days',
-      category: 'all',
+      category: '',
       type: 'all',
+      dateRange: 'all',
       minAmount: '',
-      maxAmount: ''
+      maxAmount: '',
     });
   };
 
-  // Function to filter expenses based on active filters
-  const getFilteredTransactions = useMemo(() => {
+  // Filter transactions based on current filter values
+  const filteredTransactions = useMemo(() => {
     return transactions.filter(transaction => {
       // Filter by category
-      if (filters.category !== 'all' && transaction.category !== filters.category) {
+      if (filters.category && filters.category !== 'all' && transaction.category !== filters.category) {
         return false;
       }
-      
+
       // Filter by type
-      if (filters.type !== 'all' && transaction.type !== filters.type) {
+      if (filters.type && filters.type !== 'all' && transaction.type !== filters.type) {
         return false;
       }
-      
-      // Filter by amount range
-      if (filters.minAmount && transaction.amount < parseFloat(filters.minAmount)) {
-        return false;
-      }
-      
-      if (filters.maxAmount && transaction.amount > parseFloat(filters.maxAmount)) {
-        return false;
-      }
-      
-      // Filter by time range
-      if (filters.dateRange !== 'all') {
+
+      // Filter by date range
+      if (filters.dateRange && filters.dateRange !== 'all') {
         const transactionDate = new Date(transaction.date);
-        const today = new Date();
+        const now = new Date();
         
-        switch (filters.dateRange) {
-          case '7days': {
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return transactionDate >= weekAgo;
+        if (filters.dateRange === 'thisMonth') {
+          if (
+            transactionDate.getMonth() !== now.getMonth() ||
+            transactionDate.getFullYear() !== now.getFullYear()
+          ) {
+            return false;
           }
-          case '30days': {
-            const monthAgo = new Date();
-            monthAgo.setDate(monthAgo.getDate() - 30);
-            return transactionDate >= monthAgo;
+        } else if (filters.dateRange === 'lastMonth') {
+          const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+          const lastMonthYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+          
+          if (
+            transactionDate.getMonth() !== lastMonth ||
+            transactionDate.getFullYear() !== lastMonthYear
+          ) {
+            return false;
           }
-          case 'thisMonth': {
-            return (
-              transactionDate.getMonth() === today.getMonth() &&
-              transactionDate.getFullYear() === today.getFullYear()
-            );
+        } else if (filters.dateRange === 'thisYear') {
+          if (transactionDate.getFullYear() !== now.getFullYear()) {
+            return false;
           }
-          case 'lastMonth': {
-            const lastMonth = new Date();
-            lastMonth.setMonth(lastMonth.getMonth() - 1);
-            return (
-              transactionDate.getMonth() === lastMonth.getMonth() &&
-              transactionDate.getFullYear() === lastMonth.getFullYear()
-            );
-          }
-          case 'thisYear': {
-            return transactionDate.getFullYear() === today.getFullYear();
-          }
-          default:
-            return true;
         }
       }
-      
+
+      // Filter by min amount
+      if (filters.minAmount && parseFloat(filters.minAmount) > transaction.amount) {
+        return false;
+      }
+
+      // Filter by max amount
+      if (filters.maxAmount && parseFloat(filters.maxAmount) < transaction.amount) {
+        return false;
+      }
+
       return true;
     });
   }, [transactions, filters]);
@@ -95,6 +98,6 @@ export const useFilteredTransactions = (transactions: Transaction[]) => {
     filters,
     handleFilterChange,
     handleResetFilters,
-    filteredTransactions: getFilteredTransactions
+    filteredTransactions
   };
 };

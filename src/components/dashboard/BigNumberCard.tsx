@@ -2,15 +2,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { LucideIcon } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+  Card, 
+  CardContent 
+} from '@/components/ui/card';
+import { 
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger 
+} from '@/components/ui/hover-card';
+import { Badge } from '@/components/ui/badge';
 
 interface BigNumberCardProps {
   title: string;

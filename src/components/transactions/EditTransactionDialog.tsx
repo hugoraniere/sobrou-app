@@ -98,7 +98,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             <Select 
               name="type" 
               value={editedTransaction.type}
-              onValueChange={(value) => handleSelectChange('type', value)}
+              onValueChange={(value: 'income' | 'expense' | 'transfer') => handleSelectChange('type', value)}
             >
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
@@ -126,10 +126,8 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               <SelectContent>
                 {transactionCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    <div className="flex items-center gap-2">
-                      {React.createElement(category.icon, { className: "h-4 w-4" })}
-                      {category.name}
-                    </div>
+                    {React.createElement(category.icon, { className: "h-4 w-4 mr-2 inline" })}
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>

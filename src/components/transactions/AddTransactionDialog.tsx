@@ -39,7 +39,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
   
   const [newTransaction, setNewTransaction] = useState({
     date: today,
-    type: 'expense',
+    type: 'expense' as 'expense' | 'income' | 'transfer',
     category: 'groceries',
     description: '',
     amount: 0,
@@ -68,7 +68,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
       onTransactionAdded();
       setNewTransaction({
         date: today,
-        type: 'expense',
+        type: 'expense' as 'expense' | 'income' | 'transfer',
         category: 'groceries',
         description: '',
         amount: 0,
@@ -113,7 +113,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
             <Select 
               name="type" 
               value={newTransaction.type}
-              onValueChange={(value) => handleSelectChange('type', value)}
+              onValueChange={(value: 'income' | 'expense' | 'transfer') => handleSelectChange('type', value)}
             >
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
@@ -141,10 +141,8 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
               <SelectContent>
                 {transactionCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    <div className="flex items-center gap-2">
-                      {React.createElement(category.icon, { className: "h-4 w-4" })}
-                      {category.name}
-                    </div>
+                    {React.createElement(category.icon, { className: "h-4 w-4 mr-2 inline" })}
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
