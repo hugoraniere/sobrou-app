@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 interface EditTransactionDialogProps {
   isOpen: boolean;

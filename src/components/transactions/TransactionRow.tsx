@@ -104,9 +104,10 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
       >
         <TableCell>{formatDate(transaction.date)}</TableCell>
         <TableCell>
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          <span className={cn(
+            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
             transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}>
+          )}>
             {transaction.type === 'income' ? t('common.income', 'Receita') : t('common.expense', 'Despesa')}
           </span>
         </TableCell>
@@ -117,9 +118,10 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           </div>
         </TableCell>
         <TableCell>{transaction.description}</TableCell>
-        <TableCell className={`text-right font-medium ${
+        <TableCell className={cn(
+          "text-right font-medium",
           transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-        }`}>
+        )}>
           {transaction.type === 'income' ? '+' : '-'}R${transaction.amount.toFixed(2)}
         </TableCell>
         <TableCell className="text-center relative">

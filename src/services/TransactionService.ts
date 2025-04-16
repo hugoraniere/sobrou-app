@@ -96,6 +96,10 @@ export const TransactionService = {
       }
     }
     
+    // Handle English category names by mapping to the equivalent in our system
+    if (transaction.category === 'Housing') transaction.category = 'housing';
+    if (transaction.category === 'Transportation') transaction.category = 'transportation';
+    
     // Remove the fields that don't exist in the database schema
     const { is_recurring, recurrence_interval, ...transactionData } = transaction as any;
     
@@ -137,6 +141,10 @@ export const TransactionService = {
   
   // Update a transaction
   async updateTransaction(id: string, updates: Partial<Transaction>): Promise<Transaction> {
+    // Handle English category names by mapping to the equivalent in our system
+    if (updates.category === 'Housing') updates.category = 'housing';
+    if (updates.category === 'Transportation') updates.category = 'transportation';
+    
     const { data, error } = await supabase
       .from('transactions')
       .update(updates)
