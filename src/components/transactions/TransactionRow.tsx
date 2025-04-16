@@ -62,7 +62,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         </TableCell>
         <TableCell>
           <div className="flex items-center gap-2">
-            {CategoryIcon && <CategoryIcon className="h-4 w-4" />}
+            {CategoryIcon && <CategoryIcon size={16} />}
             {transactionCategories.find(cat => cat.id === transaction.category)?.name || transaction.category}
           </div>
         </TableCell>

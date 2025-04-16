@@ -141,7 +141,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
               <SelectContent>
                 {transactionCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {React.createElement(category.icon, { className: "h-4 w-4 mr-2 inline" })}
+                    {category.icon && React.createElement(category.icon, { className: "h-4 w-4 mr-2 inline" })}
                     {category.name}
                   </SelectItem>
                 ))}
