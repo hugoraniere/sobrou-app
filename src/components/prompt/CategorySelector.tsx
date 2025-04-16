@@ -3,6 +3,7 @@ import React from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { XCircle } from "lucide-react";
 import { transactionCategories } from '@/data/categories';
+import { cn } from '@/lib/utils';
 
 interface CategorySelectorProps {
   categoryId: string;
@@ -46,9 +47,10 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
             return (
               <div
                 key={category.id}
-                className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100
-                  ${category.id === categoryId ? 'bg-blue-50 text-blue-600' : ''}
-                `}
+                className={cn(
+                  "flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100",
+                  category.id === categoryId ? 'bg-blue-50 text-blue-600' : ''
+                )}
                 onClick={() => onCategorySelect(category.id)}
               >
                 {Icon && <Icon className="h-4 w-4" />}

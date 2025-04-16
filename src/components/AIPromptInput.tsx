@@ -1,25 +1,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { TransactionService } from '../services/TransactionService';
 import { SavingsService } from '../services/SavingsService';
-import { CalendarIcon, XCircle } from "lucide-react";
 import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { getCategoryByKeyword, transactionCategories } from '@/data/categories';
-import { cn } from '@/lib/utils';
+import { getCategoryByKeyword } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
 
-// Movendo para um componente separado
-import CategorySelector from './prompt/CategorySelector';
-import TransactionDatePicker from './prompt/TransactionDatePicker';
+// Importing our extracted components
+import PromptInputField from './prompt/PromptInputField';
+import PromptExampleFooter from './prompt/PromptExampleFooter';
 
 interface AIPromptInputProps {
   onTransactionAdded: () => void;
@@ -39,7 +30,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   const inputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation();
   
-  // Detectar categoria enquanto digita (mas apenas se o usuário não selecionou uma categoria)
+  // Detect category as user types (only if no manually selected category)
   useEffect(() => {
     if (inputTimeoutRef.current) {
       clearTimeout(inputTimeoutRef.current);
@@ -140,10 +131,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     }
   };
   
-  // Obter o ícone da categoria detectada ou selecionada
-  const categoryId = userSelectedCategory || detectedCategory;
-  const categoryInfo = categoryId ? transactionCategories.find(cat => cat.id === categoryId) : null;
-  
   const handleCategorySelect = (categoryId: string) => {
     setUserSelectedCategory(categoryId);
     setIsCategoryPopoverOpen(false);
@@ -153,48 +140,36 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     e.stopPropagation();
     setUserSelectedCategory(null);
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+  
+  // Get the effective category ID (user selected or auto-detected)
+  const categoryId = userSelectedCategory || detectedCategory;
   
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4">Inserir sua transação</h2>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-grow relative">
-          <Input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="ex: Gastei R$35 no mercado ontem"
-            className="w-full pr-24"
-            disabled={isProcessing}
-          />
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-            {categoryId && (
-              <CategorySelector
-                categoryId={categoryId}
-                isOpen={isCategoryPopoverOpen}
-                setIsOpen={setIsCategoryPopoverOpen}
-                onCategorySelect={handleCategorySelect}
-                onReset={resetCategory}
-                userSelected={!!userSelectedCategory}
-              />
-            )}
-            <TransactionDatePicker
-              selectedDate={selectedDate}
-              onDateChange={(date) => date && setSelectedDate(date)}
-            />
-          </div>
-        </div>
+        <PromptInputField 
+          inputValue={inputValue}
+          onInputChange={handleInputChange}
+          categoryId={categoryId}
+          userSelectedCategory={userSelectedCategory}
+          isCategoryPopoverOpen={isCategoryPopoverOpen}
+          setIsCategoryPopoverOpen={setIsCategoryPopoverOpen}
+          handleCategorySelect={handleCategorySelect}
+          resetCategory={resetCategory}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          isProcessing={isProcessing}
+        />
         <Button type="submit" disabled={isProcessing} className="min-w-[100px]">
           {isProcessing ? "Processando..." : "Adicionar"}
         </Button>
       </form>
-      <div className="flex justify-between mt-2">
-        <p className="text-sm text-gray-500">
-          Experimente: "Recebi R$1500 de salário", ou "Guardei R$100 para férias"
-        </p>
-        <p className="text-sm text-gray-500">
-          Data: {format(selectedDate, 'dd/MM/yyyy')}
-        </p>
-      </div>
+      <PromptExampleFooter selectedDate={selectedDate} />
     </div>
   );
 };

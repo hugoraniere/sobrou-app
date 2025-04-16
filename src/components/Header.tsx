@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Wallet } from 'lucide-react';
 
 const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   
   const handleLogout = async () => {
     try {
-      await signOut();
+      await logout();
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }

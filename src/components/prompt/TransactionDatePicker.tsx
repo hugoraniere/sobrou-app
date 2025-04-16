@@ -3,6 +3,7 @@ import React from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TransactionDatePickerProps {
   selectedDate: Date;
@@ -26,7 +27,7 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
           selected={selectedDate}
           onSelect={onDateChange}
           initialFocus
-          className="p-3 pointer-events-auto"
+          className={cn("p-3 pointer-events-auto")}
         />
       </PopoverContent>
     </Popover>

@@ -128,7 +128,10 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
             title={transaction.is_recurring ? t('transactions.removeRecurring', "Click to remove recurring") : t('transactions.setRecurring', "Click to set as recurring")}
           >
             <RepeatIcon 
-              className={`h-4 w-4 ${transaction.is_recurring ? 'text-blue-500' : 'text-gray-400'}`}
+              className={cn(
+                "h-4 w-4",
+                transaction.is_recurring ? 'text-blue-500' : 'text-gray-400'
+              )}
             />
           </div>
         </TableCell>
