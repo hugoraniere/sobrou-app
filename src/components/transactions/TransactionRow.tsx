@@ -8,6 +8,7 @@ import DeleteTransactionDialog from './DeleteTransactionDialog';
 import { RepeatIcon, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 interface TransactionRowProps {
   transaction: Transaction;
