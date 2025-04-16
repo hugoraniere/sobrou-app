@@ -126,7 +126,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
                     description: t('transactions.restoreDescription', "Your transaction has been restored.")
                   });
                 }}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 rounded-md text-xs"
+                className="text-blue-500 underline hover:text-blue-700"
               >
                 {t('transactions.undo', "Undo")}
               </button>
