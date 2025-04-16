@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
-import { Transaction } from '../services/TransactionService';
+import { Transaction, TransactionService } from '../services/TransactionService';
 import TransactionTableHeader from './transactions/TransactionTableHeader';
 import TransactionRow from './transactions/TransactionRow';
 import TransactionPagination from './transactions/TransactionPagination';
 import { useTransactionSorter } from '@/hooks/useTransactionSorter';
 import { useTransactionFilter } from '@/hooks/useTransactionFilter';
+import { toast } from "sonner";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -59,10 +60,13 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   // Toggle recurring status
   const handleToggleRecurring = async (id: string, isRecurring: boolean) => {
     try {
-      // In a real implementation, we would save this to the backend
+      // Call the service to update the transaction
+      await TransactionService.updateTransaction(id, { isRecurring });
+      toast.success(isRecurring ? "Transação marcada como recorrente" : "Transação desmarcada como recorrente");
       onTransactionUpdated();
     } catch (error) {
       console.error('Erro ao atualizar transação:', error);
+      toast.error("Falha ao atualizar transação");
     }
   };
   

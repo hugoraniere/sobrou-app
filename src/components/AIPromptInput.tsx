@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -193,7 +193,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
                         `}
                         onClick={() => handleCategorySelect(category.id)}
                       >
-                        {React.createElement(category.icon, { className: "h-4 w-4" })}
+                        {category.icon && <category.icon className="h-4 w-4" />}
                         <span>{category.name}</span>
                       </div>
                     ))}
