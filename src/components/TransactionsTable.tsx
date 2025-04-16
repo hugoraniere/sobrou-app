@@ -72,7 +72,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
         <div className="p-4 border-b">
           <h3 className="text-lg font-semibold">Suas Transações</h3>
           
-          {/* Removemos o filtro conforme solicitado */}
+          {/* Removed filter as requested */}
         </div>
         
         {filteredTransactions.length === 0 ? (

@@ -126,7 +126,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               <SelectContent>
                 {transactionCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {category.icon && React.createElement(category.icon, { size: 16, className: "mr-2 inline" })}
+                    {React.createElement(category.icon, { className: "mr-2 inline h-4 w-4" })}
                     {category.name}
                   </SelectItem>
                 ))}

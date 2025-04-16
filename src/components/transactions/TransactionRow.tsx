@@ -5,7 +5,7 @@ import { Transaction, TransactionService } from '@/services/TransactionService';
 import { transactionCategories } from '@/data/categories';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
-import { RepeatIcon, Trash2, Calendar } from "lucide-react";
+import { RepeatIcon, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
 
@@ -47,6 +47,14 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         { is_recurring: !transaction.is_recurring }
       );
       onToggleRecurring(transaction.id, !transaction.is_recurring);
+      toast({
+        title: transaction.is_recurring 
+          ? t('transactions.recurringRemoved', 'Recorrência removida') 
+          : t('transactions.recurringSet', 'Marcada como recorrente'),
+        description: transaction.is_recurring 
+          ? t('transactions.recurringRemovedDesc', 'A transação não é mais recorrente') 
+          : t('transactions.recurringSetDesc', 'A transação foi marcada como recorrente'),
+      });
     } catch (error) {
       console.error('Erro ao atualizar recorrência:', error);
       toast({
@@ -101,7 +109,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         </TableCell>
         <TableCell>
           <div className="flex items-center gap-2">
-            {CategoryIcon && <CategoryIcon size={16} />}
+            {CategoryIcon && <CategoryIcon className="h-4 w-4" />}
             {transactionCategories.find(cat => cat.id === transaction.category)?.name || transaction.category}
           </div>
         </TableCell>
