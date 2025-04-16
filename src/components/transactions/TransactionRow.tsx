@@ -124,7 +124,11 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         </TableCell>
         <TableCell className="text-center relative">
           <div 
-            className={`cursor-pointer ${isHovered || transaction.is_recurring ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100 transition-opacity`}
+            className={cn(
+              "cursor-pointer",
+              isHovered || transaction.is_recurring ? 'opacity-100' : 'opacity-0',
+              "group-hover:opacity-100 transition-opacity"
+            )}
             onClick={handleToggleRecurring}
             title={transaction.is_recurring ? t('transactions.removeRecurring', "Click to remove recurring") : t('transactions.setRecurring', "Click to set as recurring")}
           >
