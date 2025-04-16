@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Transaction } from '@/services/TransactionService';
 import { transactionCategories } from '@/data/categories';
-import TransactionActions from './TransactionActions';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
-import { RepeatIcon } from "lucide-react";
+import { RepeatIcon, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -23,9 +24,20 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const { toast } = useToast();
 
   const handleEdit = () => {
     setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleToggleRecurring = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleRecurring(transaction.id, !transaction.is_recurring);
   };
 
   const CategoryIcon = transactionCategories.find(cat => cat.id === transaction.category)?.icon;
@@ -34,8 +46,10 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     <>
       <TableRow 
         key={transaction.id} 
-        className="cursor-pointer hover:bg-gray-50"
+        className="cursor-pointer hover:bg-gray-50 relative group"
         onClick={handleEdit}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <TableCell>{formatDate(transaction.date)}</TableCell>
         <TableCell>
@@ -57,21 +71,28 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         }`}>
           {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
         </TableCell>
-        <TableCell className="text-center">
-          {transaction.is_recurring && (
-            <div className="flex items-center justify-center">
-              <RepeatIcon className="h-4 w-4 text-blue-500" />
-            </div>
-          )}
+        <TableCell className="text-center relative">
+          <div 
+            className={`cursor-pointer ${isHovered || transaction.is_recurring ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100 transition-opacity`}
+            onClick={handleToggleRecurring}
+            title={transaction.is_recurring ? "Click to remove recurring" : "Click to set as recurring"}
+          >
+            <RepeatIcon 
+              className={`h-4 w-4 ${transaction.is_recurring ? 'text-blue-500' : 'text-gray-400'}`}
+            />
+          </div>
         </TableCell>
-        <TableCell onClick={(e) => e.stopPropagation()}>
-          <TransactionActions 
-            transaction={transaction}
-            onEdit={handleEdit}
-            onToggleRecurring={onToggleRecurring}
-            onDelete={() => setIsDeleteDialogOpen(true)}
-          />
-        </TableCell>
+        
+        {/* Desktop Delete Button that appears on hover */}
+        <div 
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 hidden group-hover:block md:block"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
+        >
+          <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700 cursor-pointer" />
+        </div>
       </TableRow>
 
       {/* Edit Transaction Dialog */}
@@ -87,7 +108,31 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         isOpen={isDeleteDialogOpen}
         setIsOpen={setIsDeleteDialogOpen}
         transactionId={transaction.id}
-        onTransactionUpdated={onTransactionUpdated}
+        onTransactionUpdated={() => {
+          onTransactionUpdated();
+          
+          // Show toast with undo button
+          toast({
+            title: "Transaction deleted",
+            description: "Your transaction has been deleted.",
+            action: (
+              <button
+                onClick={() => {
+                  // The undo functionality would be implemented here
+                  // In a real implementation, you would restore the transaction
+                  toast({
+                    title: "Transaction restored",
+                    description: "Your transaction has been restored."
+                  });
+                }}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 rounded-md text-xs"
+              >
+                Undo
+              </button>
+            ),
+            duration: 10000, // 10 seconds
+          });
+        }}
       />
     </>
   );

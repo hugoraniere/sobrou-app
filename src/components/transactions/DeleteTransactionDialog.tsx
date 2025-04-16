@@ -31,7 +31,7 @@ const DeleteTransactionDialog: React.FC<DeleteTransactionDialogProps> = ({
       await TransactionService.deleteTransaction(transactionId);
       setIsOpen(false);
       onTransactionUpdated();
-      toast.success('Transação excluída com sucesso');
+      // Note: The toast with undo button is now handled in TransactionRow.tsx
     } catch (error) {
       console.error('Erro ao excluir transação:', error);
       toast.error('Falha ao excluir transação');
