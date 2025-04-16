@@ -49,7 +49,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Card className="overflow-hidden border-b-4" style={{ borderColor: color }}>
+          <Card className="overflow-hidden border-b-4 hover:shadow-md transition-shadow duration-200" style={{ borderColor: color }}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
@@ -68,7 +68,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
                   className="rounded-full p-2" 
                   style={{ backgroundColor: `${color}20` }}
                 >
-                  <Icon className="h-5 w-5" style={{ color }} />
+                  <Icon className="h-6 w-6" style={{ color }} />
                 </div>
               </div>
             </CardContent>

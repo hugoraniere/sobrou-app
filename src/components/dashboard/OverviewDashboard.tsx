@@ -36,37 +36,39 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   // Calculate total savings from savings goals
   const totalSavings = savingGoals.reduce((total, goal) => total + goal.current_amount, 0);
 
-  // Default chart config with consistent colors
+  // Default chart config with consistent colors as per requirements
   const chartConfig = {
     income: {
       label: t('common.income'),
-      theme: { light: "#0088FE", dark: "#0088FE" }
+      theme: { light: "#22c55e", dark: "#22c55e" } // Green for income
     },
     expense: {
       label: t('common.expense'),
-      theme: { light: "#FF8042", dark: "#FF8042" }
+      theme: { light: "#ef4444", dark: "#ef4444" } // Red for expenses
+    },
+    balance: {
+      label: t('common.balance'),
+      theme: { light: "#3b82f6", dark: "#3b82f6" } // Blue for balance
     },
     savings: {
       label: t('common.savings'),
-      theme: { light: "#00C49F", dark: "#00C49F" }
-    },
-    food: {
-      label: "Alimentação",
-      theme: { light: "#FF8042", dark: "#FF8042" }
-    },
-    housing: {
-      label: "Moradia",
-      theme: { light: "#0088FE", dark: "#0088FE" }
-    },
-    transportation: {
-      label: "Transporte",
-      theme: { light: "#00C49F", dark: "#00C49F" }
-    },
-    entertainment: {
-      label: "Lazer",
-      theme: { light: "#FFBB28", dark: "#FFBB28" }
+      theme: { light: "#8b5cf6", dark: "#8b5cf6" } // Purple for savings
     }
   };
+
+  // Add category colors
+  transactions.forEach(transaction => {
+    const categoryId = transaction.category;
+    if (!chartConfig[categoryId]) {
+      const categoryInfo = transactionCategories.find(cat => cat.id === categoryId);
+      if (categoryInfo) {
+        chartConfig[categoryId] = {
+          label: categoryInfo.name,
+          theme: { light: categoryInfo.color, dark: categoryInfo.color }
+        };
+      }
+    }
+  });
 
   // Sample alerts (in real app, these would be calculated based on actual financial data)
   const sampleAlerts = [
@@ -112,17 +114,25 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
       {/* Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.categoryBreakdown')}</h3>
-            {hasTransactions ? (
-              <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
-            ) : (
-              <EmptyStateMessage message={t('dashboard.charts.noData')} />
-            )}
-          </CardContent>
-        </Card>
+        {/* Expenses by Category (Pie Chart) */}
+        <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
         
+        {/* Income vs Expenses (Bar Chart) */}
+        <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+      </div>
+
+      {/* Row 2 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Daily Balance (Line Chart) */}
+        <DailyBarChart transactions={transactions} />
+        
+        {/* Financial Goals Progress */}
+        <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+      </div>
+
+      {/* Row 3 - Optional charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Income by Type Chart */}
         <Card>
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
@@ -133,21 +143,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             )}
           </CardContent>
         </Card>
-      </div>
-
-      {/* Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.dailyEvolution')}</h3>
-            {hasTransactions ? (
-              <DailyBarChart transactions={transactions} />
-            ) : (
-              <EmptyStateMessage message={t('dashboard.charts.noData')} />
-            )}
-          </CardContent>
-        </Card>
         
+        {/* Balance by Account Chart */}
         <Card>
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.balanceByAccount')}</h3>
@@ -159,33 +156,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </CardContent>
         </Card>
       </div>
-
-      {/* Row 3 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.revenueVsExpense')}</h3>
-            {hasTransactions ? (
-              <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
-            ) : (
-              <EmptyStateMessage message={t('dashboard.charts.noData')} />
-            )}
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.financialGoals')}</h3>
-            {hasSavingGoals ? (
-              <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
-            ) : (
-              <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };
+
+// Import the categories here to prevent circular dependencies
+import { transactionCategories } from '@/data/categories';
 
 export default OverviewDashboard;

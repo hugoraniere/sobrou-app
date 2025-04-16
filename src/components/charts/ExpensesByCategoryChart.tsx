@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Transaction } from '@/services/TransactionService';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { transactionCategories } from '@/data/categories';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
 
 interface ExpensesByCategoryChartProps {
   expenses: Transaction[];
@@ -29,9 +30,20 @@ const processChartData = (expenses: Transaction[]) => {
       name: categoryInfo?.name || category,
       value,
       id: category,
-      color: categoryInfo?.color || '#8884d8'
+      color: categoryInfo?.color || '#8884d8',
+      percentage: 0 // Will be calculated next
     };
   }).sort((a, b) => b.value - a.value); // Sort by value, descending
+};
+
+// Calculate percentages
+const calculatePercentages = (data: any[]) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  
+  return data.map(item => ({
+    ...item,
+    percentage: total > 0 ? (item.value / total) * 100 : 0
+  }));
 };
 
 // Legend component for the pie chart
@@ -47,9 +59,14 @@ const ChartLegend: React.FC<{ data: any[] }> = ({ data }) => {
             ></div>
             <span className="text-sm truncate">{entry.name}</span>
           </div>
-          <span className="text-sm font-medium">
-            R$ {entry.value.toFixed(2)}
-          </span>
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-medium">
+              R$ {entry.value.toFixed(2)}
+            </span>
+            <span className="text-xs text-gray-500">
+              {entry.percentage.toFixed(1)}%
+            </span>
+          </div>
         </div>
       ))}
       {data.length > 5 && (
@@ -65,61 +82,94 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   expenses,
   chartConfig 
 }) => {
-  const data = processChartData(expenses);
+  const { t } = useTranslation();
+  
+  // Process and calculate percentages
+  const rawData = processChartData(expenses);
+  const data = calculatePercentages(rawData);
+  
+  // Get top category for insight
+  const topCategory = data.length > 0 ? data[0] : null;
   
   // Generate colors for pie chart segments
   const COLORS = data.map(item => item.color || '#8884d8');
   
   if (data.length === 0) {
     return (
-      <Card className="h-full">
-        <CardContent className="p-6">
-          <EmptyStateMessage message="Sem dados para mostrar" />
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EmptyStateMessage message={t('dashboard.charts.noData')} />
         </CardContent>
       </Card>
     );
   }
   
   return (
-    <Card className="h-full">
-      <CardContent className="p-6">
-        <ChartContainer 
-          className="h-[300px]"
-          config={chartConfig}
-        >
-          <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={80}
-              innerRadius={30}
-              fill="#8884d8"
-              dataKey="value"
-              nameKey="name"
-            >
-              {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.color || COLORS[index % COLORS.length]} 
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[300px]">
+          <ChartContainer 
+            className="h-full"
+            config={chartConfig}
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  innerRadius={30}
+                  fill="#8884d8"
+                  dataKey="value"
+                  nameKey="name"
+                >
+                  {data.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.color || COLORS[index % COLORS.length]} 
+                    />
+                  ))}
+                </Pie>
+                <ChartTooltip 
+                  content={
+                    <ChartTooltipContent 
+                      formatter={(value: number, name: string, entry: any) => {
+                        return [
+                          <>
+                            <span>R$ {value.toFixed(2)}</span>
+                            <span className="block text-xs text-gray-400">({entry.payload.percentage.toFixed(1)}%)</span>
+                          </>,
+                          name
+                        ];
+                      }}
+                    />
+                  } 
                 />
-              ))}
-            </Pie>
-            <ChartTooltip 
-              content={
-                <ChartTooltipContent 
-                  formatter={(value: number) => {
-                    return [`R$ ${value.toFixed(2)}`, ''];
-                  }}
-                />
-              } 
-            />
-          </PieChart>
-        </ChartContainer>
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
         
         {/* Legend */}
         <ChartLegend data={data} />
+        
+        {/* Insight */}
+        {topCategory && (
+          <div className="mt-4 p-3 bg-gray-50 rounded-md text-sm">
+            <p>
+              <span className="font-medium">{topCategory.percentage.toFixed(1)}%</span> dos seus gastos foram com{' '}
+              <span className="font-medium">{topCategory.name}</span> (R$ {topCategory.value.toFixed(2)})
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

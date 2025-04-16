@@ -1,37 +1,23 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { SavingGoal } from '@/services/SavingsService';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { SavingGoal, SavingsService } from '@/services/SavingsService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Check, X } from 'lucide-react';
-import { toast } from 'sonner';
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import EmptyStateMessage from '../dashboard/EmptyStateMessage';
+import { ChartContainer } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 
 interface FinancialGoalsProgressProps {
   savingGoals: SavingGoal[];
-  chartConfig: Record<string, any>;
+  chartConfig: any;
 }
 
 const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({ 
   savingGoals,
-  chartConfig 
+  chartConfig
 }) => {
   const { t, i18n } = useTranslation();
-  const [isAddingGoal, setIsAddingGoal] = useState(false);
-  const [newGoalName, setNewGoalName] = useState('');
-  const [newGoalAmount, setNewGoalAmount] = useState('');
   
   // Format currency based on locale
   const formatCurrency = (value: number) => {
@@ -41,133 +27,136 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
     return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
   };
   
-  // Calculate progress percentage for each goal
-  const goalsWithProgress = savingGoals.map(goal => {
-    const progressPercent = Math.round((goal.current_amount / goal.target_amount) * 100);
-    return {
-      ...goal,
-      progressPercent
-    };
-  });
-
-  const handleAddGoal = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!newGoalName.trim()) {
-      toast.error("Please enter a name for your saving goal");
-      return;
-    }
-    
-    const amount = parseFloat(newGoalAmount);
-    if (isNaN(amount) || amount <= 0) {
-      toast.error("Please enter a valid target amount");
-      return;
-    }
-    
-    try {
-      await SavingsService.createSavingGoal(newGoalName, amount);
-      toast.success(`Created new saving goal: ${newGoalName}`);
-      setNewGoalName('');
-      setNewGoalAmount('');
-      setIsAddingGoal(false);
-      // We should refresh the goals here, but since we don't have a direct callback,
-      // the parent component should handle that in the future
-    } catch (error) {
-      console.error('Error adding saving goal:', error);
-      toast.error("Could not create saving goal. Please try again.");
-    }
+  // Calculate percentage
+  const calculatePercentage = (current: number, target: number) => {
+    if (target <= 0) return 0;
+    const percentage = (current / target) * 100;
+    return Math.min(percentage, 100); // Cap at 100%
   };
 
+  // Prepare data for the chart
+  const chartData = savingGoals.map(goal => {
+    const percentage = calculatePercentage(goal.current_amount, goal.target_amount);
+    return {
+      name: goal.name,
+      current: goal.current_amount,
+      target: goal.target_amount,
+      percentage,
+      remaining: goal.target_amount - goal.current_amount,
+      isCompleted: percentage >= 100
+    };
+  }).sort((a, b) => b.percentage - a.percentage); // Sort by percentage
+  
+  // Find the goal with highest progress for insight
+  const topGoal = chartData.length > 0 ? chartData[0] : null;
+  
+  // Create motivational message
+  const getMotivationalMessage = () => {
+    if (!topGoal) return "";
+    
+    if (topGoal.percentage >= 100) {
+      return `Parabéns! Você completou a meta "${topGoal.name}"!`;
+    } else if (topGoal.percentage >= 75) {
+      return `Quase lá! Você já atingiu ${topGoal.percentage.toFixed(0)}% da sua meta "${topGoal.name}".`;
+    } else if (topGoal.percentage >= 50) {
+      return `Bom progresso! Você já está na metade do caminho para "${topGoal.name}".`;
+    } else if (topGoal.percentage >= 25) {
+      return `Você já atingiu ${topGoal.percentage.toFixed(0)}% da sua meta "${topGoal.name}". Continue assim!`;
+    } else {
+      return `Você começou a economizar para "${topGoal.name}". Pequenos passos levam a grandes conquistas!`;
+    }
+  };
+  
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-3 border rounded shadow-sm">
+          <p className="font-medium">{data.name}</p>
+          <p className="text-sm">Meta: {formatCurrency(data.target)}</p>
+          <p className="text-sm">Atual: {formatCurrency(data.current)}</p>
+          <p className="text-sm">Faltam: {formatCurrency(data.remaining)}</p>
+          <p className="text-sm font-semibold">{data.percentage.toFixed(1)}% concluído</p>
+        </div>
+      );
+    }
+    
+    return null;
+  };
+  
   return (
-    <div className="h-[300px] overflow-y-auto">
-      <div className="flex justify-between items-center mb-4">
-        <Button 
-          size="sm" 
-          onClick={() => setIsAddingGoal(!isAddingGoal)}
-          variant={isAddingGoal ? "outline" : "default"}
-        >
-          {isAddingGoal ? (
-            <X className="h-4 w-4 mr-1" />
-          ) : (
-            <Plus className="h-4 w-4 mr-1" />
-          )}
-          {isAddingGoal ? t('common.cancel') : t('dashboard.charts.createGoal')}
-        </Button>
-      </div>
-
-      {isAddingGoal && (
-        <form onSubmit={handleAddGoal} className="mb-4 p-3 bg-gray-50 rounded-md">
-          <div className="space-y-3">
-            <div>
-              <Input
-                value={newGoalName}
-                onChange={(e) => setNewGoalName(e.target.value)}
-                placeholder={t('dashboard.goals.nameInput')}
-                className="w-full mb-2"
-              />
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('dashboard.charts.financialGoals')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {savingGoals.length > 0 ? (
+          <>
+            {/* Motivational Message */}
+            <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
+              <p>{getMotivationalMessage()}</p>
             </div>
-            <div>
-              <Input
-                type="number"
-                value={newGoalAmount}
-                onChange={(e) => setNewGoalAmount(e.target.value)}
-                placeholder={t('dashboard.goals.amountInput')}
-                min="1"
-                step="0.01"
-                className="w-full"
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              <Check className="h-4 w-4 mr-2" /> {t('dashboard.goals.create')}
-            </Button>
-          </div>
-        </form>
-      )}
-      
-      {goalsWithProgress.length > 0 ? (
-        <div className="space-y-4">
-          {goalsWithProgress.map(goal => (
-            <div key={goal.id} className="space-y-2">
-              <HoverCard>
-                <HoverCardTrigger asChild>
-                  <div className="flex justify-between items-center cursor-help">
-                    <span className="font-medium text-sm">{goal.name}</span>
-                    <span className="text-sm text-gray-500">
-                      {goal.progressPercent}%
+            
+            {/* Progress Bars */}
+            <div className="space-y-4 mb-4">
+              {chartData.map((goal) => (
+                <div key={goal.name} className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>{goal.name}</span>
+                    <span>
+                      {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
                     </span>
                   </div>
-                </HoverCardTrigger>
-                <HoverCardContent className="w-80">
-                  <div className="flex justify-between mb-2">
-                    <span className="font-medium">{goal.name}</span>
-                    <span className="text-green-600 font-medium">{goal.progressPercent}% complete</span>
+                  <Progress value={goal.percentage} className="h-2" />
+                  <div className="flex justify-end text-xs text-gray-500">
+                    {goal.percentage.toFixed(1)}%
                   </div>
-                  <div className="text-sm text-gray-500 mb-2">
-                    <p>Current: {formatCurrency(goal.current_amount)}</p>
-                    <p>Target: {formatCurrency(goal.target_amount)}</p>
-                    <p>Remaining: {formatCurrency(goal.target_amount - goal.current_amount)}</p>
-                  </div>
-                </HoverCardContent>
-              </HoverCard>
-              <div className="space-y-1">
-                <Progress value={goal.progressPercent} className="h-2" />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>{formatCurrency(goal.current_amount)}</span>
-                  <span>{formatCurrency(goal.target_amount)}</span>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="h-full flex flex-col items-center justify-center text-gray-400">
-          <p>{t('dashboard.charts.noGoals')}</p>
-        </div>
-      )}
-    </div>
+            
+            {/* Horizontal Bar Chart */}
+            <div className="h-[200px] mt-6">
+              <ChartContainer className="h-full" config={chartConfig}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                    <XAxis type="number" tickFormatter={formatCurrency} />
+                    <YAxis 
+                      type="category" 
+                      dataKey="name" 
+                      width={90}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="target" fill="#d1d5db" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="current" fill="#3b82f6" radius={[0, 4, 4, 0]}>
+                      {chartData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.isCompleted ? '#22c55e' : '#3b82f6'} 
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </div>
+          </>
+        ) : (
+          <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

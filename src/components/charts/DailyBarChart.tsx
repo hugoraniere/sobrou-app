@@ -14,8 +14,13 @@ import {
   YAxis,
   CartesianGrid,
   Legend,
+  Line,
+  ComposedChart,
+  ReferenceLine
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 
 interface DailyBarChartProps {
   transactions: Transaction[];
@@ -31,7 +36,28 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
     const currentYear = today.getFullYear();
     
     // Create a map to store daily totals
-    const dailyMap = new Map<string, { day: string, income: number, expense: number }>();
+    const dailyMap = new Map<string, { 
+      day: string, 
+      income: number, 
+      expense: number,
+      balance: number,
+      cumulativeBalance: number 
+    }>();
+    
+    // Get all days in current month
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    // Initialize all days
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dayStr = i.toString();
+      dailyMap.set(dayStr, { 
+        day: dayStr, 
+        income: 0, 
+        expense: 0, 
+        balance: 0,
+        cumulativeBalance: 0 
+      });
+    }
     
     // Process transactions for the current month
     transactions
@@ -44,7 +70,13 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
         const day = date.getDate().toString();
         
         // Get or initialize daily data
-        let dailyData = dailyMap.get(day) || { day, income: 0, expense: 0 };
+        let dailyData = dailyMap.get(day) || { 
+          day, 
+          income: 0, 
+          expense: 0, 
+          balance: 0,
+          cumulativeBalance: 0 
+        };
         
         // Update income or expense
         if (transaction.type === 'income') {
@@ -53,16 +85,68 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
           dailyData.expense += transaction.amount;
         }
         
+        // Calculate daily balance
+        dailyData.balance = dailyData.income - dailyData.expense;
+        
         // Update the map
         dailyMap.set(day, dailyData);
       });
     
     // Convert map to array and sort by day
-    return Array.from(dailyMap.values())
+    let result = Array.from(dailyMap.values())
       .sort((a, b) => parseInt(a.day) - parseInt(b.day));
+      
+    // Calculate cumulative balance
+    let runningBalance = 0;
+    result = result.map(day => {
+      runningBalance += day.balance;
+      return {
+        ...day,
+        cumulativeBalance: runningBalance
+      };
+    });
+    
+    return result;
   };
 
   const dailyData = getDailyData();
+  
+  // Find periods where balance goes negative
+  const findNegativePeriods = (data: any[]) => {
+    const negativeRanges: { start: number; end: number }[] = [];
+    let currentRange: { start: number; end: number } | null = null;
+    
+    data.forEach((day, index) => {
+      if (day.cumulativeBalance < 0) {
+        if (!currentRange) {
+          currentRange = { start: parseInt(day.day), end: parseInt(day.day) };
+        } else {
+          currentRange.end = parseInt(day.day);
+        }
+      } else if (currentRange) {
+        negativeRanges.push(currentRange);
+        currentRange = null;
+      }
+    });
+    
+    if (currentRange) {
+      negativeRanges.push(currentRange);
+    }
+    
+    return negativeRanges;
+  };
+  
+  const negativePeriods = findNegativePeriods(dailyData);
+  
+  // Create insight message
+  const getInsightMessage = () => {
+    if (negativePeriods.length === 0) {
+      return "Seu saldo se manteve positivo durante todo o mês.";
+    }
+    
+    const period = negativePeriods[0];
+    return `Seu saldo entra no vermelho entre os dias ${period.start} e ${period.end}.`;
+  };
   
   // Format currency based on locale
   const formatCurrency = (value: number) => {
@@ -82,8 +166,8 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
     income: {
       label: t('common.income'),
       theme: {
-        light: "#0ea5e9",
-        dark: "#0ea5e9"
+        light: "#22c55e",
+        dark: "#22c55e"
       }
     },
     expense: {
@@ -92,64 +176,93 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
         light: "#ef4444",
         dark: "#ef4444"
       }
+    },
+    balance: {
+      label: t('common.balance'),
+      theme: {
+        light: "#3b82f6",
+        dark: "#3b82f6"
+      }
     }
   };
-
+  
   return (
-    <div className="h-[300px]">
-      {dailyData.length > 0 ? (
-        <ChartContainer className="h-full" config={chartConfig}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={dailyData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="day" 
-                label={{ 
-                  value: t('dashboard.charts.day'), 
-                  position: 'insideBottom',
-                  offset: -10
-                }}
-                height={50}
-              />
-              <YAxis 
-                tickFormatter={formatCurrency}
-                label={{ 
-                  value: t('dashboard.charts.amount'), 
-                  angle: -90, 
-                  position: 'insideLeft',
-                  offset: -5
-                }}
-                width={80}
-              />
-              <ChartTooltip
-                content={({ active, payload }) => 
-                  active && payload && payload.length ? (
-                    <ChartTooltipContent 
-                      payload={payload} 
-                      formatter={(value) => formatCurrency(value as number)}
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('dashboard.charts.dailyEvolution')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {dailyData.length > 0 ? (
+          <>
+            <div className="h-[300px]">
+              <ChartContainer className="h-full" config={chartConfig}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart
+                    data={dailyData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="day" 
+                      label={{ 
+                        value: t('dashboard.charts.day'), 
+                        position: 'insideBottom',
+                        offset: -10
+                      }}
+                      height={50}
                     />
-                  ) : null
-                }
-              />
-              <Legend 
-                wrapperStyle={{ paddingTop: 10 }}
-                verticalAlign="bottom"
-                height={36}
-              />
-              <Bar dataKey="income" name={t('common.income')} fill="#0ea5e9" />
-              <Bar dataKey="expense" name={t('common.expense')} fill="#ef4444" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      ) : (
-        <div className="h-full flex items-center justify-center text-gray-400">
-          {t('dashboard.charts.noData')}
-        </div>
-      )}
-    </div>
+                    <YAxis 
+                      tickFormatter={formatCurrency}
+                      label={{ 
+                        value: t('dashboard.charts.amount'), 
+                        angle: -90, 
+                        position: 'insideLeft',
+                        offset: -5
+                      }}
+                      width={80}
+                    />
+                    <ReferenceLine y={0} stroke="#666" />
+                    <ChartTooltip
+                      content={({ active, payload }) => 
+                        active && payload && payload.length ? (
+                          <ChartTooltipContent 
+                            payload={payload} 
+                            formatter={(value) => formatCurrency(value as number)}
+                          />
+                        ) : null
+                      }
+                    />
+                    <Legend 
+                      wrapperStyle={{ paddingTop: 10 }}
+                      verticalAlign="bottom"
+                      height={36}
+                    />
+                    <Bar dataKey="income" name={t('common.income')} fill="#22c55e" />
+                    <Bar dataKey="expense" name={t('common.expense')} fill="#ef4444" />
+                    <Line 
+                      type="monotone" 
+                      dataKey="cumulativeBalance" 
+                      name={t('common.balance')} 
+                      stroke="#3b82f6" 
+                      strokeWidth={2}
+                      dot={{ fill: '#3b82f6', r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </div>
+            
+            {/* Insight */}
+            <div className="mt-4 p-3 bg-gray-50 rounded-md text-sm">
+              <p>{getInsightMessage()}</p>
+            </div>
+          </>
+        ) : (
+          <EmptyStateMessage message={t('dashboard.charts.noData')} />
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
