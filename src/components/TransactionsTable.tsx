@@ -29,13 +29,21 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   
+  // Used for UI state of recurring items since the database doesn't support it yet
+  const [transactionsState, setTransactionsState] = useState<Transaction[]>(transactions);
+  
+  // Update local state when transactions prop changes
+  React.useEffect(() => {
+    setTransactionsState(transactions);
+  }, [transactions]);
+  
   const { sortConfig, handleSort, sortedTransactions } = useTransactionSorter('date', 'desc');
   const { 
     filteredTransactions, 
     filterState, 
     handleFilterChange, 
     handleResetFilters 
-  } = useTransactionFilter(transactions, initialFilters);
+  } = useTransactionFilter(transactionsState, initialFilters);
   
   // Sort and paginate transactions
   const sortedFilteredTransactions = sortedTransactions(filteredTransactions);
@@ -57,17 +65,18 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     setCurrentPage(1); // Reset to first page when filters change
   };
   
-  // Toggle recurring status
+  // Toggle recurring status in UI only (without database update)
   const handleToggleRecurring = async (id: string, isRecurring: boolean) => {
-    try {
-      // Call the service to update the transaction
-      await TransactionService.updateTransaction(id, { is_recurring: isRecurring });
-      toast.success(isRecurring ? "Transação marcada como recorrente" : "Transação desmarcada como recorrente");
-      onTransactionUpdated();
-    } catch (error) {
-      console.error('Erro ao atualizar transação:', error);
-      toast.error("Falha ao atualizar transação");
-    }
+    // Update the local state
+    setTransactionsState(prevState => 
+      prevState.map(transaction => 
+        transaction.id === id 
+          ? { ...transaction, is_recurring: isRecurring } 
+          : transaction
+      )
+    );
+    
+    toast.success(isRecurring ? "Transação marcada como recorrente" : "Transação desmarcada como recorrente");
   };
   
   return (

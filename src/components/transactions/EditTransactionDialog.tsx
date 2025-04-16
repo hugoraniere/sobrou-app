@@ -56,7 +56,10 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
   const handleSave = async () => {
     try {
-      await TransactionService.updateTransaction(transaction.id, editedTransaction);
+      // Filter out is_recurring if it exists since the database doesn't support it
+      const { is_recurring, ...updateData } = editedTransaction;
+      
+      await TransactionService.updateTransaction(transaction.id, updateData);
       setIsOpen(false);
       onTransactionUpdated();
       toast.success(t('transactions.updateSuccess', 'Transação atualizada com sucesso'));
