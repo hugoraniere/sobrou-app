@@ -124,12 +124,15 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 <SelectValue placeholder={t('transactions.selectCategory', 'Selecione a categoria')} />
               </SelectTrigger>
               <SelectContent>
-                {transactionCategories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.icon && <category.icon className="mr-2 inline h-4 w-4" />}
-                    {category.name}
-                  </SelectItem>
-                ))}
+                {transactionCategories.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <SelectItem key={category.id} value={category.id}>
+                      {Icon && <Icon className="mr-2 inline h-4 w-4" />}
+                      {category.name}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>

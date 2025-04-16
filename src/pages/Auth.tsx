@@ -11,7 +11,7 @@ import SignupForm from '../components/auth/SignupForm';
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [searchParams] = useSearchParams();
 
   // Check for verification parameter in URL
@@ -23,10 +23,10 @@ const Auth = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading && user) {
       navigate('/');
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [user, isLoading, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -34,22 +34,22 @@ const Auth = () => {
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 px-4 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold">FinanceBot</h1>
-            <p className="text-gray-600 mt-2">Your personal finance assistant</p>
+            <h1 className="text-3xl font-bold">Sobrou</h1>
+            <p className="text-gray-600 mt-2">Seu assistente financeiro pessoal</p>
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-2 mb-8">
               <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Create Account</TabsTrigger>
+              <TabsTrigger value="signup">Criar Conta</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
               <Card>
                 <CardHeader>
-                  <CardTitle>Login to FinanceBot</CardTitle>
+                  <CardTitle>Login na Sobrou</CardTitle>
                   <CardDescription>
-                    Welcome back! Let's check your finances.
+                    Bem-vindo de volta! Vamos verificar suas finanças.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -61,9 +61,9 @@ const Auth = () => {
             <TabsContent value="signup">
               <Card>
                 <CardHeader>
-                  <CardTitle>Create your free account</CardTitle>
+                  <CardTitle>Crie sua conta gratuita</CardTitle>
                   <CardDescription>
-                    Start organizing your expenses with just a few messages.
+                    Comece a organizar suas despesas com apenas algumas mensagens.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

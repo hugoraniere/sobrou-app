@@ -6,8 +6,8 @@ import LanguageSwitcher from './LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { Wallet } from 'lucide-react';
 
-const Header: React.FC = () => {
-  const { currentUser, signOut } = useAuth();
+const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
+  const { user, signOut } = useAuth();
   
   const handleLogout = async () => {
     try {
@@ -30,7 +30,7 @@ const Header: React.FC = () => {
         <div className="flex items-center space-x-4">
           <LanguageSwitcher />
           
-          {currentUser ? (
+          {user && !isPublic ? (
             <div className="flex items-center space-x-4">
               <Link to="/integration">
                 <Button variant="outline" size="sm">WhatsApp</Button>

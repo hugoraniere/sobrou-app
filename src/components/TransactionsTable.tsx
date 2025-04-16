@@ -61,7 +61,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const handleToggleRecurring = async (id: string, isRecurring: boolean) => {
     try {
       // Call the service to update the transaction
-      await TransactionService.updateTransaction(id, { isRecurring });
+      await TransactionService.updateTransaction(id, { is_recurring: isRecurring });
       toast.success(isRecurring ? "Transação marcada como recorrente" : "Transação desmarcada como recorrente");
       onTransactionUpdated();
     } catch (error) {

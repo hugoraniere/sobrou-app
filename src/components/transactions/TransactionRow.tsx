@@ -42,7 +42,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   const handleToggleRecurring = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const updatedTransaction = await TransactionService.updateTransaction(
+      await TransactionService.updateTransaction(
         transaction.id, 
         { is_recurring: !transaction.is_recurring }
       );
@@ -88,7 +88,9 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     }
   };
 
-  const CategoryIcon = transactionCategories.find(cat => cat.id === transaction.category)?.icon;
+  // Encontrar o componente Icon da categoria
+  const categoryInfo = transactionCategories.find(cat => cat.id === transaction.category);
+  const CategoryIcon = categoryInfo?.icon;
 
   return (
     <>
@@ -110,14 +112,14 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         <TableCell>
           <div className="flex items-center gap-2">
             {CategoryIcon && <CategoryIcon className="h-4 w-4" />}
-            {transactionCategories.find(cat => cat.id === transaction.category)?.name || transaction.category}
+            {categoryInfo?.name || transaction.category}
           </div>
         </TableCell>
         <TableCell>{transaction.description}</TableCell>
         <TableCell className={`text-right font-medium ${
           transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
         }`}>
-          {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
+          {transaction.type === 'income' ? '+' : '-'}R${transaction.amount.toFixed(2)}
         </TableCell>
         <TableCell className="text-center relative">
           <div 

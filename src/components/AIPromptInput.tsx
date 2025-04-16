@@ -13,16 +13,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { getCategoryByKeyword, transactionCategories } from '@/data/categories';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+
+// Movendo para um componente separado
+import CategorySelector from './prompt/CategorySelector';
+import TransactionDatePicker from './prompt/TransactionDatePicker';
 
 interface AIPromptInputProps {
   onTransactionAdded: () => void;
@@ -146,8 +143,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   // Obter o ícone da categoria detectada ou selecionada
   const categoryId = userSelectedCategory || detectedCategory;
   const categoryInfo = categoryId ? transactionCategories.find(cat => cat.id === categoryId) : null;
-  const CategoryIcon = categoryInfo?.icon;
-  const categoryName = categoryInfo?.name;
   
   const handleCategorySelect = (categoryId: string) => {
     setUserSelectedCategory(categoryId);
@@ -173,50 +168,19 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
           />
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
             {categoryId && (
-              <Popover open={isCategoryPopoverOpen} onOpenChange={setIsCategoryPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <div className="flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">
-                    {CategoryIcon && <CategoryIcon className="h-3 w-3" />}
-                    <span>{categoryName}</span>
-                    {userSelectedCategory && (
-                      <XCircle className="h-3 w-3 ml-1 text-gray-500 hover:text-gray-700" onClick={resetCategory} />
-                    )}
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-2" align="end">
-                  <div className="grid gap-1 max-h-60 overflow-y-auto">
-                    {transactionCategories.map((category) => (
-                      <div
-                        key={category.id}
-                        className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100
-                          ${category.id === categoryId ? 'bg-blue-50 text-blue-600' : ''}
-                        `}
-                        onClick={() => handleCategorySelect(category.id)}
-                      >
-                        {category.icon && <category.icon className="h-4 w-4" />}
-                        <span>{category.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <CategorySelector
+                categoryId={categoryId}
+                isOpen={isCategoryPopoverOpen}
+                setIsOpen={setIsCategoryPopoverOpen}
+                onCategorySelect={handleCategorySelect}
+                onReset={resetCategory}
+                userSelected={!!userSelectedCategory}
+              />
             )}
-            <Popover>
-              <PopoverTrigger asChild>
-                <button type="button" className="text-gray-400 hover:text-gray-600">
-                  <CalendarIcon className="h-4 w-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => date && setSelectedDate(date)}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
+            <TransactionDatePicker
+              selectedDate={selectedDate}
+              onDateChange={(date) => date && setSelectedDate(date)}
+            />
           </div>
         </div>
         <Button type="submit" disabled={isProcessing} className="min-w-[100px]">
