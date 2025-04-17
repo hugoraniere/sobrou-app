@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { Button } from '@/components/ui/button';
-import { Wallet, Home, PlusCircle, Settings, Menu, X } from 'lucide-react';
+import { Home, PlusCircle, Settings, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AddTransactionDialog from './transactions/AddTransactionDialog';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from '@/components/ui/menubar';
@@ -50,8 +50,11 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Link to="/" className="flex items-center">
-              <Wallet className="h-6 w-6 text-green-500 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Sobrou</span>
+              <img 
+                src="/lovable-uploads/076c0413-0b42-4810-b32c-5b627b744797.png" 
+                alt="Sobrou Logo" 
+                className="h-8 w-auto mr-2" 
+              />
             </Link>
           </div>
 
@@ -202,12 +205,10 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
         </div>
       </header>
 
-      {/* Add Transaction Dialog */}
       <AddTransactionDialog
         isOpen={isAddTransactionOpen}
         setIsOpen={setIsAddTransactionOpen}
         onTransactionAdded={() => {
-          // Atualizar a listagem se estiver no context correto
           if (window.location.pathname === '/') {
             window.location.reload();
           }
