@@ -2,16 +2,15 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useI18n } from '@/hooks/use-i18n';
 import { useTranslation } from 'react-i18next';
 import { 
   LayoutDashboard, 
   FileText, 
   Target, 
   Settings, 
-  Globe, 
   LogOut, 
-  ChevronRight 
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -21,14 +20,9 @@ import {
   SidebarHeader, 
   SidebarMenu, 
   SidebarMenuItem, 
-  SidebarMenuButton 
+  SidebarMenuButton,
+  useSidebar
 } from '@/components/ui/sidebar';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,8 +41,8 @@ const SidebarNav = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const { t } = useTranslation();
-  const { changeLanguage, isCurrentLanguage } = useI18n();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = React.useState(false);
+  const { state, toggleSidebar } = useSidebar();
 
   const getUserInitials = () => {
     // Type assertion to access user_metadata
@@ -92,13 +86,29 @@ const SidebarNav = () => {
     },
   ];
 
+  const userFullName = user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
+
   return (
     <>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center p-4">
-            <Wallet className="h-6 w-6 text-green-500 mr-2" />
-            <span className="text-xl font-bold text-gray-900">Sobrou</span>
+          <div className="flex items-center p-4 justify-between">
+            <div className="flex items-center">
+              <Wallet className="h-6 w-6 text-green-500 mr-2" />
+              <span className={`text-xl font-bold text-gray-900 ${state === 'collapsed' ? 'hidden' : 'block'}`}>Sobrou</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleSidebar} 
+              className="h-8 w-8"
+            >
+              {state === 'expanded' ? (
+                <ChevronLeft className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </Button>
           </div>
         </SidebarHeader>
         
@@ -109,68 +119,38 @@ const SidebarNav = () => {
                 <SidebarMenuButton 
                   asChild 
                   isActive={location.pathname === item.path}
+                  tooltip={state === 'collapsed' ? item.name : undefined}
                 >
                   <Link to={item.path} className="flex items-center">
                     {item.icon}
-                    <span className="ml-3">{item.name}</span>
+                    <span className={`ml-3 ${state === 'collapsed' ? 'hidden' : 'block'}`}>{item.name}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-            
-            {/* Language Switcher */}
-            <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton className="w-full text-left">
-                    <Globe className="w-5 h-5" />
-                    <span className="ml-3">{t('common.language', 'Alterar Idioma')}</span>
-                    <ChevronRight className="ml-auto h-4 w-4" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem 
-                    className={cn(isCurrentLanguage('en') && "bg-accent")}
-                    onClick={() => changeLanguage('en')}
-                  >
-                    <span className="mr-2">🇺🇸</span> English
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className={cn(isCurrentLanguage('pt-BR') && "bg-accent")}
-                    onClick={() => changeLanguage('pt-BR')}
-                  >
-                    <span className="mr-2">🇧🇷</span> Português
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
             
             {/* Logout Button */}
             <SidebarMenuItem>
               <SidebarMenuButton 
                 onClick={() => setIsLogoutDialogOpen(true)}
                 className="text-red-500 hover:text-red-600"
+                tooltip={state === 'collapsed' ? t('auth.logout', 'Sair') : undefined}
               >
                 <LogOut className="w-5 h-5" />
-                <span className="ml-3">{t('auth.logout', 'Sair')}</span>
+                <span className={`ml-3 ${state === 'collapsed' ? 'hidden' : 'block'}`}>{t('auth.logout', 'Sair')}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         
         <SidebarFooter>
-          <div className="p-4 border-t border-gray-200">
+          <div className={`p-4 border-t border-gray-200 ${state === 'collapsed' ? 'text-center' : ''}`}>
             <div className="flex items-center">
               <Avatar className="h-10 w-10 bg-blue-500 text-white">
                 <AvatarFallback>{getUserInitials()}</AvatarFallback>
               </Avatar>
-              <div className="ml-3">
-                <p className="text-sm font-medium">
-                  {user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário')}
-                </p>
-                <Link to="/profile" className="text-xs text-blue-500 hover:underline">
-                  {t('common.viewProfile', 'Ver perfil')}
-                </Link>
+              <div className={`ml-3 ${state === 'collapsed' ? 'hidden' : 'block'}`}>
+                <p className="text-sm font-medium">{userFullName}</p>
               </div>
             </div>
           </div>

@@ -53,6 +53,20 @@ declare module '@/components/transactions/TransactionRow' {
   }
 }
 
+// Add className to TransactionDatePicker props
+declare module '@/components/prompt/TransactionDatePicker' {
+  interface TransactionDatePickerProps {
+    className?: string;
+  }
+}
+
+// Add className to PromptInputField props
+declare module '@/components/prompt/PromptInputField' {
+  interface PromptInputFieldProps {
+    className?: string;
+  }
+}
+
 // Add className to PopoverContent and PopoverTrigger
 declare module '@radix-ui/react-popover' {
   interface PopoverContentProps {

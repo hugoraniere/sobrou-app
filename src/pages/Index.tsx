@@ -73,7 +73,7 @@ const Index = () => {
       />
       
       <div className="space-y-6 w-full max-w-full overflow-hidden">
-        <div>
+        <div className="mt-6 mb-6">
           <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
           <p className="text-gray-600">{t('dashboard.subtitle')}</p>
         </div>
