@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-// Extend React's IntrinsicAttributes to include className
+// Extend React's IntrinsicAttributes to include className globally
 declare module 'react' {
   interface IntrinsicAttributes {
     className?: string;
