@@ -9,18 +9,17 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 interface TransactionDatePickerProps {
   date?: Date;
-  selectedDate?: Date; // Added alternative prop name
+  selectedDate?: Date;
   onDateChange: (date: Date) => void;
   className?: string;
 }
 
 const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
   date,
-  selectedDate, // Handle both prop names
+  selectedDate,
   onDateChange,
   className
 }) => {
-  // Use either date or selectedDate prop, with date taking precedence
   const effectiveDate = date || selectedDate || new Date();
   
   return (
