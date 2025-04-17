@@ -90,7 +90,7 @@ const SidebarNav = () => {
 
   return (
     <>
-      <Sidebar>
+      <Sidebar variant="sidebar">
         <SidebarHeader>
           <div className="flex items-center p-4 justify-between">
             <div className="flex items-center">
