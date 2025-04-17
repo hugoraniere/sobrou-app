@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TransactionService } from '@/services/TransactionService';
 import {
@@ -27,12 +28,14 @@ interface AddTransactionDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onTransactionAdded: () => void;
+  className?: string;
 }
 
 const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
   isOpen,
   setIsOpen,
-  onTransactionAdded
+  onTransactionAdded,
+  className
 }) => {
   const today = new Date().toISOString().split('T')[0];
   const { t } = useTranslation();
@@ -62,6 +65,20 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
     }));
   };
 
+  // Formatação de valor em reais com vírgula apenas quando houver decimal
+  const formatCurrency = (value: number) => {
+    // Verifica se tem casas decimais
+    const hasDecimals = value % 1 !== 0;
+    
+    if (hasDecimals) {
+      // Formatação com vírgula e duas casas decimais
+      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    } else {
+      // Formatação sem casas decimais
+      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+  };
+
   const handleSubmit = async () => {
     if (!newTransaction.amount || !newTransaction.description) {
       toast.error("Por favor, preencha todos os campos");
@@ -87,8 +104,8 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
 
       toast.success(
         newTransaction.type === 'income' 
-          ? `Receita de R$${amountValue.toFixed(2)} adicionada` 
-          : `Despesa de R$${amountValue.toFixed(2)} adicionada`
+          ? `Receita de ${formatCurrency(amountValue)} adicionada` 
+          : `Despesa de ${formatCurrency(amountValue)} adicionada`
       );
       
       setIsOpen(false);
@@ -111,7 +128,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
+      <DialogContent className={cn("sm:max-w-[500px]", className)}>
         <DialogHeader>
           <DialogTitle>{t('transactions.addNew', 'Adicionar Nova Transação')}</DialogTitle>
           <DialogDescription>
@@ -146,7 +163,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="income">{t('common.income', 'Receita')}</SelectItem>
                 <SelectItem value="expense">{t('common.expense', 'Despesa')}</SelectItem>
                 <SelectItem value="transfer">{t('transactions.transfer', 'Transferência')}</SelectItem>
@@ -166,7 +183,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t('transactions.selectCategory', 'Selecione a categoria')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white max-h-[300px]">
                 {transactionCategories.map((category) => {
                   const Icon = category.icon;
                   return (

@@ -15,13 +15,15 @@ interface TransactionRowProps {
   onToggleRecurring: (id: string, isRecurring: boolean) => void;
   formatDate: (dateString: string) => string;
   onTransactionUpdated: () => void;
+  className?: string;
 }
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ 
   transaction, 
   onToggleRecurring,
   formatDate,
-  onTransactionUpdated
+  onTransactionUpdated,
+  className
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -92,12 +94,26 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   // Encontrar o componente Icon da categoria
   const categoryInfo = transactionCategories.find(cat => cat.id === transaction.category);
   const CategoryIcon = categoryInfo?.icon;
+  
+  // Formatação de valor em reais com vírgula apenas quando houver decimal
+  const formatCurrency = (value: number) => {
+    // Verifica se tem casas decimais
+    const hasDecimals = value % 1 !== 0;
+    
+    if (hasDecimals) {
+      // Formatação com vírgula e duas casas decimais
+      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    } else {
+      // Formatação sem casas decimais
+      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+  };
 
   return (
     <>
       <TableRow 
         key={transaction.id} 
-        className="cursor-pointer hover:bg-gray-50 relative group"
+        className={cn("cursor-pointer hover:bg-gray-50 relative group", className)}
         onClick={handleEdit}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -122,7 +138,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           "text-right font-medium",
           transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
         )}>
-          {transaction.type === 'income' ? '+' : '-'}R${transaction.amount.toFixed(2)}
+          {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
         </TableCell>
         <TableCell className="text-center relative">
           <div 

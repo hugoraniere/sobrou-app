@@ -92,6 +92,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     }
   ];
 
+  // Altura padrão para todos os gráficos
+  const chartHeight = "h-[350px]";
+
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Big Numbers */}
@@ -115,37 +118,57 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Expenses by Category (Pie Chart) */}
-        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
-          <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
+        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
+          <div className="p-4 h-full flex flex-col">
+            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.categoryBreakdown')}</h3>
+            <div className="flex-1">
+              <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
+            </div>
+          </div>
         </div>
         
         {/* Income vs Expenses (Line Chart) */}
-        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
-          <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
+          <div className="p-4 h-full flex flex-col">
+            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.revenueVsExpense')}</h3>
+            <div className="flex-1">
+              <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Daily Balance (Line Chart) */}
-        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
-          <DailyBarChart transactions={transactions} />
+        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
+          <div className="p-4 h-full flex flex-col">
+            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.dailyEvolution')}</h3>
+            <div className="flex-1">
+              <DailyBarChart transactions={transactions} />
+            </div>
+          </div>
         </div>
         
         {/* Financial Goals Progress */}
-        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
-          <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
+          <div className="p-4 h-full flex flex-col">
+            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.financialGoals')}</h3>
+            <div className="flex-1">
+              <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Row 3 - Optional charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Income by Type Chart */}
-        <Card className="border border-gray-100 shadow-none h-[300px] w-full max-w-full overflow-hidden">
-          <CardContent className="p-6">
+        <Card className={`border border-gray-100 shadow-none ${chartHeight} w-full max-w-full overflow-hidden`}>
+          <CardContent className="p-6 h-full flex flex-col">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
             {hasTransactions ? (
-              <div className="h-[220px] w-full flex justify-center items-center">
+              <div className="flex-1 flex items-center justify-center">
                 <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
               </div>
             ) : (

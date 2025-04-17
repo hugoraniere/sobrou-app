@@ -29,13 +29,15 @@ interface EditTransactionDialogProps {
   setIsOpen: (isOpen: boolean) => void;
   transaction: Transaction;
   onTransactionUpdated: () => void;
+  className?: string;
 }
 
 const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   isOpen,
   setIsOpen,
   transaction,
-  onTransactionUpdated
+  onTransactionUpdated,
+  className
 }) => {
   const [editedTransaction, setEditedTransaction] = useState<Transaction>({...transaction});
   const { t } = useTranslation();
@@ -55,6 +57,20 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     }));
   };
 
+  // Formatação de valor em reais com vírgula apenas quando houver decimal
+  const formatCurrency = (value: number) => {
+    // Verifica se tem casas decimais
+    const hasDecimals = value % 1 !== 0;
+    
+    if (hasDecimals) {
+      // Formatação com vírgula e duas casas decimais
+      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    } else {
+      // Formatação sem casas decimais
+      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+  };
+
   const handleSave = async () => {
     try {
       // Filter out is_recurring if it exists since the database doesn't support it
@@ -72,7 +88,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
+      <DialogContent className={cn("sm:max-w-[500px]", className)}>
         <DialogHeader>
           <DialogTitle>{t('transactions.editTitle', 'Editar Transação')}</DialogTitle>
           <DialogDescription>
@@ -107,7 +123,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="income">{t('common.income', 'Receita')}</SelectItem>
                 <SelectItem value="expense">{t('common.expense', 'Despesa')}</SelectItem>
                 <SelectItem value="transfer">{t('transactions.transfer', 'Transferência')}</SelectItem>
@@ -127,7 +143,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t('transactions.selectCategory', 'Selecione a categoria')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white max-h-[300px]">
                 {transactionCategories.map((category) => {
                   const Icon = category.icon;
                   return (

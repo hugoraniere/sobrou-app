@@ -38,26 +38,26 @@ export const getCategoryByKeyword = (description: string): TransactionCategory |
   
   // Define keyword mappings
   const categoryKeywords: Record<string, string[]> = {
-    'salary': ['salary', 'salário', 'salario', 'pagamento', 'contracheque', 'holerite'],
-    'investment': ['investment', 'investimento', 'dividendo', 'juros', 'ações', 'acoes', 'rendimento'],
+    'salary': ['salário', 'salario', 'pagamento', 'contracheque', 'holerite'],
+    'investment': ['investimento', 'dividendo', 'juros', 'ações', 'acoes', 'rendimento'],
     'extra_income': ['extra', 'bônus', 'bonus', 'freelance', 'adicional'],
-    'housing': ['aluguel', 'rent', 'mortgage', 'hipoteca', 'condomínio', 'condominio', 'apartamento', 'casa', 'moradia'],
-    'shopping': ['shopping', 'compra', 'loja', 'store', 'mall', 'roupa', 'vestuário'],
-    'food': ['food', 'comida', 'restaurante', 'restaurant', 'almoço', 'jantar', 'delivery', 'ifood'],
-    'coffee': ['coffee', 'café', 'cafe', 'starbucks'],
-    'transportation': ['gas', 'gasolina', 'combustível', 'combustivel', 'uber', '99', 'táxi', 'taxi', 'transporte'],
-    'public_transport': ['metro', 'metrô', 'ônibus', 'onibus', 'trem', 'train', 'bus', 'bilhete'],
-    'travel': ['travel', 'viagem', 'hotel', 'passagem', 'airbnb', 'hospedagem'],
-    'health': ['health', 'saúde', 'saude', 'médico', 'medico', 'dentista', 'hospital', 'farmácia', 'farmacia'],
-    'banking': ['bank', 'banco', 'taxa', 'tarifa', 'iof', 'juros', 'empréstimo', 'emprestimo'],
-    'education': ['education', 'educação', 'educacao', 'escola', 'school', 'curso', 'faculdade', 'college', 'universidade'],
-    'gift': ['gift', 'presente', 'aniversário', 'aniversario', 'natal', 'christmas'],
-    'entertainment': ['entertainment', 'entretenimento', 'cinema', 'filme', 'show', 'concerto', 'netflix', 'spotify', 'stream'],
-    'utilities': ['utilities', 'conta', 'bill', 'luz', 'electricity', 'gás', 'gas'],
-    'water': ['water', 'água', 'agua', 'saneamento'],
-    'internet': ['internet', 'wifi', 'broadband', 'banda larga'],
-    'phone': ['phone', 'telefone', 'celular', 'mobile'],
-    'credit_card': ['credit card', 'cartão de crédito', 'cartao de credito', 'cartão', 'cartao', 'fatura cartão', 'fatura do cartão', 'nubank', 'itaucard', 'credicard']
+    'housing': ['aluguel', 'hipoteca', 'condomínio', 'condominio', 'apartamento', 'casa', 'moradia'],
+    'shopping': ['compra', 'loja', 'roupa', 'vestuário'],
+    'food': ['comida', 'restaurante', 'almoço', 'jantar', 'delivery', 'ifood'],
+    'coffee': ['café', 'cafe', 'starbucks'],
+    'transportation': ['gasolina', 'combustível', 'combustivel', 'uber', '99', 'táxi', 'taxi', 'transporte'],
+    'public_transport': ['metro', 'metrô', 'ônibus', 'onibus', 'trem', 'bilhete'],
+    'travel': ['viagem', 'hotel', 'passagem', 'airbnb', 'hospedagem'],
+    'health': ['saúde', 'saude', 'médico', 'medico', 'dentista', 'hospital', 'farmácia', 'farmacia'],
+    'banking': ['banco', 'taxa', 'tarifa', 'iof', 'juros', 'empréstimo', 'emprestimo'],
+    'education': ['educação', 'educacao', 'escola', 'curso', 'faculdade', 'universidade'],
+    'gift': ['presente', 'aniversário', 'aniversario', 'natal'],
+    'entertainment': ['entretenimento', 'cinema', 'filme', 'show', 'concerto', 'netflix', 'spotify', 'stream'],
+    'utilities': ['conta', 'luz', 'gás', 'gas'],
+    'water': ['água', 'agua', 'saneamento'],
+    'internet': ['internet', 'wifi', 'banda larga'],
+    'phone': ['telefone', 'celular'],
+    'credit_card': ['cartão de crédito', 'cartao de credito', 'cartão', 'cartao', 'fatura cartão', 'fatura do cartão', 'nubank', 'itaucard', 'credicard']
   };
   
   // Check for keywords in the description
