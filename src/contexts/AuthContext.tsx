@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
@@ -89,18 +88,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isLoading) return;
 
     const handleRouteProtection = () => {
-      const publicRoutes = ['/auth'];
+      const publicRoutes = ['/auth', '/'];
       const isPublicRoute = publicRoutes.includes(location.pathname);
 
       // Redirect authenticated users away from auth pages
       if (isAuthenticated && isPublicRoute) {
-        navigate('/');
+        navigate('/dashboard');
       }
       
-      // Redirect unauthenticated users to the auth page
-      if (!isAuthenticated && !isPublicRoute) {
-        navigate('/auth');
-      }
+      // Unauthenticated users can stay on public routes
+      // but will be redirected from protected routes by ProtectedRoute component
     };
 
     handleRouteProtection();
@@ -122,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // After successful login
-      navigate('/');
+      navigate('/dashboard');
       return;
     } catch (error: any) {
       console.error('Login failed:', error);

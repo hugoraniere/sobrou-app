@@ -52,7 +52,7 @@ const PromptInputField: React.FC<PromptInputFieldProps> = ({
           />
         )}
         <TransactionDatePicker
-          selectedDate={selectedDate}
+          date={selectedDate}
           onDateChange={(date) => date && onDateChange(date)}
         />
       </div>
