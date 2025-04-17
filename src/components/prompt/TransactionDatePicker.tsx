@@ -28,17 +28,17 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
+          size="icon"
           className={cn(
-            "w-full justify-start text-left font-normal",
-            !effectiveDate && "text-muted-foreground",
+            "h-8 w-8 rounded-full",
             className
           )}
+          aria-label="Selecione uma data"
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {effectiveDate ? format(effectiveDate, 'PPP') : <span>Selecione uma data</span>}
+          <CalendarIcon className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0" align="end">
         <Calendar
           mode="single"
           selected={effectiveDate}

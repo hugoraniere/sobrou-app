@@ -5,10 +5,11 @@ import { Transaction, TransactionService } from '@/services/TransactionService';
 import { transactionCategories } from '@/data/categories';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
-import { RepeatIcon, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import RecurringIndicator from './ui/RecurringIndicator';
+import DeleteIndicator from './ui/DeleteIndicator';
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -141,34 +142,15 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
         </TableCell>
         <TableCell className="text-center relative">
-          <div 
-            className={cn(
-              "cursor-pointer",
-              isHovered || transaction.is_recurring ? 'opacity-100' : 'opacity-0',
-              "group-hover:opacity-100 transition-opacity"
-            )}
-            onClick={handleToggleRecurring}
-            title={transaction.is_recurring ? t('transactions.removeRecurring', "Click to remove recurring") : t('transactions.setRecurring', "Click to set as recurring")}
-          >
-            <RepeatIcon 
-              className={cn(
-                "h-4 w-4",
-                transaction.is_recurring ? 'text-blue-500' : 'text-gray-400'
-              )}
-            />
-          </div>
+          <RecurringIndicator 
+            isRecurring={transaction.is_recurring} 
+            onToggle={handleToggleRecurring}
+            isHovered={isHovered}
+          />
         </TableCell>
         
         {/* Desktop Delete Button that appears on hover */}
-        <div 
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 hidden group-hover:block"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDelete();
-          }}
-        >
-          <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700 cursor-pointer" />
-        </div>
+        <DeleteIndicator onDelete={handleDelete} />
       </TableRow>
 
       {/* Edit Transaction Dialog */}

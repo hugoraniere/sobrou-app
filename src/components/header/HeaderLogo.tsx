@@ -11,6 +11,7 @@ const HeaderLogo: React.FC = () => {
           alt="Sobrou Logo" 
           className="h-8 w-auto mr-2" 
         />
+        <span className="text-xl font-bold text-primary">Sobrou</span>
       </Link>
     </div>
   );

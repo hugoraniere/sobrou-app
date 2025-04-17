@@ -80,3 +80,41 @@ interface TransactionRowProps {
   className?: string;
 }
 
+// Add interfaces for TransactionDetails
+interface TransactionDetailsProps {
+  transaction: Transaction;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSelectChange: (name: string, value: string) => void;
+  className?: string;
+}
+
+// Add interfaces for TransactionControls
+interface TransactionControlsProps {
+  onClose: () => void;
+  onSave: () => Promise<void>;
+  isSubmitting?: boolean;
+  className?: string;
+}
+
+// Add interfaces for TransactionFormLayout
+interface TransactionFormLayoutProps {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  footer: React.ReactNode;
+  className?: string;
+}
+
+// Add interfaces for RecurringIndicator
+interface RecurringIndicatorProps {
+  isRecurring: boolean;
+  onToggle: (e: React.MouseEvent) => void;
+  isHovered: boolean;
+  className?: string;
+}
+
+// Add interfaces for DeleteIndicator
+interface DeleteIndicatorProps {
+  onDelete: (e: React.MouseEvent) => void;
+  className?: string;
+}

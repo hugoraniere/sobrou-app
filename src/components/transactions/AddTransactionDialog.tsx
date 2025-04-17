@@ -1,28 +1,12 @@
 
 import React, { useState } from 'react';
 import { TransactionService } from '@/services/TransactionService';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { toast } from "sonner";
-import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import TransactionFormLayout from './ui/TransactionFormLayout';
+import TransactionDetails from './ui/TransactionDetails';
+import TransactionControls from './ui/TransactionControls';
 
 interface AddTransactionDialogProps {
   isOpen: boolean;
@@ -127,114 +111,26 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className={cn("sm:max-w-[500px]", className)}>
-        <DialogHeader>
-          <DialogTitle>{t('transactions.addNew', 'Adicionar Nova Transação')}</DialogTitle>
-          <DialogDescription>
-            Preencha os detalhes da transação abaixo
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right">
-              {t('transactions.date', 'Data')}
-            </Label>
-            <Input
-              id="date"
-              name="date"
-              type="date"
-              value={newTransaction.date}
-              onChange={handleInputChange}
-              className="col-span-3"
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="type" className="text-right">
-              {t('transactions.type', 'Tipo')}
-            </Label>
-            <Select 
-              name="type" 
-              value={newTransaction.type}
-              onValueChange={(value) => handleSelectChange('type', value)}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="income">{t('common.income', 'Receita')}</SelectItem>
-                <SelectItem value="expense">{t('common.expense', 'Despesa')}</SelectItem>
-                <SelectItem value="transfer">{t('transactions.transfer', 'Transferência')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="category" className="text-right">
-              {t('transactions.category', 'Categoria')}
-            </Label>
-            <Select 
-              name="category" 
-              value={newTransaction.category}
-              onValueChange={(value) => handleSelectChange('category', value)}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder={t('transactions.selectCategory', 'Selecione a categoria')} />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-[300px]">
-                {transactionCategories.map((category) => {
-                  const Icon = category.icon;
-                  return (
-                    <SelectItem key={category.id} value={category.id}>
-                      {Icon && <Icon className="mr-2 inline h-4 w-4" />}
-                      {category.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">
-              {t('transactions.description', 'Descrição')}
-            </Label>
-            <Input
-              id="description"
-              name="description"
-              value={newTransaction.description}
-              onChange={handleInputChange}
-              className="col-span-3"
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="amount" className="text-right">
-              {t('transactions.amount', 'Valor')}
-            </Label>
-            <Input
-              id="amount"
-              name="amount"
-              type="number"
-              value={newTransaction.amount}
-              onChange={handleInputChange}
-              className="col-span-3"
-            />
-          </div>
-        </div>
-        
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
-            {t('common.cancel', 'Cancelar')}
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Processando..." : t('transactions.addNew', 'Adicionar')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <TransactionFormLayout
+      title={t('transactions.addNew', 'Adicionar Nova Transação')}
+      description={t('transactions.description', 'Preencha os detalhes da transação abaixo')}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      className={className}
+      footer={
+        <TransactionControls 
+          onClose={() => setIsOpen(false)} 
+          onSave={handleSubmit}
+          isSubmitting={isSubmitting}
+        />
+      }
+    >
+      <TransactionDetails
+        transaction={newTransaction}
+        onInputChange={handleInputChange}
+        handleSelectChange={handleSelectChange}
+      />
+    </TransactionFormLayout>
   );
 };
 
