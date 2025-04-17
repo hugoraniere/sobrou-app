@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,35 +8,102 @@ import { Check, PhoneCall, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Navigate } from 'react-router-dom';
 
 const WhatsAppIntegration = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [savedPhoneNumber, setSavedPhoneNumber] = useState<string | null>(null);
+
+  // Carregar o número de telefone salvo quando o componente for montado
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('whatsapp_number')
+          .eq('id', user.id)
+          .single();
+          
+        if (error) {
+          console.error('Erro ao buscar perfil:', error);
+          return;
+        }
+        
+        if (data?.whatsapp_number) {
+          setSavedPhoneNumber(data.whatsapp_number);
+          setIsConnected(true);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados do perfil:', error);
+      }
+    };
+    
+    fetchUserProfile();
+  }, [user]);
 
   const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast.error("Você precisa estar logado para conectar o WhatsApp");
+      return;
+    }
+    
     if (!phoneNumber || phoneNumber.length < 10) {
-      toast.error("Please enter a valid phone number");
+      toast.error("Por favor, insira um número de telefone válido");
       return;
     }
     
     setIsConnecting(true);
     
-    // Simulate API call
     try {
-      // In a real app, this would be an actual API call to connect WhatsApp
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Salvar o número no perfil do usuário
+      const { error } = await supabase
+        .from('profiles')
+        .update({ whatsapp_number: phoneNumber })
+        .eq('id', user.id);
+        
+      if (error) {
+        throw error;
+      }
       
       setIsConnected(true);
-      toast.success("WhatsApp connected successfully!");
+      setSavedPhoneNumber(phoneNumber);
+      toast.success("WhatsApp conectado com sucesso!");
     } catch (error) {
-      toast.error("Failed to connect WhatsApp. Please try again.");
+      console.error('Erro ao conectar WhatsApp:', error);
+      toast.error("Falha ao conectar WhatsApp. Por favor, tente novamente.");
     } finally {
       setIsConnecting(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ whatsapp_number: null })
+        .eq('id', user.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      setIsConnected(false);
+      setSavedPhoneNumber(null);
+      setPhoneNumber('');
+      toast.success("WhatsApp desconectado com sucesso!");
+    } catch (error) {
+      console.error('Erro ao desconectar WhatsApp:', error);
+      toast.error("Falha ao desconectar WhatsApp. Por favor, tente novamente.");
     }
   };
 
@@ -50,15 +118,17 @@ const WhatsAppIntegration = () => {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Connect Your WhatsApp</h1>
-            <p className="text-gray-600">Link your WhatsApp to start tracking expenses automatically</p>
+            <h1 className="text-3xl font-bold mb-2">Conecte seu WhatsApp</h1>
+            <p className="text-gray-600">Vincule seu WhatsApp para começar a registrar despesas automaticamente</p>
           </div>
           
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>WhatsApp Connection</CardTitle>
+              <CardTitle>Conexão com WhatsApp</CardTitle>
               <CardDescription>
-                Enter your phone number to receive a verification message
+                {isConnected 
+                  ? `Seu WhatsApp está conectado com o número: ${savedPhoneNumber}`
+                  : "Insira seu número de telefone para receber uma mensagem de verificação"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -71,45 +141,54 @@ const WhatsAppIntegration = () => {
                       </div>
                       <Input
                         type="tel"
-                        placeholder="Your WhatsApp phone number"
+                        placeholder="Seu número de WhatsApp"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         className="rounded-l-none"
                       />
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      Include country code (e.g. +1 for US)
+                      Inclua o código do país (ex: +55 para Brasil)
                     </p>
                   </div>
                   
                   <Button type="submit" disabled={isConnecting} className="w-full">
-                    {isConnecting ? "Connecting..." : "Connect WhatsApp"}
+                    {isConnecting ? "Conectando..." : "Conectar WhatsApp"}
                   </Button>
                 </form>
               ) : (
                 <div className="py-4">
                   <div className="flex items-center space-x-2 text-green-600 mb-4">
                     <Check className="h-6 w-6" />
-                    <span className="font-medium">WhatsApp Connected Successfully!</span>
+                    <span className="font-medium">WhatsApp Conectado com Sucesso!</span>
                   </div>
                   
                   <p className="text-gray-600 mb-4">
-                    Your WhatsApp account is now linked to FinanceBot. You can start sending your
-                    expenses right away.
+                    Seu WhatsApp está vinculado ao Sobrou. Você já pode começar a enviar suas
+                    despesas diretamente.
                   </p>
                   
-                  <Link to="/">
-                    <Button className="w-full">
-                      Go to Dashboard
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link to="/" className="flex-1">
+                      <Button className="w-full">
+                        Ir para o Dashboard
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={handleDisconnect}
+                    >
+                      Desconectar WhatsApp
                     </Button>
-                  </Link>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
           
           <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">How it works</h2>
+            <h2 className="text-xl font-semibold mb-4">Como funciona</h2>
             
             <div className="space-y-4">
               <div className="flex items-start">
@@ -117,9 +196,9 @@ const WhatsAppIntegration = () => {
                   1
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Send messages with your expenses</h3>
+                  <h3 className="font-medium mb-1">Envie mensagens com suas despesas</h3>
                   <p className="text-gray-600">
-                    Simply text your expenses like "Spent $25 on dinner" or "Uber ride $12"
+                    Simplesmente envie mensagens como "Gastei R$25 no jantar" ou "Uber R$12"
                   </p>
                 </div>
               </div>
@@ -129,9 +208,9 @@ const WhatsAppIntegration = () => {
                   2
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">AI categorizes expenses automatically</h3>
+                  <h3 className="font-medium mb-1">IA categoriza despesas automaticamente</h3>
                   <p className="text-gray-600">
-                    We'll extract the amount, category, and description from your message
+                    Extraímos o valor, categoria e descrição da sua mensagem
                   </p>
                 </div>
               </div>
@@ -141,9 +220,9 @@ const WhatsAppIntegration = () => {
                   3
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">View your financial dashboard</h3>
+                  <h3 className="font-medium mb-1">Veja seu painel financeiro</h3>
                   <p className="text-gray-600">
-                    See your spending patterns, get insights, and receive saving suggestions
+                    Acompanhe seus padrões de gastos, receba insights e sugestões de economia
                   </p>
                 </div>
               </div>
@@ -153,12 +232,12 @@ const WhatsAppIntegration = () => {
               <div className="flex">
                 <MessageSquare className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-blue-800 mb-1">Example messages</h4>
+                  <h4 className="font-medium text-blue-800 mb-1">Exemplos de mensagens</h4>
                   <ul className="text-sm text-blue-600 space-y-1">
-                    <li>"Spent $45.50 on groceries at Walmart"</li>
-                    <li>"$12 lunch today"</li>
-                    <li>"Rent payment $1200"</li>
-                    <li>"Uber ride yesterday $18.75"</li>
+                    <li>"Gastei R$45,50 em compras no Mercado"</li>
+                    <li>"R$12 almoço hoje"</li>
+                    <li>"Pagamento aluguel R$1200"</li>
+                    <li>"Corrida de Uber ontem R$18,75"</li>
                   </ul>
                 </div>
               </div>
