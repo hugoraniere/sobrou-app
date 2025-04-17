@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -20,7 +21,8 @@ import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMediaQuery } from '../hooks/use-mobile';
-import { useAuth, useNavigate } from '../hooks/use-auth';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 const PublicLanding: React.FC = () => {

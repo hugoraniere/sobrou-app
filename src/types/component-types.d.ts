@@ -10,7 +10,7 @@ declare module 'react' {
 
 // Add interface for TransactionDatePicker
 interface TransactionDatePickerProps {
-  date: Date;
+  date?: Date;
   onDateChange: (date: Date) => void;
   className?: string;
   // Add the alternative prop names that are used in some components
@@ -19,8 +19,8 @@ interface TransactionDatePickerProps {
 
 // Add interface for CategorySelector
 interface CategorySelectorProps {
-  selectedCategory: string;
-  onSelectCategory: (category: string) => void;
+  selectedCategory?: string;
+  onSelectCategory?: (category: string) => void;
   className?: string;
   // Add props used in the current implementation
   categoryId?: string;
@@ -38,5 +38,31 @@ interface DialogProps {
 
 // Add interfaces for Popover components
 interface PopoverProps {
+  className?: string;
+}
+
+// Add interfaces for EditTransactionDialog
+interface EditTransactionDialogProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  transaction: Transaction;
+  onTransactionUpdated: () => void;
+  className?: string;
+}
+
+// Add interfaces for AddTransactionDialog
+interface AddTransactionDialogProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  onTransactionAdded: () => void;
+  className?: string;
+}
+
+// Add interfaces for TransactionRow
+interface TransactionRowProps {
+  transaction: Transaction;
+  onToggleRecurring: (id: string, isRecurring: boolean) => void;
+  formatDate: (dateString: string) => string;
+  onTransactionUpdated: () => void;
   className?: string;
 }
