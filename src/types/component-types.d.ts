@@ -1,3 +1,4 @@
+
 import { AriaAttributes, DOMAttributes } from "react";
 
 // Extend React's intrinsic attributes to include className
@@ -44,11 +45,19 @@ interface DialogContentProps {
 // Add interfaces for Popover components
 interface PopoverProps {
   className?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+interface PopoverTriggerProps {
+  className?: string;
+  asChild?: boolean;
 }
 
 interface PopoverContentProps {
   className?: string;
   align?: string;
+  sideOffset?: number;
 }
 
 // Add interfaces for EditTransactionDialog
