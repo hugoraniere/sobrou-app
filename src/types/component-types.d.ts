@@ -45,9 +45,11 @@ declare module '@/components/transactions/EditTransactionDialog' {
 // Add className to TransactionRow props
 declare module '@/components/transactions/TransactionRow' {
   interface TransactionRowProps {
-    className?: string;
     transaction: import('@/services/TransactionService').Transaction;
-    onEdit: (transaction: import('@/services/TransactionService').Transaction) => void;
-    onDelete: (id: string) => void;
+    onToggleRecurring: (id: string, isRecurring: boolean) => void;
+    formatDate: (dateString: string) => string;
+    onTransactionUpdated: () => void;
+    className?: string;
   }
 }
+
