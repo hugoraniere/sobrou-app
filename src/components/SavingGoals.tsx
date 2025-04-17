@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SavingGoal, SavingsService } from '@/services/SavingsService';
@@ -11,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
 import { toast } from 'sonner';
 import { PlusCircle, CheckCircle, Edit, Trash2 } from "lucide-react";
 import {
@@ -45,7 +47,6 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({ savingGoals, onGoalAdded, onG
     }
 
     try {
-      // Only pass the name to createSavingGoal, the amount will be zero by default
       await SavingsService.createSavingGoal({
         name: newGoalName,
         target_amount: parseFloat(newGoalAmount),
@@ -77,6 +78,12 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({ savingGoals, onGoalAdded, onG
     }
   };
 
+  // Calculate percentage for progress bar
+  const calculatePercentage = (current: number, target: number) => {
+    if (target <= 0) return 0;
+    return Math.min(Math.round((current / target) * 100), 100);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -85,32 +92,46 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({ savingGoals, onGoalAdded, onG
       </CardHeader>
       <CardContent className="space-y-4">
         {savingGoals.length > 0 ? (
-          <ul className="list-none space-y-2">
+          <div className="h-[220px] overflow-y-auto space-y-4">
             {savingGoals.map((goal) => (
-              <li key={goal.id} className="flex items-center justify-between border rounded-md p-2">
-                <div className="flex items-center">
-                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                  <span>{goal.name}</span>
+              <div key={goal.id} className="space-y-2 border-b pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                    <span className="font-medium">{goal.name}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => {
+                        setGoalToDelete(goal);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3 text-red-500" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span>R$ {goal.current_amount} / R$ {goal.target_amount}</span>
-                  <Button variant="ghost" size="icon">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setGoalToDelete(goal);
-                      setIsDeleteDialogOpen(true);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                <div className="flex justify-between mb-1 text-sm">
+                  <span className="text-muted-foreground">
+                    R$ {goal.current_amount} / R$ {goal.target_amount}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {calculatePercentage(goal.current_amount, goal.target_amount)}%
+                  </span>
                 </div>
-              </li>
+                <Progress 
+                  value={calculatePercentage(goal.current_amount, goal.target_amount)} 
+                  className="h-2" 
+                />
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
           <p>{t('savingGoals.noGoals', 'Nenhuma meta de economia adicionada ainda.')}</p>
         )}

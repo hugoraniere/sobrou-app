@@ -6,10 +6,8 @@ import EmptyDashboard from '../EmptyDashboard';
 import { Transaction } from '@/services/TransactionService';
 import { SavingGoal } from '@/services/SavingsService';
 import TransactionsTable from '../TransactionsTable';
-import OnboardingPanel from '../OnboardingPanel';
 import OverviewDashboard from './OverviewDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import FinancialInsights from './FinancialInsights';
 
@@ -60,9 +58,9 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   }, [activeTab]);
   
   return (
-    <div className="w-full max-w-full overflow-x-hidden px-4 md:px-6">
+    <div className="w-full max-w-full overflow-x-hidden">
       <Tabs defaultValue="overview" className="mb-8" onValueChange={setActiveTab}>
-        <TabsList className="w-full max-w-full overflow-x-auto">
+        <TabsList className="w-full max-w-full overflow-x-auto justify-start">
           <TabsTrigger value="overview">{t('dashboard.tabs.overview')}</TabsTrigger>
           <TabsTrigger value="transactions">{t('dashboard.tabs.transactions')}</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
@@ -128,20 +126,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           </div>
         </TabsContent>
       </Tabs>
-      
-      {/* Onboarding Panel */}
-      {showOnboarding && activeTab === "overview" && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 relative mb-8">
-          <button 
-            onClick={() => setShowOnboarding(false)}
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-            aria-label="Dismiss"
-          >
-            <X size={16} />
-          </button>
-          <OnboardingPanel whatsAppConnected={whatsAppConnected} />
-        </div>
-      )}
     </div>
   );
 };

@@ -9,8 +9,7 @@ import {
   Pie,
   ResponsiveContainer,
   PieChart,
-  Cell,
-  Legend
+  Cell
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
 import { useTranslation } from 'react-i18next';
@@ -83,7 +82,7 @@ const IncomeByTypeChart: React.FC<IncomeByTypeChartProps> = ({
                 data={incomesByType}
                 cx="50%"
                 cy="50%"
-                labelLine={true}
+                labelLine={false}
                 outerRadius={70}
                 fill="#8884d8"
                 dataKey="value"
@@ -93,7 +92,6 @@ const IncomeByTypeChart: React.FC<IncomeByTypeChartProps> = ({
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Legend layout="horizontal" verticalAlign="bottom" align="center" />
               <ChartTooltip
                 content={({ active, payload }) => active && payload && payload.length ? (
                   <ChartTooltipContent payload={payload} />

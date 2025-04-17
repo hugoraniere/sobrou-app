@@ -6,7 +6,6 @@ import { SavingGoal } from '@/services/SavingsService';
 import ExpensesByCategoryChart from '../charts/ExpensesByCategoryChart';
 import IncomeByTypeChart from '../charts/IncomeByTypeChart';
 import DailyBarChart from '../charts/DailyBarChart';
-import BalanceByAccountChart from '../charts/BalanceByAccountChart';
 import RevenueVsExpenseChart from '../charts/RevenueVsExpenseChart';
 import FinancialGoalsProgress from '../charts/FinancialGoalsProgress';
 import FinancialAlerts from './FinancialAlerts';
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/accordion";
 import EmptyStateMessage from './EmptyStateMessage';
 import { Card, CardContent } from '@/components/ui/card';
+import { transactionCategories } from '@/data/categories';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -93,7 +93,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   ];
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden px-4 md:px-0">
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Big Numbers */}
       <DashboardBigNumbers 
         transactions={transactions} 
@@ -115,12 +115,12 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Expenses by Category (Pie Chart) */}
-        <div className="w-full">
+        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
           <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
         </div>
         
         {/* Income vs Expenses (Line Chart) */}
-        <div className="w-full">
+        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
           <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
         </div>
       </div>
@@ -128,12 +128,12 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Daily Balance (Line Chart) */}
-        <div className="w-full">
+        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
           <DailyBarChart transactions={transactions} />
         </div>
         
         {/* Financial Goals Progress */}
-        <div className="w-full">
+        <div className="w-full h-[300px] bg-white rounded-lg overflow-hidden">
           <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
         </div>
       </div>
@@ -141,26 +141,12 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 3 - Optional charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Income by Type Chart */}
-        <Card className="border border-gray-100 shadow-none min-h-[300px] w-full max-w-full overflow-hidden">
+        <Card className="border border-gray-100 shadow-none h-[300px] w-full max-w-full overflow-hidden">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
             {hasTransactions ? (
-              <div className="h-[250px] w-full flex justify-center items-center">
+              <div className="h-[220px] w-full flex justify-center items-center">
                 <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
-              </div>
-            ) : (
-              <EmptyStateMessage message={t('dashboard.charts.noData')} />
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* Balance by Account Chart */}
-        <Card className="border border-gray-100 shadow-none min-h-[300px] w-full max-w-full overflow-hidden">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.balanceByAccount')}</h3>
-            {hasTransactions ? (
-              <div className="h-[250px] w-full flex justify-center items-center">
-                <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
               </div>
             ) : (
               <EmptyStateMessage message={t('dashboard.charts.noData')} />
@@ -171,8 +157,5 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     </div>
   );
 };
-
-// Import the categories here to prevent circular dependencies
-import { transactionCategories } from '@/data/categories';
 
 export default OverviewDashboard;

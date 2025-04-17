@@ -45,6 +45,12 @@ const Index = () => {
     }
   }, [isAuthenticated]);
   
+  // Set language to Portuguese
+  useEffect(() => {
+    const { i18n } = require('react-i18next');
+    i18n.changeLanguage('pt-BR');
+  }, []);
+  
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
@@ -72,7 +78,7 @@ const Index = () => {
         onTransactionAdded={fetchData}
       />
       
-      <div className="space-y-6 px-4 md:px-6 w-full max-w-full overflow-hidden">
+      <div className="space-y-6 w-full max-w-full overflow-hidden">
         <div>
           <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
           <p className="text-gray-600">{t('dashboard.subtitle')}</p>
@@ -102,7 +108,7 @@ const Index = () => {
           isLoading={isLoading}
           hasTransactions={hasTransactions}
           onTransactionUpdated={fetchData}
-          showOnboarding={showOnboarding}
+          showOnboarding={false} // Always hide onboarding panel
           setShowOnboarding={setShowOnboarding}
           whatsAppConnected={whatsAppConnected}
           onSavingGoalAdded={fetchData}

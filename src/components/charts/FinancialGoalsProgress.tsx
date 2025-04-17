@@ -5,8 +5,6 @@ import { SavingGoal } from '@/services/SavingsService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
-import { ChartContainer } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 
 interface FinancialGoalsProgressProps {
   savingGoals: SavingGoal[];
@@ -39,7 +37,7 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
     return Math.min(percentage, 100); // Cap at 100%
   };
 
-  // Prepare data for the chart
+  // Prepare data for display
   const chartData = savingGoals.map(goal => {
     const percentage = calculatePercentage(goal.current_amount, goal.target_amount);
     return {
@@ -72,23 +70,6 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
     }
   };
   
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-3 border rounded shadow-sm">
-          <p className="font-medium">{data.name}</p>
-          <p className="text-sm">Meta: {formatCurrency(data.target)}</p>
-          <p className="text-sm">Atual: {formatCurrency(data.current)}</p>
-          <p className="text-sm">Faltam: {formatCurrency(data.remaining)}</p>
-          <p className="text-sm font-semibold">{data.percentage.toFixed(1)}% concluído</p>
-        </div>
-      );
-    }
-    
-    return null;
-  };
-  
   return (
     <Card>
       <CardHeader>
@@ -103,53 +84,21 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
             </div>
             
             {/* Progress Bars */}
-            <div className="space-y-4 mb-4">
+            <div className="h-[220px] overflow-y-auto space-y-4">
               {chartData.map((goal) => (
                 <div key={goal.name} className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span>{goal.name}</span>
-                    <span>
+                    <span className="font-medium">{goal.name}</span>
+                    <span className="text-sm text-muted-foreground">
                       {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
                     </span>
                   </div>
                   <Progress value={goal.percentage} className="h-2" />
-                  <div className="flex justify-end text-xs text-gray-500">
+                  <p className="text-right text-xs mt-1 text-muted-foreground">
                     {goal.percentage.toFixed(1)}%
-                  </div>
+                  </p>
                 </div>
               ))}
-            </div>
-            
-            {/* Horizontal Bar Chart */}
-            <div className="h-[200px] mt-6">
-              <ChartContainer className="h-full" config={chartConfig}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={chartData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                    <XAxis type="number" tickFormatter={formatCurrency} />
-                    <YAxis 
-                      type="category" 
-                      dataKey="name" 
-                      width={90}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="target" fill="#d1d5db" radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="current" fill="#3b82f6" radius={[0, 4, 4, 0]}>
-                      {chartData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={entry.isCompleted ? '#22c55e' : '#3b82f6'} 
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
             </div>
           </>
         ) : (
