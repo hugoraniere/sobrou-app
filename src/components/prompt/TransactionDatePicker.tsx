@@ -8,16 +8,18 @@ import { cn } from "@/lib/utils";
 interface TransactionDatePickerProps {
   selectedDate: Date;
   onDateChange: (date: Date | undefined) => void;
+  className?: string;
 }
 
 const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
   selectedDate,
-  onDateChange
+  onDateChange,
+  className
 }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" className="text-gray-400 hover:text-gray-600">
+        <button type="button" className={cn("text-gray-400 hover:text-gray-600", className)}>
           <CalendarIcon className="h-4 w-4" />
         </button>
       </PopoverTrigger>
