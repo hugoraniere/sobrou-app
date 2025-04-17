@@ -34,17 +34,27 @@ declare module '@/components/prompt/CategorySelector' {
 declare module '@/components/transactions/AddTransactionDialog' {
   interface AddTransactionDialogProps {
     className?: string;
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+    onTransactionAdded: () => void;
   }
 }
 
 declare module '@/components/transactions/EditTransactionDialog' {
   interface EditTransactionDialogProps {
     className?: string;
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+    transaction: import('@/services/TransactionService').Transaction;
+    onTransactionUpdated: () => void;
   }
 }
 
 declare module '@/components/transactions/TransactionRow' {
   interface TransactionRowProps {
     className?: string;
+    transaction: import('@/services/TransactionService').Transaction;
+    onEdit: (transaction: import('@/services/TransactionService').Transaction) => void;
+    onDelete: (id: string) => void;
   }
 }

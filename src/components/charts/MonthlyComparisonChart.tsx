@@ -108,13 +108,13 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   };
   
   return (
-    <Card>
+    <Card className="w-full max-w-full overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle>{t('dashboard.charts.monthlyComparison')}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center">
         {data.length > 0 ? (
-          <div className="h-[300px]">
+          <div className="h-[300px] w-full max-w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data}

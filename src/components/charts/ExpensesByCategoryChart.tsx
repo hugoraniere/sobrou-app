@@ -64,7 +64,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   
   if (data.length === 0) {
     return (
-      <Card className="min-h-[300px]">
+      <Card className="min-h-[300px] w-full">
         <CardHeader>
           <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
         </CardHeader>
@@ -76,7 +76,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   }
   
   return (
-    <Card className="min-h-[300px]">
+    <Card className="min-h-[300px] w-full max-w-full overflow-hidden">
       <CardHeader>
         <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
         
@@ -90,7 +90,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
           </div>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center">
         <div className="h-[250px] w-full max-w-full">
           <ChartContainer 
             className="h-full w-full"
@@ -135,8 +135,6 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
             </ResponsiveContainer>
           </ChartContainer>
         </div>
-        
-        {/* No legends here as requested */}
       </CardContent>
     </Card>
   );

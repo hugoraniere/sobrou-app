@@ -74,9 +74,9 @@ const BalanceByAccountChart: React.FC<BalanceByAccountChartProps> = ({
   };
 
   return (
-    <div className="h-[300px]">
+    <div className="h-[300px] w-full max-w-full overflow-hidden flex justify-center items-center p-2 sm:p-3 md:p-4">
       {balanceByAccount.length > 0 ? (
-        <ChartContainer className="h-[300px]" config={chartConfig}>
+        <ChartContainer className="h-[300px] w-full max-w-full" config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie

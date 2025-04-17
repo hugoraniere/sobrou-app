@@ -187,7 +187,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
   };
   
   return (
-    <Card className="min-h-[300px] w-full overflow-hidden">
+    <Card className="min-h-[300px] w-full max-w-full overflow-hidden">
       <CardHeader>
         <CardTitle>{t('dashboard.charts.dailyEvolution')}</CardTitle>
         
@@ -196,7 +196,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
           <p>{getInsightMessage()}</p>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center">
         {dailyData.length > 0 ? (
           <div className="h-[250px] w-full max-w-full">
             <ChartContainer className="h-full w-full" config={chartConfig}>

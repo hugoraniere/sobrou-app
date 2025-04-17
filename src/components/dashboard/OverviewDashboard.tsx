@@ -141,11 +141,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 3 - Optional charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Income by Type Chart */}
-        <Card className="border border-gray-100 shadow-none min-h-[300px] overflow-hidden">
+        <Card className="border border-gray-100 shadow-none min-h-[300px] w-full max-w-full overflow-hidden">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
             {hasTransactions ? (
-              <div className="h-[250px] w-full max-w-full">
+              <div className="h-[250px] w-full flex justify-center items-center">
                 <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
               </div>
             ) : (
@@ -155,11 +155,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
         
         {/* Balance by Account Chart */}
-        <Card className="border border-gray-100 shadow-none min-h-[300px] overflow-hidden">
+        <Card className="border border-gray-100 shadow-none min-h-[300px] w-full max-w-full overflow-hidden">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.balanceByAccount')}</h3>
             {hasTransactions ? (
-              <div className="h-[250px] w-full max-w-full">
+              <div className="h-[250px] w-full flex justify-center items-center">
                 <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
               </div>
             ) : (
