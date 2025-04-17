@@ -1,85 +1,22 @@
+import { AriaAttributes, DOMAttributes } from "react";
 
-import React from 'react';
-
-// Extend React's IntrinsicAttributes to include className globally
+// Add className to React components that need it
 declare module 'react' {
-  interface IntrinsicAttributes {
+  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
     className?: string;
   }
 }
 
-// Add className to CategorySelector props
-declare module '@/components/prompt/CategorySelector' {
-  interface CategorySelectorProps {
-    categoryId: string;
-    isOpen: boolean;
-    setIsOpen: (isOpen: boolean) => void;
-    onCategorySelect: (categoryId: string) => void;
-    onReset: (e: React.MouseEvent) => void;
-    userSelected: boolean;
-    className?: string;
-  }
+// Add interface for TransactionDatePicker
+interface TransactionDatePickerProps {
+  date: Date;
+  onDateChange: (date: Date) => void;
+  className?: string;
 }
 
-// Add className to AddTransactionDialog props
-declare module '@/components/transactions/AddTransactionDialog' {
-  interface AddTransactionDialogProps {
-    className?: string;
-    isOpen: boolean;
-    setIsOpen: (isOpen: boolean) => void;
-    onTransactionAdded: () => void;
-  }
-}
-
-// Add className to EditTransactionDialog props
-declare module '@/components/transactions/EditTransactionDialog' {
-  interface EditTransactionDialogProps {
-    className?: string;
-    isOpen: boolean;
-    setIsOpen: (isOpen: boolean) => void;
-    transaction: import('@/services/TransactionService').Transaction;
-    onTransactionUpdated: () => void;
-  }
-}
-
-// Add className to TransactionRow props
-declare module '@/components/transactions/TransactionRow' {
-  interface TransactionRowProps {
-    transaction: import('@/services/TransactionService').Transaction;
-    onToggleRecurring: (id: string, isRecurring: boolean) => void;
-    formatDate: (dateString: string) => string;
-    onTransactionUpdated: () => void;
-    className?: string;
-  }
-}
-
-// Add className to TransactionDatePicker props
-declare module '@/components/prompt/TransactionDatePicker' {
-  interface TransactionDatePickerProps {
-    className?: string;
-  }
-}
-
-// Add className to PromptInputField props
-declare module '@/components/prompt/PromptInputField' {
-  interface PromptInputFieldProps {
-    className?: string;
-  }
-}
-
-// Add className to PopoverContent and PopoverTrigger
-declare module '@radix-ui/react-popover' {
-  interface PopoverContentProps {
-    className?: string;
-  }
-  interface PopoverTriggerProps {
-    className?: string;
-  }
-}
-
-// Add className to DialogContent
-declare module '@radix-ui/react-dialog' {
-  interface DialogContentProps {
-    className?: string;
-  }
+// Add interface for CategorySelector
+interface CategorySelectorProps {
+  selectedCategory: string;
+  onSelectCategory: (category: string) => void;
+  className?: string;
 }

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { LucideIcon } from 'lucide-react';
@@ -15,6 +16,7 @@ interface BigNumberCardProps {
     value: number;
     isPositive: boolean;
   };
+  className?: string;
 }
 const BigNumberCard: React.FC<BigNumberCardProps> = ({
   title,
@@ -23,7 +25,8 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
   color,
   tooltip,
   subtitle,
-  trend
+  trend,
+  className
 }) => {
   const {
     t,
@@ -43,7 +46,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
       <HoverCardTrigger asChild>
         <Card style={{
         borderColor: color
-      }} className="">
+      }} className={className}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">

@@ -1,118 +1,62 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { MessageSquare, Target, TrendingUp, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold mb-6">Manage your finances with simplicity through WhatsApp</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-6">Organize suas finanças só digitando</h1>
           <p className="text-lg md:text-xl text-gray-600 mb-8">
-            FinanceBot helps you track expenses effortlessly - just send a message and we'll do the rest.
-            <span className="block mt-2 font-medium">100% Free to use.</span>
+            Sobrou ajuda você a rastrear despesas sem esforço - basta enviar uma mensagem e nós fazemos o resto.
+            <span className="block mt-2 font-medium">100% Gratuito para usar.</span>
           </p>
-          <Button size="lg" className="px-8">
-            Create Your Free Account and Connect WhatsApp
-          </Button>
+          <Link to="/auth">
+            <Button size="lg" className="px-8 bg-green-600 hover:bg-green-700 text-white">
+              Crie sua conta grátis
+            </Button>
+          </Link>
+          <div className="flex items-center gap-2 justify-center mt-4">
+            <CheckCircle2 className="text-green-500 h-5 w-5" />
+            <span className="text-gray-700 font-medium">Simples. Rápido. Seguro.</span>
+          </div>
         </div>
 
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-center mb-6">Why people choose FinanceBot</h2>
+          <h2 className="text-2xl font-bold text-center mb-6">Como o Sobrou funciona</h2>
           
-          <Card className="border border-gray-100 shadow-none">
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50 border-b">
-                      <th className="px-6 py-4 text-left">Feature</th>
-                      <th className="px-6 py-4 text-center">FinanceBot</th>
-                      <th className="px-6 py-4 text-center">Spreadsheet</th>
-                      <th className="px-6 py-4 text-center">Traditional Apps</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="px-6 py-4">Input Method</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">✅ Chat-based input</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">❌ Manual entry</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">😐 Complex UI</span>
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="px-6 py-4">Categorization</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">✅ Auto-categorization</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">❌ No automation</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">😐 Requires setup</span>
-                        </span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4">Insights</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">✅ AI Insights</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">❌ None</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="flex items-center justify-center">
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">✅ Some</span>
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-3xl mb-3">💬</div>
+              <h3 className="text-xl font-semibold mb-2">Você digita</h3>
+              <p className="text-gray-600">"Gastei R$ 50 com mercado ontem" via WhatsApp ou aplicativo web.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-3xl mb-3">🤖</div>
+              <h3 className="text-xl font-semibold mb-2">A IA entende</h3>
+              <p className="text-gray-600">Nossa IA processa o texto e categoriza automaticamente sua transação.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+              <div className="text-3xl mb-3">📊</div>
+              <h3 className="text-xl font-semibold mb-2">Tudo se organiza</h3>
+              <p className="text-gray-600">Veja gráficos atualizados automaticamente e relatórios inteligentes.</p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-lg border border-gray-100">
-            <div className="text-3xl mb-3">💬</div>
-            <h3 className="text-xl font-semibold mb-2">Simple chat interface</h3>
-            <p className="text-gray-600">Just send a message like "Spent $30 on lunch" via WhatsApp and we'll handle the rest.</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg border border-gray-100">
-            <div className="text-3xl mb-3">🤖</div>
-            <h3 className="text-xl font-semibold mb-2">AI-powered analysis</h3>
-            <p className="text-gray-600">Get smart insights about your spending habits without any manual work.</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg border border-gray-100">
-            <div className="text-3xl mb-3">📊</div>
-            <h3 className="text-xl font-semibold mb-2">Visual reports</h3>
-            <p className="text-gray-600">See where your money goes with clear charts and actionable recommendations.</p>
-          </div>
+        <div className="text-center">
+          <Link to="/auth">
+            <Button size="lg" className="px-8 bg-green-600 hover:bg-green-700 text-white">
+              Começar agora
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
