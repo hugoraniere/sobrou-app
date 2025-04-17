@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Menu, Wallet, LayoutDashboard, FileText, Target, Settings, LogOut } from 'lucide-react';
+import { Menu, LayoutDashboard, FileText, Target, Settings, LogOut } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,7 +13,6 @@ const MobileSidebar = () => {
   const [open, setOpen] = React.useState(false);
   
   const getUserInitials = () => {
-    // Type assertion to access user_metadata
     const fullName = user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
     const names = fullName.split(' ');
     if (names.length > 1) {
@@ -65,12 +63,14 @@ const MobileSidebar = () => {
       </SheetTrigger>
       <SheetContent side="left" className="p-0 w-[280px] max-w-[90vw] z-[1100] bg-white">
         <div className="flex items-center p-4 border-b">
-          <Wallet className="h-6 w-6 text-green-500 mr-2" />
-          <span className="text-xl font-bold">Sobrou</span>
+          <img 
+            src="/lovable-uploads/logo.png" 
+            alt="Sobrou Logo" 
+            className="h-6 w-auto mr-2" 
+          />
         </div>
         
         <div className="py-4 px-4 overflow-y-auto max-h-[calc(100vh-80px)]">
-          {/* User Profile */}
           <div className="flex items-center mb-6 p-2">
             <Avatar className="h-10 w-10 bg-blue-500 text-white mr-3">
               <AvatarFallback>{getUserInitials()}</AvatarFallback>
@@ -82,7 +82,6 @@ const MobileSidebar = () => {
             </div>
           </div>
           
-          {/* Navigation */}
           <nav className="space-y-1">
             {navigationItems.map((item) => (
               <Link
@@ -96,7 +95,6 @@ const MobileSidebar = () => {
               </Link>
             ))}
             
-            {/* Logout Button */}
             <button
               onClick={handleLogout}
               className="flex items-center w-full p-2 text-red-500 rounded-md hover:bg-gray-100 text-left"

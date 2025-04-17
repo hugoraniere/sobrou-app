@@ -51,7 +51,7 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
           <div className="flex items-center space-x-2">
             <Link to="/" className="flex items-center">
               <img 
-                src="/lovable-uploads/076c0413-0b42-4810-b32c-5b627b744797.png" 
+                src="/lovable-uploads/logo.png" 
                 alt="Sobrou Logo" 
                 className="h-8 w-auto mr-2" 
               />

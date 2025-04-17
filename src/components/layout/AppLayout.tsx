@@ -3,7 +3,6 @@ import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import SidebarNav from './SidebarNav';
 import MobileSidebar from './MobileSidebar';
-import { Wallet } from 'lucide-react';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -23,8 +22,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="md:hidden flex items-center p-4 border-b bg-white sticky top-0 z-10">
             <MobileSidebar />
             <div className="flex items-center ml-2">
-              <Wallet className="h-5 w-5 text-green-500 mr-2" />
-              <span className="text-xl font-bold">Sobrou</span>
+              <img 
+                src="/lovable-uploads/logo.png" 
+                alt="Sobrou Logo" 
+                className="h-6 w-auto mr-2" 
+              />
             </div>
           </div>
           
