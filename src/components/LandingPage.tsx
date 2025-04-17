@@ -8,8 +8,8 @@ const LandingPage: React.FC = () => {
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-6">Manage your finances with simplicity through WhatsApp</h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-6">Manage your finances with simplicity through WhatsApp</h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-8">
             FinanceBot helps you track expenses effortlessly - just send a message and we'll do the rest.
             <span className="block mt-2 font-medium">100% Free to use.</span>
           </p>
@@ -21,7 +21,7 @@ const LandingPage: React.FC = () => {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-center mb-6">Why people choose FinanceBot</h2>
           
-          <Card>
+          <Card className="border border-gray-100 shadow-none">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -95,20 +95,20 @@ const LandingPage: React.FC = () => {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white p-6 rounded-lg border border-gray-100">
             <div className="text-3xl mb-3">💬</div>
             <h3 className="text-xl font-semibold mb-2">Simple chat interface</h3>
             <p className="text-gray-600">Just send a message like "Spent $30 on lunch" via WhatsApp and we'll handle the rest.</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="bg-white p-6 rounded-lg border border-gray-100">
             <div className="text-3xl mb-3">🤖</div>
             <h3 className="text-xl font-semibold mb-2">AI-powered analysis</h3>
             <p className="text-gray-600">Get smart insights about your spending habits without any manual work.</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="bg-white p-6 rounded-lg border border-gray-100">
             <div className="text-3xl mb-3">📊</div>
             <h3 className="text-xl font-semibold mb-2">Visual reports</h3>
             <p className="text-gray-600">See where your money goes with clear charts and actionable recommendations.</p>

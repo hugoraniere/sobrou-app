@@ -93,7 +93,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full px-4">
       {/* Big Numbers */}
       <DashboardBigNumbers 
         transactions={transactions} 
@@ -101,7 +101,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       />
 
       {/* Financial Alerts as Accordion */}
-      <Accordion type="single" collapsible className="bg-white p-4 rounded-lg shadow">
+      <Accordion type="single" collapsible className="bg-white p-4 rounded-lg border border-gray-100">
         <AccordionItem value="alerts" className="border-b-0">
           <AccordionTrigger className="py-2">
             <h3 className="text-lg font-semibold">{t('dashboard.alerts.title')}</h3>
@@ -113,31 +113,41 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       </Accordion>
 
       {/* Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Expenses by Category (Pie Chart) */}
-        <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
+        <div className="w-full min-h-[300px]">
+          <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
+        </div>
         
         {/* Income vs Expenses (Bar Chart) */}
-        <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+        <div className="w-full min-h-[300px]">
+          <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
+        </div>
       </div>
 
       {/* Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Daily Balance (Line Chart) */}
-        <DailyBarChart transactions={transactions} />
+        <div className="w-full min-h-[300px]">
+          <DailyBarChart transactions={transactions} />
+        </div>
         
         {/* Financial Goals Progress */}
-        <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+        <div className="w-full min-h-[300px]">
+          <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+        </div>
       </div>
 
       {/* Row 3 - Optional charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Income by Type Chart */}
-        <Card>
+        <Card className="border border-gray-100 shadow-none">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
             {hasTransactions ? (
-              <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
+              <div className="min-h-[300px]">
+                <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
+              </div>
             ) : (
               <EmptyStateMessage message={t('dashboard.charts.noData')} />
             )}
@@ -145,11 +155,13 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
         
         {/* Balance by Account Chart */}
-        <Card>
+        <Card className="border border-gray-100 shadow-none">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.balanceByAccount')}</h3>
             {hasTransactions ? (
-              <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
+              <div className="min-h-[300px]">
+                <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
+              </div>
             ) : (
               <EmptyStateMessage message={t('dashboard.charts.noData')} />
             )}

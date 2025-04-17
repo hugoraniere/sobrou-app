@@ -42,7 +42,7 @@ const TrendCard = ({ name, growthData, competition, isHot = false, onSelect }: T
   };
 
   return (
-    <div className="trend-card relative">
+    <div className="trend-card relative border border-gray-100 p-4 rounded-lg">
       {isHot && (
         <div className="absolute -top-2 -right-2 bg-trend-orange text-white text-xs font-semibold px-3 py-1 rounded-full animate-pulse-light">
           🔥 Em ascensão
@@ -57,7 +57,7 @@ const TrendCard = ({ name, growthData, competition, isHot = false, onSelect }: T
         </div>
       </div>
       
-      <div className="h-16 mb-4">
+      <div className="h-16 mb-4 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={growthData}>
             <defs>

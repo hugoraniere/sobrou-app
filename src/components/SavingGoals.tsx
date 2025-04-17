@@ -1,232 +1,212 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { SavingGoal, SavingsService } from '@/services/SavingsService';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { SavingGoal, SavingsService } from '../services/SavingsService';
-import { Plus, Check, X, PiggyBank } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Edit, Trash2, CheckCircle, Circle } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
-interface SavingGoalsProps {
-  savingGoals: SavingGoal[];
-  onGoalAdded: () => void;
-  onGoalUpdated: () => void;
-}
-
-const SavingGoals: React.FC<SavingGoalsProps> = ({ 
-  savingGoals,
-  onGoalAdded,
-  onGoalUpdated
-}) => {
-  const [isAddingGoal, setIsAddingGoal] = useState(false);
+const SavingGoals: React.FC = () => {
+  const { t } = useTranslation();
+  const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
   const [newGoalName, setNewGoalName] = useState('');
   const [newGoalAmount, setNewGoalAmount] = useState('');
-  const [isAddingToGoal, setIsAddingToGoal] = useState<string | null>(null);
-  const [amountToAdd, setAmountToAdd] = useState('');
-  
-  const handleAddGoal = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!newGoalName.trim()) {
-      toast.error("Please enter a name for your saving goal");
-      return;
-    }
-    
-    const amount = parseFloat(newGoalAmount);
-    if (isNaN(amount) || amount <= 0) {
-      toast.error("Please enter a valid target amount");
-      return;
-    }
-    
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSavingGoals();
+  }, []);
+
+  const fetchSavingGoals = async () => {
+    setIsLoading(true);
     try {
-      await SavingsService.createSavingGoal(newGoalName, amount);
-      
-      toast.success(`Created new saving goal: ${newGoalName}`);
-      setNewGoalName('');
-      setNewGoalAmount('');
-      setIsAddingGoal(false);
-      onGoalAdded();
+      const goals = await SavingsService.getSavingGoals();
+      setSavingGoals(goals);
     } catch (error) {
-      console.error('Error adding saving goal:', error);
-      toast.error("Could not create saving goal. Please try again.");
+      console.error('Error fetching saving goals:', error);
+      toast.error("Failed to load saving goals");
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  const handleAddToGoal = async (goalId: string) => {
-    if (!amountToAdd) {
-      toast.error("Please enter an amount to add");
+
+  const handleAddSavingGoal = async () => {
+    if (!newGoalName || !newGoalAmount) {
+      toast.error("Please enter both name and amount");
       return;
     }
-    
-    const amount = parseFloat(amountToAdd);
-    if (isNaN(amount) || amount <= 0) {
+
+    const amountValue = parseFloat(newGoalAmount);
+    if (isNaN(amountValue) || amountValue <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
-    
+
     try {
-      await SavingsService.addToSavingGoal(goalId, amount, new Date().toISOString().split('T')[0]);
-      toast.success(`Added $${amount.toFixed(2)} to your savings!`);
-      setIsAddingToGoal(null);
-      setAmountToAdd('');
-      onGoalUpdated();
+      await SavingsService.createSavingGoal({ name: newGoalName, target_amount: amountValue });
+      setNewGoalName('');
+      setNewGoalAmount('');
+      await fetchSavingGoals();
+      toast.success("Saving goal added successfully");
     } catch (error) {
-      console.error('Error adding to goal:', error);
-      toast.error("Could not add to savings goal. Please try again.");
+      console.error('Error adding saving goal:', error);
+      toast.error("Failed to add saving goal");
     }
   };
-  
-  const handleToggleComplete = async (goalId: string, currentStatus: boolean) => {
+
+  const handleDeleteSavingGoal = async (id: string) => {
     try {
-      await SavingsService.toggleSavingGoalCompletion(goalId, !currentStatus);
-      onGoalUpdated();
-      toast.success(`Goal marked as ${!currentStatus ? 'complete' : 'incomplete'}`);
+      await SavingsService.deleteSavingGoal(id);
+      await fetchSavingGoals();
+      toast.success("Saving goal deleted successfully");
     } catch (error) {
-      console.error('Error toggling goal completion:', error);
-      toast.error("Could not update goal status. Please try again.");
+      console.error('Error deleting saving goal:', error);
+      toast.error("Failed to delete saving goal");
     }
   };
-  
-  const calculateProgress = (current: number, target: number) => {
-    const percentage = (current / target) * 100;
-    return Math.min(100, Math.max(0, percentage));
+
+  const handleToggleCompletion = async (id: string, completed: boolean) => {
+    try {
+      await SavingsService.toggleSavingGoalCompletion(id, !completed);
+      await fetchSavingGoals();
+      toast.success(`Saving goal ${completed ? 'unmarked as complete' : 'marked as complete'}`);
+    } catch (error) {
+      console.error('Error toggling completion:', error);
+      toast.error("Failed to toggle completion");
+    }
   };
-  
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Your Saving Goals</h3>
-        <Button 
-          size="sm" 
-          onClick={() => setIsAddingGoal(!isAddingGoal)}
-          variant={isAddingGoal ? "outline" : "default"}
-        >
-          {isAddingGoal ? "Cancel" : (
-            <>
-              <Plus className="mr-1 h-4 w-4" /> Add Goal
-            </>
-          )}
-        </Button>
-      </div>
-      
-      {isAddingGoal && (
-        <form onSubmit={handleAddGoal} className="space-y-4 p-4 bg-gray-50 rounded-lg">
-          <div>
-            <label htmlFor="goalName" className="block text-sm font-medium text-gray-700 mb-1">
-              Goal Name
-            </label>
-            <Input
-              id="goalName"
-              value={newGoalName}
-              onChange={(e) => setNewGoalName(e.target.value)}
-              placeholder="e.g. Vacation Fund"
-              className="w-full"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="goalAmount" className="block text-sm font-medium text-gray-700 mb-1">
-              Target Amount
-            </label>
-            <Input
-              id="goalAmount"
-              type="number"
-              value={newGoalAmount}
-              onChange={(e) => setNewGoalAmount(e.target.value)}
-              placeholder="e.g. 1000"
-              min="1"
-              step="1"
-              className="w-full"
-            />
-          </div>
-          
-          <Button type="submit" className="w-full">Create Saving Goal</Button>
-        </form>
-      )}
-      
-      {savingGoals.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <PiggyBank className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-          <p className="text-gray-500">You don't have any saving goals yet.</p>
-          <p className="text-gray-500 text-sm mt-1">
-            Create a goal or try saying "Saved $100 for vacation"
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {savingGoals.map((goal) => (
-            <div 
-              key={goal.id} 
-              className={`p-4 border rounded-lg ${
-                goal.completed ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
-                <h4 className="font-medium">{goal.name}</h4>
-                <div className="text-sm text-gray-600">
-                  ${goal.current_amount.toFixed(2)} of ${goal.target_amount.toFixed(2)}
-                </div>
+    <div className="container mx-auto py-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('savingGoals.title', 'Saving Goals')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="goalName">{t('savingGoals.name', 'Goal Name')}</Label>
+                <Input
+                  type="text"
+                  id="goalName"
+                  placeholder={t('savingGoals.namePlaceholder', 'Enter goal name')}
+                  value={newGoalName}
+                  onChange={(e) => setNewGoalName(e.target.value)}
+                />
               </div>
-              
-              <Progress value={calculateProgress(goal.current_amount, goal.target_amount)} className="h-2 mb-3" />
-              
-              <div className="flex flex-wrap justify-between items-center gap-2">
-                <div className="text-sm text-gray-500">
-                  {calculateProgress(goal.current_amount, goal.target_amount).toFixed(0)}% complete
-                </div>
-                
-                <div className="flex space-x-2">
-                  {isAddingToGoal === goal.id ? (
-                    <div className="flex items-center space-x-1">
-                      <Input
-                        type="number"
-                        value={amountToAdd}
-                        onChange={(e) => setAmountToAdd(e.target.value)}
-                        placeholder="Amount"
-                        className="w-24 h-8 text-sm"
-                        min="1"
-                        step="1"
-                      />
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        onClick={() => handleAddToGoal(goal.id)}
-                        className="h-8 w-8"
-                      >
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        onClick={() => setIsAddingToGoal(null)}
-                        className="h-8 w-8"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setIsAddingToGoal(goal.id)}
-                    >
-                      Add to Goal
-                    </Button>
-                  )}
-                  
-                  <Button 
-                    variant={goal.completed ? "outline" : "default"}
-                    size="sm"
-                    onClick={() => handleToggleComplete(goal.id, goal.completed)}
-                  >
-                    {goal.completed ? "Mark Incomplete" : "Mark Complete"}
-                  </Button>
-                </div>
+              <div>
+                <Label htmlFor="goalAmount">{t('savingGoals.amount', 'Target Amount')}</Label>
+                <Input
+                  type="number"
+                  id="goalAmount"
+                  placeholder={t('savingGoals.amountPlaceholder', 'Enter target amount')}
+                  value={newGoalAmount}
+                  onChange={(e) => setNewGoalAmount(e.target.value)}
+                />
+              </div>
+              <div className="flex items-end">
+                <Button onClick={handleAddSavingGoal}>{t('savingGoals.add', 'Add Goal')}</Button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+
+          {isLoading ? (
+            <p>{t('common.loading', 'Loading...')}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableCaption>{t('savingGoals.tableCaption', 'List of your saving goals.')}</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[200px]">{t('savingGoals.name', 'Name')}</TableHead>
+                    <TableHead>{t('savingGoals.targetAmount', 'Target Amount')}</TableHead>
+                    <TableHead>{t('savingGoals.currentAmount', 'Current Amount')}</TableHead>
+                    <TableHead>{t('savingGoals.completed', 'Completed')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {savingGoals.map((goal) => (
+                    <TableRow key={goal.id}>
+                      <TableCell className="font-medium">{goal.name}</TableCell>
+                      <TableCell>R$ {goal.target_amount.toFixed(2)}</TableCell>
+                      <TableCell>R$ {goal.current_amount.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleCompletion(goal.id, goal.completed)}
+                        >
+                          {goal.completed ? (
+                            <>
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              {t('common.yes', 'Yes')}
+                            </>
+                          ) : (
+                            <>
+                              <Circle className="mr-2 h-4 w-4" />
+                              {t('common.no', 'No')}
+                            </>
+                          )}
+                        </Button>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" size="icon">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="destructive" size="icon">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>{t('common.confirmation', 'Are you absolutely sure?')}</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  {t('savingGoals.deleteConfirmation', 'This action cannot be undone. Are you sure you want to delete this goal?')}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteSavingGoal(goal.id)}>{t('common.delete', 'Delete')}</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
