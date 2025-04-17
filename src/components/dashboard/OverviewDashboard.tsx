@@ -92,8 +92,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     }
   ];
 
-  // Altura padrão para todos os gráficos
-  const chartHeight = "h-[350px]";
+  // Altura padrão para todos os gráficos - aumentada para garantir que o conteúdo não seja cortado
+  const chartHeight = "h-[400px]";
 
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
@@ -120,8 +120,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         {/* Expenses by Category (Pie Chart) */}
         <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
           <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.categoryBreakdown')}</h3>
-            <div className="flex-1">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.categoryBreakdown')}</h3>
+            <div className="flex-1 flex items-center justify-center">
               <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
             </div>
           </div>
@@ -130,8 +130,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         {/* Income vs Expenses (Line Chart) */}
         <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
           <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.revenueVsExpense')}</h3>
-            <div className="flex-1">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.revenueVsExpense')}</h3>
+            <div className="flex-1 flex items-center justify-center">
               <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
             </div>
           </div>
@@ -143,8 +143,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         {/* Daily Balance (Line Chart) */}
         <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
           <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.dailyEvolution')}</h3>
-            <div className="flex-1">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.dailyEvolution')}</h3>
+            <div className="flex-1 flex items-center justify-center">
               <DailyBarChart transactions={transactions} />
             </div>
           </div>
@@ -153,8 +153,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         {/* Financial Goals Progress */}
         <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
           <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-2">{t('dashboard.charts.financialGoals')}</h3>
-            <div className="flex-1">
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.financialGoals')}</h3>
+            <div className="flex-1 flex items-center justify-center">
               <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
             </div>
           </div>

@@ -18,7 +18,7 @@ const MobileSidebar = () => {
           <span className="sr-only">{t('common.menu', 'Menu')}</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-[280px] max-w-[90vw]">
+      <SheetContent side="left" className="p-0 w-[280px] max-w-[90vw] z-50">
         <div className="flex items-center p-4 border-b">
           <Wallet className="h-6 w-6 text-green-500 mr-2" />
           <span className="text-xl font-bold">Sobrou</span>

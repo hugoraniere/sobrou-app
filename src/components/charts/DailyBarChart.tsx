@@ -196,9 +196,9 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
           <p>{getInsightMessage()}</p>
         </div>
       </CardHeader>
-      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center">
+      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center h-[250px]">
         {dailyData.length > 0 ? (
-          <div className="h-[250px] w-full max-w-full">
+          <div className="h-full w-full max-w-full">
             <ChartContainer className="h-full w-full" config={chartConfig}>
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
