@@ -40,9 +40,18 @@ interface DialogProps {
   className?: string;
 }
 
+interface DialogContentProps {
+  className?: string;
+}
+
 // Add interfaces for Popover components
 interface PopoverProps {
   className?: string;
+}
+
+interface PopoverContentProps {
+  className?: string;
+  align?: string;
 }
 
 // Add interfaces for EditTransactionDialog
@@ -70,3 +79,4 @@ interface TransactionRowProps {
   onTransactionUpdated: () => void;
   className?: string;
 }
+

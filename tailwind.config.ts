@@ -23,10 +23,16 @@ export default {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
+				background: {
+					DEFAULT: 'hsl(var(--background))',
+					base: '#FFFFFF',
+					surface: '#F5F5F5'
+				},
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
+					DEFAULT: '#09983D',
+					hover: '#0BBE4A',
+					dark: '#077A31',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
@@ -62,6 +68,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				text: {
+					primary: '#1C1C1C',
+					secondary: '#7A7A7A'
+				},
+				border: {
+					DEFAULT: 'hsl(var(--border))',
+					subtle: '#E5E5E5'
+				},
+				feedback: {
+					error: '#EF4444',
+					warning: '#FACC15',
+					success: '#22C55E'
 				},
 				// TrendMap AI colors
 				trend: {

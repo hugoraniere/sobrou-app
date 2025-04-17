@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -61,8 +62,8 @@ const MobileSidebar = () => {
           <span className="sr-only">{t('common.menu', 'Menu')}</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-[280px] max-w-[90vw] z-[1100] bg-white">
-        <div className="flex items-center p-4 border-b">
+      <SheetContent side="left" className="p-0 w-[280px] max-w-[90vw] z-[1100] bg-background-base">
+        <div className="flex items-center p-4 border-b border-border-subtle">
           <img 
             src="/lovable-uploads/logo.png" 
             alt="Sobrou Logo" 
@@ -72,7 +73,7 @@ const MobileSidebar = () => {
         
         <div className="py-4 px-4 overflow-y-auto max-h-[calc(100vh-80px)]">
           <div className="flex items-center mb-6 p-2">
-            <Avatar className="h-10 w-10 bg-blue-500 text-white mr-3">
+            <Avatar className="h-10 w-10 bg-primary text-white mr-3">
               <AvatarFallback>{getUserInitials()}</AvatarFallback>
             </Avatar>
             <div>
@@ -87,7 +88,7 @@ const MobileSidebar = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className="flex items-center p-2 text-gray-700 rounded-md hover:bg-gray-100"
+                className="flex items-center p-2 text-text-primary rounded-md hover:bg-background-surface"
                 onClick={() => setOpen(false)}
               >
                 {item.icon}
@@ -97,7 +98,7 @@ const MobileSidebar = () => {
             
             <button
               onClick={handleLogout}
-              className="flex items-center w-full p-2 text-red-500 rounded-md hover:bg-gray-100 text-left"
+              className="flex items-center w-full p-2 text-feedback-error rounded-md hover:bg-background-surface text-left"
             >
               <LogOut className="w-5 h-5" />
               <span className="ml-3">{t('auth.logout', 'Sair')}</span>
