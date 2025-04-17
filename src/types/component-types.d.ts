@@ -82,7 +82,7 @@ interface TransactionRowProps {
 
 // Add interfaces for TransactionDetails
 interface TransactionDetailsProps {
-  transaction: Transaction;
+  transaction: any;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   className?: string;

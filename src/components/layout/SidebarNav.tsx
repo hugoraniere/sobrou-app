@@ -69,11 +69,11 @@ const SidebarNav = () => {
     if (path === '/') {
       return location.pathname === '/' || location.pathname === '/home';
     }
-    return location.pathname === path;
+    return location.pathname.startsWith(path);
   };
   
   return <>
-      <Sidebar variant="sidebar" className="fixed h-screen w-64 transition-all duration-300 md:relative z-10 border-r border-gray-200 shadow-sm">
+      <Sidebar variant="sidebar" className="fixed h-screen w-64 transition-all duration-300 z-10 border-r border-gray-200 shadow-sm">
         <SidebarHeader>
           <div className="flex items-center p-4 justify-between">
             <div className="flex items-center">
@@ -99,9 +99,14 @@ const SidebarNav = () => {
                   >
                     <Link to={item.path} className={cn(
                       "flex items-center", 
-                      isActive ? "font-medium" : ""
+                      isActive ? "font-bold text-primary" : "font-normal text-text-primary"
                     )}>
-                      {item.icon}
+                      <span className={cn(
+                        "flex items-center justify-center",
+                        isActive ? "text-primary" : "text-text-primary"
+                      )}>
+                        {item.icon}
+                      </span>
                       <span className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
                         {item.name}
                       </span>

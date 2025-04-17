@@ -18,7 +18,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
         
         {/* Main Content */}
-        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
+        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden md:ml-64">
           {/* Mobile Header */}
           <MobileHeader />
           

@@ -12,7 +12,7 @@ interface CategorySelectorProps {
   onCategorySelect: (categoryId: string) => void;
   onReset: (e: React.MouseEvent) => void;
   userSelected: boolean;
-  className?: string; // Added className prop
+  className?: string;
 }
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
@@ -22,7 +22,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   onCategorySelect,
   onReset,
   userSelected,
-  className // Added className to props
+  className
 }) => {
   const categoryInfo = transactionCategories.find(cat => cat.id === categoryId);
   const CategoryIcon = categoryInfo?.icon;
@@ -42,7 +42,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           )}
         </div>
       </PopoverTrigger>
-      <PopoverContent className={cn("w-56 p-2", className)} align="end">
+      <PopoverContent className="w-56 p-2" align="end">
         <div className="grid gap-1 max-h-60 overflow-y-auto">
           {transactionCategories.map((category) => {
             const Icon = category.icon;

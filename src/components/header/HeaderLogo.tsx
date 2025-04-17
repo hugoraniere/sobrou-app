@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 
 const HeaderLogo: React.FC = () => {
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center">
       <Link to="/" className="flex items-center">
         <img 
           src="/lovable-uploads/logo.png" 
-          alt="Sobrou Logo" 
+          alt="Logo" 
           className="h-8 w-auto" 
         />
       </Link>

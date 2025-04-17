@@ -11,7 +11,7 @@ const MobileHeader: React.FC = () => {
         <Link to="/" className="flex items-center">
           <img 
             src="/lovable-uploads/logo.png" 
-            alt="Sobrou Logo" 
+            alt="Logo" 
             className="h-6 w-auto" 
           />
         </Link>

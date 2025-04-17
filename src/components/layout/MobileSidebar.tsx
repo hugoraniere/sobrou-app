@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 const MobileSidebar = () => {
   const { t } = useTranslation();
@@ -51,7 +52,7 @@ const MobileSidebar = () => {
     if (path === '/') {
       return location.pathname === '/' || location.pathname === '/home';
     }
-    return location.pathname === path;
+    return location.pathname.startsWith(path);
   };
 
   const handleLogout = async () => {
@@ -75,7 +76,7 @@ const MobileSidebar = () => {
         <div className="flex items-center p-4 border-b border-border-subtle">
           <img 
             src="/lovable-uploads/logo.png" 
-            alt="Sobrou Logo" 
+            alt="Logo" 
             className="h-6 w-auto" 
           />
         </div>
@@ -100,14 +101,20 @@ const MobileSidebar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center p-2 rounded-md hover:bg-background-surface ${
+                  className={cn(
+                    "flex items-center p-2 rounded-md hover:bg-background-surface",
                     isActive 
-                      ? "bg-background-surface text-primary font-medium" 
-                      : "text-text-primary"
-                  }`}
+                      ? "bg-background-surface text-primary font-bold" 
+                      : "text-text-primary font-normal"
+                  )}
                   onClick={() => setOpen(false)}
                 >
-                  {item.icon}
+                  <span className={cn(
+                    "flex items-center justify-center",
+                    isActive ? "text-primary" : "text-text-primary"
+                  )}>
+                    {item.icon}
+                  </span>
                   <span className="ml-3">{item.name}</span>
                 </Link>
               );
