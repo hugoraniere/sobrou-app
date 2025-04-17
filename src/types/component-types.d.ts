@@ -27,12 +27,12 @@ interface CategorySelectorProps {
   onSelectCategory?: (category: string) => void;
   className?: string;
   // Add props used in the current implementation
-  categoryId?: string;
-  isOpen?: boolean;
-  setIsOpen?: (isOpen: boolean) => void;
-  onCategorySelect?: (categoryId: string) => void;
-  onReset?: (e: React.MouseEvent) => void;
-  userSelected?: boolean;
+  categoryId: string;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  onCategorySelect: (categoryId: string) => void;
+  onReset: (e: React.MouseEvent) => void;
+  userSelected: boolean;
 }
 
 // Add interfaces for Dialog components
@@ -103,6 +103,8 @@ interface TransactionFormLayoutProps {
   children: React.ReactNode;
   footer: React.ReactNode;
   className?: string;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 // Add interfaces for RecurringIndicator
