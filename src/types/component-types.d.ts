@@ -1,5 +1,5 @@
 
-import { AriaAttributes, DOMAttributes } from "react";
+import React, { AriaAttributes, DOMAttributes } from "react";
 
 // Extend React's intrinsic attributes to include className
 declare module 'react' {
@@ -9,6 +9,11 @@ declare module 'react' {
   
   interface SVGAttributes<T> extends AriaAttributes, DOMAttributes<T> {
     className?: string;
+  }
+
+  // Add className to functional components and intrinsic elements
+  interface FunctionComponent<P = {}> {
+    (props: P & { className?: string }, context?: any): ReactElement | null;
   }
 }
 
