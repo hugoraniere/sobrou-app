@@ -1,7 +1,5 @@
 
 import React from 'react';
-import FinancialAlerts from './FinancialAlerts';
-import GoalsRecommendations from './GoalsRecommendations';
 import { useTranslation } from 'react-i18next';
 
 interface DashboardInsightsProps {
@@ -26,8 +24,7 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <FinancialAlerts alerts={alerts} />
-      <GoalsRecommendations recommendations={recommendations} />
+      {/* Financial Alerts and Goals Recommendations components have been removed */}
     </div>
   );
 };

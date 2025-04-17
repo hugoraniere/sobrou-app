@@ -8,7 +8,6 @@ import IncomeByTypeChart from '../charts/IncomeByTypeChart';
 import DailyBarChart from '../charts/DailyBarChart';
 import RevenueVsExpenseChart from '../charts/RevenueVsExpenseChart';
 import FinancialGoalsProgress from '../charts/FinancialGoalsProgress';
-import FinancialAlerts from './FinancialAlerts';
 import DashboardBigNumbers from './DashboardBigNumbers';
 import { 
   Accordion,
@@ -70,28 +69,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     }
   });
 
-  // Sample alerts (in real app, these would be calculated based on actual financial data)
-  const sampleAlerts = [
-    {
-      id: '1',
-      title: t('dashboard.alerts.budget'),
-      description: t('dashboard.alerts.budgetDescription'),
-      type: 'warning' as const
-    },
-    {
-      id: '2',
-      title: t('dashboard.alerts.fixedExpenses'),
-      description: t('dashboard.alerts.fixedExpensesDescription'),
-      type: 'info' as const
-    },
-    {
-      id: '3',
-      title: t('dashboard.alerts.balance'),
-      description: t('dashboard.alerts.balanceDescription'),
-      type: 'success' as const
-    }
-  ];
-
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Big Numbers */}
@@ -100,17 +77,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         totalSavings={totalSavings} 
       />
 
-      {/* Financial Alerts as Accordion */}
-      <Accordion type="single" collapsible className="bg-white p-4 rounded-lg border border-gray-100">
-        <AccordionItem value="alerts" className="border-b-0">
-          <AccordionTrigger className="py-2">
-            <h3 className="text-lg font-semibold">{t('dashboard.alerts.title')}</h3>
-          </AccordionTrigger>
-          <AccordionContent>
-            <FinancialAlerts alerts={sampleAlerts} />
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      {/* Financial Alerts accordion removed */}
 
       {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
