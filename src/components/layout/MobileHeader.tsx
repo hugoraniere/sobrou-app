@@ -12,9 +12,8 @@ const MobileHeader: React.FC = () => {
           <img 
             src="/lovable-uploads/logo.png" 
             alt="Sobrou Logo" 
-            className="h-6 w-auto mr-2" 
+            className="h-6 w-auto" 
           />
-          <span className="text-lg font-bold text-primary">Sobrou</span>
         </Link>
       </div>
     </div>

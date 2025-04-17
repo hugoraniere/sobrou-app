@@ -9,9 +9,8 @@ const HeaderLogo: React.FC = () => {
         <img 
           src="/lovable-uploads/logo.png" 
           alt="Sobrou Logo" 
-          className="h-8 w-auto mr-2" 
+          className="h-8 w-auto" 
         />
-        <span className="text-xl font-bold text-primary">Sobrou</span>
       </Link>
     </div>
   );

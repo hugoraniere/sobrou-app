@@ -64,13 +64,20 @@ const SidebarNav = () => {
   
   const userFullName = user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
   
+  // Helper function to check if a route is active
+  const isActiveRoute = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/' || location.pathname === '/home';
+    }
+    return location.pathname === path;
+  };
+  
   return <>
-      <Sidebar variant="sidebar" className="w-64 transition-all duration-300 absolute md:relative z-10 border-r border-gray-200 shadow-sm">
+      <Sidebar variant="sidebar" className="fixed h-screen w-64 transition-all duration-300 md:relative z-10 border-r border-gray-200 shadow-sm">
         <SidebarHeader>
           <div className="flex items-center p-4 justify-between">
             <div className="flex items-center">
-              <img src="/lovable-uploads/logo.png" alt="Sobrou Logo" className="h-6 w-auto mr-2" />
-              <span className={`text-xl font-bold text-gray-900 transition-opacity duration-200 ${state === 'collapsed' ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>Sobrou</span>
+              <img src="/lovable-uploads/logo.png" alt="Sobrou Logo" className="h-6 w-auto" />
             </div>
             <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-8 w-8">
               {state === 'expanded' ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -81,8 +88,7 @@ const SidebarNav = () => {
         <SidebarContent>
           <SidebarMenu>
             {navigationItems.map(item => {
-              const isActive = location.pathname === item.path || 
-                (item.path === '/' && location.pathname === '/home');
+              const isActive = isActiveRoute(item.path);
               
               return (
                 <SidebarMenuItem key={item.path}>

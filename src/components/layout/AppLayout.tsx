@@ -12,8 +12,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-background-surface">
-        {/* Desktop Sidebar - Always visible, just collapsed on smaller screens */}
-        <div className="hidden md:flex">
+        {/* Desktop Sidebar - Fixed and full height */}
+        <div className="hidden md:block">
           <SidebarNav />
         </div>
         

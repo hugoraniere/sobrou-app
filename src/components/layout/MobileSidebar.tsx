@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, LayoutDashboard, FileText, Target, Settings, LogOut } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ const MobileSidebar = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [open, setOpen] = React.useState(false);
+  const location = useLocation();
   
   const getUserInitials = () => {
     const fullName = user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
@@ -45,6 +46,14 @@ const MobileSidebar = () => {
     },
   ];
 
+  // Helper function to check if a route is active
+  const isActiveRoute = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/' || location.pathname === '/home';
+    }
+    return location.pathname === path;
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -67,7 +76,7 @@ const MobileSidebar = () => {
           <img 
             src="/lovable-uploads/logo.png" 
             alt="Sobrou Logo" 
-            className="h-6 w-auto mr-2" 
+            className="h-6 w-auto" 
           />
         </div>
         
@@ -84,17 +93,25 @@ const MobileSidebar = () => {
           </div>
           
           <nav className="space-y-1">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="flex items-center p-2 text-text-primary rounded-md hover:bg-background-surface"
-                onClick={() => setOpen(false)}
-              >
-                {item.icon}
-                <span className="ml-3">{item.name}</span>
-              </Link>
-            ))}
+            {navigationItems.map((item) => {
+              const isActive = isActiveRoute(item.path);
+              
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center p-2 rounded-md hover:bg-background-surface ${
+                    isActive 
+                      ? "bg-background-surface text-primary font-medium" 
+                      : "text-text-primary"
+                  }`}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.icon}
+                  <span className="ml-3">{item.name}</span>
+                </Link>
+              );
+            })}
             
             <button
               onClick={handleLogout}
