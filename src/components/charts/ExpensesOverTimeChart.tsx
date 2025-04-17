@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -60,6 +61,33 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
   
   const data = processData();
   
+  // Create an insight message
+  const getInsightMessage = () => {
+    if (data.length < 2) return "Adicione mais transações para ver insights sobre seus gastos ao longo do tempo.";
+    
+    // Find the highest spending day
+    const highestSpending = [...data].sort((a, b) => b.amount - a.amount)[0];
+    const highestDate = parseISO(highestSpending.date);
+    
+    if (isValid(highestDate)) {
+      return `Seu maior gasto foi em ${format(highestDate, 'dd/MM/yyyy', { locale: dateLocale })}, totalizando ${formatCurrency(highestSpending.amount)}.`;
+    }
+    
+    return "Adicione mais transações para ver insights sobre seus gastos ao longo do tempo.";
+  };
+  
+  const formatCurrency = (value: number) => {
+    const localeStr = locale === 'pt-BR' ? 'pt-BR' : 'en-US';
+    const currency = localeStr === 'pt-BR' ? 'BRL' : 'USD';
+    
+    return new Intl.NumberFormat(localeStr, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+  
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const date = parseISO(label);
@@ -70,7 +98,7 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
             {isValid(date) ? format(date, 'PP', { locale: dateLocale }) : label}
           </p>
           <p className="text-sm text-gray-600">
-            {`R$ ${payload[0].value.toFixed(2)}`}
+            {formatCurrency(payload[0].value)}
           </p>
         </div>
       );
@@ -93,20 +121,25 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
   };
   
   return (
-    <Card>
+    <Card className="min-h-[300px] w-full overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle>{t('dashboard.charts.expensesOverTime')}</CardTitle>
+        
+        {/* Standardized insight location */}
+        <div className="p-3 bg-gray-50 rounded-md text-sm">
+          <p>{getInsightMessage()}</p>
+        </div>
       </CardHeader>
       <CardContent>
         {data.length > 0 ? (
-          <div className="h-[300px]">
+          <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={data}
                 margin={{
                   top: 10,
                   right: 10,
-                  left: 0,
+                  left: 10,
                   bottom: 20,
                 }}
               >
@@ -114,22 +147,23 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
                 <XAxis 
                   dataKey="date" 
                   tickFormatter={formatXAxis}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 11 }}
                   angle={-45}
                   textAnchor="end"
                   height={50}
                 />
                 <YAxis 
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => `R$${value}`}
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(value) => formatCurrency(value)}
+                  width={60}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line
                   type="monotone"
                   dataKey="amount"
-                  stroke="#8884d8"
+                  stroke="#ef4444"
                   strokeWidth={2}
-                  activeDot={{ r: 8 }}
+                  activeDot={{ r: 6 }}
                   name="Despesas"
                 />
               </LineChart>

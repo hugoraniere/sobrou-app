@@ -93,7 +93,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   ];
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
+    <div className="space-y-6 w-full max-w-full overflow-hidden px-4 md:px-0">
       {/* Big Numbers */}
       <DashboardBigNumbers 
         transactions={transactions} 
@@ -119,7 +119,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
         </div>
         
-        {/* Income vs Expenses (Bar Chart) */}
+        {/* Income vs Expenses (Line Chart) */}
         <div className="w-full min-h-[300px]">
           <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
         </div>
@@ -141,11 +141,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 3 - Optional charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Income by Type Chart */}
-        <Card className="border border-gray-100 shadow-none">
+        <Card className="border border-gray-100 shadow-none min-h-[300px] overflow-hidden">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
             {hasTransactions ? (
-              <div className="min-h-[300px]">
+              <div className="h-[250px]">
                 <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
               </div>
             ) : (
@@ -155,11 +155,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
         
         {/* Balance by Account Chart */}
-        <Card className="border border-gray-100 shadow-none">
+        <Card className="border border-gray-100 shadow-none min-h-[300px] overflow-hidden">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.balanceByAccount')}</h3>
             {hasTransactions ? (
-              <div className="min-h-[300px]">
+              <div className="h-[250px]">
                 <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
               </div>
             ) : (

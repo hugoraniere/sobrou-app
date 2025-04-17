@@ -7,14 +7,14 @@ import {
   ChartTooltipContent
 } from "@/components/ui/chart";
 import {
-  Bar,
-  BarChart,
   ResponsiveContainer,
   XAxis,
   YAxis,
   CartesianGrid,
   Legend,
-  Cell
+  Line,
+  LineChart,
+  ReferenceLine
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -105,46 +105,38 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   };
   
   return (
-    <Card>
+    <Card className="min-h-[300px] w-full overflow-hidden">
       <CardHeader>
         <CardTitle>{t('dashboard.charts.revenueVsExpense')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Insight */}
+        
+        {/* Insight - Standardized after the title */}
         {currentMonthData && (
-          <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
+          <div className="p-3 bg-gray-50 rounded-md text-sm">
             <p>{getInsightMessage()}</p>
           </div>
         )}
-      
+      </CardHeader>
+      <CardContent>
         {monthlyData.length > 0 ? (
-          <div className="h-[300px]">
+          <div className="h-[250px]">
             <ChartContainer className="h-full" config={chartConfig}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
+                <LineChart
                   data={monthlyData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis 
                     dataKey="month" 
-                    label={{ 
-                      value: t('dashboard.charts.month'), 
-                      position: 'insideBottom',
-                      offset: -10
-                    }}
-                    height={50}
+                    height={40}
+                    tick={{ fontSize: 11 }}
                   />
                   <YAxis 
                     tickFormatter={formatCurrency}
-                    label={{ 
-                      value: t('dashboard.charts.amount'), 
-                      angle: -90, 
-                      position: 'insideLeft',
-                      offset: -5
-                    }}
-                    width={80}
+                    width={60}
+                    tick={{ fontSize: 11 }}
                   />
+                  <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
                   <ChartTooltip
                     content={({ active, payload }) => 
                       active && payload && payload.length ? (
@@ -156,21 +148,34 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                     }
                   />
                   <Legend 
-                    wrapperStyle={{ paddingTop: 10 }}
                     verticalAlign="bottom"
                     height={36}
                   />
-                  <Bar dataKey="income" name={t('common.income')} fill="#22c55e" />
-                  <Bar dataKey="expense" name={t('common.expense')} fill="#ef4444" />
-                  <Bar dataKey="balance" name={t('common.balance')} fill="#3b82f6">
-                    {monthlyData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={entry.balance >= 0 ? '#3b82f6' : '#9ca3af'} 
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
+                  <Line 
+                    type="monotone" 
+                    dataKey="income" 
+                    name={t('common.income')} 
+                    stroke="#22c55e" 
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="expense" 
+                    name={t('common.expense')} 
+                    stroke="#ef4444" 
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="balance" 
+                    name={t('common.balance')} 
+                    stroke="#3b82f6" 
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </ChartContainer>
           </div>

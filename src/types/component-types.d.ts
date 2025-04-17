@@ -16,3 +16,17 @@ declare module '@/components/SavingGoals' {
     onGoalUpdated: () => void;
   }
 }
+
+// Add specific type declarations for components with className errors
+declare module '@/components/prompt/CategorySelector' {
+  interface CategorySelectorProps {
+    categoryId: string;
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+    onCategorySelect: (categoryId: string) => void;
+    onReset: (e: React.MouseEvent) => void;
+    userSelected: boolean;
+    className?: string;
+  }
+}
+

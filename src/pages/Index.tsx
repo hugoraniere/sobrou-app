@@ -72,7 +72,7 @@ const Index = () => {
         onTransactionAdded={fetchData}
       />
       
-      <div className="space-y-6 px-4 max-w-full">
+      <div className="space-y-6 px-4 md:px-6 w-full max-w-full overflow-hidden">
         <div>
           <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
           <p className="text-gray-600">{t('dashboard.subtitle')}</p>
@@ -85,7 +85,7 @@ const Index = () => {
         />
         
         {/* Filter Bar - Only show on transactions tab */}
-        <div id="filters-container">
+        <div id="filters-container" className="w-full overflow-hidden">
           <FilterBar 
             filters={filters}
             onFilterChange={handleFilterChange}
