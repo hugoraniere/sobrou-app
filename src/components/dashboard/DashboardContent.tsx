@@ -49,13 +49,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   
-  // Show/hide filters based on active tab
-  useEffect(() => {
-    const filtersContainer = document.getElementById('filters-container');
-    if (filtersContainer) {
-      filtersContainer.style.display = activeTab === 'transactions' ? 'block' : 'none';
-    }
-  }, [activeTab]);
+  // We're removing the code that shows/hides filters based on active tab
+  // since we're removing the duplicate filter
   
   return (
     <div className="w-full max-w-full overflow-x-hidden">
@@ -86,18 +81,12 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         <TabsContent value="transactions">
           <TransactionsTable 
             transactions={filteredTransactions}
-            filters={{
-              category: filters.category,
-              type: filters.type,
-              dateRange: filters.dateRange,
-              minAmount: filters.minAmount,
-              maxAmount: filters.maxAmount
-            }}
+            filters={filters}
             onTransactionUpdated={onTransactionUpdated}
           />
         </TabsContent>
         
-        {/* Insights Tab (replacing Analytics) */}
+        {/* Insights Tab */}
         <TabsContent value="insights">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">

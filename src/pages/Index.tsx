@@ -12,7 +12,6 @@ import AddTransactionDialog from '@/components/transactions/AddTransactionDialog
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AIPromptInput from '../components/AIPromptInput';
-import FilterBar from '../components/FilterBar';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
@@ -54,9 +53,6 @@ const Index = () => {
     return <Navigate to="/auth" replace />;
   }
   
-  // Extract category IDs for filters
-  const categoryIds = transactionCategories.map(cat => cat.id);
-  
   return (
     <>
       {/* Action Button */}
@@ -89,15 +85,7 @@ const Index = () => {
           onSavingAdded={fetchData}
         />
         
-        {/* Filter Bar - Only show on transactions tab */}
-        <div id="filters-container" className="w-full overflow-hidden">
-          <FilterBar 
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            categories={categoryIds}
-            onResetFilters={handleResetFilters}
-          />
-        </div>
+        {/* We've removed the duplicate filter bar here */}
         
         <DashboardContent
           transactions={transactions}

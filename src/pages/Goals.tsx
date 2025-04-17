@@ -156,7 +156,6 @@ const Goals = () => {
       };
     }
     
-    // In a real app, you'd compare with a deadline
     return {
       label: t('goals.inProgress', 'Em andamento'),
       color: 'bg-blue-100 text-blue-800',
@@ -301,7 +300,7 @@ const Goals = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-blue-900">
-                    {t('goals.progress', 'Você est�� fazendo progresso!')}
+                    {t('goals.progress', 'Você está fazendo progresso!')}
                   </h3>
                   <p className="text-blue-800">
                     {goals.some(g => calculateProgress(g.current_amount, g.target_amount) > 50)

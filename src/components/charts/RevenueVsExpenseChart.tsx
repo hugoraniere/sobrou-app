@@ -17,8 +17,6 @@ import {
   ReferenceLine
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { subMonths, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -105,85 +103,82 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   };
   
   return (
-    <Card className="min-h-[300px] w-full overflow-hidden">
-      <CardHeader>
-        <CardTitle>{t('dashboard.charts.revenueVsExpense')}</CardTitle>
-        
-        {/* Insight - Standardized after the title */}
-        {currentMonthData && (
-          <div className="p-3 bg-gray-50 rounded-md text-sm">
-            <p>{getInsightMessage()}</p>
-          </div>
-        )}
-      </CardHeader>
-      <CardContent>
-        {monthlyData.length > 0 ? (
-          <div className="h-[250px]">
-            <ChartContainer className="h-full" config={chartConfig}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={monthlyData}
-                  margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis 
-                    dataKey="month" 
-                    height={40}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <YAxis 
-                    tickFormatter={formatCurrency}
-                    width={60}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
-                  <ChartTooltip
-                    content={({ active, payload }) => 
-                      active && payload && payload.length ? (
-                        <ChartTooltipContent 
-                          payload={payload} 
-                          formatter={(value) => formatCurrency(value as number)}
-                        />
-                      ) : null
-                    }
-                  />
-                  <Legend 
-                    verticalAlign="bottom"
-                    height={36}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="income" 
-                    name={t('common.income')} 
-                    stroke="#22c55e" 
-                    strokeWidth={2}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="expense" 
-                    name={t('common.expense')} 
-                    stroke="#ef4444" 
-                    strokeWidth={2}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="balance" 
-                    name={t('common.balance')} 
-                    stroke="#3b82f6" 
-                    strokeWidth={2}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </div>
-        ) : (
-          <EmptyStateMessage message={t('dashboard.charts.noData')} />
-        )}
-      </CardContent>
-    </Card>
+    <div className="h-[320px] w-full">
+      {/* Insight - Standardized after the title */}
+      {currentMonthData && (
+        <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
+          <p>{getInsightMessage()}</p>
+        </div>
+      )}
+      
+      {monthlyData.length > 0 ? (
+        <div className="h-[250px]">
+          <ChartContainer className="h-full" config={chartConfig}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={monthlyData}
+                margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis 
+                  dataKey="month" 
+                  height={40}
+                  tick={{ fontSize: 11 }}
+                />
+                <YAxis 
+                  tickFormatter={formatCurrency}
+                  width={60}
+                  tick={{ fontSize: 11 }}
+                />
+                <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
+                <ChartTooltip
+                  content={({ active, payload }) => 
+                    active && payload && payload.length ? (
+                      <ChartTooltipContent 
+                        payload={payload} 
+                        formatter={(value) => formatCurrency(value as number)}
+                      />
+                    ) : null
+                  }
+                />
+                <Legend 
+                  verticalAlign="bottom"
+                  height={36}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="income" 
+                  name={t('common.income')} 
+                  stroke="#22c55e" 
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="expense" 
+                  name={t('common.expense')} 
+                  stroke="#ef4444" 
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="balance" 
+                  name={t('common.balance')} 
+                  stroke="#3b82f6" 
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+      ) : (
+        <div className="h-[250px] flex items-center justify-center text-gray-400">
+          {t('dashboard.charts.noData')}
+        </div>
+      )}
+    </div>
   );
 };
 

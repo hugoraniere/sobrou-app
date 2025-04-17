@@ -2,7 +2,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SavingGoal } from '@/services/SavingsService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 
@@ -71,41 +70,36 @@ const FinancialGoalsProgress: React.FC<FinancialGoalsProgressProps> = ({
   };
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('dashboard.charts.financialGoals')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {savingGoals.length > 0 ? (
-          <>
-            {/* Motivational Message */}
-            <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
-              <p>{getMotivationalMessage()}</p>
-            </div>
-            
-            {/* Progress Bars */}
-            <div className="h-[220px] overflow-y-auto space-y-4">
-              {chartData.map((goal) => (
-                <div key={goal.name} className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">{goal.name}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
-                    </span>
-                  </div>
-                  <Progress value={goal.percentage} className="h-2" />
-                  <p className="text-right text-xs mt-1 text-muted-foreground">
-                    {goal.percentage.toFixed(1)}%
-                  </p>
+    <div className="h-[320px] w-full">
+      {savingGoals.length > 0 ? (
+        <>
+          {/* Motivational Message */}
+          <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
+            <p>{getMotivationalMessage()}</p>
+          </div>
+          
+          {/* Progress Bars */}
+          <div className="h-[250px] overflow-y-auto space-y-4">
+            {chartData.map((goal) => (
+              <div key={goal.name} className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">{goal.name}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
+                  </span>
                 </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
-        )}
-      </CardContent>
-    </Card>
+                <Progress value={goal.percentage} className="h-2" />
+                <p className="text-right text-xs mt-1 text-muted-foreground">
+                  {goal.percentage.toFixed(1)}%
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
+      )}
+    </div>
   );
 };
 

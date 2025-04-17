@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
 import { useTranslation } from 'react-i18next';
+import { transactionCategories } from '@/data/categories';
 
 interface IncomeByTypeChartProps {
   incomes: Transaction[];
@@ -25,9 +26,6 @@ const IncomeByTypeChart: React.FC<IncomeByTypeChartProps> = ({
 }) => {
   const { t } = useTranslation();
   
-  // Generate unique colors for pie chart
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A259FF', '#4BC0C0', '#FF6384', '#36A2EB', '#FB6340'];
-  
   // Helper function to get data for pie chart (incomes by type)
   const getIncomesByType = () => {
     const typeMap = new Map<string, number>();
@@ -39,10 +37,15 @@ const IncomeByTypeChart: React.FC<IncomeByTypeChartProps> = ({
         typeMap.set(income.category, currentAmount + income.amount);
       });
     
-    return Array.from(typeMap.entries()).map(([name, value]) => ({
-      name,
-      value
-    }));
+    return Array.from(typeMap.entries()).map(([categoryId, value]) => {
+      // Find the category information from transactionCategories
+      const categoryInfo = transactionCategories.find(cat => cat.id === categoryId);
+      return {
+        name: categoryInfo?.name || categoryId,
+        value,
+        color: categoryInfo?.color || '#8884d8'
+      };
+    });
   };
   
   const incomesByType = getIncomesByType();
@@ -89,7 +92,7 @@ const IncomeByTypeChart: React.FC<IncomeByTypeChartProps> = ({
                 label={renderCustomizedLabel}
               >
                 {incomesByType.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={entry.color || chartConfig[entry.name]?.theme?.light || '#8884d8'} />
                 ))}
               </Pie>
               <ChartTooltip

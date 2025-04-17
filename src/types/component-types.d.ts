@@ -8,7 +8,7 @@ declare module 'react' {
   }
 }
 
-// Update existing type declarations to explicitly include className
+// Add className to CategorySelector props
 declare module '@/components/prompt/CategorySelector' {
   interface CategorySelectorProps {
     categoryId: string;
