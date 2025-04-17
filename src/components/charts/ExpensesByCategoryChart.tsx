@@ -46,38 +46,6 @@ const calculatePercentages = (data: any[]) => {
   }));
 };
 
-// Legend component for the pie chart
-const ChartLegend: React.FC<{ data: any[] }> = ({ data }) => {
-  return (
-    <div className="grid grid-cols-1 gap-1 mt-4">
-      {data.slice(0, 5).map((entry, index) => (
-        <div key={entry.id} className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div 
-              className="w-3 h-3 rounded-full mr-2" 
-              style={{ backgroundColor: entry.color }}
-            ></div>
-            <span className="text-sm truncate">{entry.name}</span>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="text-sm font-medium">
-              R$ {entry.value.toFixed(2)}
-            </span>
-            <span className="text-xs text-gray-500">
-              {entry.percentage.toFixed(1)}%
-            </span>
-          </div>
-        </div>
-      ))}
-      {data.length > 5 && (
-        <div className="text-xs text-center text-gray-500 mt-1">
-          +{data.length - 5} outras categorias
-        </div>
-      )}
-    </div>
-  );
-};
-
 const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({ 
   expenses,
   chartConfig 
@@ -96,7 +64,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   
   if (data.length === 0) {
     return (
-      <Card>
+      <Card className="min-h-[300px]">
         <CardHeader>
           <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
         </CardHeader>
@@ -108,18 +76,28 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   }
   
   return (
-    <Card>
+    <Card className="min-h-[300px]">
       <CardHeader>
         <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
+        
+        {/* Insight moved to top for consistency */}
+        {topCategory && (
+          <div className="mt-2 p-3 bg-gray-50 rounded-md text-sm">
+            <p>
+              <span className="font-medium">{topCategory.percentage.toFixed(1)}%</span> dos seus gastos foram com{' '}
+              <span className="font-medium">{topCategory.name}</span> (R$ {topCategory.value.toFixed(2)})
+            </p>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[250px] w-full max-w-full">
           <ChartContainer 
-            className="h-full"
+            className="h-full w-full"
             config={chartConfig}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+              <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                 <Pie
                   data={data}
                   cx="50%"
@@ -158,18 +136,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
           </ChartContainer>
         </div>
         
-        {/* Legend */}
-        <ChartLegend data={data} />
-        
-        {/* Insight */}
-        {topCategory && (
-          <div className="mt-4 p-3 bg-gray-50 rounded-md text-sm">
-            <p>
-              <span className="font-medium">{topCategory.percentage.toFixed(1)}%</span> dos seus gastos foram com{' '}
-              <span className="font-medium">{topCategory.name}</span> (R$ {topCategory.value.toFixed(2)})
-            </p>
-          </div>
-        )}
+        {/* No legends here as requested */}
       </CardContent>
     </Card>
   );

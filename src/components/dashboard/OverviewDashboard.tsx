@@ -115,12 +115,12 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Expenses by Category (Pie Chart) */}
-        <div className="w-full min-h-[300px]">
+        <div className="w-full">
           <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
         </div>
         
         {/* Income vs Expenses (Line Chart) */}
-        <div className="w-full min-h-[300px]">
+        <div className="w-full">
           <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
         </div>
       </div>
@@ -128,12 +128,12 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Daily Balance (Line Chart) */}
-        <div className="w-full min-h-[300px]">
+        <div className="w-full">
           <DailyBarChart transactions={transactions} />
         </div>
         
         {/* Financial Goals Progress */}
-        <div className="w-full min-h-[300px]">
+        <div className="w-full">
           <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
         </div>
       </div>
@@ -145,7 +145,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
             {hasTransactions ? (
-              <div className="h-[250px]">
+              <div className="h-[250px] w-full max-w-full">
                 <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
               </div>
             ) : (
@@ -159,7 +159,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.balanceByAccount')}</h3>
             {hasTransactions ? (
-              <div className="h-[250px]">
+              <div className="h-[250px] w-full max-w-full">
                 <BalanceByAccountChart transactions={transactions} chartConfig={chartConfig} />
               </div>
             ) : (

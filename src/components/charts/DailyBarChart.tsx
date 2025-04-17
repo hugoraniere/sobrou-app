@@ -198,12 +198,12 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
       </CardHeader>
       <CardContent>
         {dailyData.length > 0 ? (
-          <div className="h-[250px]">
-            <ChartContainer className="h-full" config={chartConfig}>
+          <div className="h-[250px] w-full max-w-full">
+            <ChartContainer className="h-full w-full" config={chartConfig}>
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={dailyData}
-                  margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
+                  margin={{ top: 10, right: 0, left: 0, bottom: 20 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis 
@@ -213,7 +213,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
                   />
                   <YAxis 
                     tickFormatter={formatCurrency}
-                    width={60}
+                    width={50}
                     tick={{ fontSize: 11 }}
                   />
                   <ReferenceLine y={0} stroke="#666" />

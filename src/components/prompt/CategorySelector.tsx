@@ -12,6 +12,7 @@ interface CategorySelectorProps {
   onCategorySelect: (categoryId: string) => void;
   onReset: (e: React.MouseEvent) => void;
   userSelected: boolean;
+  className?: string; // Added className prop
 }
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
@@ -20,7 +21,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   setIsOpen,
   onCategorySelect,
   onReset,
-  userSelected
+  userSelected,
+  className // Added className to props
 }) => {
   const categoryInfo = transactionCategories.find(cat => cat.id === categoryId);
   const CategoryIcon = categoryInfo?.icon;
@@ -29,7 +31,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <div className="flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">
+        <div className={cn("flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200", className)}>
           {CategoryIcon && <CategoryIcon className="h-3 w-3" />}
           <span>{categoryName}</span>
           {userSelected && (
@@ -40,7 +42,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           )}
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-56 p-2" align="end">
+      <PopoverContent className={cn("w-56 p-2", className)} align="end">
         <div className="grid gap-1 max-h-60 overflow-y-auto">
           {transactionCategories.map((category) => {
             const Icon = category.icon;

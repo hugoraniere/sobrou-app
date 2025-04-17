@@ -30,3 +30,21 @@ declare module '@/components/prompt/CategorySelector' {
   }
 }
 
+// Add declarations for other components that need className
+declare module '@/components/transactions/AddTransactionDialog' {
+  interface AddTransactionDialogProps {
+    className?: string;
+  }
+}
+
+declare module '@/components/transactions/EditTransactionDialog' {
+  interface EditTransactionDialogProps {
+    className?: string;
+  }
+}
+
+declare module '@/components/transactions/TransactionRow' {
+  interface TransactionRowProps {
+    className?: string;
+  }
+}
