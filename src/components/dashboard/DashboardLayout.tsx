@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Header from '../Header';
 import AIPromptInput from '../AIPromptInput';
 import FilterBar from '../FilterBar';
 
@@ -26,9 +25,6 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
-  whatsAppConnected,
-  showOnboarding,
-  setShowOnboarding,
   filters,
   handleFilterChange,
   handleResetFilters,
@@ -39,9 +35,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { t } = useTranslation();
   
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
+    <div className="min-h-screen">
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>

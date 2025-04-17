@@ -1,0 +1,28 @@
+
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import SidebarNav from './SidebarNav';
+
+const MobileSidebar = () => {
+  const { t } = useTranslation();
+  const [open, setOpen] = React.useState(false);
+  
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden">
+          <Menu className="h-6 w-6" />
+          <span className="sr-only">{t('common.menu', 'Menu')}</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="p-0" onClick={() => setOpen(false)}>
+        <SidebarNav />
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+export default MobileSidebar;

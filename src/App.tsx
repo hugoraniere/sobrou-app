@@ -11,10 +11,10 @@ import Auth from "./pages/Auth";
 import { AuthProvider } from "./contexts/AuthContext";
 import PublicLanding from "./pages/PublicLanding";
 import ProtectedRoute from "./components/ProtectedRoute";
-import React from "react"; // Proper React import
+import AppLayout from "./components/layout/AppLayout";
+import React from "react";
 
 const App = () => {
-  // Create QueryClient inside the component
   const queryClient = React.useMemo(() => new QueryClient(), []);
   
   return (
@@ -31,7 +31,9 @@ const App = () => {
                   path="/"
                   element={
                     <ProtectedRoute>
-                      <Index />
+                      <AppLayout>
+                        <Index />
+                      </AppLayout>
                     </ProtectedRoute>
                   }
                 />
@@ -39,7 +41,9 @@ const App = () => {
                   path="/integration"
                   element={
                     <ProtectedRoute>
-                      <WhatsAppIntegration />
+                      <AppLayout>
+                        <WhatsAppIntegration />
+                      </AppLayout>
                     </ProtectedRoute>
                   }
                 />

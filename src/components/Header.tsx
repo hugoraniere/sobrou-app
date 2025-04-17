@@ -38,6 +38,10 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
     return names[0][0].toUpperCase();
   };
 
+  // For TypeScript errors: Cast user to any temporarily to allow access to user_metadata
+  // This is a workaround and should be fixed by properly typing the user object
+  const userAny = user as any;
+
   return (
     <>
       <header className="bg-white border-b border-gray-200 shadow-sm py-4">
@@ -51,7 +55,7 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            {user && !isPublic ? (
+            {userAny && !isPublic ? (
               <>
                 <Menubar className="border-none shadow-none">
                   <MenubarMenu>
@@ -104,7 +108,7 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
                       <AvatarFallback>{getUserInitials()}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium">
-                      {user.user_metadata?.full_name || t('common.user', 'Usuário')}
+                      {userAny.user_metadata?.full_name || t('common.user', 'Usuário')}
                     </span>
                   </div>
                 </div>
@@ -129,14 +133,14 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
               </SheetTrigger>
               <SheetContent side="right">
                 <div className="flex flex-col space-y-4 pt-8">
-                  {user && !isPublic ? (
+                  {userAny && !isPublic ? (
                     <>
                       <div className="flex items-center space-x-2 p-2">
                         <Avatar className="h-10 w-10 bg-blue-500 text-white">
                           <AvatarFallback>{getUserInitials()}</AvatarFallback>
                         </Avatar>
                         <span className="text-sm font-medium">
-                          {user.user_metadata?.full_name || t('common.user', 'Usuário')}
+                          {userAny.user_metadata?.full_name || t('common.user', 'Usuário')}
                         </span>
                       </div>
                       

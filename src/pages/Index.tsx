@@ -2,17 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import DashboardLayout from '../components/dashboard/DashboardLayout';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import DeveloperControls from '../components/dashboard/DeveloperControls';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import AIPromptInput from '../components/AIPromptInput';
+import FilterBar from '../components/FilterBar';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
@@ -49,15 +49,11 @@ const Index = () => {
     return <Navigate to="/auth" replace />;
   }
   
-  // Extrair os nomes das categorias para os filtros
+  // Extract category IDs for filters
   const categoryIds = transactionCategories.map(cat => cat.id);
   
   return (
     <>
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageSwitcher />
-      </div>
-      
       {/* Action Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button 
@@ -76,17 +72,28 @@ const Index = () => {
         onTransactionAdded={fetchData}
       />
       
-      <DashboardLayout
-        whatsAppConnected={whatsAppConnected}
-        showOnboarding={showOnboarding}
-        setShowOnboarding={setShowOnboarding}
-        filters={filters}
-        handleFilterChange={handleFilterChange}
-        handleResetFilters={handleResetFilters}
-        categories={categoryIds}
-        onTransactionAdded={fetchData}
-        onSavingAdded={fetchData}
-      >
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
+          <p className="text-gray-600">{t('dashboard.subtitle')}</p>
+        </div>
+        
+        {/* AI-powered prompt input at the top */}
+        <AIPromptInput 
+          onTransactionAdded={fetchData}
+          onSavingAdded={fetchData}
+        />
+        
+        {/* Filter Bar - Only show on transactions tab */}
+        <div id="filters-container">
+          <FilterBar 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            categories={categoryIds}
+            onResetFilters={handleResetFilters}
+          />
+        </div>
+        
         <DashboardContent
           transactions={transactions}
           filteredTransactions={filteredTransactions}
@@ -101,7 +108,7 @@ const Index = () => {
           onSavingGoalAdded={fetchData}
           onSavingGoalUpdated={fetchData}
         />
-      </DashboardLayout>
+      </div>
       
       <DeveloperControls 
         whatsAppConnected={whatsAppConnected}
