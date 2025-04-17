@@ -1,14 +1,16 @@
+
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import SidebarNav from './SidebarNav';
 import MobileHeader from './MobileHeader';
+
 interface AppLayoutProps {
   children: React.ReactNode;
 }
-const AppLayout: React.FC<AppLayoutProps> = ({
-  children
-}) => {
-  return <SidebarProvider defaultOpen={true}>
+
+const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  return (
+    <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-background-surface">
         {/* Desktop Sidebar - Fixed and full height */}
         <div className="hidden md:block">
@@ -16,7 +18,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         </div>
         
         {/* Main Content */}
-        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden md:ml-64 mx-0">
+        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
           {/* Mobile Header */}
           <MobileHeader />
           
@@ -25,6 +27,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           </div>
         </main>
       </div>
-    </SidebarProvider>;
+    </SidebarProvider>
+  );
 };
+
 export default AppLayout;

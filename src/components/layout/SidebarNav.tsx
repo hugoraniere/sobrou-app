@@ -77,7 +77,7 @@ const SidebarNav = () => {
         <SidebarHeader>
           <div className="flex items-center p-4 justify-between">
             <div className="flex items-center">
-              <img src="/lovable-uploads/logo.png" alt="Sobrou Logo" className="h-6 w-auto" />
+              <Logo size="sm" />
             </div>
             <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-8 w-8">
               {state === 'expanded' ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}

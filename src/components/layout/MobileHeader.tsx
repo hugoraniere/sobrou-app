@@ -2,6 +2,7 @@
 import React from 'react';
 import MobileSidebar from './MobileSidebar';
 import { Link } from 'react-router-dom';
+import Logo from '../brand/Logo';
 
 const MobileHeader: React.FC = () => {
   return (
@@ -9,11 +10,7 @@ const MobileHeader: React.FC = () => {
       <MobileSidebar />
       <div className="flex items-center ml-2">
         <Link to="/" className="flex items-center">
-          <img 
-            src="/lovable-uploads/logo.png" 
-            alt="Logo" 
-            className="h-6 w-auto" 
-          />
+          <Logo size="sm" />
         </Link>
       </div>
     </div>
