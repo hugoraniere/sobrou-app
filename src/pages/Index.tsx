@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import DashboardContent from '../components/dashboard/DashboardContent';
-import DeveloperControls from '../components/dashboard/DeveloperControls';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { transactionCategories } from '@/data/categories';
@@ -85,8 +84,6 @@ const Index = () => {
           onSavingAdded={fetchData}
         />
         
-        {/* We've removed the duplicate filter bar here */}
-        
         <DashboardContent
           transactions={transactions}
           filteredTransactions={filteredTransactions}
@@ -102,11 +99,6 @@ const Index = () => {
           onSavingGoalUpdated={fetchData}
         />
       </div>
-      
-      <DeveloperControls 
-        whatsAppConnected={whatsAppConnected}
-        toggleWhatsApp={toggleWhatsApp}
-      />
     </>
   );
 };

@@ -52,3 +52,20 @@ declare module '@/components/transactions/TransactionRow' {
     className?: string;
   }
 }
+
+// Add className to PopoverContent and PopoverTrigger
+declare module '@radix-ui/react-popover' {
+  interface PopoverContentProps {
+    className?: string;
+  }
+  interface PopoverTriggerProps {
+    className?: string;
+  }
+}
+
+// Add className to DialogContent
+declare module '@radix-ui/react-dialog' {
+  interface DialogContentProps {
+    className?: string;
+  }
+}

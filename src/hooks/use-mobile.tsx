@@ -1,23 +1,27 @@
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from 'react';
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth < 768 : false
-  )
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
     }
+    
+    const listener = () => {
+      setMatches(media.matches);
+    };
+    
+    // Add listener
+    media.addEventListener('change', listener);
+    
+    // Clean up
+    return () => {
+      media.removeEventListener('change', listener);
+    };
+  }, [matches, query]);
 
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  return isMobile
+  return matches;
 }

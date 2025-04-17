@@ -49,9 +49,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   
-  // We're removing the code that shows/hides filters based on active tab
-  // since we're removing the duplicate filter
-  
   return (
     <div className="w-full max-w-full overflow-x-hidden">
       <Tabs defaultValue="overview" className="mb-8" onValueChange={setActiveTab}>

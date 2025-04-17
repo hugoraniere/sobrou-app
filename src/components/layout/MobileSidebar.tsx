@@ -23,7 +23,7 @@ const MobileSidebar = () => {
           <Wallet className="h-6 w-6 text-green-500 mr-2" />
           <span className="text-xl font-bold">Sobrou</span>
         </div>
-        <div className="py-4 overflow-y-auto max-h-[calc(100vh-80px)]">
+        <div className="py-4 px-4 overflow-y-auto max-h-[calc(100vh-80px)]">
           <SidebarNav />
         </div>
       </SheetContent>
