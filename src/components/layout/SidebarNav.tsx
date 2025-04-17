@@ -51,7 +51,8 @@ const SidebarNav = () => {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = React.useState(false);
 
   const getUserInitials = () => {
-    const fullName = user?.user_metadata?.full_name || t('common.user', 'Usuário');
+    // Type assertion to access user_metadata
+    const fullName = user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
     const names = fullName.split(' ');
     if (names.length > 1) {
       return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
@@ -121,7 +122,7 @@ const SidebarNav = () => {
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton as="button" className="w-full text-left">
+                  <SidebarMenuButton className="w-full text-left">
                     <Globe className="w-5 h-5" />
                     <span className="ml-3">{t('common.language', 'Alterar Idioma')}</span>
                     <ChevronRight className="ml-auto h-4 w-4" />
@@ -147,7 +148,6 @@ const SidebarNav = () => {
             {/* Logout Button */}
             <SidebarMenuItem>
               <SidebarMenuButton 
-                as="button" 
                 onClick={() => setIsLogoutDialogOpen(true)}
                 className="text-red-500 hover:text-red-600"
               >
@@ -166,7 +166,7 @@ const SidebarNav = () => {
               </Avatar>
               <div className="ml-3">
                 <p className="text-sm font-medium">
-                  {user?.user_metadata?.full_name || t('common.user', 'Usuário')}
+                  {user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário')}
                 </p>
                 <Link to="/profile" className="text-xs text-blue-500 hover:underline">
                   {t('common.viewProfile', 'Ver perfil')}

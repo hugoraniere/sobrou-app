@@ -6,6 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
+import Transactions from "./pages/Transactions";
+import Settings from "./pages/Settings";
+import Goals from "./pages/Goals";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -33,6 +36,36 @@ const App = () => {
                     <ProtectedRoute>
                       <AppLayout>
                         <Index />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/transactions"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Transactions />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/goals"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Goals />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Settings />
                       </AppLayout>
                     </ProtectedRoute>
                   }
