@@ -95,7 +95,7 @@ const SidebarNav = () => {
           <div className="flex items-center p-4 justify-between">
             <div className="flex items-center">
               <Wallet className="h-6 w-6 text-green-500 mr-2" />
-              <span className={`text-xl font-bold text-gray-900 ${state === 'collapsed' ? 'hidden' : 'block'}`}>Sobrou</span>
+              <span className={`text-xl font-bold text-gray-900 transition-opacity duration-200 ${state === 'collapsed' ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>Sobrou</span>
             </div>
             <Button 
               variant="ghost" 
@@ -123,7 +123,7 @@ const SidebarNav = () => {
                 >
                   <Link to={item.path} className="flex items-center">
                     {item.icon}
-                    <span className={`ml-3 ${state === 'collapsed' ? 'hidden' : 'block'}`}>{item.name}</span>
+                    <span className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>{item.name}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -137,19 +137,19 @@ const SidebarNav = () => {
                 tooltip={state === 'collapsed' ? t('auth.logout', 'Sair') : undefined}
               >
                 <LogOut className="w-5 h-5" />
-                <span className={`ml-3 ${state === 'collapsed' ? 'hidden' : 'block'}`}>{t('auth.logout', 'Sair')}</span>
+                <span className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>{t('auth.logout', 'Sair')}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         
         <SidebarFooter>
-          <div className={`p-4 border-t border-gray-200 ${state === 'collapsed' ? 'text-center' : ''}`}>
+          <div className={`p-4 border-t border-gray-200 ${state === 'collapsed' ? 'flex justify-center' : ''}`}>
             <div className="flex items-center">
               <Avatar className="h-10 w-10 bg-blue-500 text-white">
                 <AvatarFallback>{getUserInitials()}</AvatarFallback>
               </Avatar>
-              <div className={`ml-3 ${state === 'collapsed' ? 'hidden' : 'block'}`}>
+              <div className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
                 <p className="text-sm font-medium">{userFullName}</p>
               </div>
             </div>
