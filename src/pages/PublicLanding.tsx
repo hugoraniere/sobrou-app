@@ -1,22 +1,7 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { 
-  MessageSquare, 
-  Smartphone, 
-  TrendingUp, 
-  Target, 
-  Repeat, 
-  Lock, 
-  Zap, 
-  BarChart2, 
-  ArrowRight,
-  CheckCircle2,
-  Brain,
-  PieChart,
-  Globe
-} from 'lucide-react';
+import { MessageSquare, Smartphone, TrendingUp, Target, Repeat, Lock, Zap, BarChart2, ArrowRight, CheckCircle2, Brain, PieChart, Globe } from 'lucide-react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,20 +9,18 @@ import { useMediaQuery } from '../hooks/use-mobile';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-
 const PublicLanding: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const { isAuthenticated } = useAuth();
+  const {
+    isAuthenticated
+  } = useAuth();
   const navigate = useNavigate();
-  
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+  return <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       <Header isPublic={true} />
       
       {/* Hero Section */}
@@ -64,11 +47,7 @@ const PublicLanding: React.FC = () => {
           </div>
           <div className="w-full md:w-1/2">
             <div className="rounded-lg shadow-xl overflow-hidden border border-gray-200 bg-white">
-              <img 
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2070"
-                alt="Sobrou app interface" 
-                className="w-full h-auto object-cover"
-              />
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2070" alt="Sobrou app interface" className="w-full h-auto object-cover" />
             </div>
           </div>
         </div>
@@ -228,11 +207,7 @@ const PublicLanding: React.FC = () => {
               <CarouselContent>
                 <CarouselItem>
                   <div className="border border-gray-200 shadow-md rounded-lg overflow-hidden">
-                    <img 
-                      src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=2071" 
-                      alt="Dashboard financeiro"
-                      className="w-full h-auto object-cover"
-                    />
+                    <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=2071" alt="Dashboard financeiro" className="w-full h-auto object-cover" />
                     <div className="p-4">
                       <h3 className="font-semibold">Dashboard intuitivo e completo</h3>
                     </div>
@@ -240,11 +215,7 @@ const PublicLanding: React.FC = () => {
                 </CarouselItem>
                 <CarouselItem>
                   <div className="border border-gray-200 shadow-md rounded-lg overflow-hidden">
-                    <img 
-                      src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2070" 
-                      alt="Entrada por texto"
-                      className="w-full h-auto object-cover"
-                    />
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2070" alt="Entrada por texto" className="w-full h-auto object-cover" />
                     <div className="p-4">
                       <h3 className="font-semibold">Registre gastos com texto natural</h3>
                     </div>
@@ -252,11 +223,7 @@ const PublicLanding: React.FC = () => {
                 </CarouselItem>
                 <CarouselItem>
                   <div className="border border-gray-200 shadow-md rounded-lg overflow-hidden">
-                    <img 
-                      src="https://images.unsplash.com/photo-1583752028088-91e3e9880b46?auto=format&fit=crop&q=80&w=2067" 
-                      alt="Integração com WhatsApp"
-                      className="w-full h-auto object-cover"
-                    />
+                    <img src="https://images.unsplash.com/photo-1583752028088-91e3e9880b46?auto=format&fit=crop&q=80&w=2067" alt="Integração com WhatsApp" className="w-full h-auto object-cover" />
                     <div className="p-4">
                       <h3 className="font-semibold">Integração direta com WhatsApp</h3>
                     </div>
@@ -444,13 +411,9 @@ const PublicLanding: React.FC = () => {
               <a href="#" className="hover:text-green-600 transition-colors">Contato</a>
             </div>
           </div>
-          <div className="border-t border-gray-200 mt-8 pt-8 text-center text-gray-500">
-            <p>Copyright © 2025 Sobrou</p>
-          </div>
+          
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default PublicLanding;
