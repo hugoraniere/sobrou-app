@@ -30,8 +30,10 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
   };
 
   const getUserInitials = () => {
-    if (!user?.user_metadata?.full_name) return 'U';
-    const names = user.user_metadata.full_name.split(' ');
+    // Cast to any to access user_metadata which isn't in the UserProfile type
+    const userAny = user as any;
+    if (!userAny?.user_metadata?.full_name) return 'U';
+    const names = userAny.user_metadata.full_name.split(' ');
     if (names.length > 1) {
       return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
     }

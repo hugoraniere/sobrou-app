@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface SavingGoal {
@@ -38,7 +37,7 @@ export const SavingsService = {
   },
   
   // Add a new saving goal
-  async createSavingGoal(name: string, targetAmount: number): Promise<SavingGoal> {
+  async createSavingGoal(goalData: { name: string, target_amount: number, current_amount?: number }): Promise<SavingGoal> {
     // Get the current user's ID
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -49,9 +48,9 @@ export const SavingsService = {
     const { data, error } = await supabase
       .from('saving_goals')
       .insert([{
-        name,
-        target_amount: targetAmount,
-        current_amount: 0,
+        name: goalData.name,
+        target_amount: goalData.target_amount,
+        current_amount: goalData.current_amount || 0,
         completed: false,
         user_id: user.id
       }])
@@ -145,7 +144,7 @@ export const SavingsService = {
     }
     
     // Otherwise, create a new goal
-    return this.createSavingGoal(name, targetAmount);
+    return this.createSavingGoal({ name, target_amount: targetAmount });
   },
   
   // Update a saving goal
@@ -163,6 +162,19 @@ export const SavingsService = {
     }
     
     return data as SavingGoal;
+  },
+  
+  // Delete a saving goal
+  async deleteSavingGoal(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('saving_goals')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      console.error('Error deleting saving goal:', error);
+      throw error;
+    }
   },
   
   // Toggle the completion status of a saving goal

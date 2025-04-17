@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TransactionService } from '@/services/TransactionService';
 import {
@@ -95,7 +94,6 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
       setIsOpen(false);
       onTransactionAdded();
       
-      // Reset form
       setNewTransaction({
         amount: '',
         description: '',

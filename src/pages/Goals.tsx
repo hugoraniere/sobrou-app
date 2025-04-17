@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -81,7 +80,6 @@ const Goals = () => {
 
   const handleAddGoal = async () => {
     try {
-      // Adding a goal would go here
       await SavingsService.createSavingGoal({
         name: newGoal.name,
         target_amount: parseFloat(newGoal.target_amount),
@@ -109,7 +107,6 @@ const Goals = () => {
     if (!currentGoal) return;
     
     try {
-      // Editing a goal would go here
       await SavingsService.updateSavingGoal(currentGoal.id, {
         name: currentGoal.name,
         target_amount: currentGoal.target_amount,
@@ -128,7 +125,6 @@ const Goals = () => {
     if (!currentGoal) return;
     
     try {
-      // Deleting a goal would go here
       await SavingsService.deleteSavingGoal(currentGoal.id);
       
       setIsDeleteGoalDialogOpen(false);
@@ -297,7 +293,6 @@ const Goals = () => {
         </Card>
       ) : (
         <>
-          {/* Feedback message */}
           <Card className="mb-6 bg-blue-50 border-blue-200">
             <CardContent className="p-4">
               <div className="flex items-start space-x-4">
@@ -306,7 +301,7 @@ const Goals = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-blue-900">
-                    {t('goals.progress', 'Você está fazendo progresso!')}
+                    {t('goals.progress', 'Você est�� fazendo progresso!')}
                   </h3>
                   <p className="text-blue-800">
                     {goals.some(g => calculateProgress(g.current_amount, g.target_amount) > 50)
@@ -318,7 +313,6 @@ const Goals = () => {
             </CardContent>
           </Card>
 
-          {/* Goals List */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {goals.map((goal) => {
               const progress = calculateProgress(goal.current_amount, goal.target_amount);
@@ -390,7 +384,6 @@ const Goals = () => {
         </>
       )}
 
-      {/* Edit Goal Dialog */}
       <Dialog open={isEditGoalDialogOpen} onOpenChange={setIsEditGoalDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -436,7 +429,6 @@ const Goals = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Goal Dialog */}
       <Dialog open={isDeleteGoalDialogOpen} onOpenChange={setIsDeleteGoalDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
