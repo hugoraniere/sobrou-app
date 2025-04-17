@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,9 +30,12 @@ import {
   Moon, 
   Palette, 
   LogOut, 
-  Trash2 
+  Trash2,
+  MessageCircle,
+  Link as LinkIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -59,7 +61,6 @@ const Settings = () => {
   };
 
   const handleDeleteAccount = () => {
-    // Implementation would go here
     toast.success(t('settings.accountDeleted', 'Conta excluída com sucesso'));
     setIsDeleteDialogOpen(false);
     logout();
@@ -93,7 +94,6 @@ const Settings = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Account Information */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -128,7 +128,6 @@ const Settings = () => {
           </CardFooter>
         </Card>
 
-        {/* Notifications */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -184,7 +183,6 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Appearance */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -212,7 +210,6 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Security */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -235,7 +232,6 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Delete Account */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center text-red-500">
@@ -277,6 +273,55 @@ const Settings = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <MessageCircle className="h-5 w-5 mr-2" />
+              {t('settings.whatsapp', 'Integração WhatsApp')}
+            </CardTitle>
+            <CardDescription>
+              {t('settings.whatsappDescription', 'Registre transações diretamente pelo WhatsApp')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label>{t('settings.whatsappStatus', 'Status da Conexão')}</Label>
+                <p className="text-sm text-muted-foreground">
+                  {user?.user_metadata?.whatsapp_number 
+                    ? t('settings.whatsappConnected', 'Conectado') 
+                    : t('settings.whatsappNotConnected', 'Não conectado')}
+                </p>
+              </div>
+              
+              <Link to="/integration">
+                <Button variant="outline">
+                  <LinkIcon className="h-4 w-4 mr-2" />
+                  {user?.user_metadata?.whatsapp_number 
+                    ? t('settings.manageConnection', 'Gerenciar') 
+                    : t('settings.connectWhatsapp', 'Conectar')}
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+              <div className="flex items-start">
+                <MessageCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-blue-800 mb-1">
+                    {t('settings.whatsappTips', 'Como usar o WhatsApp')}
+                  </h4>
+                  <ul className="text-sm text-blue-600 space-y-1 list-disc list-inside">
+                    <li>{t('settings.whatsappTip1', 'Envie mensagens como "Gastei R$50 no mercado"')}</li>
+                    <li>{t('settings.whatsappTip2', 'Transações serão adicionadas automaticamente')}</li>
+                    <li>{t('settings.whatsappTip3', 'Suporte a várias categorias de despesas')}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
