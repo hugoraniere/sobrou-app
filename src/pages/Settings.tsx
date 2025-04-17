@@ -23,24 +23,22 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
-  UserCog, 
-  Key, 
-  Shield, 
   Bell, 
   Moon, 
   Palette, 
   LogOut, 
   Trash2,
   MessageCircle,
-  Link as LinkIcon
+  UserCog
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import ProfileEditDialog from '@/components/profile/ProfileEditDialog';
 
 const Settings = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notifications, setNotifications] = useState({
     spendingAlerts: true,
@@ -52,7 +50,7 @@ const Settings = () => {
   });
   
   const getUserInitials = () => {
-    const fullName = (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
+    const fullName = user?.user_metadata?.full_name || t('common.user', 'Usuário');
     const names = fullName.split(' ');
     if (names.length > 1) {
       return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
@@ -87,47 +85,75 @@ const Settings = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t('settings.title', 'Configurações')}</h1>
-        <p className="text-gray-600 mt-2">
-          {t('settings.subtitle', 'Gerencie suas preferências e configurações de conta')}
-        </p>
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={() => setIsProfileEditOpen(true)}
+            className="group flex items-center"
+          >
+            <Avatar className="h-12 w-12 border-2 border-primary/20 group-hover:border-primary/40 transition-colors">
+              <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                {user?.user_metadata?.full_name || t('common.user', 'Usuário')}
+              </h2>
+              <p className="text-sm text-muted-foreground">{user?.email}</p>
+            </div>
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        {/* WhatsApp Integration Card */}
+        <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <UserCog className="h-5 w-5 mr-2" />
-              {t('settings.accountInfo', 'Informações da Conta')}
+              <MessageCircle className="h-5 w-5 mr-2" />
+              {t('settings.whatsapp', 'Integração WhatsApp')}
             </CardTitle>
             <CardDescription>
-              {t('settings.accountDescription', 'Gerencie suas informações pessoais')}
+              {t('settings.whatsappDescription', 'Registre transações diretamente pelo WhatsApp')}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-16 w-16 bg-blue-500 text-white">
-                <AvatarFallback>{getUserInitials()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium text-lg">
-                  {(user as any)?.user_metadata?.full_name || t('common.user', 'Usuário')}
-                </h3>
-                <p className="text-gray-500">{user?.email}</p>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label>{t('settings.whatsappStatus', 'Status da Conexão')}</Label>
+                <p className="text-sm text-muted-foreground">
+                  {user?.user_metadata?.whatsapp_number 
+                    ? t('settings.whatsappConnected', 'Conectado') 
+                    : t('settings.whatsappNotConnected', 'Não conectado')}
+                </p>
+              </div>
+              
+              <Button variant="default" onClick={() => window.location.href = '/integration'}>
+                {user?.user_metadata?.whatsapp_number 
+                  ? t('settings.manageConnection', 'Gerenciar') 
+                  : t('settings.connectWhatsapp', 'Conectar WhatsApp')}
+              </Button>
+            </div>
+            
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+              <div className="flex items-start">
+                <MessageCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium text-blue-800 mb-2">
+                    {t('settings.whatsappTips', 'Como usar o WhatsApp')}
+                  </h4>
+                  <ul className="text-sm text-blue-600 space-y-2 list-disc list-inside">
+                    <li>{t('settings.whatsappTip1', 'Envie mensagens como "Gastei R$50 no mercado"')}</li>
+                    <li>{t('settings.whatsappTip2', 'Transações serão adicionadas automaticamente')}</li>
+                    <li>{t('settings.whatsappTip3', 'Suporte a várias categorias de despesas')}</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-end space-x-2">
-            <Button variant="outline">
-              {t('settings.editProfile', 'Editar Perfil')}
-            </Button>
-            <Button variant="outline">
-              <Key className="h-4 w-4 mr-2" />
-              {t('settings.changePassword', 'Alterar Senha')}
-            </Button>
-          </CardFooter>
         </Card>
 
+        {/* Notifications Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -183,6 +209,7 @@ const Settings = () => {
           </CardContent>
         </Card>
 
+        {/* Appearance Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -210,28 +237,7 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Shield className="h-5 w-5 mr-2" />
-              {t('settings.security', 'Segurança')}
-            </CardTitle>
-            <CardDescription>
-              {t('settings.securityDescription', 'Gerenciar opções de segurança da sua conta')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full">
-              {t('settings.enable2FA', 'Ativar autenticação em dois fatores')}
-            </Button>
-            
-            <Button variant="outline" className="w-full text-orange-500 hover:bg-orange-50 hover:text-orange-600">
-              <LogOut className="h-4 w-4 mr-2" />
-              {t('settings.logoutAllSessions', 'Sair de todas as sessões')}
-            </Button>
-          </CardContent>
-        </Card>
-
+        {/* Delete Account Card */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center text-red-500">
@@ -275,56 +281,12 @@ const Settings = () => {
             </Dialog>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <MessageCircle className="h-5 w-5 mr-2" />
-              {t('settings.whatsapp', 'Integração WhatsApp')}
-            </CardTitle>
-            <CardDescription>
-              {t('settings.whatsappDescription', 'Registre transações diretamente pelo WhatsApp')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label>{t('settings.whatsappStatus', 'Status da Conexão')}</Label>
-                <p className="text-sm text-muted-foreground">
-                  {user?.user_metadata?.whatsapp_number 
-                    ? t('settings.whatsappConnected', 'Conectado') 
-                    : t('settings.whatsappNotConnected', 'Não conectado')}
-                </p>
-              </div>
-              
-              <Link to="/integration">
-                <Button variant="outline">
-                  <LinkIcon className="h-4 w-4 mr-2" />
-                  {user?.user_metadata?.whatsapp_number 
-                    ? t('settings.manageConnection', 'Gerenciar') 
-                    : t('settings.connectWhatsapp', 'Conectar')}
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-              <div className="flex items-start">
-                <MessageCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-blue-800 mb-1">
-                    {t('settings.whatsappTips', 'Como usar o WhatsApp')}
-                  </h4>
-                  <ul className="text-sm text-blue-600 space-y-1 list-disc list-inside">
-                    <li>{t('settings.whatsappTip1', 'Envie mensagens como "Gastei R$50 no mercado"')}</li>
-                    <li>{t('settings.whatsappTip2', 'Transações serão adicionadas automaticamente')}</li>
-                    <li>{t('settings.whatsappTip3', 'Suporte a várias categorias de despesas')}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      <ProfileEditDialog 
+        isOpen={isProfileEditOpen} 
+        onClose={() => setIsProfileEditOpen(false)} 
+      />
     </div>
   );
 };

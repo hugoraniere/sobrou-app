@@ -64,18 +64,25 @@ const WhatsAppIntegration = () => {
     
     try {
       // Salvar o número no perfil do usuário
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({ whatsapp_number: phoneNumber })
         .eq('id', user.id);
         
-      if (error) {
-        throw error;
+      if (updateError) throw updateError;
+
+      // Enviar mensagem de boas-vindas
+      const { error: welcomeError } = await supabase.functions.invoke('send-whatsapp-welcome', {
+        body: { phone: phoneNumber }
+      });
+
+      if (welcomeError) {
+        console.error('Erro ao enviar mensagem de boas-vindas:', welcomeError);
       }
       
       setIsConnected(true);
       setSavedPhoneNumber(phoneNumber);
-      toast.success("WhatsApp conectado com sucesso!");
+      toast.success("WhatsApp conectado com sucesso! Você receberá uma mensagem em breve.");
     } catch (error) {
       console.error('Erro ao conectar WhatsApp:', error);
       toast.error("Falha ao conectar WhatsApp. Por favor, tente novamente.");
