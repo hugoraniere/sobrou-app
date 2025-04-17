@@ -2,10 +2,8 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Transaction } from '@/services/TransactionService';
-import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { transactionCategories } from '@/data/categories';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
 
 interface ExpensesByCategoryChartProps {
@@ -63,80 +61,66 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   const COLORS = data.map(item => item.color || '#8884d8');
   
   if (data.length === 0) {
-    return (
-      <Card className="min-h-[300px] w-full">
-        <CardHeader>
-          <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <EmptyStateMessage message={t('dashboard.charts.noData')} />
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
   
   return (
-    <Card className="min-h-[300px] w-full max-w-full overflow-hidden">
-      <CardHeader>
-        <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
-        
-        {/* Insight moved to top for consistency */}
-        {topCategory && (
-          <div className="mt-2 p-3 bg-gray-50 rounded-md text-sm">
-            <p>
-              <span className="font-medium">{topCategory.percentage.toFixed(1)}%</span> dos seus gastos foram com{' '}
-              <span className="font-medium">{topCategory.name}</span> (R$ {topCategory.value.toFixed(2)})
-            </p>
-          </div>
-        )}
-      </CardHeader>
-      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center">
-        <div className="h-[250px] w-full max-w-full">
-          <ChartContainer 
-            className="h-full w-full"
-            config={chartConfig}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                <Pie
-                  data={data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  innerRadius={30}
-                  fill="#8884d8"
-                  dataKey="value"
-                  nameKey="name"
-                >
-                  {data.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={entry.color || COLORS[index % COLORS.length]} 
-                    />
-                  ))}
-                </Pie>
-                <ChartTooltip 
-                  content={
-                    <ChartTooltipContent 
-                      formatter={(value: number, name: string, entry: any) => {
-                        return [
-                          <>
-                            <span>R$ {value.toFixed(2)}</span>
-                            <span className="block text-xs text-gray-400">({entry.payload.percentage.toFixed(1)}%)</span>
-                          </>,
-                          name
-                        ];
-                      }}
-                    />
-                  } 
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+    <div className="h-full w-full">
+      {/* Insight moved to top for consistency */}
+      {topCategory && (
+        <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
+          <p>
+            <span className="font-medium">{topCategory.percentage.toFixed(1)}%</span> dos seus gastos foram com{' '}
+            <span className="font-medium">{topCategory.name}</span> (R$ {topCategory.value.toFixed(2)})
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      )}
+      
+      <div className="h-[220px] w-full">
+        <ChartContainer 
+          className="h-full w-full"
+          config={chartConfig}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                innerRadius={30}
+                fill="#8884d8"
+                dataKey="value"
+                nameKey="name"
+              >
+                {data.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.color || COLORS[index % COLORS.length]} 
+                  />
+                ))}
+              </Pie>
+              <ChartTooltip 
+                content={
+                  <ChartTooltipContent 
+                    formatter={(value: number, name: string, entry: any) => {
+                      return [
+                        <>
+                          <span>R$ {value.toFixed(2)}</span>
+                          <span className="block text-xs text-gray-400">({entry.payload.percentage.toFixed(1)}%)</span>
+                        </>,
+                        name
+                      ];
+                    }}
+                  />
+                } 
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
+    </div>
   );
 };
 

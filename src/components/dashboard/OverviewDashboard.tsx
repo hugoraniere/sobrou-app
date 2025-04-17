@@ -17,7 +17,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import EmptyStateMessage from './EmptyStateMessage';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { transactionCategories } from '@/data/categories';
 
 interface OverviewDashboardProps {
@@ -92,9 +92,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     }
   ];
 
-  // Altura padrão para todos os gráficos - aumentada para garantir que o conteúdo não seja cortado
-  const chartHeight = "h-[400px]";
-
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Big Numbers */}
@@ -118,59 +115,75 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Expenses by Category (Pie Chart) */}
-        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
-          <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.categoryBreakdown')}</h3>
-            <div className="flex-1 flex items-center justify-center">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{t('dashboard.charts.categoryBreakdown')}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[320px]">
+            {hasTransactions ? (
               <ExpensesByCategoryChart expenses={transactions} chartConfig={chartConfig} />
-            </div>
-          </div>
-        </div>
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
         
         {/* Income vs Expenses (Line Chart) */}
-        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
-          <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.revenueVsExpense')}</h3>
-            <div className="flex-1 flex items-center justify-center">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{t('dashboard.charts.revenueVsExpense')}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[320px]">
+            {hasTransactions ? (
               <RevenueVsExpenseChart transactions={transactions} chartConfig={chartConfig} />
-            </div>
-          </div>
-        </div>
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Daily Balance (Line Chart) */}
-        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
-          <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.dailyEvolution')}</h3>
-            <div className="flex-1 flex items-center justify-center">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{t('dashboard.charts.dailyEvolution')}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[320px]">
+            {hasTransactions ? (
               <DailyBarChart transactions={transactions} />
-            </div>
-          </div>
-        </div>
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noData')} />
+            )}
+          </CardContent>
+        </Card>
         
         {/* Financial Goals Progress */}
-        <div className={`w-full ${chartHeight} bg-white rounded-lg overflow-hidden`}>
-          <div className="p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.financialGoals')}</h3>
-            <div className="flex-1 flex items-center justify-center">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{t('dashboard.charts.financialGoals')}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[320px]">
+            {hasSavingGoals ? (
               <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
-            </div>
-          </div>
-        </div>
+            ) : (
+              <EmptyStateMessage message={t('dashboard.charts.noGoals')} />
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Row 3 - Optional charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Income by Type Chart */}
-        <Card className={`border border-gray-100 shadow-none ${chartHeight} w-full max-w-full overflow-hidden`}>
-          <CardContent className="p-6 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.charts.incomeByType')}</h3>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{t('dashboard.charts.incomeByType')}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[320px]">
             {hasTransactions ? (
-              <div className="flex-1 flex items-center justify-center">
-                <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
-              </div>
+              <IncomeByTypeChart incomes={transactions} chartConfig={chartConfig} />
             ) : (
               <EmptyStateMessage message={t('dashboard.charts.noData')} />
             )}

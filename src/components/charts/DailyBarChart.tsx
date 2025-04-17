@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/chart";
 import {
   Bar,
-  BarChart,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -19,7 +18,6 @@ import {
   ReferenceLine
 } from "recharts";
 import { Transaction } from '@/services/TransactionService';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 
 interface DailyBarChartProps {
@@ -186,71 +184,67 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
     }
   };
   
+  // Se não tiver dados, retorna vazio para o componente pai mostrar o EmptyStateMessage
+  if (dailyData.length === 0) {
+    return null;
+  }
+
   return (
-    <Card className="min-h-[300px] w-full max-w-full overflow-hidden">
-      <CardHeader>
-        <CardTitle>{t('dashboard.charts.dailyEvolution')}</CardTitle>
-        
-        {/* Insight - Standardized after the title */}
-        <div className="p-3 bg-gray-50 rounded-md text-sm">
-          <p>{getInsightMessage()}</p>
-        </div>
-      </CardHeader>
-      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center h-[250px]">
-        {dailyData.length > 0 ? (
-          <div className="h-full w-full max-w-full">
-            <ChartContainer className="h-full w-full" config={chartConfig}>
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart
-                  data={dailyData}
-                  margin={{ top: 10, right: 0, left: 0, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis 
-                    dataKey="day" 
-                    height={40}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <YAxis 
-                    tickFormatter={formatCurrency}
-                    width={50}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <ReferenceLine y={0} stroke="#666" />
-                  <ChartTooltip
-                    content={({ active, payload }) => 
-                      active && payload && payload.length ? (
-                        <ChartTooltipContent 
-                          payload={payload} 
-                          formatter={(value) => formatCurrency(value as number)}
-                        />
-                      ) : null
-                    }
-                  />
-                  <Legend 
-                    verticalAlign="bottom"
-                    height={36}
-                  />
-                  <Bar dataKey="income" name={t('common.income')} fill="#22c55e" maxBarSize={15} />
-                  <Bar dataKey="expense" name={t('common.expense')} fill="#ef4444" maxBarSize={15} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="cumulativeBalance" 
-                    name={t('common.balance')} 
-                    stroke="#3b82f6" 
-                    strokeWidth={2}
-                    dot={{ fill: '#3b82f6', r: 3 }}
-                    activeDot={{ r: 5 }}
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </div>
-        ) : (
-          <EmptyStateMessage message={t('dashboard.charts.noData')} />
-        )}
-      </CardContent>
-    </Card>
+    <div className="h-full w-full">
+      {/* Insight message */}
+      <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
+        <p>{getInsightMessage()}</p>
+      </div>
+      
+      <div className="h-[220px] w-full">
+        <ChartContainer className="h-full w-full" config={chartConfig}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart
+              data={dailyData}
+              margin={{ top: 10, right: 0, left: 0, bottom: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis 
+                dataKey="day" 
+                height={40}
+                tick={{ fontSize: 11 }}
+              />
+              <YAxis 
+                tickFormatter={formatCurrency}
+                width={50}
+                tick={{ fontSize: 11 }}
+              />
+              <ReferenceLine y={0} stroke="#666" />
+              <ChartTooltip
+                content={({ active, payload }) => 
+                  active && payload && payload.length ? (
+                    <ChartTooltipContent 
+                      payload={payload} 
+                      formatter={(value) => formatCurrency(value as number)}
+                    />
+                  ) : null
+                }
+              />
+              <Legend 
+                verticalAlign="bottom"
+                height={36}
+              />
+              <Bar dataKey="income" name={t('common.income')} fill="#22c55e" maxBarSize={15} />
+              <Bar dataKey="expense" name={t('common.expense')} fill="#ef4444" maxBarSize={15} />
+              <Line 
+                type="monotone" 
+                dataKey="cumulativeBalance" 
+                name={t('common.balance')} 
+                stroke="#3b82f6" 
+                strokeWidth={2}
+                dot={{ fill: '#3b82f6', r: 3 }}
+                activeDot={{ r: 5 }}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
+    </div>
   );
 };
 

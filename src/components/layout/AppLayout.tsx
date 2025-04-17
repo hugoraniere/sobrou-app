@@ -20,7 +20,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         
         {/* Main Content */}
         <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
-          <div className="md:hidden flex items-center p-4 border-b">
+          <div className="md:hidden flex items-center p-4 border-b bg-white sticky top-0 z-10">
             <MobileSidebar />
             <div className="flex items-center ml-2">
               <Wallet className="h-5 w-5 text-green-500 mr-2" />
@@ -28,7 +28,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </div>
           </div>
           
-          <div className="flex-1 px-5 sm:px-6 md:px-8 overflow-x-hidden">
+          <div className="flex-1 px-5 sm:px-6 md:px-8 py-4 overflow-x-hidden">
             {children}
           </div>
         </main>
