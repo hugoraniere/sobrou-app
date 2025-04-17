@@ -7,3 +7,12 @@ declare module 'react' {
     className?: string;
   }
 }
+
+// Add missing props for SavingGoals component
+declare module '@/components/SavingGoals' {
+  interface SavingGoalsProps {
+    savingGoals: import('@/services/SavingsService').SavingGoal[];
+    onGoalAdded: () => void;
+    onGoalUpdated: () => void;
+  }
+}

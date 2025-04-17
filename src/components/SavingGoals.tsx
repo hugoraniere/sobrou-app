@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SavingGoal, SavingsService } from '@/services/SavingsService';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Edit, Trash2, CheckCircle, Circle } from 'lucide-react';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { toast } from 'sonner';
+import { PlusCircle, CheckCircle, Edit, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,189 +22,149 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-const SavingGoals: React.FC = () => {
+interface SavingGoalsProps {
+  savingGoals: SavingGoal[];
+  onGoalAdded: () => void;
+  onGoalUpdated: () => void;
+}
+
+const SavingGoals: React.FC<SavingGoalsProps> = ({ savingGoals, onGoalAdded, onGoalUpdated }) => {
   const { t } = useTranslation();
-  const [savingGoals, setSavingGoals] = useState<SavingGoal[]>([]);
   const [newGoalName, setNewGoalName] = useState('');
   const [newGoalAmount, setNewGoalAmount] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAddingGoal, setIsAddingGoal] = useState(false);
+  const [goalToDelete, setGoalToDelete] = useState<SavingGoal | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  useEffect(() => {
-    fetchSavingGoals();
-  }, []);
-
-  const fetchSavingGoals = async () => {
-    setIsLoading(true);
-    try {
-      const goals = await SavingsService.getSavingGoals();
-      setSavingGoals(goals);
-    } catch (error) {
-      console.error('Error fetching saving goals:', error);
-      toast.error("Failed to load saving goals");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddSavingGoal = async () => {
+  const handleAddGoal = async () => {
     if (!newGoalName || !newGoalAmount) {
-      toast.error("Please enter both name and amount");
-      return;
-    }
-
-    const amountValue = parseFloat(newGoalAmount);
-    if (isNaN(amountValue) || amountValue <= 0) {
-      toast.error("Please enter a valid amount");
+      toast.error(t('savingGoals.missingFields', 'Por favor, preencha todos os campos.'));
       return;
     }
 
     try {
-      await SavingsService.createSavingGoal({ name: newGoalName, target_amount: amountValue });
+      // Only pass the name to createSavingGoal, the amount will be zero by default
+      await SavingsService.createSavingGoal({
+        name: newGoalName,
+        target_amount: parseFloat(newGoalAmount),
+        current_amount: 0,
+      });
+      toast.success(t('savingGoals.goalCreated', 'Meta de economia criada com sucesso!'));
       setNewGoalName('');
       setNewGoalAmount('');
-      await fetchSavingGoals();
-      toast.success("Saving goal added successfully");
+      setIsAddingGoal(false);
+      onGoalAdded();
     } catch (error) {
-      console.error('Error adding saving goal:', error);
-      toast.error("Failed to add saving goal");
+      console.error('Error creating saving goal:', error);
+      toast.error(t('savingGoals.goalCreationFailed', 'Falha ao criar meta de economia.'));
     }
   };
 
-  const handleDeleteSavingGoal = async (id: string) => {
+  const handleDeleteGoal = async () => {
+    if (!goalToDelete) return;
+
     try {
-      await SavingsService.deleteSavingGoal(id);
-      await fetchSavingGoals();
-      toast.success("Saving goal deleted successfully");
+      await SavingsService.deleteSavingGoal(goalToDelete.id);
+      toast.success(t('savingGoals.goalDeleted', 'Meta de economia excluída com sucesso!'));
+      setGoalToDelete(null);
+      setIsDeleteDialogOpen(false);
+      onGoalUpdated();
     } catch (error) {
       console.error('Error deleting saving goal:', error);
-      toast.error("Failed to delete saving goal");
-    }
-  };
-
-  const handleToggleCompletion = async (id: string, completed: boolean) => {
-    try {
-      await SavingsService.toggleSavingGoalCompletion(id, !completed);
-      await fetchSavingGoals();
-      toast.success(`Saving goal ${completed ? 'unmarked as complete' : 'marked as complete'}`);
-    } catch (error) {
-      console.error('Error toggling completion:', error);
-      toast.error("Failed to toggle completion");
+      toast.error(t('savingGoals.goalDeletionFailed', 'Falha ao excluir meta de economia.'));
     }
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('savingGoals.title', 'Saving Goals')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="goalName">{t('savingGoals.name', 'Goal Name')}</Label>
-                <Input
-                  type="text"
-                  id="goalName"
-                  placeholder={t('savingGoals.namePlaceholder', 'Enter goal name')}
-                  value={newGoalName}
-                  onChange={(e) => setNewGoalName(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="goalAmount">{t('savingGoals.amount', 'Target Amount')}</Label>
-                <Input
-                  type="number"
-                  id="goalAmount"
-                  placeholder={t('savingGoals.amountPlaceholder', 'Enter target amount')}
-                  value={newGoalAmount}
-                  onChange={(e) => setNewGoalAmount(e.target.value)}
-                />
-              </div>
-              <div className="flex items-end">
-                <Button onClick={handleAddSavingGoal}>{t('savingGoals.add', 'Add Goal')}</Button>
-              </div>
-            </div>
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('savingGoals.title', 'Metas de Economia')}</CardTitle>
+        <CardDescription>{t('savingGoals.subtitle', 'Acompanhe suas metas financeiras')}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {savingGoals.length > 0 ? (
+          <ul className="list-none space-y-2">
+            {savingGoals.map((goal) => (
+              <li key={goal.id} className="flex items-center justify-between border rounded-md p-2">
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                  <span>{goal.name}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span>R$ {goal.current_amount} / R$ {goal.target_amount}</span>
+                  <Button variant="ghost" size="icon">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setGoalToDelete(goal);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>{t('savingGoals.noGoals', 'Nenhuma meta de economia adicionada ainda.')}</p>
+        )}
 
-          {isLoading ? (
-            <p>{t('common.loading', 'Loading...')}</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableCaption>{t('savingGoals.tableCaption', 'List of your saving goals.')}</TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">{t('savingGoals.name', 'Name')}</TableHead>
-                    <TableHead>{t('savingGoals.targetAmount', 'Target Amount')}</TableHead>
-                    <TableHead>{t('savingGoals.currentAmount', 'Current Amount')}</TableHead>
-                    <TableHead>{t('savingGoals.completed', 'Completed')}</TableHead>
-                    <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {savingGoals.map((goal) => (
-                    <TableRow key={goal.id}>
-                      <TableCell className="font-medium">{goal.name}</TableCell>
-                      <TableCell>R$ {goal.target_amount.toFixed(2)}</TableCell>
-                      <TableCell>R$ {goal.current_amount.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleToggleCompletion(goal.id, goal.completed)}
-                        >
-                          {goal.completed ? (
-                            <>
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              {t('common.yes', 'Yes')}
-                            </>
-                          ) : (
-                            <>
-                              <Circle className="mr-2 h-4 w-4" />
-                              {t('common.no', 'No')}
-                            </>
-                          )}
-                        </Button>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="icon">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="icon">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>{t('common.confirmation', 'Are you absolutely sure?')}</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {t('savingGoals.deleteConfirmation', 'This action cannot be undone. Are you sure you want to delete this goal?')}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteSavingGoal(goal.id)}>{t('common.delete', 'Delete')}</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+        {isAddingGoal ? (
+          <div className="grid gap-2">
+            <Label htmlFor="goal-name">{t('savingGoals.goalName', 'Nome da Meta')}</Label>
+            <Input
+              id="goal-name"
+              placeholder={t('savingGoals.goalNamePlaceholder', 'Ex: Carro novo')}
+              value={newGoalName}
+              onChange={(e) => setNewGoalName(e.target.value)}
+            />
+            <Label htmlFor="goal-amount">{t('savingGoals.goalAmount', 'Valor da Meta')}</Label>
+            <Input
+              id="goal-amount"
+              placeholder={t('savingGoals.goalAmountPlaceholder', 'Ex: 20000')}
+              type="number"
+              value={newGoalAmount}
+              onChange={(e) => setNewGoalAmount(e.target.value)}
+            />
+            <Button onClick={handleAddGoal}>{t('savingGoals.addGoal', 'Adicionar Meta')}</Button>
+          </div>
+        ) : (
+          <Button variant="outline" className="w-full" onClick={() => setIsAddingGoal(true)}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            {t('savingGoals.addGoalButton', 'Adicionar Nova Meta')}
+          </Button>
+        )}
+      </CardContent>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('savingGoals.deleteConfirmationTitle', 'Excluir Meta')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('savingGoals.deleteConfirmationDescription', 'Tem certeza de que deseja excluir esta meta? Esta ação não pode ser desfeita.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsDeleteDialogOpen(false);
+              setGoalToDelete(null);
+            }}>
+              {t('common.cancel', 'Cancelar')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteGoal}>
+              {t('savingGoals.delete', 'Excluir')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Card>
   );
 };
 

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Menu } from 'lucide-react';
+import { Menu, Wallet } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import SidebarNav from './SidebarNav';
@@ -18,8 +18,14 @@ const MobileSidebar = () => {
           <span className="sr-only">{t('common.menu', 'Menu')}</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0" onClick={() => setOpen(false)}>
-        <SidebarNav />
+      <SheetContent side="left" className="p-0 w-[280px]" onClick={() => setOpen(false)}>
+        <div className="flex items-center p-4 border-b">
+          <Wallet className="h-6 w-6 text-green-500 mr-2" />
+          <span className="text-xl font-bold">Sobrou</span>
+        </div>
+        <div className="py-4">
+          <SidebarNav />
+        </div>
       </SheetContent>
     </Sheet>
   );

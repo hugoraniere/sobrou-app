@@ -60,9 +60,9 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   }, [activeTab]);
   
   return (
-    <>
+    <div className="w-full max-w-full overflow-x-hidden px-4 md:px-6">
       <Tabs defaultValue="overview" className="mb-8" onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className="w-full max-w-full overflow-x-auto">
           <TabsTrigger value="overview">{t('dashboard.tabs.overview')}</TabsTrigger>
           <TabsTrigger value="transactions">{t('dashboard.tabs.transactions')}</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
@@ -142,7 +142,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           <OnboardingPanel whatsAppConnected={whatsAppConnected} />
         </div>
       )}
-    </>
+    </div>
   );
 };
 

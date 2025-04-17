@@ -35,8 +35,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { t } = useTranslation();
   
   return (
-    <div className="min-h-screen">
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden">
+      <main className="w-full px-4 md:px-8 py-6 md:py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
           <p className="text-gray-600">{t('dashboard.subtitle')}</p>
@@ -49,7 +49,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         />
         
         {/* Filter Bar - Only show on transactions tab */}
-        <div id="filters-container">
+        <div id="filters-container" className="mt-6">
           <FilterBar 
             filters={filters}
             onFilterChange={handleFilterChange}
@@ -58,7 +58,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           />
         </div>
         
-        {children}
+        <div className="mt-6">
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -18,10 +18,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
         
         {/* Main Content */}
-        <main className="flex-1 flex flex-col min-h-screen">
+        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
           <div className="md:hidden flex items-center p-4 border-b">
             <MobileSidebar />
-            <span className="ml-2 text-xl font-bold">Sobrou</span>
+            <div className="flex items-center ml-2">
+              <span className="text-xl font-bold">Sobrou</span>
+            </div>
           </div>
           
           <div className="flex-1 p-4 md:p-8">

@@ -75,7 +75,7 @@ const HomeDashboard: React.FC<HomeDashboardProps> = ({
   ];
 
   return (
-    <div className="space-y-6 max-w-full px-4">
+    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       {/* Big Numbers Section */}
       <DashboardBigNumbers 
         transactions={transactions}
