@@ -16,7 +16,7 @@ import FilterBar from '../components/FilterBar';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   
   const {
@@ -47,9 +47,8 @@ const Index = () => {
   
   // Set language to Portuguese
   useEffect(() => {
-    const { i18n } = require('react-i18next');
     i18n.changeLanguage('pt-BR');
-  }, []);
+  }, [i18n]);
   
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;

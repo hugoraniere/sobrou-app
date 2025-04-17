@@ -52,4 +52,3 @@ declare module '@/components/transactions/TransactionRow' {
     className?: string;
   }
 }
-
