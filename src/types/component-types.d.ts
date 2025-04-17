@@ -1,23 +1,14 @@
 
 import React from 'react';
 
-// Add missing className prop to components
+// Extend React's IntrinsicAttributes to include className
 declare module 'react' {
   interface IntrinsicAttributes {
     className?: string;
   }
 }
 
-// Add missing props for SavingGoals component
-declare module '@/components/SavingGoals' {
-  interface SavingGoalsProps {
-    savingGoals: import('@/services/SavingsService').SavingGoal[];
-    onGoalAdded: () => void;
-    onGoalUpdated: () => void;
-  }
-}
-
-// Add specific type declarations for components with className errors
+// Update existing type declarations to explicitly include className
 declare module '@/components/prompt/CategorySelector' {
   interface CategorySelectorProps {
     categoryId: string;
@@ -30,7 +21,7 @@ declare module '@/components/prompt/CategorySelector' {
   }
 }
 
-// Add declarations for other components that need className
+// Add className to AddTransactionDialog props
 declare module '@/components/transactions/AddTransactionDialog' {
   interface AddTransactionDialogProps {
     className?: string;
@@ -40,6 +31,7 @@ declare module '@/components/transactions/AddTransactionDialog' {
   }
 }
 
+// Add className to EditTransactionDialog props
 declare module '@/components/transactions/EditTransactionDialog' {
   interface EditTransactionDialogProps {
     className?: string;
@@ -50,6 +42,7 @@ declare module '@/components/transactions/EditTransactionDialog' {
   }
 }
 
+// Add className to TransactionRow props
 declare module '@/components/transactions/TransactionRow' {
   interface TransactionRowProps {
     className?: string;
