@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import SavingGoals from '../SavingGoals';
@@ -10,7 +9,6 @@ import OverviewDashboard from './OverviewDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import FinancialInsights from './FinancialInsights';
-
 interface DashboardContentProps {
   transactions: Transaction[];
   filteredTransactions: Transaction[];
@@ -31,7 +29,6 @@ interface DashboardContentProps {
   onSavingGoalAdded: () => void;
   onSavingGoalUpdated: () => void;
 }
-
 const DashboardContent: React.FC<DashboardContentProps> = ({
   transactions,
   filteredTransactions,
@@ -46,11 +43,11 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   onSavingGoalAdded,
   onSavingGoalUpdated
 }) => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
-  
-  return (
-    <div className="w-full max-w-full overflow-x-hidden">
+  return <div className="w-full max-w-full overflow-x-hidden">
       <Tabs defaultValue="overview" className="mb-8" onValueChange={setActiveTab}>
         <TabsList className="w-full max-w-full overflow-x-auto justify-start">
           <TabsTrigger value="overview">{t('dashboard.tabs.overview')}</TabsTrigger>
@@ -60,60 +57,33 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         
         {/* Overview Dashboard Tab */}
         <TabsContent value="overview">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
+          {isLoading ? <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : hasTransactions ? (
-            <OverviewDashboard 
-              transactions={transactions}
-              savingGoals={savingGoals}
-            />
-          ) : (
-            <EmptyDashboard />
-          )}
+            </div> : hasTransactions ? <OverviewDashboard transactions={transactions} savingGoals={savingGoals} /> : <EmptyDashboard />}
         </TabsContent>
         
         {/* Transactions Tab */}
         <TabsContent value="transactions">
-          <TransactionsTable 
-            transactions={filteredTransactions}
-            filters={filters}
-            onTransactionUpdated={onTransactionUpdated}
-          />
+          <TransactionsTable transactions={filteredTransactions} filters={filters} onTransactionUpdated={onTransactionUpdated} />
         </TabsContent>
         
         {/* Insights Tab */}
         <TabsContent value="insights">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              {isLoading ? (
-                <div className="flex justify-center items-center h-64">
+              {isLoading ? <div className="flex justify-center items-center h-64">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : hasTransactions ? (
-                <FinancialInsights transactions={transactions} />
-              ) : (
-                <EmptyDashboard />
-              )}
+                </div> : hasTransactions ? <FinancialInsights transactions={transactions} /> : <EmptyDashboard />}
             </div>
             
             <div>
               <Card>
-                <CardContent className="pt-6">
-                  <SavingGoals 
-                    savingGoals={savingGoals}
-                    onGoalAdded={onSavingGoalAdded}
-                    onGoalUpdated={onSavingGoalUpdated}
-                  />
-                </CardContent>
+                
               </Card>
             </div>
           </div>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default DashboardContent;
