@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { X, Send } from 'lucide-react'
 import { cn } from "@/lib/utils"
@@ -8,6 +7,7 @@ import { toast } from 'sonner'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useDashboardData } from '@/hooks/useDashboardData'
 import { TransactionService } from '@/services/TransactionService'
+import { PiStarFourFill } from "react-icons/pi"
 
 interface Message {
   role: 'user' | 'assistant';
@@ -37,7 +37,6 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   const { transactions } = useDashboardData()
   const [localTransactions, setLocalTransactions] = React.useState([])
 
-  // Garantir que temos transações quando o chat é aberto
   React.useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -71,7 +70,6 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setIsLoading(true)
 
-    // Use transactions from useDashboardData ou as que buscamos diretamente
     const transactionsToSend = transactions.length > 0 ? transactions : localTransactions;
     console.log("Sending transactions to API:", transactionsToSend.length);
 
@@ -120,9 +118,11 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         : "bottom-24 right-6 w-96 rounded-lg",
       className
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h3 className="font-semibold text-gray-700">Chat de IA</h3>
+        <div className="flex items-center gap-2">
+          <PiStarFourFill className="w-5 h-5 text-primary" />
+          <h3 className="font-semibold text-gray-700">Chat de IA</h3>
+        </div>
         <button
           onClick={onClose}
           className="text-gray-500 hover:text-gray-700"
@@ -132,7 +132,6 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         </button>
       </div>
 
-      {/* Messages */}
       <div className="h-96 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="space-y-4">
@@ -169,7 +168,6 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <form onSubmit={handleSubmit} className="border-t border-gray-200 p-4">
         <div className="flex gap-2">
           <input

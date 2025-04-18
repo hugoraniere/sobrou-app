@@ -1,18 +1,12 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
-import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
-import { PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import AIPromptInput from '../components/AIPromptInput';
-import FloatingChatButton from '@/components/chat/FloatingChatButton';
-import ChatWindow from '@/components/chat/ChatWindow';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
@@ -38,14 +32,12 @@ const Index = () => {
     filteredTransactions
   } = useFilteredTransactions(transactions);
   
-  // Initial data fetch
   useEffect(() => {
     if (isAuthenticated) {
       fetchData();
     }
   }, [isAuthenticated]);
   
-  // Set language to Portuguese
   useEffect(() => {
     i18n.changeLanguage('pt-BR');
   }, [i18n]);
@@ -53,49 +45,34 @@ const Index = () => {
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
-
-  const [isChatOpen, setIsChatOpen] = useState(false);
   
   return (
-    <>
-      {/* Chat Components */}
-      <FloatingChatButton 
-        isOpen={isChatOpen}
-        onClick={() => setIsChatOpen(!isChatOpen)}
-      />
-      <ChatWindow
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
+      <div className="mt-6 mb-6">
+        <h1 className="text-3xl font-bold mb-2">Visão geral</h1>
+        <p className="text-gray-600">{t('dashboard.subtitle')}</p>
+      </div>
+      
+      <AIPromptInput 
+        onTransactionAdded={fetchData}
+        onSavingAdded={fetchData}
       />
       
-      <div className="space-y-6 w-full max-w-full overflow-hidden">
-        <div className="mt-6 mb-6">
-          <h1 className="text-3xl font-bold mb-2">Visão geral</h1>
-          <p className="text-gray-600">{t('dashboard.subtitle')}</p>
-        </div>
-        
-        {/* AI-powered prompt input at the top */}
-        <AIPromptInput 
-          onTransactionAdded={fetchData}
-          onSavingAdded={fetchData}
-        />
-        
-        <DashboardContent
-          transactions={transactions}
-          filteredTransactions={filteredTransactions}
-          savingGoals={savingGoals}
-          filters={filters}
-          isLoading={isLoading}
-          hasTransactions={hasTransactions}
-          onTransactionUpdated={fetchData}
-          showOnboarding={false} // Always hide onboarding panel
-          setShowOnboarding={setShowOnboarding}
-          whatsAppConnected={whatsAppConnected}
-          onSavingGoalAdded={fetchData}
-          onSavingGoalUpdated={fetchData}
-        />
-      </div>
-    </>
+      <DashboardContent
+        transactions={transactions}
+        filteredTransactions={filteredTransactions}
+        savingGoals={savingGoals}
+        filters={filters}
+        isLoading={isLoading}
+        hasTransactions={hasTransactions}
+        onTransactionUpdated={fetchData}
+        showOnboarding={false}
+        setShowOnboarding={setShowOnboarding}
+        whatsAppConnected={whatsAppConnected}
+        onSavingGoalAdded={fetchData}
+        onSavingGoalUpdated={fetchData}
+      />
+    </div>
   );
 };
 
