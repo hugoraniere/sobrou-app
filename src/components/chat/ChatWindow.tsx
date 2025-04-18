@@ -4,6 +4,7 @@ import { X, Send } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
+import { toast } from 'sonner'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -45,14 +46,22 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         body: { prompt: userMessage, userId: user?.id }
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Error from Edge Function:', error);
+        throw new Error(error.message || 'Erro ao processar mensagem');
+      }
+
+      if (!data || !data.response) {
+        throw new Error('Resposta inválida do servidor');
+      }
 
       setMessages(prev => [...prev, { role: 'assistant', content: data.response }])
     } catch (error) {
-      console.error('Error processing chat:', error)
+      console.error('Error processing chat:', error);
+      toast.error('Erro ao processar mensagem');
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Desculpe, tive um problema ao processar sua mensagem. Tente novamente.' 
+        content: 'Desculpe, tive um problema ao processar sua mensagem. Por favor, tente novamente mais tarde.' 
       }])
     } finally {
       setIsLoading(false)
@@ -81,6 +90,11 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
 
       {/* Messages */}
       <div className="h-96 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && (
+          <div className="text-gray-500 text-center py-4">
+            Faça uma pergunta sobre suas finanças
+          </div>
+        )}
         {messages.map((message, index) => (
           <div
             key={index}

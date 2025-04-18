@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { BrainCircuit } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { cn } from "@/lib/utils"
 
 interface FloatingChatButtonProps {
@@ -21,7 +21,7 @@ const FloatingChatButton = ({ isOpen, onClick, className }: FloatingChatButtonPr
       )}
       aria-label="Abrir chat de IA"
     >
-      <BrainCircuit className="h-6 w-6" />
+      <Star className="h-6 w-6" />
     </button>
   )
 }
