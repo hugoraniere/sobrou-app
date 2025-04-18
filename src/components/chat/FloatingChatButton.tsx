@@ -14,8 +14,8 @@ const FloatingChatButton = ({ isOpen, onClick, className }: FloatingChatButtonPr
     <button
       onClick={onClick}
       className={cn(
-        "fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-purple-500 text-white shadow-lg",
-        "hover:bg-purple-600 transition-colors duration-200",
+        "fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-[#7C3AED] text-white shadow-lg",
+        "hover:bg-[#6D28D9] transition-colors duration-200",
         "flex items-center justify-center",
         className
       )}

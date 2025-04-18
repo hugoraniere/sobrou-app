@@ -29,9 +29,9 @@ export default {
 				},
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#7C3AED',
-					hover: '#6D28D9',
-					dark: '#5B21B6',
+					DEFAULT: '#09983D',
+					hover: '#0BBE4A',
+					dark: '#077A31',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
@@ -81,7 +81,6 @@ export default {
 					warning: '#FACC15',
 					success: '#22C55E'
 				},
-				// TrendMap AI colors
 				trend: {
 					blue: '#4361EE',
 					green: '#38B000',

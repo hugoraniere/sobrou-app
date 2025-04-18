@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { X, Send } from 'lucide-react'
 import { cn } from "@/lib/utils"
@@ -128,7 +129,7 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
               className={cn(
                 "max-w-[85%] rounded-lg p-3",
                 message.role === 'user'
-                  ? "ml-auto bg-[#7C3AED] text-white"
+                  ? "ml-auto bg-primary text-white"
                   : "bg-gray-100 text-gray-700"
               )}
             >
@@ -147,14 +148,14 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Digite sua pergunta..."
-            className="flex-1 rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7C3AED]"
+            className="flex-1 rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             disabled={isLoading}
           />
           <button
             type="submit"
             className={cn(
-              "rounded-lg bg-[#7C3AED] p-2 text-white",
-              "hover:bg-[#6D28D9] transition-colors duration-200",
+              "rounded-lg bg-primary p-2 text-white",
+              "hover:bg-primary-hover transition-colors duration-200",
               "disabled:opacity-50 disabled:cursor-not-allowed"
             )}
             disabled={!input.trim() || isLoading}
