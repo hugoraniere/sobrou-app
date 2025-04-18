@@ -1,6 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.21.0'
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
@@ -14,22 +13,8 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, userId } = await req.json()
+    const { prompt, userId, transactions } = await req.json()
     
-    // Criar cliente Supabase
-    const supabaseClient = createClient(
-      'https://jevsazpwfowhmjupuuzw.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpldnNhenB3Zm93aG1qdXB1dXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3Njg5MjcsImV4cCI6MjA1OTM0NDkyN30.ZvIahA6EAPrVKSEUoRXDFJn6LeyqF-7_QM-Qv5O8Pn8'
-    )
-
-    // Buscar dados do usuário
-    const { data: transactions } = await supabaseClient
-      .from('transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(50)
-
     // Processar com OpenAI
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -43,9 +28,10 @@ serve(async (req) => {
           {
             role: 'system',
             content: `Você é um assistente financeiro que tem acesso às transações do usuário.
-            Aqui estão as últimas transações: ${JSON.stringify(transactions || [])}
-            Responda perguntas sobre gastos, análise financeira e forneça insights úteis.
-            Seja conciso e direto nas respostas.`
+            Aqui estão as transações recentes: ${JSON.stringify(transactions || [])}
+            Use estes dados para fornecer análises detalhadas e insights personalizados.
+            Seja específico ao mencionar valores, categorias e padrões de gastos.
+            Mantenha as respostas concisas e diretas.`
           },
           {
             role: 'user',
@@ -58,12 +44,10 @@ serve(async (req) => {
 
     const data = await response.json()
     
-    // Verificar se há um erro na resposta da OpenAI
     if (data.error) {
       throw new Error(`OpenAI Error: ${data.error.message || 'Unknown error'}`);
     }
     
-    // Verificar se a resposta tem o formato esperado
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       throw new Error('Formato de resposta inválido da OpenAI');
     }

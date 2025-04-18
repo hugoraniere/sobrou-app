@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useDashboardData } from '@/hooks/useDashboardData'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -32,6 +33,7 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
   const { user } = useAuth()
   const isMobile = useIsMobile()
+  const { transactions } = useDashboardData()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -52,7 +54,11 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
 
     try {
       const { data, error } = await supabase.functions.invoke('process-chat', {
-        body: { prompt: userMessage, userId: user?.id }
+        body: { 
+          prompt: userMessage, 
+          userId: user?.id,
+          transactions: transactions 
+        }
       })
 
       if (error) {
