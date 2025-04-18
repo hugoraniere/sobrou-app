@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -47,7 +46,6 @@ const MobileSidebar = () => {
     },
   ];
 
-  // Helper function to check if a route is active
   const isActiveRoute = (path: string) => {
     if (path === '/') {
       return location.pathname === '/' || location.pathname === '/home';
@@ -72,16 +70,8 @@ const MobileSidebar = () => {
           <span className="sr-only">{t('common.menu', 'Menu')}</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-[280px] max-w-[90vw] z-[1100] bg-background-base">
-        <div className="flex items-center p-4 border-b border-border-subtle">
-          <img 
-            src="/lovable-uploads/logo.png" 
-            alt="Logo" 
-            className="h-6 w-auto" 
-          />
-        </div>
-        
-        <div className="py-4 px-4 overflow-y-auto max-h-[calc(100vh-80px)]">
+      <SheetContent side="right" className="w-[280px] max-w-[90vw] z-[1100] bg-background-base">
+        <div className="py-4">
           <div className="flex items-center mb-6 p-2">
             <Avatar className="h-10 w-10 bg-primary text-white mr-3">
               <AvatarFallback>{getUserInitials()}</AvatarFallback>
