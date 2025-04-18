@@ -1,4 +1,3 @@
-
 import React, { AriaAttributes, DOMAttributes } from "react";
 
 // Extend React's intrinsic attributes to include className
@@ -17,10 +16,10 @@ declare module 'react' {
   }
   
   // Adicionar suporte para componentes do tipo ForwardRefExoticComponent
-  type ElementType<P = any, C extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements> = 
+  type ElementType<P = any> = 
     | React.JSXElementConstructor<P>
     | React.ForwardRefExoticComponent<P>
-    | C;
+    | keyof JSX.IntrinsicElements;
 }
 
 // Add interface for TransactionDatePicker
