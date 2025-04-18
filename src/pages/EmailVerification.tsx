@@ -19,22 +19,31 @@ const EmailVerification = () => {
       try {
         console.log('Verification parameters:', Object.fromEntries(searchParams.entries()));
         
-        // Support for hash fragment parameters
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        // Suporte para parâmetros no hash fragment (nova abordagem do Supabase)
+        // A URL pode conter #access_token=xxx&refresh_token=xxx&...
+        const hashFragment = window.location.hash.substring(1);
+        const hashParams = new URLSearchParams(hashFragment);
+        
+        // Extrair tokens do hash ou dos query parameters
         const accessToken = hashParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token');
         const type = hashParams.get('type');
         
-        console.log('Hash parameters:', { accessToken, refreshToken, type });
+        console.log('Hash and parameters:', { 
+          hashFragment,
+          accessToken: accessToken ? "present (not showing full token)" : null,
+          refreshToken: refreshToken ? "present (not showing full token)" : null,
+          type
+        });
         
-        // Extract token types from the URL
-        const token_hash = searchParams.get('token_hash') || accessToken;
-        const typeParam = searchParams.get('type') || type;
+        // Token do link tradicional (antigo formato)
+        const tokenHash = searchParams.get('token_hash');
+        const typeParam = searchParams.get('type');
         
-        if ((token_hash && typeParam) || accessToken) {
+        if ((tokenHash && typeParam) || accessToken) {
           if (accessToken) {
-            // Handle direct token from hash (new Supabase flow)
-            // Set the session directly
+            // Abordagem com token no hash (novo formato Supabase)
+            console.log('Trying to set session with access token from hash fragment');
             const { data, error } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken || ''
@@ -47,15 +56,16 @@ const EmailVerification = () => {
             } else {
               setVerificationStatus('success');
               
-              // Redirect after a short delay to show success message
+              // Redirecionar após um pequeno atraso para exibir a mensagem de sucesso
               setTimeout(() => {
                 navigate('/auth?verification=success');
               }, 3000);
             }
           } else {
-            // Traditional OTP verification
+            // Abordagem tradicional com OTP (antigo formato)
+            console.log('Trying traditional OTP verification with token_hash');
             const { error } = await supabase.auth.verifyOtp({
-              token_hash,
+              token_hash: tokenHash!,
               type: typeParam as any,
             });
             
@@ -66,7 +76,7 @@ const EmailVerification = () => {
             } else {
               setVerificationStatus('success');
               
-              // Redirect after a short delay to show success message
+              // Redirecionar após um pequeno atraso para exibir a mensagem de sucesso
               setTimeout(() => {
                 navigate('/auth?verification=success');
               }, 3000);
@@ -75,7 +85,7 @@ const EmailVerification = () => {
         } else {
           setVerificationStatus('error');
           setErrorMessage('URL de verificação inválida ou incompleta.');
-          console.error('Missing verification parameters:', { token_hash, typeParam, accessToken });
+          console.error('Missing verification parameters:', { tokenHash, typeParam, accessToken });
         }
       } catch (error: any) {
         setVerificationStatus('error');
@@ -87,11 +97,19 @@ const EmailVerification = () => {
     handleEmailVerification();
   }, [searchParams, navigate]);
 
-  // Check if we have hash parameters for Supabase's newer email flow
+  // Caso especial - para URLs com apenas hash e sem outros parâmetros
   useEffect(() => {
-    if (window.location.hash) {
-      console.log('Hash detected in URL:', window.location.hash);
-    }
+    const handleHashOnly = () => {
+      const hashWithoutParams = window.location.hash;
+      // Detectar um formato específico de hash que pode conter a URL de redirecionamento
+      if (hashWithoutParams && hashWithoutParams.includes('supabase.co/') && !hashWithoutParams.includes('access_token=')) {
+        console.error('Detected malformed URL with only hash:', hashWithoutParams);
+        setVerificationStatus('error');
+        setErrorMessage('URL de redirecionamento malformada. Por favor, contacte o suporte ou tente se registrar novamente.');
+      }
+    };
+    
+    handleHashOnly();
   }, []);
 
   // Redirect immediately if no parameters are present and no hash

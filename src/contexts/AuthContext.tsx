@@ -123,12 +123,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (fullName: string, email: string, password: string) => {
     try {
-      // Construir URL absolutas completas (com protocolo) para redirecionamentos
-      // Isso corrige o problema de concatenação incorreta pelo Supabase
+      // Definir URLs absolutas e corretamente formatadas
       const siteUrl = window.location.origin; // Ex: https://www.sobrouapp.com.br
-      const redirectUrl = `${siteUrl}/verify`;
+      const redirectTo = `${siteUrl}/verify`; // Ex: https://www.sobrouapp.com.br/verify
       
-      console.log('Signup with redirectUrl:', redirectUrl);
+      console.log('Signup with redirectTo:', redirectTo);
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -137,8 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           data: {
             full_name: fullName
           },
-          // Configurar redirecionamento para a página verify
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectTo
         }
       });
 

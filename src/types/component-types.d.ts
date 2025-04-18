@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export interface StandardProps {
@@ -20,7 +21,10 @@ export interface Transaction {
   category: string;
   description: string;
   amount: number;
-  isRecurring: boolean;
+  is_recurring?: boolean;  // Propriedade original
+  isRecurring?: boolean;   // Alias para compatibilidade
+  user_id?: string;        // Adicionado para satisfazer os requisitos de tipo
+  created_at?: string;     // Adicionado para satisfazer os requisitos de tipo
 }
 
 export interface TransactionDetailsProps extends StandardProps {

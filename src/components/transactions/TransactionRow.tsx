@@ -26,6 +26,11 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   const { toast } = useToast();
   const { t } = useTranslation();
 
+  // Usando o getter para normalizar o acesso à propriedade is_recurring/isRecurring
+  const getIsRecurring = (tx: Transaction): boolean => {
+    return tx.isRecurring || tx.is_recurring || false;
+  };
+
   const handleEdit = () => {
     setIsEditDialogOpen(true);
   };
@@ -33,7 +38,9 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
     // Armazenar a transação a ser excluída para possível restauração
-    setDeletedTransaction({ ...transaction });
+    if (transaction) {
+      setDeletedTransaction({ ...transaction });
+    }
   };
 
   const handleToggleRecurring = async (e: React.MouseEvent) => {
@@ -42,13 +49,13 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
       // Since is_recurring column doesn't exist in the database schema,
       // we'll just call the onToggleRecurring callback to update the UI state
       // without actually persisting the change to the database
-      onToggleRecurring(transaction.id, !transaction.is_recurring);
+      onToggleRecurring(transaction.id, !getIsRecurring(transaction));
       
       toast({
-        title: transaction.is_recurring 
+        title: getIsRecurring(transaction) 
           ? t('transactions.recurringRemoved', 'Recorrência removida') 
           : t('transactions.recurringSet', 'Marcada como recorrente'),
-        description: transaction.is_recurring 
+        description: getIsRecurring(transaction) 
           ? t('transactions.recurringRemovedDesc', 'A transação não é mais recorrente') 
           : t('transactions.recurringSetDesc', 'A transação foi marcada como recorrente'),
       });
@@ -136,10 +143,10 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         </TableCell>
         <TableCell className="text-center relative">
           <RecurringIndicator 
-            isRecurring={transaction.is_recurring} 
+            isRecurring={getIsRecurring(transaction)} 
             onToggle={(e) => {
               e.stopPropagation();
-              onToggleRecurring(transaction.id, !transaction.is_recurring);
+              onToggleRecurring(transaction.id, !getIsRecurring(transaction));
             }}
             isHovered={isHovered}
           />
@@ -149,7 +156,9 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         <DeleteIndicator onDelete={(e) => {
           e.stopPropagation();
           setIsDeleteDialogOpen(true);
-          setDeletedTransaction({ ...transaction });
+          if (transaction) {
+            setDeletedTransaction({ ...transaction });
+          }
         }} />
       </TableRow>
 
