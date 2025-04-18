@@ -132,7 +132,7 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         </button>
       </div>
 
-      <div className="h-96 overflow-y-auto p-4 space-y-4">
+      <div className="h-96 overflow-y-auto p-4 space-y-6">
         {messages.length === 0 ? (
           <div className="space-y-4">
             <p className="text-gray-500 text-center">
@@ -155,7 +155,7 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
             <div
               key={index}
               className={cn(
-                "max-w-[85%] rounded-lg p-3",
+                "max-w-[85%] rounded-lg p-4 whitespace-pre-line leading-relaxed",
                 message.role === 'user'
                   ? "ml-auto bg-primary text-white"
                   : "bg-gray-100 text-gray-700"

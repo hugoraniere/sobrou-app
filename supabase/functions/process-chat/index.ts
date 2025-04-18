@@ -19,7 +19,6 @@ serve(async (req) => {
     console.log("User ID:", userId);
     console.log("Transactions count:", transactions ? transactions.length : 0);
     
-    // Processar com OpenAI
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -31,11 +30,19 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `Você é um assistente financeiro que tem acesso às transações do usuário.
-            Aqui estão as transações recentes: ${JSON.stringify(transactions || [])}
-            Use estes dados para fornecer análises detalhadas e insights personalizados.
-            Seja específico ao mencionar valores, categorias e padrões de gastos.
-            Mantenha as respostas concisas e diretas.`
+            content: `Você é um assistente financeiro no app Sobrou. Sempre responda com linguagem clara, objetiva e fácil de ler em dispositivos móveis.
+
+NÃO utilize formatação Markdown.
+NÃO utilize símbolos como asteriscos, ###, -, bullets ou listas numeradas.
+
+Organize o conteúdo com parágrafos bem separados.
+Use espaçamento natural entre os blocos de texto.
+Destaque valores, categorias e análises com frases diretas, não com negrito artificial.
+
+Aqui estão as transações recentes do usuário: ${JSON.stringify(transactions || [])}
+Use estes dados para fornecer análises detalhadas e insights personalizados.
+Seja específico ao mencionar valores, categorias e padrões de gastos.
+Mantenha as respostas concisas e diretas.`
           },
           {
             role: 'user',
