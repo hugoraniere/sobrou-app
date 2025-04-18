@@ -23,8 +23,9 @@ interface ProfileEditDialogProps {
 const ProfileEditDialog = ({ isOpen, onClose }: ProfileEditDialogProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  // Acessar corretamente os metadados do usuário - user?.user_metadata é o caminho correto
-  const [fullName, setFullName] = React.useState(user?.user_metadata?.full_name || '');
+  // Use casting para acessar os metadados do usuário
+  const userAny = user as any;
+  const [fullName, setFullName] = React.useState(userAny?.user_metadata?.full_name || '');
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,7 +69,7 @@ const ProfileEditDialog = ({ isOpen, onClose }: ProfileEditDialogProps) => {
 
           <div className="space-y-2">
             <Label>{t('profile.email', 'Email')}</Label>
-            <Input value={user?.email} disabled />
+            <Input value={userAny?.email} disabled />
           </div>
 
           <DialogFooter>

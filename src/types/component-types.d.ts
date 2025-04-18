@@ -15,6 +15,12 @@ declare module 'react' {
   interface FunctionComponent<P = {}> {
     (props: P & { className?: string }, context?: any): ReactElement | null;
   }
+  
+  // Adicionar suporte para componentes do tipo ForwardRefExoticComponent
+  type ElementType<P = any, C extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements> = 
+    | React.JSXElementConstructor<P>
+    | React.ForwardRefExoticComponent<P>
+    | C;
 }
 
 // Add interface for TransactionDatePicker
