@@ -17,6 +17,7 @@ import PublicLanding from "./pages/PublicLanding";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
 import React from "react";
+import EmailVerification from "./pages/EmailVerification";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -32,6 +33,7 @@ const App = () => {
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/" element={<PublicLanding />} />
+                <Route path="/verify" element={<EmailVerification />} />
                 <Route
                   path="/dashboard"
                   element={

@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
@@ -87,10 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isLoading) return;
 
     const handleRouteProtection = () => {
-      const publicRoutes = ['/auth', '/'];
-      const isPublicRoute = publicRoutes.includes(location.pathname);
+      const publicRoutes = ['/auth', '/', '/verify'];
+      const isPublicRoute = publicRoutes.some(route => location.pathname.startsWith(route));
 
-      if (isAuthenticated && isPublicRoute) {
+      if (isAuthenticated && isPublicRoute && location.pathname !== '/verify') {
         navigate('/dashboard');
       }
     };
@@ -129,6 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           data: {
             full_name: fullName
           },
+          // Configure redirectTo to point to the verify page in our app
           emailRedirectTo: `${window.location.origin}/auth?verification=success`
         }
       });

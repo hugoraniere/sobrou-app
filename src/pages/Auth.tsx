@@ -7,6 +7,9 @@ import { useAuth } from '../contexts/AuthContext';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
 import Logo from '../components/brand/Logo';
+import { toast } from 'sonner';
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle2 } from 'lucide-react';
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
@@ -19,12 +22,15 @@ const Auth = () => {
     const verification = searchParams.get('verification');
     if (verification === 'success') {
       setActiveTab('login');
+      toast.success('Email verificado com sucesso! Você já pode fazer login.', {
+        duration: 5000
+      });
     }
   }, [searchParams]);
 
   useEffect(() => {
     if (!isLoading && user) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [user, isLoading, navigate]);
 
@@ -38,6 +44,16 @@ const Auth = () => {
             </div>
             <p className="text-gray-600 mt-2">Seu assistente financeiro pessoal</p>
           </div>
+          
+          {searchParams.get('verification') === 'success' && (
+            <Alert className="mb-6 bg-green-50 border-green-200">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <AlertTitle>Email verificado!</AlertTitle>
+              <AlertDescription>
+                Sua conta foi verificada com sucesso. Agora você pode fazer login.
+              </AlertDescription>
+            </Alert>
+          )}
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-2 mb-8">
