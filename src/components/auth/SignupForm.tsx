@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -73,8 +72,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ setActiveTab }) => {
       <div className="space-y-4">
         <Alert className="bg-blue-50 border-blue-200">
           <AlertDescription className="text-blue-800">
-            <p className="mb-2 font-medium">Verification email sent!</p>
-            <p>We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.</p>
+            <p className="mb-2 font-medium">Email de verificação enviado!</p>
+            <p>Enviamos um link de verificação para seu email. Por favor, verifique sua caixa de entrada e clique no link para verificar sua conta.</p>
           </AlertDescription>
         </Alert>
         <Button 
@@ -82,7 +81,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ setActiveTab }) => {
           className="w-full"
           onClick={() => setActiveTab("login")}
         >
-          Return to Login
+          Voltar para o Login
         </Button>
       </div>
     );
@@ -210,12 +209,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ setActiveTab }) => {
           className="w-full mt-6"
           disabled={form.formState.isSubmitting}
         >
-          {form.formState.isSubmitting ? "Creating Account..." : "Create Account"}
+          {form.formState.isSubmitting ? "Criando Conta..." : "Criar Conta"}
         </Button>
       </form>
       <div className="flex justify-center mt-4">
         <p className="text-sm text-gray-600">
-          Already have an account?{" "}
+          Já tem uma conta?{" "}
           <a
             onClick={() => setActiveTab("login")}
             className="text-primary hover:underline cursor-pointer"

@@ -4,9 +4,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
-import Header from '../components/Header';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
+import Logo from '../components/brand/Logo';
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
@@ -30,11 +30,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header isPublic={true} />
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold">Sobrou</h1>
+            <div className="flex justify-center mb-4">
+              <Logo size="lg" />
+            </div>
             <p className="text-gray-600 mt-2">Seu assistente financeiro pessoal</p>
           </div>
           

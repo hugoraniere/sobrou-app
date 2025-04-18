@@ -99,9 +99,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center justify-between">
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Senha</FormLabel>
                 <a href="#" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  Esqueceu a senha?
                 </a>
               </div>
               <FormControl>
@@ -135,17 +135,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
           className="w-full mt-6" 
           disabled={form.formState.isSubmitting}
         >
-          {form.formState.isSubmitting ? "Logging in..." : "Login"}
+          {form.formState.isSubmitting ? "Entrando..." : "Entrar"}
         </Button>
       </form>
       <div className="flex justify-center mt-4">
         <p className="text-sm text-gray-600">
-          Don't have an account yet?{" "}
+          Ainda não tem uma conta?{" "}
           <a
             onClick={() => setActiveTab("signup")}
             className="text-primary hover:underline cursor-pointer"
           >
-            Create one now
+            Criar agora
           </a>
         </p>
       </div>

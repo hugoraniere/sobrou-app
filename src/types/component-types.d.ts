@@ -19,7 +19,8 @@ declare module 'react' {
   type ElementType<P = any> = 
     | React.JSXElementConstructor<P>
     | React.ForwardRefExoticComponent<P>
-    | keyof JSX.IntrinsicElements;
+    | keyof JSX.IntrinsicElements
+    | React.ComponentType<P>;
 }
 
 // Add interface for TransactionDatePicker
