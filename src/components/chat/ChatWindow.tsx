@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { X, Send } from 'lucide-react'
 import { cn } from "@/lib/utils"
@@ -74,6 +75,9 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
     console.log("Sending transactions to API:", transactionsToSend.length);
 
     try {
+      // Adiciona mensagem temporária de "digitando..."
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Analisando suas finanças...' }])
+
       const { data, error } = await supabase.functions.invoke('process-chat', {
         body: { 
           prompt: userMessage, 
@@ -91,11 +95,13 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         throw new Error('Resposta inválida do servidor');
       }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }])
+      // Remove a mensagem de "digitando..." e adiciona a resposta real
+      setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: data.response }])
     } catch (error) {
       console.error('Error processing chat:', error);
       toast.error('Erro ao processar mensagem');
-      setMessages(prev => [...prev, { 
+      // Remove a mensagem de "digitando..." e adiciona mensagem de erro
+      setMessages(prev => [...prev.slice(0, -1), { 
         role: 'assistant', 
         content: 'Desculpe, tive um problema ao processar sua mensagem. Por favor, tente novamente mais tarde.' 
       }])
