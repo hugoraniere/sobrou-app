@@ -4,11 +4,15 @@ import { supabase } from '../integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
-type UserProfile = {
+export interface UserProfile {
   id: string;
   fullName: string;
   email: string;
-};
+  user_metadata?: {
+    full_name?: string;
+    [key: string]: any;
+  };
+}
 
 type AuthContextType = {
   user: UserProfile | null;
@@ -30,20 +34,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Initialize the auth state
   useEffect(() => {
-    // Set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
         setSession(currentSession);
         setIsAuthenticated(!!currentSession);
         
         if (currentSession?.user) {
-          // Format user data for our app
           setUser({
             id: currentSession.user.id,
             email: currentSession.user.email || '',
-            fullName: currentSession.user.user_metadata.full_name || ''
+            fullName: currentSession.user.user_metadata.full_name || '',
+            user_metadata: currentSession.user.user_metadata
           });
         } else {
           setUser(null);
@@ -53,7 +55,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Get the initial session
     const initializeAuth = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
@@ -61,11 +62,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthenticated(!!initialSession);
         
         if (initialSession?.user) {
-          // Format user data for our app
           setUser({
             id: initialSession.user.id,
             email: initialSession.user.email || '',
-            fullName: initialSession.user.user_metadata.full_name || ''
+            fullName: initialSession.user.user_metadata.full_name || '',
+            user_metadata: initialSession.user.user_metadata
           });
         }
       } catch (error) {
@@ -77,13 +78,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initializeAuth();
 
-    // Cleanup
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
-  // Handle protected routes
   useEffect(() => {
     if (isLoading) return;
 
@@ -91,13 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const publicRoutes = ['/auth', '/'];
       const isPublicRoute = publicRoutes.includes(location.pathname);
 
-      // Redirect authenticated users away from auth pages
       if (isAuthenticated && isPublicRoute) {
         navigate('/dashboard');
       }
-      
-      // Unauthenticated users can stay on public routes
-      // but will be redirected from protected routes by ProtectedRoute component
     };
 
     handleRouteProtection();
@@ -111,14 +106,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        // Check for unverified email error
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please verify your email before logging in.');
         }
         throw new Error(error.message);
       }
 
-      // After successful login
       navigate('/dashboard');
       return;
     } catch (error: any) {
@@ -142,18 +135,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw new Error(error.message);
 
-      // Return early if email confirmation is required
       if (data.user?.identities?.length === 0) {
         throw new Error('This email is already registered.');
       }
 
-      // Check if email confirmation is needed
       if (data.user && !data.user.confirmed_at) {
         toast.success('Registration successful! Please check your email to verify your account.');
         return;
       }
 
-      // If no email confirmation needed, user is logged in automatically
       navigate('/');
       return;
     } catch (error: any) {
@@ -167,14 +157,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signOut();
       if (error) throw new Error(error.message);
       
-      // Auth state listener will handle clearing user state
       navigate('/auth');
     } catch (error: any) {
       console.error('Logout failed:', error);
       throw new Error('Logout failed. Please try again.');
     }
   };
-  
+
   return (
     <AuthContext.Provider value={{ 
       user, 

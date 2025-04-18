@@ -51,7 +51,8 @@ const SidebarNav = () => {
   };
 
   const getUserInitials = () => {
-    const fullName = user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
+    // Usando any para acessar os metadados do usuário, já que UserProfile não tem essa propriedade
+    const fullName = user ? (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário') : t('common.user', 'Usuário');
     const names = fullName.split(' ');
     if (names.length > 1) {
       return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
@@ -67,7 +68,7 @@ const SidebarNav = () => {
   };
 
   // Obter o nome completo do usuário para exibição
-  const userFullName = user?.user_metadata?.full_name || t('common.user', 'Usuário');
+  const userFullName = user ? (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário') : t('common.user', 'Usuário');
 
   return (
     <>

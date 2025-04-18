@@ -1,3 +1,4 @@
+
 import React, { AriaAttributes, DOMAttributes } from "react";
 
 declare module 'react' {
@@ -13,9 +14,10 @@ declare module 'react' {
     (props: P & { className?: string }, context?: any): ReactElement<any, any> | null;
   }
   
-  type ElementType<P = any> = {
-    [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never
-  }[keyof JSX.IntrinsicElements] | React.ComponentType<P>;
+  type ElementType<P = any> = 
+    | { [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never }[keyof JSX.IntrinsicElements] 
+    | React.ComponentType<P>
+    | React.ForwardRefExoticComponent<P>;
 }
 
 interface TransactionDatePickerProps {
