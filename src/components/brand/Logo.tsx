@@ -7,7 +7,7 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const Logo: React.FC<LogoProps> = ({ className, size = 'md' }) => {
+const Logo = React.forwardRef<HTMLImageElement, LogoProps>(({ className, size = 'md' }, ref) => {
   const sizeClasses = {
     sm: 'h-8',
     md: 'h-10',
@@ -16,11 +16,14 @@ const Logo: React.FC<LogoProps> = ({ className, size = 'md' }) => {
 
   return (
     <img 
+      ref={ref}
       src="/lovable-uploads/99c07f63-fffe-4761-a8d8-35c85d058c3a.png"
       alt="Sobrou" 
       className={cn(sizeClasses[size], 'w-auto', className)}
     />
   );
-};
+});
+
+Logo.displayName = 'Logo';
 
 export default Logo;

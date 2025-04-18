@@ -6,11 +6,11 @@ import { ArrowRight } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative min-h-screen flex items-center bg-gradient-to-b from-primary-light/50 to-white">
+    <section className="relative min-h-[100vh] flex items-center bg-gradient-to-b from-primary-light/50 to-white">
       <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-5" />
       
       <div className="container mx-auto px-4 pt-20">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
+        <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[calc(100vh-80px)] py-12">
           <div className="flex-1 text-center lg:text-left max-w-2xl">
             <h1 className="font-alliance-n2 text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Organize suas finanças só digitando
