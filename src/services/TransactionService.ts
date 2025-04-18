@@ -1,19 +1,8 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getCategoryByKeyword } from "@/data/categories";
+import type { Transaction } from "@/types/component-types";
 
-export interface Transaction {
-  id: string;
-  user_id: string;
-  amount: number;
-  description: string;
-  category: string;
-  type: 'expense' | 'income' | 'transfer';
-  date: string;
-  created_at: string;
-  is_recurring?: boolean;
-  recurrence_interval?: 'weekly' | 'monthly' | 'yearly';
-}
+export { Transaction };
 
 export interface ParsedExpense {
   amount: number;
@@ -80,7 +69,7 @@ export const TransactionService = {
   },
   
   // Add a new transaction
-  async addTransaction(transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at'>): Promise<Transaction> {
+  async addTransaction(transaction: Omit<Transaction, 'id' | 'created_at'>): Promise<Transaction> {
     // Get the current user's ID
     const { data: { user } } = await supabase.auth.getUser();
     

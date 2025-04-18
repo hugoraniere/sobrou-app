@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export interface StandardProps {
@@ -21,9 +20,10 @@ export interface Transaction {
   category: string;
   description: string;
   amount: number;
-  is_recurring: boolean;
+  is_recurring?: boolean;
   user_id: string;
   created_at: string;
+  recurrence_interval?: 'weekly' | 'monthly' | 'yearly';
 }
 
 export interface TransactionDetailsProps extends StandardProps {
@@ -38,4 +38,3 @@ export interface TransactionRowProps extends StandardProps {
   formatDate: (dateString: string) => string;
   onTransactionUpdated: () => void;
 }
-
