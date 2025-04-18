@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,6 +65,9 @@ const SidebarNav = () => {
     }
     return location.pathname.startsWith(path);
   };
+
+  // Obter o nome completo do usuário para exibição
+  const userFullName = user?.user_metadata?.full_name || t('common.user', 'Usuário');
 
   return (
     <>

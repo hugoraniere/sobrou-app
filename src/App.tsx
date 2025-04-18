@@ -9,6 +9,7 @@ import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
 import Goals from "./pages/Goals";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -67,6 +68,16 @@ const App = () => {
                     <ProtectedRoute>
                       <AppLayout>
                         <Settings />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Profile />
                       </AppLayout>
                     </ProtectedRoute>
                   }
