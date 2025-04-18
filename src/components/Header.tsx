@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import LanguageSwitcher from './LanguageSwitcher';
 import HeaderLogo from './header/HeaderLogo';
 import { useTranslation } from 'react-i18next';
 import AddTransactionDialog from './transactions/AddTransactionDialog';
@@ -19,7 +18,6 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
           <HeaderLogo />
           
           <div className="flex items-center space-x-4">
-            <LanguageSwitcher />
             {!user && (
               <Link to="/auth">
                 <button className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded">
