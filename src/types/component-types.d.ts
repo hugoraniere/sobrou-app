@@ -1,34 +1,35 @@
-
 import React, { AriaAttributes, DOMAttributes, ForwardRefExoticComponent, ReactElement, ReactNode, RefAttributes } from "react";
 
 declare module 'react' {
   interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
     className?: string;
+    children?: ReactNode;
   }
   
   interface SVGAttributes<T> extends AriaAttributes, DOMAttributes<T> {
     className?: string;
+    children?: ReactNode;
   }
 
   type ElementType<P = any> = 
     | { [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never }[keyof JSX.IntrinsicElements] 
     | React.ComponentType<P>
     | React.ForwardRefExoticComponent<P & RefAttributes<any>>
-    | React.FunctionComponent<P>;  // Este é crucial para compatibilidade
+    | React.FunctionComponent<P>;
 
   interface ForwardRefExoticComponent<P> {
-    (props: P & { children?: ReactNode }): ReactElement | null;
+    (props: P & { children?: ReactNode; className?: string }): ReactElement | null;
   }
 }
 
-// Interfaces para Radix UI e outros componentes personalizados
+// Interfaces for Radix UI and other custom components
 
 // AccordionItem
 interface AccordionItemProps {
   className?: string;
+  children?: React.ReactNode;
   value?: string;
   disabled?: boolean;
-  children?: React.ReactNode;
 }
 
 // AccordionTrigger
