@@ -41,14 +41,14 @@ const Auth = () => {
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-2 mb-8">
-              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="login">Entrar</TabsTrigger>
               <TabsTrigger value="signup">Criar Conta</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
               <Card>
                 <CardHeader>
-                  <CardTitle>Login na Sobrou</CardTitle>
+                  <CardTitle>Entrar na sua conta</CardTitle>
                   <CardDescription>
                     Bem-vindo de volta! Vamos verificar suas finanças.
                   </CardDescription>

@@ -1,6 +1,5 @@
 import React, { AriaAttributes, DOMAttributes } from "react";
 
-// Extend React's intrinsic attributes to include className
 declare module 'react' {
   interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
     className?: string;
@@ -10,20 +9,15 @@ declare module 'react' {
     className?: string;
   }
 
-  // Add className to functional components and intrinsic elements
   interface FunctionComponent<P = {}> {
-    (props: P & { className?: string }, context?: any): ReactElement | null;
+    (props: P & { className?: string }, context?: any): ReactElement<any, any> | null;
   }
   
-  // Adicionar suporte para componentes do tipo ForwardRefExoticComponent
-  type ElementType<P = any> = 
-    | React.JSXElementConstructor<P>
-    | React.ForwardRefExoticComponent<P>
-    | keyof JSX.IntrinsicElements
-    | React.ComponentType<P>;
+  type ElementType<P = any> = {
+    [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never
+  }[keyof JSX.IntrinsicElements] | React.ComponentType<P>;
 }
 
-// Add interface for TransactionDatePicker
 interface TransactionDatePickerProps {
   date?: Date;
   onDateChange: (date: Date) => void;
@@ -31,7 +25,6 @@ interface TransactionDatePickerProps {
   selectedDate?: Date;
 }
 
-// Add interface for CategorySelector with all required props
 interface CategorySelectorProps {
   categoryId: string;
   isOpen: boolean;
@@ -44,7 +37,6 @@ interface CategorySelectorProps {
   onSelectCategory?: (category: string) => void;
 }
 
-// Add interfaces for Dialog components
 interface DialogProps {
   className?: string;
 }
@@ -53,7 +45,6 @@ interface DialogContentProps {
   className?: string;
 }
 
-// Add interfaces for Popover components
 interface PopoverProps {
   className?: string;
   open?: boolean;
@@ -71,7 +62,6 @@ interface PopoverContentProps {
   sideOffset?: number;
 }
 
-// Add interfaces for EditTransactionDialog
 interface EditTransactionDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -80,7 +70,6 @@ interface EditTransactionDialogProps {
   className?: string;
 }
 
-// Add interfaces for AddTransactionDialog
 interface AddTransactionDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -88,7 +77,6 @@ interface AddTransactionDialogProps {
   className?: string;
 }
 
-// Add interfaces for TransactionRow
 interface TransactionRowProps {
   transaction: Transaction;
   onToggleRecurring: (id: string, isRecurring: boolean) => void;
@@ -97,7 +85,6 @@ interface TransactionRowProps {
   className?: string;
 }
 
-// Add interfaces for TransactionDetails
 interface TransactionDetailsProps {
   transaction: any;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -105,7 +92,6 @@ interface TransactionDetailsProps {
   className?: string;
 }
 
-// Add interfaces for TransactionControls
 interface TransactionControlsProps {
   onClose: () => void;
   onSave: () => Promise<void>;
@@ -113,7 +99,6 @@ interface TransactionControlsProps {
   className?: string;
 }
 
-// Add interfaces for TransactionFormLayout
 interface TransactionFormLayoutProps {
   title: string;
   description: string;
@@ -124,7 +109,6 @@ interface TransactionFormLayoutProps {
   setIsOpen: (isOpen: boolean) => void;
 }
 
-// Add interfaces for RecurringIndicator
 interface RecurringIndicatorProps {
   isRecurring: boolean;
   onToggle: (e: React.MouseEvent) => void;
@@ -132,7 +116,6 @@ interface RecurringIndicatorProps {
   className?: string;
 }
 
-// Add interfaces for DeleteIndicator
 interface DeleteIndicatorProps {
   onDelete: (e: React.MouseEvent) => void;
   className?: string;
