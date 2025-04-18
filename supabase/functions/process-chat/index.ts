@@ -15,6 +15,10 @@ serve(async (req) => {
   try {
     const { prompt, userId, transactions } = await req.json()
     
+    console.log("Received prompt:", prompt);
+    console.log("User ID:", userId);
+    console.log("Transactions count:", transactions ? transactions.length : 0);
+    
     // Processar com OpenAI
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

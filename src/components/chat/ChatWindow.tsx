@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useDashboardData } from '@/hooks/useDashboardData'
+import { TransactionService } from '@/services/TransactionService'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -34,6 +35,24 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   const { user } = useAuth()
   const isMobile = useIsMobile()
   const { transactions } = useDashboardData()
+  const [localTransactions, setLocalTransactions] = React.useState([])
+
+  // Garantir que temos transações quando o chat é aberto
+  React.useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const data = await TransactionService.getTransactions();
+        setLocalTransactions(data);
+        console.log("Fetched transactions:", data.length);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    if (isOpen && user) {
+      fetchTransactions();
+    }
+  }, [isOpen, user]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -52,12 +71,16 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setIsLoading(true)
 
+    // Use transactions from useDashboardData ou as que buscamos diretamente
+    const transactionsToSend = transactions.length > 0 ? transactions : localTransactions;
+    console.log("Sending transactions to API:", transactionsToSend.length);
+
     try {
       const { data, error } = await supabase.functions.invoke('process-chat', {
         body: { 
           prompt: userMessage, 
           userId: user?.id,
-          transactions: transactions 
+          transactions: transactionsToSend 
         }
       })
 

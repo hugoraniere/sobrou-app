@@ -1,3 +1,4 @@
+
 import React, { AriaAttributes, DOMAttributes, ForwardRefExoticComponent, ReactElement, ReactNode, RefAttributes } from "react";
 
 declare module 'react' {
@@ -12,8 +13,7 @@ declare module 'react' {
   type ElementType<P = any> = 
     | { [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never }[keyof JSX.IntrinsicElements] 
     | React.ComponentType<P>
-    | React.ForwardRefExoticComponent<P & RefAttributes<any>>
-    | React.FunctionComponent<P>;
+    | React.ForwardRefExoticComponent<P & RefAttributes<any>>;
 
   interface ForwardRefExoticComponent<P> {
     (props: P & { children?: ReactNode }): ReactElement | null;
