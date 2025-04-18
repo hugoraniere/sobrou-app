@@ -21,14 +21,13 @@ export interface Transaction {
   category: string;
   description: string;
   amount: number;
-  is_recurring?: boolean;  // Propriedade original
-  isRecurring?: boolean;   // Alias para compatibilidade
-  user_id?: string;        // Adicionado para satisfazer os requisitos de tipo
-  created_at?: string;     // Adicionado para satisfazer os requisitos de tipo
+  is_recurring: boolean;
+  user_id: string;
+  created_at: string;
 }
 
 export interface TransactionDetailsProps extends StandardProps {
-  transaction: any;
+  transaction: Transaction;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }
@@ -39,3 +38,4 @@ export interface TransactionRowProps extends StandardProps {
   formatDate: (dateString: string) => string;
   onTransactionUpdated: () => void;
 }
+
