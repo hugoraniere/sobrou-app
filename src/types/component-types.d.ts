@@ -1,3 +1,4 @@
+
 import React, { AriaAttributes, DOMAttributes, ForwardRefExoticComponent, ReactElement, ReactNode, RefAttributes } from "react";
 
 declare module 'react' {
@@ -14,88 +15,60 @@ declare module 'react' {
   type ElementType<P = any> = 
     | { [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never }[keyof JSX.IntrinsicElements] 
     | React.ComponentType<P>
-    | React.ForwardRefExoticComponent<P & RefAttributes<any>>
-    | React.FunctionComponent<P>;
+    | ForwardRefExoticComponent<P & RefAttributes<any>>;
 
   interface ForwardRefExoticComponent<P> {
     (props: P & { children?: ReactNode; className?: string }): ReactElement | null;
   }
 }
 
+// Interface padrão com className e children
+interface StandardProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 // Interfaces for Radix UI and other custom components
 
 // AccordionItem
-interface AccordionItemProps {
-  className?: string;
-  children?: React.ReactNode;
+interface AccordionItemProps extends StandardProps {
   value?: string;
   disabled?: boolean;
 }
 
 // AccordionTrigger
-interface AccordionTriggerProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AccordionTriggerProps extends StandardProps {}
 
 // AccordionContent
-interface AccordionContentProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AccordionContentProps extends StandardProps {}
 
 // AlertDialog
-interface AlertDialogOverlayProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AlertDialogOverlayProps extends StandardProps {}
 
-interface AlertDialogContentProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AlertDialogContentProps extends StandardProps {}
 
-interface AlertDialogTitleProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AlertDialogTitleProps extends StandardProps {}
 
-interface AlertDialogDescriptionProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AlertDialogDescriptionProps extends StandardProps {}
 
-interface AlertDialogActionProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AlertDialogActionProps extends StandardProps {}
 
-interface AlertDialogCancelProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AlertDialogCancelProps extends StandardProps {}
 
 // Avatar
-interface AvatarProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface AvatarProps extends StandardProps {}
 
-interface AvatarImageProps {
-  className?: string;
+interface AvatarImageProps extends StandardProps {
   src?: string;
   alt?: string;
 }
 
-interface AvatarFallbackProps {
-  className?: string;
-  children?: React.ReactNode;
+interface AvatarFallbackProps extends StandardProps {
   delayMs?: number;
 }
 
 // Checkbox
-interface CheckboxProps {
-  className?: string;
+interface CheckboxProps extends StandardProps {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
@@ -106,235 +79,153 @@ interface CheckboxProps {
 }
 
 // Command
-interface CommandProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface CommandProps extends StandardProps {}
 
-interface CommandInputProps {
-  className?: string;
+interface CommandInputProps extends StandardProps {
   value?: string;
   onValueChange?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
 }
 
-interface CommandListProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface CommandListProps extends StandardProps {}
 
-interface CommandEmptyProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface CommandEmptyProps extends StandardProps {}
 
-interface CommandGroupProps {
-  className?: string;
+interface CommandGroupProps extends StandardProps {
   heading?: React.ReactNode;
-  children?: React.ReactNode;
 }
 
-interface CommandItemProps {
-  className?: string;
+interface CommandItemProps extends StandardProps {
   onSelect?: (value: string) => void;
   disabled?: boolean;
   value?: string;
-  children?: React.ReactNode;
 }
 
-interface CommandSeparatorProps {
-  className?: string;
-}
+interface CommandSeparatorProps extends StandardProps {}
 
-interface TransactionDatePickerProps {
+interface TransactionDatePickerProps extends StandardProps {
   date?: Date;
   onDateChange: (date: Date) => void;
-  className?: string;
   selectedDate?: Date;
 }
 
-interface CategorySelectorProps {
+interface CategorySelectorProps extends StandardProps {
   categoryId: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onCategorySelect: (categoryId: string) => void;
   onReset: (e: React.MouseEvent) => void;
   userSelected: boolean;
-  className?: string;
   selectedCategory?: string;
   onSelectCategory?: (category: string) => void;
 }
 
-interface DialogProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface DialogProps extends StandardProps {}
 
-interface DialogContentProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface DialogContentProps extends StandardProps {}
 
-interface PopoverProps {
-  className?: string;
+interface PopoverProps extends StandardProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
 }
 
-interface PopoverTriggerProps {
-  className?: string;
+interface PopoverTriggerProps extends StandardProps {
   asChild?: boolean;
-  children?: React.ReactNode;
 }
 
-interface PopoverContentProps {
-  className?: string;
+interface PopoverContentProps extends StandardProps {
   align?: string;
   sideOffset?: number;
-  children?: React.ReactNode;
 }
 
-interface EditTransactionDialogProps {
+interface EditTransactionDialogProps extends StandardProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   transaction: Transaction;
   onTransactionUpdated: () => void;
-  className?: string;
 }
 
-interface AddTransactionDialogProps {
+interface AddTransactionDialogProps extends StandardProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onTransactionAdded: () => void;
-  className?: string;
 }
 
-interface TransactionRowProps {
+interface TransactionRowProps extends StandardProps {
   transaction: Transaction;
   onToggleRecurring: (id: string, isRecurring: boolean) => void;
   formatDate: (dateString: string) => string;
   onTransactionUpdated: () => void;
-  className?: string;
 }
 
-interface TransactionDetailsProps {
+interface TransactionDetailsProps extends StandardProps {
   transaction: any;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
-  className?: string;
 }
 
-interface TransactionControlsProps {
+interface TransactionControlsProps extends StandardProps {
   onClose: () => void;
   onSave: () => Promise<void>;
   isSubmitting?: boolean;
-  className?: string;
 }
 
-interface TransactionFormLayoutProps {
+interface TransactionFormLayoutProps extends StandardProps {
   title: string;
   description: string;
-  children: React.ReactNode;
   footer: React.ReactNode;
-  className?: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
-interface RecurringIndicatorProps {
+interface RecurringIndicatorProps extends StandardProps {
   isRecurring: boolean;
   onToggle: (e: React.MouseEvent) => void;
   isHovered: boolean;
-  className?: string;
 }
 
-interface DeleteIndicatorProps {
+interface DeleteIndicatorProps extends StandardProps {
   onDelete: (e: React.MouseEvent) => void;
-  className?: string;
 }
 
 // Outros tipos necessários para componentes UI
-interface CommandSeparatorProps {
-  className?: string;
-}
+interface CommandShortcutProps extends StandardProps {}
 
-interface CommandShortcutProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface SheetProps extends StandardProps {}
 
-interface SheetProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-interface SheetContentProps {
-  className?: string;
-  children?: React.ReactNode;
+interface SheetContentProps extends StandardProps {
   side?: "top" | "right" | "bottom" | "left";
 }
 
-interface SheetHeaderProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface SheetHeaderProps extends StandardProps {}
 
-interface SheetFooterProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface SheetFooterProps extends StandardProps {}
 
-interface SheetTitleProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface SheetTitleProps extends StandardProps {}
 
-interface SheetDescriptionProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface SheetDescriptionProps extends StandardProps {}
 
-interface ToastProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface ToastProps extends StandardProps {}
 
-interface ToastActionProps {
-  className?: string;
-  children?: React.ReactNode;
+interface ToastActionProps extends StandardProps {
   altText: string;
 }
 
-interface ToastCloseProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface ToastCloseProps extends StandardProps {}
 
-interface ToastTitleProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface ToastTitleProps extends StandardProps {}
 
-interface ToastDescriptionProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface ToastDescriptionProps extends StandardProps {}
 
-interface ToastViewportProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+interface ToastViewportProps extends StandardProps {}
 
-interface ChatWindowProps {
+interface ChatWindowProps extends StandardProps {
   isOpen: boolean;
   onClose: () => void;
-  className?: string;
 }
 
-interface FloatingChatButtonProps {
+interface FloatingChatButtonProps extends StandardProps {
   isOpen: boolean;
   onClick: () => void;
-  className?: string;
 }

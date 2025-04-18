@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
-import { Transaction } from '@/services/TransactionService';
 
 interface TransactionDetailsProps {
   transaction: any;
@@ -29,7 +28,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   const { t } = useTranslation();
 
   return (
-    <>
+    <div className={className}>
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="date" className="text-right">
           {t('transactions.date', 'Data')}
@@ -116,7 +115,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           className="col-span-3"
         />
       </div>
-    </>
+    </div>
   );
 };
 
