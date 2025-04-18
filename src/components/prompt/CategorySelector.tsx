@@ -4,16 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { XCircle } from "lucide-react";
 import { transactionCategories } from '@/data/categories';
 import { cn } from '@/lib/utils';
-
-interface CategorySelectorProps {
-  categoryId: string;
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-  onCategorySelect: (categoryId: string) => void;
-  onReset: (e: React.MouseEvent) => void;
-  userSelected: boolean;
-  className?: string;
-}
+import type { CategorySelectorProps } from '@/types/component-types';
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
   categoryId,

@@ -11,13 +11,7 @@ import {
 } from "@/components/ui/select";
 import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
-
-interface TransactionDetailsProps {
-  transaction: any;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
-  className?: string;
-}
+import type { TransactionDetailsProps } from '@/types/component-types';
 
 const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   transaction,

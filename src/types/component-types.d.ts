@@ -117,8 +117,6 @@ interface CategorySelectorProps extends StandardProps {
   onCategorySelect: (categoryId: string) => void;
   onReset: (e: React.MouseEvent) => void;
   userSelected: boolean;
-  selectedCategory?: string;
-  onSelectCategory?: (category: string) => void;
 }
 
 interface DialogProps extends StandardProps {}

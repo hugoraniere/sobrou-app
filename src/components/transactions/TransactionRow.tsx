@@ -10,14 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import RecurringIndicator from './ui/RecurringIndicator';
 import DeleteIndicator from './ui/DeleteIndicator';
-
-interface TransactionRowProps {
-  transaction: Transaction;
-  onToggleRecurring: (id: string, isRecurring: boolean) => void;
-  formatDate: (dateString: string) => string;
-  onTransactionUpdated: () => void;
-  className?: string;
-}
+import type { TransactionRowProps } from '@/types/component-types';
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ 
   transaction, 
@@ -115,7 +108,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
       <TableRow 
         key={transaction.id} 
         className={cn("cursor-pointer hover:bg-gray-50 relative group", className)}
-        onClick={handleEdit}
+        onClick={() => setIsEditDialogOpen(true)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -144,13 +137,20 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         <TableCell className="text-center relative">
           <RecurringIndicator 
             isRecurring={transaction.is_recurring} 
-            onToggle={handleToggleRecurring}
+            onToggle={(e) => {
+              e.stopPropagation();
+              onToggleRecurring(transaction.id, !transaction.is_recurring);
+            }}
             isHovered={isHovered}
           />
         </TableCell>
         
         {/* Desktop Delete Button that appears on hover */}
-        <DeleteIndicator onDelete={handleDelete} />
+        <DeleteIndicator onDelete={(e) => {
+          e.stopPropagation();
+          setIsDeleteDialogOpen(true);
+          setDeletedTransaction({ ...transaction });
+        }} />
       </TableRow>
 
       {/* Edit Transaction Dialog */}
@@ -175,7 +175,27 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
             description: t('transactions.deleteDescription', "Sua transação foi excluída."),
             action: (
               <button
-                onClick={handleUndoDelete}
+                onClick={() => {
+                  if (deletedTransaction) {
+                    const { id, created_at, user_id, ...transactionData } = deletedTransaction;
+                    TransactionService.addTransaction(transactionData)
+                      .then(() => {
+                        onTransactionUpdated();
+                        toast({
+                          title: t('transactions.restoreSuccess', "Transação restaurada"),
+                          description: t('transactions.restoreDescription', "Sua transação foi restaurada.")
+                        });
+                      })
+                      .catch(error => {
+                        console.error('Erro ao restaurar transação:', error);
+                        toast({
+                          title: t('common.error', "Erro"),
+                          description: t('transactions.restoreError', "Erro ao restaurar transação"),
+                          variant: "destructive"
+                        });
+                      });
+                  }
+                }}
                 className="text-blue-500 underline hover:text-blue-700"
               >
                 {t('transactions.undo', "Desfazer")}
