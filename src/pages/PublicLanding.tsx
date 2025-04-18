@@ -1,4 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { MessageSquare, Smartphone, TrendingUp, Target, Repeat, Lock, Zap, BarChart2, ArrowRight, CheckCircle2, Brain, PieChart, Globe } from 'lucide-react';
@@ -6,20 +8,20 @@ import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMediaQuery } from '../hooks/use-mobile';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+
 const PublicLanding: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const {
     isAuthenticated
   } = useAuth();
   const navigate = useNavigate();
-  useEffect(() => {
+  
+  React.useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
+  
   return <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       <Header isPublic={true} />
       
