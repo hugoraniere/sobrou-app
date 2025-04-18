@@ -17,31 +17,65 @@ const EmailVerification = () => {
   useEffect(() => {
     const handleEmailVerification = async () => {
       try {
-        // Extract token types from the URL
-        const token_hash = searchParams.get('token_hash');
-        const type = searchParams.get('type');
+        console.log('Verification parameters:', Object.fromEntries(searchParams.entries()));
         
-        if (token_hash && type) {
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash,
-            type: type as any,
-          });
-          
-          if (error) {
-            setVerificationStatus('error');
-            setErrorMessage(error.message);
-            console.error('Verification error:', error.message);
-          } else {
-            setVerificationStatus('success');
+        // Support for hash fragment parameters
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+        
+        console.log('Hash parameters:', { accessToken, refreshToken, type });
+        
+        // Extract token types from the URL
+        const token_hash = searchParams.get('token_hash') || accessToken;
+        const typeParam = searchParams.get('type') || type;
+        
+        if ((token_hash && typeParam) || accessToken) {
+          if (accessToken) {
+            // Handle direct token from hash (new Supabase flow)
+            // Set the session directly
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || ''
+            });
             
-            // Redirect after a short delay to show success message
-            setTimeout(() => {
-              navigate('/auth?verification=success');
-            }, 3000);
+            if (error) {
+              setVerificationStatus('error');
+              setErrorMessage(error.message);
+              console.error('Session error:', error.message);
+            } else {
+              setVerificationStatus('success');
+              
+              // Redirect after a short delay to show success message
+              setTimeout(() => {
+                navigate('/auth?verification=success');
+              }, 3000);
+            }
+          } else {
+            // Traditional OTP verification
+            const { error } = await supabase.auth.verifyOtp({
+              token_hash,
+              type: typeParam as any,
+            });
+            
+            if (error) {
+              setVerificationStatus('error');
+              setErrorMessage(error.message);
+              console.error('Verification error:', error.message);
+            } else {
+              setVerificationStatus('success');
+              
+              // Redirect after a short delay to show success message
+              setTimeout(() => {
+                navigate('/auth?verification=success');
+              }, 3000);
+            }
           }
         } else {
           setVerificationStatus('error');
           setErrorMessage('URL de verificação inválida ou incompleta.');
+          console.error('Missing verification parameters:', { token_hash, typeParam, accessToken });
         }
       } catch (error: any) {
         setVerificationStatus('error');
@@ -53,8 +87,15 @@ const EmailVerification = () => {
     handleEmailVerification();
   }, [searchParams, navigate]);
 
-  // Redirect immediately if no parameters are present
-  if (!searchParams.get('token_hash') && !searchParams.get('type')) {
+  // Check if we have hash parameters for Supabase's newer email flow
+  useEffect(() => {
+    if (window.location.hash) {
+      console.log('Hash detected in URL:', window.location.hash);
+    }
+  }, []);
+
+  // Redirect immediately if no parameters are present and no hash
+  if (!searchParams.get('token_hash') && !searchParams.get('type') && !window.location.hash) {
     return <Navigate to="/auth" replace />;
   }
 
