@@ -1,7 +1,7 @@
 
 import React from 'react'
 import { cn } from "@/lib/utils"
-import { Star } from 'lucide-react';
+import { Asterisk } from 'lucide-react';
 
 interface FloatingChatButtonProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ const FloatingChatButton = ({ isOpen, onClick, className }: FloatingChatButtonPr
       )}
       aria-label="Abrir chat de IA"
     >
-      <Star className="w-6 h-6" strokeWidth={2.5} />
+      <Asterisk className="w-6 h-6" strokeWidth={2.5} />
     </button>
   )
 }
