@@ -1,5 +1,4 @@
-
-import React, { AriaAttributes, DOMAttributes } from "react";
+import React, { AriaAttributes, DOMAttributes, ForwardRefExoticComponent, ReactElement, ReactNode, RefAttributes } from "react";
 
 declare module 'react' {
   interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
@@ -10,14 +9,15 @@ declare module 'react' {
     className?: string;
   }
 
-  interface FunctionComponent<P = {}> {
-    (props: P & { className?: string }, context?: any): ReactElement<any, any> | null;
-  }
-  
   type ElementType<P = any> = 
     | { [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never }[keyof JSX.IntrinsicElements] 
     | React.ComponentType<P>
-    | React.ForwardRefExoticComponent<P>;
+    | React.ForwardRefExoticComponent<P & RefAttributes<any>>
+    | React.FunctionComponent<P>;
+
+  interface ForwardRefExoticComponent<P> {
+    (props: P & { children?: ReactNode }): ReactElement | null;
+  }
 }
 
 interface TransactionDatePickerProps {
