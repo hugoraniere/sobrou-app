@@ -13,11 +13,94 @@ declare module 'react' {
   type ElementType<P = any> = 
     | { [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never }[keyof JSX.IntrinsicElements] 
     | React.ComponentType<P>
-    | React.ForwardRefExoticComponent<P & RefAttributes<any>>;
+    | React.ForwardRefExoticComponent<P & RefAttributes<any>>
+    | React.FunctionComponent<P>;  // Adicionado de volta
 
   interface ForwardRefExoticComponent<P> {
     (props: P & { children?: ReactNode }): ReactElement | null;
   }
+}
+
+// Adicionando interfaces para componentes Radix UI
+// Estas interfaces são para tipos usados em componentes como Accordion, Alert Dialog, etc.
+interface AccordionItemProps {
+  className?: string;
+}
+
+interface AccordionTriggerProps {
+  className?: string;
+}
+
+interface AccordionContentProps {
+  className?: string;
+}
+
+interface AlertDialogOverlayProps {
+  className?: string;
+}
+
+interface AlertDialogContentProps {
+  className?: string;
+}
+
+interface AlertDialogTitleProps {
+  className?: string;
+}
+
+interface AlertDialogDescriptionProps {
+  className?: string;
+}
+
+interface AlertDialogActionProps {
+  className?: string;
+}
+
+interface AlertDialogCancelProps {
+  className?: string;
+}
+
+interface AvatarProps {
+  className?: string;
+}
+
+interface AvatarImageProps {
+  className?: string;
+}
+
+interface AvatarFallbackProps {
+  className?: string;
+}
+
+interface CheckboxProps {
+  className?: string;
+}
+
+interface CommandProps {
+  className?: string;
+}
+
+interface CommandInputProps {
+  className?: string;
+}
+
+interface CommandListProps {
+  className?: string;
+}
+
+interface CommandEmptyProps {
+  className?: string;
+}
+
+interface CommandGroupProps {
+  className?: string;
+}
+
+interface CommandItemProps {
+  className?: string;
+}
+
+interface CommandSeparatorProps {
+  className?: string;
 }
 
 interface TransactionDatePickerProps {
