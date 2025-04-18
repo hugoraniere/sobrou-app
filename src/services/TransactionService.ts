@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { getCategoryByKeyword } from "@/data/categories";
 import type { Transaction } from "@/types/component-types";
