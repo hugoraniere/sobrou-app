@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
@@ -30,6 +30,10 @@ const HeroSection: React.FC = () => {
                   Ver como funciona
                 </Button>
               </Link>
+            </div>
+            <div className="flex items-center gap-2 mt-6 justify-center lg:justify-start text-gray-600">
+              <CheckCircle2 className="text-primary h-5 w-5" />
+              <span className="font-alliance">Comece em menos de 2 minutos</span>
             </div>
           </div>
           
