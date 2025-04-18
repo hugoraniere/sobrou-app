@@ -1,10 +1,10 @@
-
 import React from 'react'
 import { X, Send } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -17,12 +17,20 @@ interface ChatWindowProps {
   className?: string;
 }
 
+const SUGGESTED_QUESTIONS = [
+  "Como estão minhas finanças este mês?",
+  "Qual categoria gastei mais?",
+  "Quais são minhas metas de economia?",
+  "Me ajude a economizar dinheiro"
+]
+
 const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   const [messages, setMessages] = React.useState<Message[]>([])
   const [input, setInput] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
   const { user } = useAuth()
+  const isMobile = useIsMobile()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -68,12 +76,18 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
     }
   }
 
+  const handleSuggestionClick = (question: string) => {
+    setInput(question)
+  }
+
   if (!isOpen) return null
 
   return (
     <div className={cn(
-      "fixed bottom-24 right-6 z-50 w-96 rounded-lg bg-white shadow-xl",
-      "border border-gray-200",
+      "fixed z-50 bg-white shadow-xl border border-gray-200",
+      isMobile 
+        ? "bottom-24 left-4 right-4 w-auto rounded-xl"
+        : "bottom-24 right-6 w-96 rounded-lg",
       className
     )}>
       {/* Header */}
@@ -90,24 +104,38 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
 
       {/* Messages */}
       <div className="h-96 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && (
-          <div className="text-gray-500 text-center py-4">
-            Faça uma pergunta sobre suas finanças
+        {messages.length === 0 ? (
+          <div className="space-y-4">
+            <p className="text-gray-500 text-center">
+              Como posso ajudar você hoje? Aqui algumas sugestões:
+            </p>
+            <div className="space-y-2">
+              {SUGGESTED_QUESTIONS.map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSuggestionClick(question)}
+                  className="w-full text-left p-3 text-sm rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
           </div>
+        ) : (
+          messages.map((message, index) => (
+            <div
+              key={index}
+              className={cn(
+                "max-w-[85%] rounded-lg p-3",
+                message.role === 'user'
+                  ? "ml-auto bg-[#7C3AED] text-white"
+                  : "bg-gray-100 text-gray-700"
+              )}
+            >
+              {message.content}
+            </div>
+          ))
         )}
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={cn(
-              "max-w-[85%] rounded-lg p-3",
-              message.role === 'user'
-                ? "ml-auto bg-[#7C3AED] text-white"
-                : "bg-gray-100 text-gray-700"
-            )}
-          >
-            {message.content}
-          </div>
-        ))}
         <div ref={messagesEndRef} />
       </div>
 
