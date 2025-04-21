@@ -15,12 +15,16 @@ const Settings = () => {
     <div className="container mx-auto px-4 py-8">
       <ProfileSection onEditClick={() => setIsProfileEditOpen(true)} />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6">
         <WhatsAppSection />
-        <NotificationsSection />
-        <AppearanceSection />
-        <ChangePasswordSection />
-        <DangerZoneSection />
+        <div className="grid gap-6 md:grid-cols-2">
+          <NotificationsSection />
+          <AppearanceSection />
+        </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          <ChangePasswordSection />
+          <DangerZoneSection />
+        </div>
       </div>
 
       <ProfileEditDialog 
