@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Form, 
@@ -16,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LockIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +32,6 @@ type FormValues = z.infer<typeof passwordChangeSchema>;
 
 const ChangePasswordSection: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [isChanging, setIsChanging] = useState(false);
 
   const form = useForm<FormValues>({
@@ -74,10 +72,6 @@ const ChangePasswordSection: React.FC = () => {
     } finally {
       setIsChanging(false);
     }
-  };
-
-  const handleResetPasswordClick = () => {
-    navigate('/reset-password');
   };
 
   return (
@@ -155,11 +149,7 @@ const ChangePasswordSection: React.FC = () => {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-end border-t pt-4">
-        <Button variant="outline" onClick={handleResetPasswordClick}>
-          {t('settings.forgotPassword', 'Esqueci minha senha')}
-        </Button>
-      </CardFooter>
+      {/* Card footer with "Forgot Password" button has been removed as requested */}
     </Card>
   );
 };
