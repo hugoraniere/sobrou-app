@@ -16,10 +16,10 @@ const Settings = () => {
       <ProfileSection onEditClick={() => setIsProfileEditOpen(true)} />
 
       <div className="grid gap-6 md:grid-cols-2">
-        <ChangePasswordSection />
         <WhatsAppSection />
         <NotificationsSection />
         <AppearanceSection />
+        <ChangePasswordSection />
         <DangerZoneSection />
       </div>
 
