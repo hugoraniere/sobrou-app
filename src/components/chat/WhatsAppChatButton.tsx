@@ -63,7 +63,7 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
         return;
       }
       
-      // Usar diretamente a API oficial do WhatsApp Business
+      // Usar a API web do WhatsApp 
       window.open(`https://wa.me/${WHATSAPP_PHONE_NUMBER_ID}`, '_blank');
     } else {
       // Redirecionar para a página de integração usando React Router

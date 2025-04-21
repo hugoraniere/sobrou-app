@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import HeaderLogo from './header/HeaderLogo';
 import { useTranslation } from 'react-i18next';
 import AddTransactionDialog from './transactions/AddTransactionDialog';
+import HeaderDesktopNav from './header/HeaderDesktopNav';
 
 const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
   const { user } = useAuth();
@@ -24,6 +25,12 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
                   {t('auth.login', 'Entrar')}
                 </button>
               </Link>
+            )}
+            
+            {user && !isPublic && (
+              <div className="hidden md:flex">
+                <HeaderDesktopNav onNewTransaction={() => setIsAddTransactionOpen(true)} />
+              </div>
             )}
           </div>
         </div>
