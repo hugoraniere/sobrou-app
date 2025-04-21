@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { categories } from '@/data/categories';
+import { transactionCategories } from '@/data/categories';
 import { cn } from '@/lib/utils';
 
 interface CategorySelectorProps {
@@ -17,7 +17,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
   const [open, setOpen] = useState(false);
 
   // Get current category data
-  const selectedCategory = categories.find(c => c.value === value) || {
+  const selectedCategory = transactionCategories.find(c => c.value === value) || {
     label: value || 'Selecione uma categoria',
     value: value,
     color: 'bg-gray-100 text-gray-800',
@@ -30,7 +30,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
       <CommandList>
         <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
         <CommandGroup heading="Categorias">
-          {categories.map((category) => (
+          {transactionCategories.map((category) => (
             <CommandItem
               key={category.value}
               value={category.value}

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { categories } from '@/data/categories';
+import { transactionCategories } from '@/data/categories';
 
 interface TransactionCategoryCellProps {
   category: string;
@@ -13,9 +13,9 @@ interface TransactionCategoryCellProps {
  */
 const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ category, className }) => {
   // Get category metadata
-  const categoryData = categories.find(c => c.value.toLowerCase() === category.toLowerCase()) || {
+  const categoryData = transactionCategories.find(c => c.value === category) || {
     label: category,
-    value: category.toLowerCase(),
+    value: category,
     color: 'bg-gray-100 text-gray-800',
     icon: null
   };
@@ -27,7 +27,7 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
       className
     )}>
       {categoryData.icon && (
-        <span className="w-3 h-3">{categoryData.icon}</span>
+        <span className="w-3 h-3">{categoryData.icon()}</span>
       )}
       {categoryData.label}
     </div>

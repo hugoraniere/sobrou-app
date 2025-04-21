@@ -17,11 +17,11 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({ expenses
   
   // Add all transaction categories to the chart config
   transactionCategories.forEach(category => {
-    chartConfig[category.id] = {
+    chartConfig[category.value] = {
       label: category.name,
       theme: {
-        light: category.color || "#8884D8",
-        dark: category.color || "#8884D8"
+        light: category.color.replace('bg-', '').replace('text-', '') || "#8884D8",
+        dark: category.color.replace('bg-', '').replace('text-', '') || "#8884D8"
       }
     };
   });
