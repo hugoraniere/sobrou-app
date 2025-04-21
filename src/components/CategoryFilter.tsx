@@ -1,12 +1,13 @@
 
 import React from 'react';
+import { categories } from '@/data/categories';
 
 type CategoryProps = {
   activeCategory: string;
   setActiveCategory: (category: string) => void;
 };
 
-const categories = [
+const allCategories = [
   "Todos",
   "Tecnologia",
   "Moda",
@@ -25,7 +26,7 @@ const CategoryFilter = ({ activeCategory, setActiveCategory }: CategoryProps) =>
       <h3 className="font-montserrat font-semibold text-lg mb-4">Categorias</h3>
       
       <div className="space-y-2">
-        {categories.map((category) => (
+        {allCategories.map((category) => (
           <button
             key={category}
             onClick={() => setActiveCategory(category)}

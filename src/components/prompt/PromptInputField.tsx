@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tag, X, Calendar } from "lucide-react";
 import TransactionDatePicker from './TransactionDatePicker';
-import { CategoryItem, categories } from '@/data/categories';
+import { transactionCategories } from '@/data/categories';
 
 interface PromptInputFieldProps {
   inputValue: string;
@@ -31,7 +31,7 @@ const CategorySelectorPopover: React.FC<{
   onReset: (e: React.MouseEvent) => void;
   userSelected: boolean;
 }> = ({ categoryId, isOpen, setIsOpen, onCategorySelect, onReset, userSelected }) => {
-  const category = categories.find(c => c.value === categoryId);
+  const category = transactionCategories.find(c => c.value === categoryId);
   
   if (!category) return null;
   
@@ -55,7 +55,7 @@ const CategorySelectorPopover: React.FC<{
           </div>
           
           <div className="space-y-1">
-            {categories.map((cat) => (
+            {transactionCategories.map((cat) => (
               <Badge
                 key={cat.value}
                 variant={cat.value === categoryId ? "default" : "outline"}
