@@ -44,10 +44,16 @@ file_size_limit = "50MiB"
 site_url = "http://localhost:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = ["https://localhost:3000"]
-# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (1
+# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
 # week).
 jwt_expiry = 3600
 # Allow/disallow new user signups to your project.
+enable_signup = true
+# If disabled, the user will be persisted in the app but the signup mail will not be sent.
+enable_confirmations = false
+
+[auth.email]
+# Allow/disallow new user signups via email to your project.
 enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
@@ -55,15 +61,58 @@ double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
 
-[analytics]
+# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
+# `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin`, `notion`, `twitch`,
+# `twitter`, `slack`, `spotify`, `workos`, `zoom`.
+[auth.external.apple]
 enabled = false
-port = 54327
-vector_port = 54328
-# Setup BigQuery for Supabase Analytics.
-backend = "postgres" # or "bigquery"
-# How often Analytics data is pushed to BigQuery, in seconds
-batch_interval = 60
+client_id = ""
+secret = ""
+# Overrides the default auth redirectUrl.
+redirect_uri = ""
+# Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
+# or any other third-party OIDC providers.
+url = ""
 
-# Configuração da função whatsapp-webhook
-[functions.whatsapp-webhook]
-verify_jwt = false
+[functions]
+# Port to serve Edge Functions on your local machine.
+port = 54321
+
+# Configure one of the supported storage providers.
+[storage.file]
+enabled = true
+
+[storage.s3]
+enabled = false
+endpoint = ""
+bucket = ""
+region = ""
+access_key = ""
+secret = ""
+
+# Configure one of the supported SMS providers.
+[sms.twilio]
+enabled = false
+account_sid = ""
+message_service_sid = ""
+auth_token = ""
+
+[sms.messagebird]
+enabled = false
+access_key = ""
+originator = ""
+
+[sms.vonage]
+enabled = false
+api_key = ""
+api_secret = ""
+from = ""
+
+[sms.textlocal]
+enabled = false
+api_key = ""
+sender = ""
+
+# Configura a função de verificação de WhatsApp
+[functions.check-whatsapp-number]
+verify_jwt = true

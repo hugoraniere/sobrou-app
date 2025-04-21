@@ -1,26 +1,36 @@
 
 import React from 'react';
-import { TableCell } from "@/components/ui/table";
-import { transactionCategories } from '@/data/categories';
 import { cn } from '@/lib/utils';
-import type { Transaction } from '@/services/TransactionService';
-import type { StandardProps } from '@/types/component-types';
+import { categories } from '@/data/categories';
 
-interface TransactionCategoryCellProps extends StandardProps {
-  category: Transaction['category'];
+interface TransactionCategoryCellProps {
+  category: string;
+  className?: string;
 }
 
+/**
+ * Component to display a transaction category with appropriate styling
+ */
 const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ category, className }) => {
-  const categoryInfo = transactionCategories.find(cat => cat.id === category);
-  const CategoryIcon = categoryInfo?.icon;
-
+  // Get category metadata
+  const categoryData = categories.find(c => c.value.toLowerCase() === category.toLowerCase()) || {
+    label: category,
+    value: category.toLowerCase(),
+    color: 'bg-gray-100 text-gray-800',
+    icon: null
+  };
+  
   return (
-    <TableCell className={cn(className)}>
-      <div className="flex items-center gap-2">
-        {CategoryIcon && <CategoryIcon className="h-4 w-4" />}
-        <span>{categoryInfo?.name || category}</span>
-      </div>
-    </TableCell>
+    <div className={cn(
+      "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap",
+      categoryData.color,
+      className
+    )}>
+      {categoryData.icon && (
+        <span className="w-3 h-3">{categoryData.icon}</span>
+      )}
+      {categoryData.label}
+    </div>
   );
 };
 

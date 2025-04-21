@@ -1,59 +1,58 @@
 
-import React from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { XCircle } from "lucide-react";
-import { transactionCategories } from '@/data/categories';
+import React, { useState } from 'react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { categories } from '@/data/categories';
 import { cn } from '@/lib/utils';
-import type { CategorySelectorProps } from '@/types/component-types';
 
-const CategorySelector: React.FC<CategorySelectorProps> = ({
-  categoryId,
-  isOpen,
-  setIsOpen,
-  onCategorySelect,
-  onReset,
-  userSelected,
-  className
-}) => {
-  const categoryInfo = transactionCategories.find(cat => cat.id === categoryId);
-  const CategoryIcon = categoryInfo?.icon;
-  const categoryName = categoryInfo?.name;
+interface CategorySelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}
+
+/**
+ * Dropdown component for selecting transaction categories
+ */
+const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, className }) => {
+  const [open, setOpen] = useState(false);
+
+  // Get current category data
+  const selectedCategory = categories.find(c => c.value === value) || {
+    label: value || 'Selecione uma categoria',
+    value: value,
+    color: 'bg-gray-100 text-gray-800',
+    icon: null
+  };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <div className={cn("flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200", className)}>
-          {CategoryIcon && <CategoryIcon className="h-3 w-3" />}
-          <span>{categoryName}</span>
-          {userSelected && (
-            <XCircle 
-              className="h-3 w-3 ml-1 text-gray-500 hover:text-gray-700" 
-              onClick={onReset} 
-            />
-          )}
-        </div>
-      </PopoverTrigger>
-      <PopoverContent className="w-56 p-2" align="end">
-        <div className="grid gap-1 max-h-60 overflow-y-auto">
-          {transactionCategories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <div
-                key={category.id}
-                className={cn(
-                  "flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100",
-                  category.id === categoryId ? 'bg-blue-50 text-blue-600' : ''
-                )}
-                onClick={() => onCategorySelect(category.id)}
-              >
-                {Icon && <Icon className="h-4 w-4" />}
-                <span>{category.name}</span>
-              </div>
-            );
-          })}
-        </div>
-      </PopoverContent>
-    </Popover>
+    <Command className={cn("rounded-lg border shadow-md", className)}>
+      <CommandInput placeholder="Buscar categoria..." />
+      <CommandList>
+        <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
+        <CommandGroup heading="Categorias">
+          {categories.map((category) => (
+            <CommandItem
+              key={category.value}
+              value={category.value}
+              onSelect={(currentValue) => {
+                onChange(currentValue);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 cursor-pointer",
+                value === category.value ? "bg-primary/10" : ""
+              )}
+            >
+              <div className={cn(
+                "w-3 h-3 rounded-full",
+                category.color.replace('text-', 'bg-').split(' ')[0]
+              )} />
+              {category.label}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 };
 

@@ -1,116 +1,112 @@
 
-import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { transactionCategories } from '@/data/categories';
+import React, { useState } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Calendar, Clock, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import TransactionCategoryCell from '@/components/transactions/cells/TransactionCategoryCell';
+import TransactionAmountCell from '@/components/transactions/cells/TransactionAmountCell';
+import TransactionTypeCell from '@/components/transactions/cells/TransactionTypeCell';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import type { TransactionDetailsProps } from '@/types/component-types';
 
-const TransactionDetails: React.FC<TransactionDetailsProps> = ({
-  transaction,
-  onInputChange,
-  handleSelectChange,
-  className
-}) => {
-  const { t } = useTranslation();
+interface TransactionDetailsProps {
+  transaction: {
+    id: string;
+    description: string;
+    amount: number;
+    date: string;
+    category: string;
+    type: string;
+  };
+  className?: string;
+}
+
+/**
+ * Displays detailed information about a transaction
+ */
+const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, className }) => {
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.language === 'pt-BR' ? ptBR : undefined;
+
+  // Format transaction date for display
+  const formattedDate = format(new Date(transaction.date), 'PPP', {
+    locale: currentLocale,
+  });
+  
+  // Format transaction time (using current time as placeholder since we don't store time)
+  const formattedTime = format(new Date(), 'p', {
+    locale: currentLocale,
+  });
 
   return (
-    <div className={cn("space-y-4", className)}>
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="date" className="text-right">
-          {t('transactions.date', 'Data')}
-        </Label>
-        <Input
-          id="date"
-          name="date"
-          type="date"
-          value={transaction.date || ''}
-          onChange={onInputChange}
-          className="col-span-3"
-        />
-      </div>
+    <Card className={cn("w-full", className)}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl font-bold">{transaction.description}</CardTitle>
+        <CardDescription>
+          {t('transactions.details', 'Detalhes da transação')}
+        </CardDescription>
+      </CardHeader>
       
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="type" className="text-right">
-          {t('transactions.type', 'Tipo')}
-        </Label>
-        <Select 
-          name="type" 
-          value={transaction.type || 'expense'}
-          onValueChange={(value) => handleSelectChange('type', value)}
-        >
-          <SelectTrigger className="col-span-3">
-            <SelectValue placeholder={t('transactions.selectType', 'Selecione o tipo')} />
-          </SelectTrigger>
-          <SelectContent className="bg-white">
-            <SelectItem value="income">{t('common.income', 'Receita')}</SelectItem>
-            <SelectItem value="expense">{t('common.expense', 'Despesa')}</SelectItem>
-            <SelectItem value="transfer">{t('transactions.transfer', 'Transferência')}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="category" className="text-right">
-          {t('transactions.category', 'Categoria')}
-        </Label>
-        <Select 
-          name="category" 
-          value={transaction.category || 'other'}
-          onValueChange={(value) => handleSelectChange('category', value)}
-        >
-          <SelectTrigger className="col-span-3">
-            <SelectValue placeholder={t('transactions.selectCategory', 'Selecione a categoria')} />
-          </SelectTrigger>
-          <SelectContent className="bg-white max-h-[300px]">
-            {transactionCategories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <SelectItem key={category.id} value={category.id}>
-                  {Icon && <Icon className="mr-2 inline h-4 w-4" />}
-                  {category.name}
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="description" className="text-right">
-          {t('transactions.description', 'Descrição')}
-        </Label>
-        <Input
-          id="description"
-          name="description"
-          value={transaction.description || ''}
-          onChange={onInputChange}
-          className="col-span-3"
-        />
-      </div>
-      
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="amount" className="text-right">
-          {t('transactions.amount', 'Valor')}
-        </Label>
-        <Input
-          id="amount"
-          name="amount"
-          type="number"
-          value={transaction.amount || ''}
-          onChange={onInputChange}
-          className="col-span-3"
-        />
-      </div>
-    </div>
+      <CardContent className="space-y-4">
+        {/* Amount section */}
+        <div className="text-center py-4">
+          <TransactionAmountCell amount={transaction.amount} type={transaction.type} className="text-3xl font-bold" />
+        </div>
+        
+        <Separator />
+        
+        {/* Transaction metadata */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              {t('transactions.category', 'Categoria')}
+            </div>
+            <TransactionCategoryCell category={transaction.category} className="text-sm" />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              {t('transactions.type', 'Tipo')}
+            </div>
+            <TransactionTypeCell type={transaction.type} />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              {t('transactions.date', 'Data')}
+            </div>
+            <div className="flex items-center">
+              <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>{formattedDate}</span>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              {t('transactions.time', 'Hora')}
+            </div>
+            <div className="flex items-center">
+              <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>{formattedTime}</span>
+            </div>
+          </div>
+        </div>
+        
+        <Separator />
+        
+        {/* Transaction ID */}
+        <div className="pt-2">
+          <div className="flex items-start gap-2 text-xs text-muted-foreground">
+            <Info className="h-4 w-4 shrink-0" />
+            <div>
+              <p>{t('transactions.idLabel', 'ID da Transação')}: {transaction.id}</p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
