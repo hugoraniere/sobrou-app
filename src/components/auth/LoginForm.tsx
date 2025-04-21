@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,225 +11,189 @@ import {
   FormLabel, 
   FormMessage 
 } from "@/components/ui/form";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription, 
-  DialogTrigger 
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { toast } from "sonner";
 import { useAuth } from '../../contexts/AuthContext';
-import { useSearchParams } from 'react-router-dom';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertCircle } from 'lucide-react';
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+const formSchema = z.object({
+  email: z.string().email("Endereço de email inválido"),
+  password: z.string().min(1, "A senha é obrigatória"),
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-const passwordResetSchema = z.object({
-  email: z.string().email("Por favor, insira um email válido"),
-});
+type FormValues = z.infer<typeof formSchema>;
+type ResetPasswordFormValues = { email: string };
 
 interface LoginFormProps {
   setActiveTab: (tab: string) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [searchParams] = useSearchParams();
-  const [verificationSuccess, setVerificationSuccess] = useState(false);
-  const { login } = useAuth();
+  const { login, requestPasswordReset } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
 
-  // Check for verification success in URL params
-  useEffect(() => {
-    const verification = searchParams.get('verification');
-    if (verification === 'success') {
-      setVerificationSuccess(true);
-    }
-  }, [searchParams]);
-
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: ""
-    }
+      password: "",
+    },
   });
 
-  const handleLogin = async (values: LoginFormValues) => {
+  const resetPasswordForm = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(z.object({
+      email: z.string().email("Endereço de email inválido")
+    })),
+    defaultValues: {
+      email: form.getValues("email") || "",
+    },
+  });
+
+  const onSubmit = async (values: FormValues) => {
     try {
+      setIsLoading(true);
       await login(values.email, values.password);
-      toast.success("Login successful!");
     } catch (error: any) {
-      toast.error(error.message || "Login failed. Please check your credentials.");
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handlePasswordReset = async (values: { email: string }) => {
+  const handleResetPassword = async (values: ResetPasswordFormValues) => {
     try {
       setIsResettingPassword(true);
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: `${window.location.origin}/reset-password`
-      });
-
-      if (error) throw error;
-
-      toast.success('Email de redefinição de senha enviado com sucesso!');
+      await requestPasswordReset(values.email);
+      setIsResetDialogOpen(false);
     } catch (error: any) {
-      toast.error(error.message || 'Erro ao enviar email de redefinição');
+      toast.error(error.message);
     } finally {
       setIsResettingPassword(false);
     }
   };
 
-  const passwordResetForm = useForm<{ email: string }>({
-    resolver: zodResolver(passwordResetSchema),
-    defaultValues: { email: "" }
-  });
+  const openResetDialog = () => {
+    resetPasswordForm.setValue("email", form.getValues("email") || "");
+    setIsResetDialogOpen(true);
+  };
 
   return (
-    <Form {...form}>
-      {verificationSuccess && (
-        <Alert className="mb-4 bg-green-50 border-green-200">
-          <AlertDescription className="text-green-800">
-            Email verified successfully! You can now log in.
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <div className="relative">
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
                   <Input 
-                    placeholder="you@example.com" 
-                    type="email" 
-                    className="pl-10" 
+                    placeholder="seu@email.com" 
+                    autoComplete="email"
                     {...field} 
                   />
-                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <div className="flex items-center justify-between">
-                <FormLabel>Senha</FormLabel>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <a href="#" className="text-sm text-primary hover:underline">
-                      Esqueceu a senha?
-                    </a>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Redefinir Senha</DialogTitle>
-                      <DialogDescription>
-                        Insira seu email para receber instruções de redefinição de senha
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Form {...passwordResetForm}>
-                      <form onSubmit={passwordResetForm.handleSubmit(handlePasswordReset)} className="space-y-4">
-                        <FormField
-                          control={passwordResetForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input 
-                                    placeholder="seu@exemplo.com" 
-                                    type="email" 
-                                    className="pl-10" 
-                                    {...field} 
-                                  />
-                                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button 
-                          type="submit" 
-                          className="w-full mt-4"
-                          disabled={isResettingPassword}
-                        >
-                          {isResettingPassword ? 'Enviando...' : 'Enviar link de redefinição'}
-                        </Button>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    placeholder="••••••••"
-                    type={showPassword ? "text" : "password"}
-                    className="pl-10 pr-10"
-                    {...field}
-                  />
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center justify-between">
+                  <FormLabel>Senha</FormLabel>
+                  <button 
+                    type="button" 
+                    className="text-sm font-medium text-primary hover:text-primary/80"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openResetDialog();
+                    }}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
+                    Esqueceu a senha?
                   </button>
                 </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button 
-          type="submit" 
-          className="w-full mt-6" 
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? "Entrando..." : "Entrar"}
-        </Button>
-      </form>
-      <div className="flex justify-center mt-4">
-        <p className="text-sm text-gray-600">
+                <FormControl>
+                  <Input 
+                    type="password" 
+                    placeholder="••••••••" 
+                    autoComplete="current-password"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Entrando..." : "Entrar"}
+          </Button>
+        </form>
+      </Form>
+      
+      <div className="mt-6 text-center text-sm">
+        <p className="text-muted-foreground">
           Ainda não tem uma conta?{" "}
-          <a
+          <button
+            type="button"
+            className="font-medium text-primary hover:text-primary/80"
             onClick={() => setActiveTab("signup")}
-            className="text-primary hover:underline cursor-pointer"
           >
-            Criar agora
-          </a>
+            Cadastre-se
+          </button>
         </p>
       </div>
-    </Form>
+
+      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Redefinir Senha</DialogTitle>
+            <DialogDescription>
+              Informe seu e-mail e enviaremos instruções para redefinir sua senha.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...resetPasswordForm}>
+            <form onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)}>
+              <FormField
+                control={resetPasswordForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="seu@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter className="mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsResetDialogOpen(false)}
+                  type="button"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={isResettingPassword}
+                >
+                  {isResettingPassword ? "Enviando..." : "Enviar Link"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

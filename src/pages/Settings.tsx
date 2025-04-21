@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +34,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import ProfileEditDialog from '@/components/profile/ProfileEditDialog';
+import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -106,6 +108,9 @@ const Settings = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
+        {/* Seção de alteração de senha */}
+        <ChangePasswordSection />
+        
         {/* WhatsApp Integration Card */}
         <Card className="md:col-span-2">
           <CardHeader>

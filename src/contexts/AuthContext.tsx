@@ -23,6 +23,7 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   signup: (fullName: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,7 +38,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
+      async (event, currentSession) => {
+        // Para debug: identificar eventos de autenticação
+        console.log('Auth event:', event);
+        
         setSession(currentSession);
         setIsAuthenticated(!!currentSession);
         
@@ -50,6 +54,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         } else {
           setUser(null);
+        }
+
+        // Identificar se estamos em um fluxo de recuperação de senha
+        if (event === 'PASSWORD_RECOVERY') {
+          navigate('/reset-password');
         }
 
         setIsLoading(false);
@@ -82,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   // Completamente reescrita para evitar redirecionamentos em loops
   useEffect(() => {
@@ -92,12 +101,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Lista de rotas que são exclusivamente públicas (não fazem sentido para usuários autenticados)
     const strictlyPublicRoutes = ['/auth'];
     
+    // Rotas que são acessíveis tanto para usuários autenticados quanto não autenticados
+    const publicAccessibleRoutes = ['/reset-password'];
+    
     // Verificamos se o usuário está na página de autenticação e já está autenticado
     const isOnStrictlyPublicRoute = strictlyPublicRoutes.includes(location.pathname);
+    const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
     
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
-    // uma rota exclusivamente pública (como a página de login)
-    if (isAuthenticated && isOnStrictlyPublicRoute) {
+    // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
+    if (isAuthenticated && isOnStrictlyPublicRoute && !isOnPasswordResetRoute) {
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, isLoading, location.pathname, navigate]);
@@ -162,6 +175,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    try {
+      const resetPasswordRedirectTo = `${window.location.origin}/reset-password`;
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: resetPasswordRedirectTo
+      });
+      
+      if (error) throw error;
+      
+      toast.success('Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha.');
+    } catch (error: any) {
+      console.error('Password reset request failed:', error);
+      // Não mostramos erro específico para evitar vazamento de informação
+      toast.success('Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha.');
+    }
+  };
+
   const logout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -182,7 +213,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isLoading,
       login, 
       signup, 
-      logout 
+      logout,
+      requestPasswordReset
     }}>
       {children}
     </AuthContext.Provider>

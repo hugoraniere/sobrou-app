@@ -18,6 +18,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Logo from '@/components/brand/Logo';
+import { useAuth } from '@/contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { InfoIcon } from 'lucide-react';
 
 const passwordResetSchema = z.object({
   password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
@@ -30,7 +33,9 @@ const passwordResetSchema = z.object({
 const PasswordReset: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isResetting, setIsResetting] = useState(false);
+  const [resetType, setResetType] = useState<'token' | 'logged-in'>('token');
 
   const form = useForm<{
     password: string;
@@ -43,17 +48,48 @@ const PasswordReset: React.FC = () => {
     }
   });
 
+  useEffect(() => {
+    // Verifica se é uma redefinição de senha com token ou um usuário logado alterando a senha
+    const accessToken = searchParams.get('access_token');
+    const tokenHash = searchParams.get('token_hash');
+    const type = searchParams.get('type');
+    
+    if ((accessToken || tokenHash) && type === 'recovery') {
+      setResetType('token');
+      // Aqui não terminamos a autenticação, apenas permitimos que o usuário defina a nova senha
+    } else if (user) {
+      setResetType('logged-in');
+    } else {
+      // Se não há token de recuperação e nem usuário logado, redireciona para a autenticação
+      navigate('/auth');
+    }
+  }, [searchParams, user, navigate]);
+
   const handlePasswordReset = async (values: { password: string }) => {
     try {
       setIsResetting(true);
-      const { error } = await supabase.auth.updateUser({
-        password: values.password
-      });
+      
+      if (resetType === 'token') {
+        // Usando o token na URL para redefinir a senha
+        const { error } = await supabase.auth.updateUser({
+          password: values.password
+        });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast.success('Senha redefinida com sucesso!');
-      navigate('/dashboard');
+        toast.success('Senha redefinida com sucesso!');
+        navigate('/auth');
+      } else {
+        // Usuário logado alterando a senha
+        const { error } = await supabase.auth.updateUser({
+          password: values.password
+        });
+
+        if (error) throw error;
+
+        toast.success('Senha atualizada com sucesso!');
+        navigate('/settings');
+      }
     } catch (error: any) {
       toast.error(error.message || 'Erro ao redefinir senha');
     } finally {
@@ -69,18 +105,29 @@ const PasswordReset: React.FC = () => {
             <Logo size="lg" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Redefinir Senha
+            {resetType === 'token' ? 'Redefinir Senha' : 'Alterar Senha'}
           </h2>
         </div>
         
         <Card>
           <CardHeader>
-            <CardTitle>Nova Senha</CardTitle>
+            <CardTitle>{resetType === 'token' ? 'Nova Senha' : 'Alterar Senha'}</CardTitle>
             <CardDescription>
-              Insira sua nova senha para redefinir o acesso
+              {resetType === 'token' 
+                ? 'Insira sua nova senha para redefinir o acesso' 
+                : 'Defina uma nova senha para sua conta'}
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {resetType === 'logged-in' && (
+              <Alert className="mb-4 bg-blue-50 border-blue-200">
+                <InfoIcon className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-700">
+                  Por segurança, você precisará fazer login novamente após alterar sua senha.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handlePasswordReset)} className="space-y-4">
                 <FormField
@@ -122,7 +169,7 @@ const PasswordReset: React.FC = () => {
                   className="w-full mt-6" 
                   disabled={isResetting}
                 >
-                  {isResetting ? 'Redefinindo...' : 'Redefinir Senha'}
+                  {isResetting ? 'Processando...' : (resetType === 'token' ? 'Redefinir Senha' : 'Atualizar Senha')}
                 </Button>
               </form>
             </Form>
