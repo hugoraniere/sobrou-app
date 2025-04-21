@@ -7,6 +7,7 @@ import WhatsAppSection from '@/components/settings/WhatsAppSection';
 import DangerZoneSection from '@/components/settings/DangerZoneSection';
 import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
 import ProfileEditDialog from '@/components/profile/ProfileEditDialog';
+import ResetPasswordSection from '@/components/settings/ResetPasswordSection';  // New import
 
 const Settings = () => {
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
@@ -17,6 +18,7 @@ const Settings = () => {
 
       <div className="grid gap-6 md:grid-cols-2">
         <ChangePasswordSection />
+        <ResetPasswordSection />  {/* Added this line */}
         <WhatsAppSection />
         <NotificationsSection />
         <AppearanceSection />
