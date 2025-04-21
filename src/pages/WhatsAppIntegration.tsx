@@ -36,6 +36,7 @@ const WhatsAppIntegration = () => {
         }
         
         if (data?.whatsapp_number) {
+          console.log(data);
           setSavedPhoneNumber(data.whatsapp_number);
           setIsConnected(true);
         }
