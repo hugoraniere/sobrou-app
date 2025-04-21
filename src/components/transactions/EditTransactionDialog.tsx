@@ -44,7 +44,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   const handleSave = async () => {
     try {
       // Filter out is_recurring if it exists since the database doesn't support it
-      const { is_recurring, ...updateData } = editedTransaction;
+      const { is_recurring, ...updateData } = editedTransaction as any;
       
       await TransactionService.updateTransaction(transaction.id, updateData);
       setIsOpen(false);

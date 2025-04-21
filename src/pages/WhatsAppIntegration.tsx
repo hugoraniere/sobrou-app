@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,13 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert";
+
+const alertStatus = (status: string) => {
+  if (status === 'verified') return { message: t('whatsapp.verified'), variant: 'default' as const };
+  if (status === 'pending') return { message: t('whatsapp.pending'), variant: 'default' as const };
+  if (status === 'error') return { message: t('whatsapp.error'), variant: 'destructive' as const };
+  return { message: t('whatsapp.unknown'), variant: 'destructive' as const };
+};
 
 const WhatsAppIntegration = () => {
   const { isAuthenticated, user } = useAuth();

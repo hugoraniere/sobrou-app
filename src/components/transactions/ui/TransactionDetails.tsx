@@ -1,112 +1,100 @@
 
-import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Calendar, Clock, Info } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import TransactionCategoryCell from '@/components/transactions/cells/TransactionCategoryCell';
+import React from 'react';
+import { Transaction } from '@/services/TransactionService';
+import { FormLabel, FormItem, FormControl } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionAmountCell from '@/components/transactions/cells/TransactionAmountCell';
 import TransactionTypeCell from '@/components/transactions/cells/TransactionTypeCell';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
+import TransactionCategoryCell from '@/components/transactions/cells/TransactionCategoryCell';
+import { useTranslation } from 'react-i18next';
+import CategorySelector from '@/components/prompt/CategorySelector';
+import TransactionDatePicker from '@/components/prompt/TransactionDatePicker';
 
 interface TransactionDetailsProps {
-  transaction: {
-    id: string;
-    description: string;
-    amount: number;
-    date: string;
-    category: string;
-    type: string;
-  };
-  className?: string;
+  transaction: Transaction;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSelectChange: (name: string, value: string) => void;
 }
 
-/**
- * Displays detailed information about a transaction
- */
-const TransactionDetails: React.FC<TransactionDetailsProps> = ({ transaction, className }) => {
-  const { t, i18n } = useTranslation();
-  const currentLocale = i18n.language === 'pt-BR' ? ptBR : undefined;
-
-  // Format transaction date for display
-  const formattedDate = format(new Date(transaction.date), 'PPP', {
-    locale: currentLocale,
-  });
-  
-  // Format transaction time (using current time as placeholder since we don't store time)
-  const formattedTime = format(new Date(), 'p', {
-    locale: currentLocale,
-  });
+const TransactionDetails: React.FC<TransactionDetailsProps> = ({ 
+  transaction, 
+  onInputChange,
+  handleSelectChange
+}) => {
+  const { t } = useTranslation();
 
   return (
-    <Card className={cn("w-full", className)}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-bold">{transaction.description}</CardTitle>
-        <CardDescription>
-          {t('transactions.details', 'Detalhes da transação')}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {/* Amount section */}
-        <div className="text-center py-4">
-          <TransactionAmountCell amount={transaction.amount} type={transaction.type} className="text-3xl font-bold" />
+    <div className="space-y-4">
+      <Tabs 
+        defaultValue={transaction.type} 
+        value={transaction.type}
+        onValueChange={(value) => handleSelectChange('type', value)}
+        className="w-full"
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="expense">{t('transactions.expense', 'Despesa')}</TabsTrigger>
+          <TabsTrigger value="income">{t('transactions.income', 'Receita')}</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <TransactionTypeCell type={transaction.type} />
+          <TransactionCategoryCell category={transaction.category} />
         </div>
-        
-        <Separator />
-        
-        {/* Transaction metadata */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground">
-              {t('transactions.category', 'Categoria')}
-            </div>
-            <TransactionCategoryCell category={transaction.category} className="text-sm" />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground">
-              {t('transactions.type', 'Tipo')}
-            </div>
-            <TransactionTypeCell type={transaction.type} />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground">
-              {t('transactions.date', 'Data')}
-            </div>
-            <div className="flex items-center">
-              <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-              <span>{formattedDate}</span>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground">
-              {t('transactions.time', 'Hora')}
-            </div>
-            <div className="flex items-center">
-              <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-              <span>{formattedTime}</span>
-            </div>
-          </div>
-        </div>
-        
-        <Separator />
-        
-        {/* Transaction ID */}
-        <div className="pt-2">
-          <div className="flex items-start gap-2 text-xs text-muted-foreground">
-            <Info className="h-4 w-4 shrink-0" />
-            <div>
-              <p>{t('transactions.idLabel', 'ID da Transação')}: {transaction.id}</p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <FormItem>
+        <FormLabel>{t('transactions.amount', 'Valor')}</FormLabel>
+        <FormControl>
+          <Input
+            type="number"
+            name="amount"
+            value={transaction.amount}
+            onChange={onInputChange}
+            placeholder="0.00"
+          />
+        </FormControl>
+      </FormItem>
+
+      <FormItem>
+        <FormLabel>{t('transactions.description', 'Descrição')}</FormLabel>
+        <FormControl>
+          <Input
+            name="description"
+            value={transaction.description}
+            onChange={onInputChange}
+            placeholder={t('transactions.descriptionPlaceholder', 'Ex: Supermercado')}
+          />
+        </FormControl>
+      </FormItem>
+
+      <FormItem>
+        <FormLabel>{t('transactions.category', 'Categoria')}</FormLabel>
+        <FormControl>
+          <CategorySelector
+            value={transaction.category}
+            onChange={(value) => handleSelectChange('category', value)}
+          />
+        </FormControl>
+      </FormItem>
+
+      <FormItem>
+        <FormLabel>{t('transactions.date', 'Data')}</FormLabel>
+        <FormControl>
+          <TransactionDatePicker
+            date={new Date(transaction.date)}
+            onDateChange={(date) => {
+              if (date) {
+                const formattedDate = date.toISOString().split('T')[0];
+                handleSelectChange('date', formattedDate);
+              }
+            }}
+          />
+        </FormControl>
+      </FormItem>
+    </div>
   );
 };
 

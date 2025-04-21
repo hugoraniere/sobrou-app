@@ -1,49 +1,50 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { ptBR } from 'date-fns/locale';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useTranslation } from 'react-i18next';
 
-interface TransactionDatePickerProps {
-  date?: Date;
-  selectedDate?: Date;
-  onDateChange: (date: Date) => void;
+export interface TransactionDatePickerProps {
+  date: Date;
+  onDateChange: (date: Date | undefined) => void;
   className?: string;
 }
 
-const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
-  date,
-  selectedDate,
+const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({ 
+  date, 
   onDateChange,
-  className
+  className 
 }) => {
-  const effectiveDate = date || selectedDate || new Date();
-  
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'pt-BR' ? ptBR : undefined;
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
           className={cn(
-            "h-8 w-8 p-0",
+            'w-full justify-start text-left font-normal',
+            !date && 'text-muted-foreground',
             className
           )}
-          aria-label="Selecione uma data"
         >
-          <CalendarIcon className="h-4 w-4 text-gray-500" />
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, 'PPP', { locale }) : <span>{t('common.pickDate', 'Escolha uma data')}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="end">
+      <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={effectiveDate}
-          onSelect={(date) => date && onDateChange(date)}
+          selected={date}
+          onSelect={onDateChange}
           initialFocus
-          className="pointer-events-auto"
+          locale={locale}
         />
       </PopoverContent>
     </Popover>

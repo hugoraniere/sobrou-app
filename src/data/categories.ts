@@ -1,11 +1,20 @@
 
 import { BarChartBig, CreditCard, Home, ShoppingBag, Coffee, Car, Utensils, Train, Plane, HeartPulse, Landmark, GraduationCap, Gift, PartyPopper, Zap, Droplets, Wifi, Phone, DollarSign, Wallet } from "lucide-react";
+import React from 'react';
 
 export interface TransactionCategory {
   id: string;
   name: string;
   icon: React.ComponentType;
   color: string;
+}
+
+// Adicionando a interface para manter compatibilidade com código existente
+export interface CategoryItem {
+  value: string;
+  label: string;
+  color: string;
+  icon: React.ReactNode | null;
 }
 
 export const transactionCategories: TransactionCategory[] = [
@@ -31,6 +40,14 @@ export const transactionCategories: TransactionCategory[] = [
   { id: 'credit_card', name: 'Cartão de Crédito', icon: CreditCard, color: '#9C27B0' },
   { id: 'other', name: 'Outros', icon: BarChartBig, color: '#9E9E9E' }
 ];
+
+// Convertendo transactionCategories para o formato usado por outros componentes
+export const categories: CategoryItem[] = transactionCategories.map(category => ({
+  value: category.id,
+  label: category.name,
+  color: `bg-[${category.color}] text-white`,
+  icon: React.createElement(category.icon, { size: 16 })
+}));
 
 // Function to get category by keyword in description
 export const getCategoryByKeyword = (description: string): TransactionCategory | null => {

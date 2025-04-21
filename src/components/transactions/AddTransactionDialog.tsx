@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 interface AddTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onTransactionAdded?: () => void;
 }
 
 // Schema for transaction form validation
@@ -31,7 +32,11 @@ const transactionFormSchema = z.object({
 
 type TransactionFormValues = z.infer<typeof transactionFormSchema>;
 
-const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ open, onOpenChange }) => {
+const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ 
+  open, 
+  onOpenChange,
+  onTransactionAdded 
+}) => {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
@@ -56,6 +61,13 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ open, onOpe
     setIsSubmitting(true);
     
     try {
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        throw new Error('Usuário não autenticado');
+      }
+      
       // Insert transaction in the database
       const { error } = await supabase
         .from('transactions')
@@ -64,7 +76,8 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ open, onOpe
           amount: data.amount,
           category: data.category,
           date: data.date.toISOString().split('T')[0],
-          type: data.type
+          type: data.type,
+          user_id: user.id
         });
       
       if (error) throw error;
@@ -74,6 +87,11 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ open, onOpe
       // Reset form and close dialog
       form.reset(defaultValues);
       onOpenChange(false);
+      
+      // Call callback if provided
+      if (onTransactionAdded) {
+        onTransactionAdded();
+      }
       
       // Refresh transaction data
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -175,7 +193,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ open, onOpe
                   <FormControl>
                     <TransactionDatePicker 
                       date={field.value} 
-                      setDate={field.onChange} 
+                      onDateChange={field.onChange} 
                     />
                   </FormControl>
                   <FormMessage />
