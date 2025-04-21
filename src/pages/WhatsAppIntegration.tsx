@@ -1,343 +1,213 @@
-import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Check, PhoneCall, MessageSquare, AlertTriangle, Info } from "lucide-react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
-
-const alertStatus = (status: string) => {
-  if (status === 'verified') return { message: t('whatsapp.verified'), variant: 'default' as const };
-  if (status === 'pending') return { message: t('whatsapp.pending'), variant: 'default' as const };
-  if (status === 'error') return { message: t('whatsapp.error'), variant: 'destructive' as const };
-  return { message: t('whatsapp.unknown'), variant: 'destructive' as const };
-};
+import { Textarea } from '@/components/ui/textarea';
+import { MessageCircle, QrCode, Smartphone } from 'lucide-react';
 
 const WhatsAppIntegration = () => {
-  const { isAuthenticated, user } = useAuth();
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const [phoneNumber, setPhoneNumber] = useState(user?.user_metadata?.whatsapp_number || '');
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [savedPhoneNumber, setSavedPhoneNumber] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isNumberInUse, setIsNumberInUse] = useState(false);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!user) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('whatsapp_number')
-          .eq('id', user.id)
-          .maybeSingle();
-          
-        if (error) {
-          console.error('Erro ao buscar perfil:', error);
-          return;
-        }
-        
-        if (data?.whatsapp_number) {
-          console.log(data);
-          setSavedPhoneNumber(data.whatsapp_number);
-          setIsConnected(true);
-        }
-      } catch (error) {
-        console.error('Erro ao buscar dados do perfil:', error);
-      }
-    };
-    
-    fetchUserProfile();
-  }, [user]);
+  const handleWhatsAppConnection = async () => {
+    if (!phoneNumber || phoneNumber.trim() === '') {
+      toast.error(t('whatsapp.errorEmptyNumber', 'Por favor, insira um número de telefone válido'));
+      return;
+    }
 
-  const validatePhoneNumber = (number: string) => {
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    return phoneRegex.test(number);
-  };
-
-  const checkIfNumberExists = async (number: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('whatsapp_number', number)
-        .maybeSingle();
-        
-      if (error) throw error;
+      setIsConnecting(true);
       
-      return data !== null;
-    } catch (error) {
-      console.error('Erro ao verificar número:', error);
-      return false;
-    }
-  };
-
-  const handleConnect = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Limpar mensagens de erro anteriores
-    setErrorMessage(null);
-    setIsNumberInUse(false);
-    
-    if (!user) {
-      toast.error("Você precisa estar logado para conectar o WhatsApp");
-      return;
-    }
-    
-    if (!phoneNumber || phoneNumber.length < 10) {
-      setErrorMessage("Por favor, insira um número de telefone válido");
-      return;
-    }
-    
-    if (!validatePhoneNumber(phoneNumber)) {
-      setErrorMessage("Por favor, insira o número no formato internacional (ex: +5511999999999)");
-      return;
-    }
-    
-    setIsConnecting(true);
-    
-    try {
-      // Verificar se o número já está em uso
-      const numberExists = await checkIfNumberExists(phoneNumber);
+      // Format phone number to remove any non-numeric characters
+      const formattedNumber = phoneNumber.replace(/\D/g, '');
       
-      if (numberExists) {
-        setIsNumberInUse(true);
-        setErrorMessage("Este número de WhatsApp já está em uso por outra conta");
-        setIsConnecting(false);
-        return;
-      }
-      
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ whatsapp_number: phoneNumber })
-        .eq('id', user.id);
-        
-      if (updateError) {
-        // Se ainda ocorrer o erro de unicidade (caso raro de condição de corrida)
-        if (updateError.code === '23505') {
-          setIsNumberInUse(true);
-          setErrorMessage("Este número de WhatsApp já está em uso por outra conta");
-          setIsConnecting(false);
-          return;
+      // Update user metadata with WhatsApp number
+      const { error } = await supabase.auth.updateUser({
+        data: { 
+          whatsapp_number: formattedNumber 
         }
-        throw updateError;
-      }
-
-      const { error: welcomeError } = await supabase.functions.invoke('send-whatsapp-welcome', {
-        body: { phone: phoneNumber }
       });
 
-      if (welcomeError) {
-        console.error('Erro ao enviar mensagem de boas-vindas:', welcomeError);
-        toast.warning("WhatsApp conectado, mas não foi possível enviar a mensagem de boas-vindas. Você ainda pode usar o serviço.");
-      } else {
-        toast.success("WhatsApp conectado com sucesso! Você receberá uma mensagem em breve.");
-      }
+      if (error) throw error;
       
-      setIsConnected(true);
-      setSavedPhoneNumber(phoneNumber);
-    } catch (error) {
-      console.error('Erro ao conectar WhatsApp:', error);
-      
-      // Verificar se é o erro de duplicação
-      if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
-        setIsNumberInUse(true);
-        setErrorMessage("Este número de WhatsApp já está em uso por outra conta");
-      } else {
-        toast.error("Falha ao conectar WhatsApp. Por favor, tente novamente.");
-      }
+      toast.success(t('whatsapp.successConnection', 'WhatsApp conectado com sucesso!'));
+    } catch (error: any) {
+      console.error('WhatsApp connection error:', error);
+      toast.error(error.message || t('whatsapp.errorConnection', 'Erro ao conectar WhatsApp'));
     } finally {
       setIsConnecting(false);
     }
   };
 
-  const handleDisconnect = async () => {
-    if (!user) return;
-    
+  const handleDisconnectWhatsApp = async () => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ whatsapp_number: null })
-        .eq('id', user.id);
-        
-      if (error) {
-        throw error;
-      }
+      setIsConnecting(true);
       
-      setIsConnected(false);
-      setSavedPhoneNumber(null);
+      // Remove WhatsApp number from user metadata
+      const { error } = await supabase.auth.updateUser({
+        data: { 
+          whatsapp_number: null 
+        }
+      });
+
+      if (error) throw error;
+      
       setPhoneNumber('');
-      toast.success("WhatsApp desconectado com sucesso!");
-    } catch (error) {
-      console.error('Erro ao desconectar WhatsApp:', error);
-      toast.error("Falha ao desconectar WhatsApp. Por favor, tente novamente.");
+      toast.success(t('whatsapp.disconnected', 'WhatsApp desconectado com sucesso!'));
+    } catch (error: any) {
+      console.error('WhatsApp disconnection error:', error);
+      toast.error(error.message || t('whatsapp.errorDisconnection', 'Erro ao desconectar WhatsApp'));
+    } finally {
+      setIsConnecting(false);
     }
   };
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Conecte seu WhatsApp</h1>
-          <p className="text-gray-600">Vincule seu WhatsApp para começar a registrar despesas automaticamente</p>
-        </div>
-        
-        <Card className="mb-8">
+      <h1 className="text-2xl font-bold mb-6">{t('whatsapp.integration', 'Integração WhatsApp')}</h1>
+      
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
           <CardHeader>
-            <CardTitle>Conexão com WhatsApp</CardTitle>
+            <CardTitle className="flex items-center">
+              <Smartphone className="h-5 w-5 mr-2" />
+              {t('whatsapp.connection', 'Conexão WhatsApp')}
+            </CardTitle>
             <CardDescription>
-              {isConnected 
-                ? `Seu WhatsApp está conectado com o número: ${savedPhoneNumber}`
-                : "Insira seu número de telefone para receber uma mensagem de verificação"}
+              {t('whatsapp.description', 'Conecte seu número de WhatsApp para registrar transações automaticamente')}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            {!isConnected ? (
-              <form onSubmit={handleConnect} className="space-y-4">
-                <div>
-                  <div className="flex">
-                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md">
-                      <PhoneCall className="h-4 w-4 text-gray-500" />
-                    </div>
-                    <Input
-                      type="tel"
-                      placeholder="+5511999999999"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="rounded-l-none"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Inclua o código do país (ex: +55 para Brasil)
-                  </p>
-                </div>
-                
-                {errorMessage && (
-                  <Alert variant={isNumberInUse ? "destructive" : "warning"} className="my-4">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>{isNumberInUse ? "Número já em uso" : "Erro de validação"}</AlertTitle>
-                    <AlertDescription>{errorMessage}</AlertDescription>
-                  </Alert>
-                )}
-                
-                <div className="p-3 bg-blue-50 rounded-md border border-blue-100 flex items-start gap-2">
-                  <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-blue-700">
-                      Importante: Você receberá uma mensagem de confirmação da nossa API oficial do WhatsApp Business.
-                    </p>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Após receber a mensagem, você poderá iniciar o uso do serviço automaticamente.
-                    </p>
-                  </div>
-                </div>
-                
-                <Button type="submit" disabled={isConnecting} className="w-full">
-                  {isConnecting ? "Conectando..." : "Conectar WhatsApp"}
-                </Button>
-              </form>
-            ) : (
-              <div className="py-4">
-                <div className="flex items-center space-x-2 text-green-600 mb-4">
-                  <Check className="h-6 w-6" />
-                  <span className="font-medium">WhatsApp Conectado com Sucesso!</span>
-                </div>
-                
-                <p className="text-gray-600 mb-4">
-                  Seu WhatsApp está vinculado ao Sobrou. Você já pode começar a enviar suas
-                  despesas diretamente.
-                </p>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Link to="/" className="flex-1">
-                    <Button className="w-full">
-                      Ir para o Dashboard
-                    </Button>
-                  </Link>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {t('whatsapp.phoneNumber', 'Número de WhatsApp')}
+              </label>
+              <Input
+                type="tel"
+                placeholder="+55 (11) 98765-4321"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                {t('whatsapp.phoneNumberHint', 'Inclua o código do país e DDD')}
+              </p>
+            </div>
+            
+            <div className="flex space-x-2 pt-2">
+              {user?.user_metadata?.whatsapp_number ? (
+                <>
                   <Button 
                     variant="outline" 
-                    className="flex-1"
-                    onClick={handleDisconnect}
+                    onClick={handleDisconnectWhatsApp}
+                    disabled={isConnecting}
                   >
-                    Desconectar WhatsApp
+                    {isConnecting ? 
+                      t('whatsapp.disconnecting', 'Desconectando...') : 
+                      t('whatsapp.disconnect', 'Desconectar')}
                   </Button>
-                </div>
-              </div>
-            )}
+                  <Button 
+                    variant="default" 
+                    onClick={handleWhatsAppConnection}
+                    disabled={isConnecting}
+                  >
+                    {isConnecting ? 
+                      t('whatsapp.updating', 'Atualizando...') : 
+                      t('whatsapp.update', 'Atualizar número')}
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  variant="default" 
+                  onClick={handleWhatsAppConnection}
+                  disabled={isConnecting}
+                >
+                  {isConnecting ? 
+                    t('whatsapp.connecting', 'Conectando...') : 
+                    t('whatsapp.connect', 'Conectar WhatsApp')}
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
         
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Como funciona</h2>
-          
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
-                1
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <MessageCircle className="h-5 w-5 mr-2" />
+              {t('whatsapp.howToUse', 'Como usar')}
+            </CardTitle>
+            <CardDescription>
+              {t('whatsapp.howToUseDescription', 'Instruções para registrar transações via WhatsApp')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="rounded-lg bg-blue-50 p-4 border border-blue-100">
+                <h3 className="font-medium text-blue-800 mb-2">
+                  {t('whatsapp.examples', 'Exemplos de mensagens')}
+                </h3>
+                <div className="space-y-2">
+                  <div className="bg-white p-3 rounded border border-blue-200">
+                    <p className="text-sm font-medium">Gastei R$50 no mercado</p>
+                  </div>
+                  <div className="bg-white p-3 rounded border border-blue-200">
+                    <p className="text-sm font-medium">Recebi R$1000 de salário</p>
+                  </div>
+                  <div className="bg-white p-3 rounded border border-blue-200">
+                    <p className="text-sm font-medium">Paguei R$120 de internet ontem</p>
+                  </div>
+                </div>
               </div>
+              
               <div>
-                <h3 className="font-medium mb-1">Envie mensagens com suas despesas</h3>
-                <p className="text-gray-600">
-                  Simplesmente envie mensagens como "Gastei R$25 no jantar" ou "Uber R$12"
-                </p>
+                <h3 className="font-medium mb-2">
+                  {t('whatsapp.instructions', 'Instruções')}
+                </h3>
+                <ol className="list-decimal list-inside space-y-2 text-sm">
+                  <li>{t('whatsapp.step1', 'Conecte seu número de WhatsApp acima')}</li>
+                  <li>{t('whatsapp.step2', 'Envie mensagens com suas transações')}</li>
+                  <li>{t('whatsapp.step3', 'O sistema identificará automaticamente o tipo, valor e categoria')}</li>
+                  <li>{t('whatsapp.step4', 'A transação será registrada em sua conta')}</li>
+                </ol>
               </div>
             </div>
-            
-            <div className="flex items-start">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
-                2
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">IA categoriza despesas automaticamente</h3>
-                <p className="text-gray-600">
-                  Extraímos o valor, categoria e descrição da sua mensagem
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
-                3
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Veja seu painel financeiro</h3>
-                <p className="text-gray-600">
-                  Acompanhe seus padrões de gastos, receba insights e sugestões de economia
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <div className="flex">
-              <MessageSquare className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-blue-800 mb-1">Exemplos de mensagens</h4>
-                <ul className="text-sm text-blue-600 space-y-1">
-                  <li>"Gastei R$45,50 em compras no Mercado"</li>
-                  <li>"R$12 almoço hoje"</li>
-                  <li>"Pagamento aluguel R$1200"</li>
-                  <li>"Corrida de Uber ontem R$18,75"</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
+      
+      {user?.user_metadata?.whatsapp_number && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <QrCode className="h-5 w-5 mr-2" />
+              {t('whatsapp.status', 'Status da Conexão')}
+            </CardTitle>
+            <CardDescription>
+              {t('whatsapp.statusDescription', 'Informações sobre sua conexão atual com WhatsApp')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-green-50 border border-green-100 rounded-lg p-4">
+              <div className="flex items-center">
+                <div className="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                <p className="font-medium text-green-800">
+                  {t('whatsapp.connected', 'Conectado')}
+                </p>
+              </div>
+              <p className="mt-2 text-sm text-green-700">
+                {t('whatsapp.connectedNumber', 'Número conectado')}: 
+                <span className="font-medium ml-1">{user.user_metadata.whatsapp_number}</span>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

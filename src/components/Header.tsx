@@ -38,11 +38,9 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
 
       {user && !isPublic && (
         <AddTransactionDialog
-          isOpen={isAddTransactionOpen}
-          setIsOpen={setIsAddTransactionOpen}
-          onTransactionAdded={() => {
-            /* Removido o recarregamento da página */
-          }}
+          open={isAddTransactionOpen}
+          onOpenChange={setIsAddTransactionOpen}
+          onTransactionAdded={() => {}}
         />
       )}
     </>
