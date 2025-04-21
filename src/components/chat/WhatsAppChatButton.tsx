@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BsWhatsapp } from 'react-icons/bs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -51,8 +52,10 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
     }
 
     if (hasWhatsApp) {
-      // Abrir o WhatsApp oficial
-      window.open('https://wa.me/14155238886', '_blank');
+      // Usar diretamente a API oficial do WhatsApp Business
+      // Não precisamos de nenhum comando 'join' aqui, apenas abrir o chat
+      const PHONE_NUMBER_ID = '704756652109046'; // Número do WhatsApp Business
+      window.open(`https://wa.me/${PHONE_NUMBER_ID}`, '_blank');
     } else {
       // Redirecionar para a página de integração
       window.location.href = '/whatsapp-integration';

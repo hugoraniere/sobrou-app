@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
@@ -168,10 +169,10 @@ const WhatsAppIntegration = () => {
                     <AlertTriangle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm text-blue-700">
-                        Importante: Você deve iniciar uma conversa com o nosso número de WhatsApp antes de receber mensagens.
+                        Importante: Você receberá uma mensagem de confirmação da nossa API oficial do WhatsApp Business.
                       </p>
                       <p className="text-xs text-blue-600 mt-1">
-                        Salve o número <span className="font-semibold">+1 (415) 523-8886</span> e envie a mensagem "join strength-fence" para iniciar.
+                        Após receber a mensagem, você poderá iniciar o uso do serviço automaticamente.
                       </p>
                     </div>
                   </div>
