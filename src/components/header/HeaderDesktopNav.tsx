@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { Home, PlusCircle, Settings } from 'lucide-react';
@@ -15,6 +15,7 @@ interface HeaderDesktopNavProps {
 const HeaderDesktopNav: React.FC<HeaderDesktopNavProps> = ({ onNewTransaction }) => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {

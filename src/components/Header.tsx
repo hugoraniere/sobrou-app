@@ -34,9 +34,7 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
           isOpen={isAddTransactionOpen}
           setIsOpen={setIsAddTransactionOpen}
           onTransactionAdded={() => {
-            if (window.location.pathname === '/') {
-              window.location.reload();
-            }
+            /* Removido o recarregamento da página */
           }}
         />
       )}

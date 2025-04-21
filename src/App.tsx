@@ -19,6 +19,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
+import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -93,18 +94,18 @@ const App = () => {
                 />
                 
                 <Route
-                  path="/integration"
+                  path="/whatsapp-integration"
                   element={
                     <ProtectedRoute>
-                      <AppLayout>
-                        <WhatsAppIntegration />
-                      </AppLayout>
+                      <WhatsAppIntegration />
                     </ProtectedRoute>
                   }
                 />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              
+              <WhatsAppChatButton />
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>

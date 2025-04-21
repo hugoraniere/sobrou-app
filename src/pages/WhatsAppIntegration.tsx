@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Check, PhoneCall, MessageSquare, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Navigate } from 'react-router-dom';
 
 const WhatsAppIntegration = () => {
   const { isAuthenticated, user } = useAuth();
@@ -17,6 +16,7 @@ const WhatsAppIntegration = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [savedPhoneNumber, setSavedPhoneNumber] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {

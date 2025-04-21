@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface WhatsAppChatButtonProps {
   className?: string;
@@ -14,6 +15,7 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
   const { user } = useAuth();
   const [hasWhatsApp, setHasWhatsApp] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const checkWhatsAppConnection = async () => {
@@ -57,8 +59,8 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
       const PHONE_NUMBER_ID = '704756652109046'; // Número do WhatsApp Business
       window.open(`https://wa.me/${PHONE_NUMBER_ID}`, '_blank');
     } else {
-      // Redirecionar para a página de integração
-      window.location.href = '/whatsapp-integration';
+      // Redirecionar para a página de integração usando React Router
+      navigate('/whatsapp-integration');
     }
   };
 
