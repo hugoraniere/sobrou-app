@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BsWhatsapp } from 'react-icons/bs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -53,7 +52,7 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
 
     if (hasWhatsApp) {
       // Abrir o WhatsApp oficial
-      window.open('https://wa.me/14155238886?text=join%20strength-fence', '_blank');
+      window.open('https://wa.me/14155238886', '_blank');
     } else {
       // Redirecionar para a página de integração
       window.location.href = '/whatsapp-integration';
