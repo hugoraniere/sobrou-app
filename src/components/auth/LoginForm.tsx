@@ -137,7 +137,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
                 <FormLabel>Senha</FormLabel>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <a href="/reset-password" className="text-sm text-primary hover:underline">
+                    <a href="#" className="text-sm text-primary hover:underline">
                       Esqueceu a senha?
                     </a>
                   </DialogTrigger>
