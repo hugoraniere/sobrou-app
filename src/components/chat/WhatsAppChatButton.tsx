@@ -17,6 +17,9 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
   const [isLoading, setIsLoading] = React.useState(true);
   const navigate = useNavigate();
 
+  // Usando variável de ambiente para o número do WhatsApp
+  const WHATSAPP_PHONE_NUMBER_ID = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID || '';
+
   React.useEffect(() => {
     const checkWhatsAppConnection = async () => {
       if (!user) {
@@ -54,10 +57,14 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
     }
 
     if (hasWhatsApp) {
+      // Verificação de número válido antes de abrir
+      if (!WHATSAPP_PHONE_NUMBER_ID) {
+        toast.error('Número do WhatsApp Business não configurado');
+        return;
+      }
+      
       // Usar diretamente a API oficial do WhatsApp Business
-      // Não precisamos de nenhum comando 'join' aqui, apenas abrir o chat
-      const PHONE_NUMBER_ID = '704756652109046'; // Número do WhatsApp Business
-      window.open(`https://wa.me/${PHONE_NUMBER_ID}`, '_blank');
+      window.open(`https://wa.me/${WHATSAPP_PHONE_NUMBER_ID}`, '_blank');
     } else {
       // Redirecionar para a página de integração usando React Router
       navigate('/whatsapp-integration');
