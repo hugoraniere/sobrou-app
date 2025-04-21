@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 // Definição do tipo para categorias
@@ -12,8 +11,8 @@ export interface CategoryType {
   icon: () => JSX.Element;
 }
 
-// Categorias de receita
-const incomeCategories = [
+// Ajustar as categorias existentes para garantir o tipo correto
+const incomeCategories: CategoryType[] = [
   { 
     id: 'salary',
     name: 'Salário', 
@@ -59,8 +58,7 @@ const incomeCategories = [
   }
 ];
 
-// Categorias de despesa
-const expenseCategories = [
+const expenseCategories: CategoryType[] = [
   { 
     id: 'food',
     name: 'Alimentação', 
