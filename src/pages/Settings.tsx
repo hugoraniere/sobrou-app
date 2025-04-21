@@ -16,11 +16,16 @@ const Settings = () => {
       <ProfileSection onEditClick={() => setIsProfileEditOpen(true)} />
 
       <div className="grid gap-6">
+        {/* 1. WhatsApp Section - Ocupa toda a largura */}
         <WhatsAppSection />
+        
+        {/* 2. Notificações e Aparência - Lado a lado */}
         <div className="grid gap-6 md:grid-cols-2">
           <NotificationsSection />
           <AppearanceSection />
         </div>
+        
+        {/* 3. Segurança e Zona de Perigo - Lado a lado */}
         <div className="grid gap-6 md:grid-cols-2">
           <ChangePasswordSection />
           <DangerZoneSection />
