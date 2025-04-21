@@ -33,14 +33,18 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <Routes>
+                {/* Rotas públicas */}
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/" element={<PublicLanding />} />
                 <Route path="/verify" element={<EmailVerification />} />
                 <Route path="/reset-password" element={<PasswordReset />} />
                 
-                {/* Redirecionar / para /dashboard se estiver autenticado */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                {/* Rota principal - condicional baseada na autenticação */}
+                <Route 
+                  path="/" 
+                  element={<PublicLanding />} 
+                />
                 
+                {/* Rotas protegidas */}
                 <Route
                   path="/dashboard"
                   element={

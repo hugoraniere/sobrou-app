@@ -84,21 +84,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Modificando esta parte para evitar redirecionamentos excessivos
+  // Completamente reescrita para evitar redirecionamentos em loops
   useEffect(() => {
+    // Só executamos esta lógica depois que a verificação de autenticação inicial estiver concluída
     if (isLoading) return;
 
-    const handleRouteProtection = () => {
-      const publicRoutes = ['/auth', '/', '/verify', '/reset-password'];
-      const isPublicRoute = publicRoutes.some(route => location.pathname === route || location.pathname.startsWith('/verify'));
-      
-      // Só redirecionar para o dashboard se estiver tentando acessar uma rota pública de autenticação
-      if (isAuthenticated && isPublicRoute && location.pathname !== '/verify') {
-        navigate('/dashboard');
-      }
-    };
-
-    handleRouteProtection();
+    // Lista de rotas que são exclusivamente públicas (não fazem sentido para usuários autenticados)
+    const strictlyPublicRoutes = ['/auth'];
+    
+    // Verificamos se o usuário está na página de autenticação e já está autenticado
+    const isOnStrictlyPublicRoute = strictlyPublicRoutes.includes(location.pathname);
+    
+    // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
+    // uma rota exclusivamente pública (como a página de login)
+    if (isAuthenticated && isOnStrictlyPublicRoute) {
+      navigate('/dashboard', { replace: true });
+    }
   }, [isAuthenticated, isLoading, location.pathname, navigate]);
 
   const login = async (email: string, password: string) => {

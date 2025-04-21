@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
@@ -37,15 +36,13 @@ const Index = () => {
     if (isAuthenticated) {
       fetchData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchData]);
   
   useEffect(() => {
     i18n.changeLanguage('pt-BR');
   }, [i18n]);
   
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
+  // Removemos o código de redirecionamento aqui, pois isso já é tratado pelo ProtectedRoute
   
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
