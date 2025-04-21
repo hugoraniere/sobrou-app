@@ -19,7 +19,7 @@ export const TransactionService = {
   // Parse expense text using the edge function
   async parseExpenseText(text: string): Promise<ParsedExpense> {
     try {
-      console.log("Sending text to parse-expense function:", text);
+      console.log("Enviando texto para a função parse-expense:", text);
       // Use hardcoded URL instead of process.env
       const response = await fetch('https://jevsazpwfowhmjupuuzw.supabase.co/functions/v1/parse-expense', {
         method: 'POST',
@@ -56,17 +56,40 @@ export const TransactionService = {
   
   // Get all transactions for the current user
   async getTransactions(): Promise<Transaction[]> {
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .order('date', { ascending: false });
+    console.log('Buscando transações do usuário...');
+    
+    try {
+      // Verifica se o usuário está autenticado
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-    if (error) {
-      console.error('Error fetching transactions:', error);
+      if (authError) {
+        console.error('Erro de autenticação ao buscar transações:', authError);
+        throw new Error('Erro de autenticação: ' + authError.message);
+      }
+      
+      if (!user) {
+        console.warn('Usuário não está autenticado ao buscar transações');
+        return [];
+      }
+      
+      console.log('Usuário autenticado, buscando transações...');
+      
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('date', { ascending: false });
+        
+      if (error) {
+        console.error('Erro ao buscar transações do banco de dados:', error);
+        throw error;
+      }
+      
+      console.log(`Transações recuperadas: ${data?.length || 0}`);
+      return data as Transaction[] || [];
+    } catch (error) {
+      console.error('Erro completo ao buscar transações:', error);
       throw error;
     }
-    
-    return data as Transaction[] || [];
   },
   
   // Add a new transaction

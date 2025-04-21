@@ -9,14 +9,14 @@ import AddTransactionDialog from '@/components/transactions/AddTransactionDialog
 import AIPromptInput from '../components/AIPromptInput';
 
 const Index = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { t, i18n } = useTranslation();
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   
   const {
     transactions,
     savingGoals,
-    isLoading,
+    isLoading: dataLoading,
     whatsAppConnected,
     showOnboarding,
     setShowOnboarding,
@@ -32,17 +32,21 @@ const Index = () => {
     filteredTransactions
   } = useFilteredTransactions(transactions);
   
+  // Aguardar a autenticação ser completada antes de buscar dados
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchData();
+    if (isAuthenticated && !authLoading) {
+      console.log('Usuário autenticado, buscando dados do dashboard...');
+      fetchData().catch(error => {
+        console.error('Erro ao buscar dados no useEffect do Index:', error);
+      });
     }
-  }, [isAuthenticated, fetchData]);
+  }, [isAuthenticated, authLoading, fetchData]);
   
   useEffect(() => {
     i18n.changeLanguage('pt-BR');
   }, [i18n]);
   
-  // Removemos o código de redirecionamento aqui, pois isso já é tratado pelo ProtectedRoute
+  const isLoading = authLoading || dataLoading;
   
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">

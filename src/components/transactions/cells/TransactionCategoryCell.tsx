@@ -18,7 +18,7 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
     <TableCell className={cn(className)}>
       <div className="flex items-center gap-2">
         {CategoryIcon && <CategoryIcon className="h-4 w-4" />}
-        {categoryInfo?.name || category}
+        <span>{categoryInfo?.name || category}</span>
       </div>
     </TableCell>
   );
