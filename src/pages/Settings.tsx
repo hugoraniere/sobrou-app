@@ -6,6 +6,7 @@ import AppearanceSection from '@/components/settings/AppearanceSection';
 import WhatsAppSection from '@/components/settings/WhatsAppSection';
 import DangerZoneSection from '@/components/settings/DangerZoneSection';
 import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
+import ProfileEditDialog from '@/components/profile/ProfileEditDialog';
 // Removed import for ResetPasswordSection
 
 const Settings = () => {
