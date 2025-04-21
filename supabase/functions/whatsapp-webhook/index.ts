@@ -19,7 +19,35 @@ serve(async (req) => {
   }
 
   try {
-    // Processar somente requisições POST
+    // Verificar token de verificação do webhook Meta (para a verificação inicial)
+    const url = new URL(req.url);
+    const mode = url.searchParams.get('hub.mode');
+    const token = url.searchParams.get('hub.verify_token');
+    const challenge = url.searchParams.get('hub.challenge');
+
+    // Verificação do webhook do Meta/WhatsApp
+    if (req.method === 'GET' && mode === 'subscribe') {
+      // Verificar o token (deve ser configurado no painel do Meta)
+      const VERIFY_TOKEN = Deno.env.get('WHATSAPP_VERIFY_TOKEN') || 'sobrou_webhook_token';
+      
+      console.log('Recebida solicitação de verificação do webhook:', { mode, token, challenge });
+      
+      if (token === VERIFY_TOKEN) {
+        console.log('Verificação de webhook bem-sucedida');
+        return new Response(challenge, { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'text/plain' } 
+        });
+      } else {
+        console.error('Falha na verificação: token inválido');
+        return new Response(JSON.stringify({ error: 'Token de verificação inválido' }), { 
+          status: 403, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        });
+      }
+    }
+
+    // Processar somente requisições POST para mensagens
     if (req.method !== 'POST') {
       return new Response(
         JSON.stringify({ error: 'Método não permitido' }),
@@ -37,11 +65,11 @@ serve(async (req) => {
     const payload = await req.json();
     console.log("Payload recebido:", JSON.stringify(payload, null, 2));
 
-    // Verificar se é uma mensagem válida (a estrutura exata dependerá do seu provedor de WhatsApp)
-    // Este exemplo assume uma estrutura genérica - você precisará adaptar para o seu provedor específico
-    if (!payload.phone || !payload.message) {
+    // Processar payload do webhook do WhatsApp Business API
+    // Formato: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples
+    if (!payload.object || payload.object !== 'whatsapp_business_account') {
       return new Response(
-        JSON.stringify({ error: 'Payload inválido: precisa de phone e message' }),
+        JSON.stringify({ error: 'Payload inválido: não é uma mensagem do WhatsApp Business' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -49,17 +77,50 @@ serve(async (req) => {
       );
     }
 
-    // Extrair dados da mensagem
-    const { phone, message } = payload;
-    const cleanPhone = phone.replace(/\D/g, ''); // Remove caracteres não numéricos
+    // Processar apenas se for uma mensagem de texto
+    const entry = payload.entry?.[0];
+    const changes = entry?.changes?.[0];
+    const value = changes?.value;
+    const messages = value?.messages;
 
-    console.log(`Mensagem recebida de ${cleanPhone}: ${message}`);
+    if (!messages || messages.length === 0) {
+      console.log("Recebido evento que não é uma mensagem");
+      // Alguns eventos são notificações de status, devemos responder com 200 mesmo assim
+      return new Response(
+        JSON.stringify({ status: 'success', message: 'Evento processado' }),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Obter a primeira mensagem (geralmente só há uma)
+    const message = messages[0];
+    
+    // Verificar se é uma mensagem de texto
+    if (message.type !== 'text') {
+      console.log(`Tipo de mensagem não suportado: ${message.type}`);
+      return new Response(
+        JSON.stringify({ status: 'success', message: 'Tipo de mensagem não processado' }),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Extrair dados da mensagem
+    const text = message.text.body;
+    const from = message.from; // Número de telefone do remetente
+    
+    console.log(`Mensagem recebida de ${from}: ${text}`);
 
     // Encontrar usuário pelo número de telefone
     const { data: profiles, error: profileError } = await supabase
       .from('profiles')
       .select('id')
-      .eq('whatsapp_number', phone)
+      .eq('whatsapp_number', from)
       .maybeSingle();
 
     if (profileError) {
@@ -69,11 +130,15 @@ serve(async (req) => {
 
     // Se nenhum usuário for encontrado com este número
     if (!profiles) {
-      console.log(`Nenhum usuário encontrado com o número ${phone}`);
+      console.log(`Nenhum usuário encontrado com o número ${from}`);
+      
+      // Enviar resposta informando que o número não está registrado
+      await sendWhatsAppMessage(from, "Seu número não está registrado no Sobrou. Por favor, registre-se pelo aplicativo.");
+      
       return new Response(
         JSON.stringify({ status: 'error', message: 'Usuário não encontrado' }),
         { 
-          status: 404, 
+          status: 200, // Respondemos com 200 para o webhook, mas logamos o erro
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
@@ -89,58 +154,116 @@ serve(async (req) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${supabaseServiceKey}`
       },
-      body: JSON.stringify({ text: message })
+      body: JSON.stringify({ text: text })
     });
 
     if (!parseResponse.ok) {
+      const errorMsg = "Não consegui entender sua mensagem. Por favor, tente novamente com formato como 'Gastei R$50 no mercado'";
+      await sendWhatsAppMessage(from, errorMsg);
       throw new Error(`Falha ao processar mensagem: ${parseResponse.statusText}`);
     }
 
     const parsedData = await parseResponse.json();
     console.log("Dados processados:", parsedData);
 
-    // Criar a transação no banco de dados
-    const { data: transaction, error: transactionError } = await supabase
-      .from('transactions')
-      .insert([{
-        user_id: userId,
-        amount: parsedData.amount,
-        description: parsedData.description,
-        category: parsedData.category.toLowerCase(),
-        type: parsedData.type,
-        date: parsedData.date
-      }])
-      .select()
-      .single();
+    try {
+      // Criar a transação no banco de dados
+      const { data: transaction, error: transactionError } = await supabase
+        .from('transactions')
+        .insert([{
+          user_id: userId,
+          amount: parsedData.amount,
+          description: parsedData.description,
+          category: parsedData.category.toLowerCase(),
+          type: parsedData.type,
+          date: parsedData.date
+        }])
+        .select()
+        .single();
 
-    if (transactionError) {
-      console.error("Erro ao criar transação:", transactionError);
-      throw transactionError;
-    }
-
-    console.log(`Transação criada com sucesso: ${transaction.id}`);
-
-    // Resposta de sucesso
-    return new Response(
-      JSON.stringify({
-        status: 'success',
-        message: 'Transação registrada com sucesso',
-        data: transaction
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      if (transactionError) {
+        console.error("Erro ao criar transação:", transactionError);
+        throw transactionError;
       }
-    );
+
+      console.log(`Transação criada com sucesso: ${transaction.id}`);
+      
+      // Envia confirmação para o usuário
+      const confirmationMsg = `✅ Transação registrada!\n\nValor: R$ ${parsedData.amount}\nCategoria: ${parsedData.category}\nDescrição: ${parsedData.description}`;
+      await sendWhatsAppMessage(from, confirmationMsg);
+
+      // Resposta de sucesso
+      return new Response(
+        JSON.stringify({
+          status: 'success',
+          message: 'Transação registrada com sucesso',
+          data: transaction
+        }),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    } catch (error) {
+      // Em caso de erro, notificar o usuário
+      const errorMsg = "Desculpe, ocorreu um erro ao registrar sua transação. Por favor, tente novamente.";
+      await sendWhatsAppMessage(from, errorMsg);
+      throw error;
+    }
 
   } catch (error) {
     console.error("Erro no webhook do WhatsApp:", error.message);
     return new Response(
       JSON.stringify({ status: 'error', message: error.message }),
       { 
-        status: 500, 
+        status: 200, // Sempre responder com 200 para webhooks, mesmo em erro
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
   }
 });
+
+// Função para enviar mensagem usando a API oficial do WhatsApp Business
+async function sendWhatsAppMessage(to: string, message: string) {
+  try {
+    // Obter configurações do WhatsApp Business
+    const PHONE_NUMBER_ID = Deno.env.get('WHATSAPP_PHONE_NUMBER_ID') || '704756652109046';
+    const ACCESS_TOKEN = Deno.env.get('WHATSAPP_ACCESS_TOKEN');
+    
+    if (!ACCESS_TOKEN) {
+      throw new Error("Token de acesso do WhatsApp não configurado");
+    }
+
+    const url = `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${ACCESS_TOKEN}`
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'text',
+        text: {
+          body: message
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Erro ao enviar mensagem WhatsApp:", errorData);
+      throw new Error(`Falha ao enviar mensagem WhatsApp: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log("Mensagem WhatsApp enviada com sucesso:", data);
+    return data;
+  } catch (error) {
+    console.error("Erro ao enviar mensagem WhatsApp:", error);
+    throw error;
+  }
+}

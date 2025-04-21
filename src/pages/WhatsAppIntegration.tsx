@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Check, PhoneCall, MessageSquare } from "lucide-react";
+import { Check, PhoneCall, MessageSquare, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from '../contexts/AuthContext';
@@ -18,7 +17,6 @@ const WhatsAppIntegration = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [savedPhoneNumber, setSavedPhoneNumber] = useState<string | null>(null);
 
-  // Carregar o número de telefone salvo quando o componente for montado
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) return;
@@ -28,7 +26,7 @@ const WhatsAppIntegration = () => {
           .from('profiles')
           .select('whatsapp_number')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
           
         if (error) {
           console.error('Erro ao buscar perfil:', error);
@@ -61,10 +59,15 @@ const WhatsAppIntegration = () => {
       return;
     }
     
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      toast.error("Por favor, insira o número no formato internacional (ex: +5511999999999)");
+      return;
+    }
+    
     setIsConnecting(true);
     
     try {
-      // Salvar o número no perfil do usuário
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ whatsapp_number: phoneNumber })
@@ -72,18 +75,19 @@ const WhatsAppIntegration = () => {
         
       if (updateError) throw updateError;
 
-      // Enviar mensagem de boas-vindas
       const { error: welcomeError } = await supabase.functions.invoke('send-whatsapp-welcome', {
         body: { phone: phoneNumber }
       });
 
       if (welcomeError) {
         console.error('Erro ao enviar mensagem de boas-vindas:', welcomeError);
+        toast.warning("WhatsApp conectado, mas não foi possível enviar a mensagem de boas-vindas. Você ainda pode usar o serviço.");
+      } else {
+        toast.success("WhatsApp conectado com sucesso! Você receberá uma mensagem em breve.");
       }
       
       setIsConnected(true);
       setSavedPhoneNumber(phoneNumber);
-      toast.success("WhatsApp conectado com sucesso! Você receberá uma mensagem em breve.");
     } catch (error) {
       console.error('Erro ao conectar WhatsApp:', error);
       toast.error("Falha ao conectar WhatsApp. Por favor, tente novamente.");
@@ -149,7 +153,7 @@ const WhatsAppIntegration = () => {
                       </div>
                       <Input
                         type="tel"
-                        placeholder="Seu número de WhatsApp"
+                        placeholder="+5511999999999"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         className="rounded-l-none"
@@ -158,6 +162,18 @@ const WhatsAppIntegration = () => {
                     <p className="text-xs text-gray-500 mt-1">
                       Inclua o código do país (ex: +55 para Brasil)
                     </p>
+                  </div>
+                  
+                  <div className="p-3 bg-blue-50 rounded-md border border-blue-100 flex items-start gap-2">
+                    <AlertTriangle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-blue-700">
+                        Importante: Você deve iniciar uma conversa com o nosso número de WhatsApp antes de receber mensagens.
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Salve o número <span className="font-semibold">+1 (415) 523-8886</span> e envie a mensagem "join strength-fence" para iniciar.
+                      </p>
+                    </div>
                   </div>
                   
                   <Button type="submit" disabled={isConnecting} className="w-full">
