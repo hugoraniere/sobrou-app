@@ -52,7 +52,7 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
     }
 
     if (hasWhatsApp) {
-      // Abrir o WhatsApp com número oficial
+      // Abrir o WhatsApp oficial
       window.open('https://wa.me/14155238886?text=join%20strength-fence', '_blank');
     } else {
       // Redirecionar para a página de integração
