@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import TransactionFormLayout from './ui/TransactionFormLayout';
 import TransactionDetails from './ui/TransactionDetails';
 import TransactionControls from './ui/TransactionControls';
+import type { Transaction } from '@/types/component-types';
 
 interface AddTransactionDialogProps {
   isOpen: boolean;
@@ -24,11 +25,11 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
   const today = new Date().toISOString().split('T')[0];
   const { t } = useTranslation();
   
-  const [newTransaction, setNewTransaction] = useState({
+  const [newTransaction, setNewTransaction] = useState<Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at'>>>({
     amount: '',
     description: '',
     category: 'other',
-    type: 'expense',
+    type: 'expense' as const,
     date: today
   });
   
@@ -69,7 +70,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
       return;
     }
 
-    const amountValue = parseFloat(newTransaction.amount);
+    const amountValue = parseFloat(newTransaction.amount.toString());
     if (isNaN(amountValue) || amountValue <= 0) {
       toast.error("Por favor, insira um valor válido");
       return;
@@ -80,10 +81,10 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
     try {
       await TransactionService.addTransaction({
         amount: amountValue,
-        description: newTransaction.description,
-        category: newTransaction.category,
-        type: newTransaction.type as 'expense' | 'income',
-        date: newTransaction.date
+        description: newTransaction.description || '',
+        category: newTransaction.category || 'other',
+        type: newTransaction.type as 'expense' | 'income' | 'transfer',
+        date: newTransaction.date || today
       });
 
       toast.success(
@@ -99,7 +100,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
         amount: '',
         description: '',
         category: 'other',
-        type: 'expense',
+        type: 'expense' as const,
         date: today
       });
     } catch (error) {
