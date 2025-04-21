@@ -47,7 +47,7 @@ const OnboardingPanel: React.FC<OnboardingPanelProps> = ({ whatsAppConnected }) 
                 : "Connect your WhatsApp to start tracking expenses"}
             </span>
             {!whatsAppConnected && (
-              <Link to="/integration">
+              <Link to="/whatsapp-integration">
                 <Button size="sm" className="ml-0 md:ml-4">
                   Connect WhatsApp
                   <ArrowRight className="ml-2 h-4 w-4" />

@@ -104,7 +104,9 @@ const App = () => {
                   path="/whatsapp-integration"
                   element={
                     <ProtectedRoute>
-                      <WhatsAppIntegration />
+                      <AppLayout>
+                        <WhatsAppIntegration />
+                      </AppLayout>
                     </ProtectedRoute>
                   }
                 />

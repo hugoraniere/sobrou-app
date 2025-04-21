@@ -128,7 +128,7 @@ const Settings = () => {
                 </p>
               </div>
               
-              <Button variant="default" onClick={() => window.location.href = '/integration'}>
+              <Button variant="default" onClick={() => window.location.href = '/whatsapp-integration'}>
                 {user?.user_metadata?.whatsapp_number 
                   ? t('settings.manageConnection', 'Gerenciar') 
                   : t('settings.connectWhatsapp', 'Conectar WhatsApp')}
