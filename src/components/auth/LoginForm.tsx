@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,6 +10,14 @@ import {
   FormLabel, 
   FormMessage 
 } from "@/components/ui/form";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
@@ -18,6 +25,7 @@ import { toast } from "sonner";
 import { useAuth } from '../../contexts/AuthContext';
 import { useSearchParams } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/integrations/supabase/client';
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -25,6 +33,10 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
+
+const passwordResetSchema = z.object({
+  email: z.string().email("Por favor, insira um email válido"),
+});
 
 interface LoginFormProps {
   setActiveTab: (tab: string) => void;
@@ -35,6 +47,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
   const [searchParams] = useSearchParams();
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const { login } = useAuth();
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   // Check for verification success in URL params
   useEffect(() => {
@@ -60,6 +73,28 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
       toast.error(error.message || "Login failed. Please check your credentials.");
     }
   };
+
+  const handlePasswordReset = async (values: { email: string }) => {
+    try {
+      setIsResettingPassword(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+
+      if (error) throw error;
+
+      toast.success('Email de redefinição de senha enviado com sucesso!');
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao enviar email de redefinição');
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
+  const passwordResetForm = useForm<{ email: string }>({
+    resolver: zodResolver(passwordResetSchema),
+    defaultValues: { email: "" }
+  });
 
   return (
     <Form {...form}>
@@ -100,9 +135,53 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel>Senha</FormLabel>
-                <a href="#" className="text-sm text-primary hover:underline">
-                  Esqueceu a senha?
-                </a>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <a href="#" className="text-sm text-primary hover:underline">
+                      Esqueceu a senha?
+                    </a>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Redefinir Senha</DialogTitle>
+                      <DialogDescription>
+                        Insira seu email para receber instruções de redefinição de senha
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Form {...passwordResetForm}>
+                      <form onSubmit={passwordResetForm.handleSubmit(handlePasswordReset)} className="space-y-4">
+                        <FormField
+                          control={passwordResetForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input 
+                                    placeholder="seu@exemplo.com" 
+                                    type="email" 
+                                    className="pl-10" 
+                                    {...field} 
+                                  />
+                                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button 
+                          type="submit" 
+                          className="w-full mt-4"
+                          disabled={isResettingPassword}
+                        >
+                          {isResettingPassword ? 'Enviando...' : 'Enviar link de redefinição'}
+                        </Button>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </div>
               <FormControl>
                 <div className="relative">
