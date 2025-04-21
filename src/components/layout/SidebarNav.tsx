@@ -21,7 +21,7 @@ const SidebarNav = () => {
   const navigationItems = [
     {
       name: t('common.dashboard', 'Visão Geral'),
-      path: '/',
+      path: '/dashboard',
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
     {
@@ -61,8 +61,8 @@ const SidebarNav = () => {
   };
 
   const isActiveRoute = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/' || location.pathname === '/home';
+    if (path === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
     }
     return location.pathname.startsWith(path);
   };
@@ -88,13 +88,27 @@ const SidebarNav = () => {
               return (
                 <SidebarMenuItem key={item.path}>
                   <SidebarMenuButton asChild isActive={isActive} tooltip={state === 'collapsed' ? item.name : undefined}>
-                    <Link to={item.path} className={cn("flex items-center", isActive ? "font-bold text-primary" : "font-normal text-text-primary")}>
-                      <span className={cn("flex items-center justify-center", isActive ? "text-primary" : "text-text-primary")}>
+                    <Link 
+                      to={item.path} 
+                      className={cn(
+                        "flex items-center rounded-md w-full transition-colors",
+                        isActive 
+                          ? "bg-primary/10 text-primary font-bold" 
+                          : "text-text-primary hover:bg-gray-100"
+                      )}
+                    >
+                      <span className={cn(
+                        "flex items-center justify-center",
+                        isActive ? "text-primary" : "text-text-primary"
+                      )}>
                         {item.icon}
                       </span>
                       <span className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
                         {item.name}
                       </span>
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-md"></span>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

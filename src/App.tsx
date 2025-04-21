@@ -38,10 +38,10 @@ const App = () => {
                 <Route path="/verify" element={<EmailVerification />} />
                 <Route path="/reset-password" element={<PasswordReset />} />
                 
-                {/* Rota principal - condicional baseada na autenticação */}
+                {/* Rota principal - redireciona com base na autenticação */}
                 <Route 
                   path="/" 
-                  element={<PublicLanding />} 
+                  element={<Navigate to="/dashboard" replace />} 
                 />
                 
                 {/* Rotas protegidas */}

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { Home, PlusCircle, Settings, Menu } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 interface HeaderMobileNavProps {
   isPublic?: boolean;
@@ -19,6 +20,7 @@ const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ isPublic = false, onN
   const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -38,6 +40,13 @@ const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ isPublic = false, onN
       return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
     }
     return names[0][0].toUpperCase();
+  };
+
+  const isActivePath = (path: string) => {
+    if (path === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
+    }
+    return location.pathname === path;
   };
 
   // For TypeScript errors: Cast user to any temporarily to allow access to user_metadata
@@ -64,13 +73,27 @@ const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ isPublic = false, onN
               </div>
               
               <div className="border-t border-border-subtle pt-4">
-                <Link to="/" className="flex items-center p-2 hover:bg-background-surface rounded" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link 
+                  to="/dashboard" 
+                  className={cn(
+                    "flex items-center p-2 rounded",
+                    isActivePath('/dashboard') 
+                      ? "bg-primary/10 text-primary font-medium" 
+                      : "hover:bg-background-surface text-text-primary"
+                  )}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   <Home className="mr-3 h-5 w-5" />
                   <span>{t('common.dashboard', 'Painel')}</span>
                 </Link>
                 
                 <button 
-                  className="flex items-center p-2 hover:bg-background-surface rounded w-full text-left"
+                  className={cn(
+                    "flex items-center p-2 rounded w-full text-left",
+                    isActivePath('/transactions') 
+                      ? "bg-primary/10 text-primary font-medium" 
+                      : "hover:bg-background-surface text-text-primary"
+                  )}
                   onClick={() => {
                     onNewTransaction();
                     setIsMobileMenuOpen(false);
@@ -80,7 +103,16 @@ const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ isPublic = false, onN
                   <span>{t('transactions.new', 'Nova Transação')}</span>
                 </button>
                 
-                <Link to="/settings" className="flex items-center p-2 hover:bg-background-surface rounded" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link 
+                  to="/settings" 
+                  className={cn(
+                    "flex items-center p-2 rounded",
+                    isActivePath('/settings') 
+                      ? "bg-primary/10 text-primary font-medium" 
+                      : "hover:bg-background-surface text-text-primary"
+                  )}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   <Settings className="mr-3 h-5 w-5" />
                   <span>{t('common.settings', 'Configurações')}</span>
                 </Link>

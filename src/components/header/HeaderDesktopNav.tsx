@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { Home, PlusCircle, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from '@/components/ui/menubar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 interface HeaderDesktopNavProps {
   onNewTransaction: () => void;
@@ -16,6 +17,7 @@ const HeaderDesktopNav: React.FC<HeaderDesktopNavProps> = ({ onNewTransaction })
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -36,6 +38,13 @@ const HeaderDesktopNav: React.FC<HeaderDesktopNavProps> = ({ onNewTransaction })
     return names[0][0].toUpperCase();
   };
 
+  const isActivePath = (path: string) => {
+    if (path === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
+    }
+    return location.pathname === path;
+  };
+
   // For TypeScript errors: Cast user to any temporarily to allow access to user_metadata
   const userAny = user as any;
 
@@ -43,13 +52,16 @@ const HeaderDesktopNav: React.FC<HeaderDesktopNavProps> = ({ onNewTransaction })
     <>
       <Menubar className="border-none shadow-none">
         <MenubarMenu>
-          <MenubarTrigger className="cursor-pointer">
+          <MenubarTrigger className={cn(
+            "cursor-pointer", 
+            isActivePath('/dashboard') && "text-primary font-medium bg-primary/10"
+          )}>
             <Home className="mr-2 h-4 w-4" />
             <span>{t('common.dashboard', 'Painel')}</span>
           </MenubarTrigger>
           <MenubarContent>
             <MenubarItem>
-              <Link to="/" className="flex items-center w-full">
+              <Link to="/dashboard" className="flex items-center w-full">
                 <Home className="mr-2 h-4 w-4" />
                 {t('common.dashboard', 'Painel')}
               </Link>
@@ -58,14 +70,23 @@ const HeaderDesktopNav: React.FC<HeaderDesktopNavProps> = ({ onNewTransaction })
         </MenubarMenu>
 
         <MenubarMenu>
-          <MenubarTrigger className="cursor-pointer" onClick={onNewTransaction}>
+          <MenubarTrigger 
+            className={cn(
+              "cursor-pointer", 
+              isActivePath('/transactions') && "text-primary font-medium bg-primary/10"
+            )} 
+            onClick={onNewTransaction}
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>{t('transactions.new', 'Nova Transação')}</span>
           </MenubarTrigger>
         </MenubarMenu>
 
         <MenubarMenu>
-          <MenubarTrigger className="cursor-pointer">
+          <MenubarTrigger className={cn(
+            "cursor-pointer", 
+            isActivePath('/settings') && "text-primary font-medium bg-primary/10"
+          )}>
             <Settings className="mr-2 h-4 w-4" />
             <span>{t('common.settings', 'Configurações')}</span>
           </MenubarTrigger>
