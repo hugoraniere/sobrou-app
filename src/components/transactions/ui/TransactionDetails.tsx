@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 import type { TransactionDetailsProps } from '@/types/component-types';
 
 const TransactionDetails: React.FC<TransactionDetailsProps> = ({
@@ -22,7 +23,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className={className}>
+    <div className={cn("space-y-4", className)}>
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="date" className="text-right">
           {t('transactions.date', 'Data')}
@@ -31,7 +32,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           id="date"
           name="date"
           type="date"
-          value={transaction.date}
+          value={transaction.date || ''}
           onChange={onInputChange}
           className="col-span-3"
         />
@@ -43,7 +44,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         </Label>
         <Select 
           name="type" 
-          value={transaction.type}
+          value={transaction.type || 'expense'}
           onValueChange={(value) => handleSelectChange('type', value)}
         >
           <SelectTrigger className="col-span-3">
@@ -63,7 +64,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         </Label>
         <Select 
           name="category" 
-          value={transaction.category}
+          value={transaction.category || 'other'}
           onValueChange={(value) => handleSelectChange('category', value)}
         >
           <SelectTrigger className="col-span-3">
@@ -90,7 +91,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         <Input
           id="description"
           name="description"
-          value={transaction.description}
+          value={transaction.description || ''}
           onChange={onInputChange}
           className="col-span-3"
         />
@@ -104,7 +105,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           id="amount"
           name="amount"
           type="number"
-          value={transaction.amount}
+          value={transaction.amount || ''}
           onChange={onInputChange}
           className="col-span-3"
         />

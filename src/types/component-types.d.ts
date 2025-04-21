@@ -28,7 +28,7 @@ export interface Transaction {
 }
 
 export interface TransactionDetailsProps extends StandardProps {
-  transaction: Transaction;
+  transaction: Transaction | Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at'>>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }

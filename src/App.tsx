@@ -1,3 +1,4 @@
+
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -17,6 +18,7 @@ import PublicLanding from "./pages/PublicLanding";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
 import EmailVerification from "./pages/EmailVerification";
+import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);

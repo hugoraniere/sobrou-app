@@ -29,7 +29,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     t
   } = useTranslation();
 
-  // Detect category as user types (only if no manually selected category)
   useEffect(() => {
     if (inputTimeoutRef.current) {
       clearTimeout(inputTimeoutRef.current);
@@ -48,6 +47,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       }
     };
   }, [inputValue, userSelectedCategory]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) {
@@ -56,15 +56,12 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     }
     setIsProcessing(true);
     try {
-      // Use AI to parse the text input
       const parsedData = await TransactionService.parseExpenseText(inputValue);
       console.log("Parsed data:", parsedData);
 
-      // Use the selected date from the datepicker
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       parsedData.date = formattedDate;
 
-      // Use user selected category if available
       if (userSelectedCategory) {
         parsedData.category = userSelectedCategory;
       }
@@ -74,13 +71,9 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
         return;
       }
 
-      // Handle saving entries differently
       if (parsedData.isSaving && parsedData.savingGoal) {
         try {
-          // Find or create the saving goal
           const goal = await SavingsService.findOrCreateSavingGoal(parsedData.savingGoal);
-
-          // Add money to the goal
           await SavingsService.addToSavingGoal(goal.id, parsedData.amount, parsedData.date);
           toast.success(`Adicionado R$${parsedData.amount.toFixed(2)} à sua poupança ${goal.name}!`);
           onSavingAdded();
@@ -90,7 +83,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
         }
       } else {
         try {
-          // Add as a regular transaction - removing unsupported fields
           await TransactionService.addTransaction({
             amount: parsedData.amount,
             description: parsedData.description,
@@ -106,7 +98,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
         }
       }
 
-      // Reset the form
       setInputValue('');
       setUserSelectedCategory(null);
     } catch (error) {
@@ -116,19 +107,21 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       setIsProcessing(false);
     }
   };
+
   const handleCategorySelect = (categoryId: string) => {
     setUserSelectedCategory(categoryId);
     setIsCategoryPopoverOpen(false);
   };
+
   const resetCategory = (e: React.MouseEvent) => {
     e.stopPropagation();
     setUserSelectedCategory(null);
   };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
-  // Get the effective category ID (user selected or auto-detected)
   const categoryId = userSelectedCategory || detectedCategory;
   return <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4">Inserir sua transação</h2>

@@ -70,7 +70,7 @@ export const TransactionService = {
   },
   
   // Add a new transaction
-  async addTransaction(transaction: Omit<Transaction, 'id' | 'created_at'>): Promise<Transaction> {
+  async addTransaction(transaction: Omit<Transaction, 'id' | 'created_at' | 'user_id'> & { user_id?: string }): Promise<Transaction> {
     // Get the current user's ID
     const { data: { user } } = await supabase.auth.getUser();
     
