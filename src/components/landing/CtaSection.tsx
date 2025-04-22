@@ -14,7 +14,7 @@ const CtaSection: React.FC = () => {
         <p className="font-alliance text-xl mb-8 opacity-90">
           Controle suas finanças de forma simples e inteligente
         </p>
-        <Link to="/auth">
+        <Link to="/auth?tab=signup">
           <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-alliance-n2">
             Criar conta gratuita
           </Button>

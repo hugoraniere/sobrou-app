@@ -48,7 +48,7 @@ const TransparentHeader = () => {
                 Entrar
               </Button>
             </Link>
-            <Link to="/auth">
+            <Link to="/auth?tab=signup">
               <Button className="bg-primary hover:bg-primary-hover text-white font-alliance">
                 Criar conta grátis
               </Button>

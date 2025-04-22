@@ -26,6 +26,14 @@ const Auth = () => {
         duration: 5000
       });
     }
+    
+    // Check for tab parameter in URL
+    const tab = searchParams.get('tab');
+    if (tab === 'signup') {
+      setActiveTab('signup');
+    } else if (tab === 'login') {
+      setActiveTab('login');
+    }
   }, [searchParams]);
 
   useEffect(() => {
