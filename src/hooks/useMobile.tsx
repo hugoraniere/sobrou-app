@@ -10,23 +10,44 @@ import { useState, useEffect } from "react";
  *
  * Exemplo de uso:
  *   const { isMobile, width } = useMobile();
- *   if (isMobile) { /* render mobile menu */ }
+ *   if (isMobile) {
+ *     // renderiza menu móvel
+ *   }
  */
 export function useMobile() {
-  const [width, setWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1200);
+  const [width, setWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
   const [isMobile, setIsMobile] = useState<boolean>(width <= 768);
 
   useEffect(() => {
     const handleResize = () => {
-      setWidth(window.innerWidth);
-      setIsMobile(window.innerWidth <= 768);
+      const currentWidth = window.innerWidth;
+      setWidth(currentWidth);
+      setIsMobile(currentWidth <= 768);
+      
+      // Adiciona classe para facilitar estilização responsiva
+      document.documentElement.classList.toggle('is-mobile', currentWidth <= 768);
     };
 
+    // Adiciona suporte para orientação do dispositivo
     window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+    
     handleResize(); // Atualiza na montagem
-    return () => window.removeEventListener("resize", handleResize);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+      document.documentElement.classList.remove('is-mobile');
+    };
   }, []);
 
-  return { isMobile, width };
+  return { 
+    isMobile, 
+    width,
+    // Métodos auxiliares para PWA
+    isTouchDevice: 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  };
 }
 
