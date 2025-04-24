@@ -13,18 +13,18 @@ const getCategoryIcon = (categoryId: string) => {
   switch (categoryId) {
     case 'other-income':
     case 'other-expense':
-      return <Activity className="w-5 h-5" />;
+      return <Activity className="h-4 w-4" />;
     case 'salary':
-      return <Wallet className="w-5 h-5" />;
+      return <Wallet className="h-4 w-4" />;
     case 'food':
-      return <Utensils className="w-5 h-5" />;
+      return <Utensils className="h-4 w-4" />;
     case 'housing':
     case 'moradia':
-      return <Home className="w-5 h-5" />;
+      return <Home className="h-4 w-4" />;
     case 'credit-card':
-      return <CreditCard className="w-5 h-5" />;
+      return <CreditCard className="h-4 w-4" />;
     default:
-      return <Activity className="w-5 h-5" />;
+      return <Activity className="h-4 w-4" />;
   }
 };
 
@@ -39,15 +39,14 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
   return (
     <div 
       className={cn(
-        "flex items-center gap-3 text-gray-900",
-        "text-sm",
+        "flex items-center gap-2",
         className
       )}
     >
       <span className="flex-shrink-0">
         {getCategoryIcon(categoryData.value)}
       </span>
-      <span>{categoryData.label || category}</span>
+      <span className="text-sm text-gray-900">{categoryData.label || category}</span>
     </div>
   );
 };
