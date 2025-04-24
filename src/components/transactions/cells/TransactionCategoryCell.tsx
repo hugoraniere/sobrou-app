@@ -10,7 +10,6 @@ import {
   Wifi, 
   Phone, 
   CreditCard,
-  ChartBar,
   Activity, 
   Wallet, 
   Utensils, 
@@ -70,7 +69,7 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
   return (
     <div 
       className={cn(
-        "flex items-center py-2",
+        "h-12 flex items-center",
         className
       )}
     >
