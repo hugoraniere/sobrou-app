@@ -5,7 +5,7 @@ import { transactionCategories } from '@/data/categories';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, CircleDot } from 'lucide-react';
 import { CategoryType } from '@/types/categories';
 
 interface CategorySelectorProps {
@@ -27,7 +27,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
       type: 'expense',
       label: 'Outros',
       color: 'bg-gray-100 text-gray-800',
-      icon: () => <span className="h-4 w-4">•</span>
+      icon: CircleDot
     }
   ];
 
@@ -44,7 +44,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
     type: 'expense' as const,
     label: 'Selecione uma categoria',
     color: 'bg-gray-100',
-    icon: () => <span className="h-4 w-4">•</span>
+    icon: CircleDot
   };
 
   // Filtrar categorias com base na busca

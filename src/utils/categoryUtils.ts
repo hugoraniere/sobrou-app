@@ -1,64 +1,43 @@
 
 import { CategoryType } from '../types/categories';
-import { transactionCategories } from '../data/categories';
 
-export const getCategoryByKeyword = (text: string): CategoryType | null => {
-  if (!text) return null;
-  
-  const normalizedText = text.toLowerCase().trim();
-  
-  const keywordMap: Record<string, string> = {
-    // Receitas
-    'salário': 'salary',
-    'salario': 'salary',
-    'pagamento': 'salary',
-    'freelance': 'freelance',
-    'freela': 'freelance',
-    'projeto': 'freelance',
-    
-    // Despesas
-    'comida': 'food',
-    'restaurante': 'food',
-    'almoço': 'food',
-    'almoco': 'food',
-    'jantar': 'food',
-    'café': 'food',
-    'cafe': 'food',
-    'mercado': 'food',
-    'supermercado': 'food',
-    
-    'transporte': 'transport',
-    'uber': 'transport',
-    'táxi': 'transport',
-    'taxi': 'transport',
-    'ônibus': 'transport',
-    'onibus': 'transport',
-    'metrô': 'transport',
-    'metro': 'transport',
-    'gasolina': 'transport',
-    'combustível': 'transport',
-    'combustivel': 'transport',
-    
-    'conta': 'utilities',
-    'contas': 'utilities',
-    'água': 'utilities',
-    'agua': 'utilities',
-    'luz': 'utilities',
-    'energia': 'utilities',
-    'gás': 'utilities',
-    'gas': 'utilities',
-    'internet': 'utilities',
-    'telefone': 'utilities',
-    'celular': 'utilities',
-    'aluguel': 'utilities'
-  };
-  
-  for (const [keyword, categoryId] of Object.entries(keywordMap)) {
-    if (normalizedText.includes(keyword)) {
-      const foundCategory = transactionCategories.find(c => c.value === categoryId);
-      if (foundCategory) return foundCategory;
-    }
+/**
+ * Detecta categorias com base no texto
+ * @param text Texto para análise
+ * @param categories Lista de categorias para comparação
+ * @returns Lista de categorias detectadas
+ */
+export const detectCategories = (
+  text: string, 
+  categories: CategoryType[]
+): CategoryType[] => {
+  if (!text || !categories || !Array.isArray(categories)) {
+    return [];
   }
   
-  return null;
+  // Implementação básica - expandir conforme necessário
+  const lowerText = text.toLowerCase();
+  return categories.filter(category => 
+    category.name.toLowerCase().includes(lowerText) || 
+    category.label.toLowerCase().includes(lowerText)
+  );
+};
+
+/**
+ * Encontra uma categoria pelo seu ID ou valor
+ * @param categoryId ID ou valor da categoria 
+ * @param categories Lista de categorias
+ * @returns Categoria encontrada ou undefined
+ */
+export const findCategoryById = (
+  categoryId: string,
+  categories: CategoryType[]
+): CategoryType | undefined => {
+  if (!categoryId || !categories || !Array.isArray(categories)) {
+    return undefined;
+  }
+  
+  return categories.find(
+    category => category.id === categoryId || category.value === categoryId
+  );
 };
