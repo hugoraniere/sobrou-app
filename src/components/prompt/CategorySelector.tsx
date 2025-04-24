@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
+import { CategoryType } from '@/types/categories';
 
 interface CategorySelectorProps {
   value: string;
@@ -17,21 +18,40 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Garantir que temos uma lista válida de categorias - sempre inicializada como array
-  const safeCategories = Array.isArray(transactionCategories) ? transactionCategories : [];
+  // Criar uma lista estática de categorias padrão caso não tenha categorias
+  const defaultCategories: CategoryType[] = [
+    {
+      id: 'other',
+      name: 'Outros',
+      value: 'other',
+      type: 'expense',
+      label: 'Outros',
+      color: 'bg-gray-100 text-gray-800',
+      icon: () => <span className="h-4 w-4">•</span>
+    }
+  ];
+
+  // Garantir que estamos trabalhando com um array válido de categorias
+  const categories: CategoryType[] = Array.isArray(transactionCategories) && transactionCategories.length > 0
+    ? transactionCategories
+    : defaultCategories;
   
   // Encontrar a categoria selecionada ou usar um valor padrão seguro
-  const selectedCategory = safeCategories.find(c => c.value === value) || {
-    label: 'Selecione uma categoria',
+  const selectedCategory = categories.find(c => c.value === value) || {
+    id: '',
+    name: 'Selecione uma categoria',
     value: '',
-    icon: null
+    type: 'expense' as const,
+    label: 'Selecione uma categoria',
+    color: 'bg-gray-100',
+    icon: () => <span className="h-4 w-4">•</span>
   };
 
-  // Filtrar categorias com base na busca - garantir que trabalhamos com um array
+  // Filtrar categorias com base na busca
   const filteredCategories = searchQuery.length > 0
-    ? safeCategories.filter(category => 
+    ? categories.filter(category => 
         category.label.toLowerCase().includes(searchQuery.toLowerCase()))
-    : safeCategories;
+    : categories;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -67,11 +87,12 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
               const Icon = category.icon;
               return (
                 <CommandItem
-                  key={category.value}
+                  key={category.value || category.id}
                   value={category.value}
                   onSelect={(currentValue) => {
                     onChange(currentValue);
                     setOpen(false);
+                    setSearchQuery("");
                   }}
                   className="flex items-center gap-2 py-2"
                 >
