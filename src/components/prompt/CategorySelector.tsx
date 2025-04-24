@@ -15,12 +15,23 @@ interface CategorySelectorProps {
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, className }) => {
   const [open, setOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
 
-  const selectedCategory = transactionCategories.find(c => c.value === value) || {
+  // Garantir que temos uma lista válida de categorias
+  const categories = transactionCategories || [];
+  
+  // Encontrar a categoria selecionada ou usar um valor padrão seguro
+  const selectedCategory = categories.find(c => c.value === value) || {
     label: 'Selecione uma categoria',
     value: '',
     icon: null
   };
+
+  // Filtrar categorias com base na busca
+  const filteredCategories = searchQuery.length > 0
+    ? categories.filter(category => 
+        category.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    : categories;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -40,17 +51,18 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent className="w-full p-0 bg-white" align="start">
         <Command>
           <CommandInput 
             placeholder="Buscar categoria..." 
             className="h-9"
+            onValueChange={setSearchQuery}
           />
           <CommandEmpty className="py-2 text-sm text-gray-500">
             Nenhuma categoria encontrada.
           </CommandEmpty>
           <CommandGroup className="max-h-[200px] overflow-y-auto">
-            {transactionCategories.map((category) => {
+            {filteredCategories.map((category) => {
               const Icon = category.icon;
               return (
                 <CommandItem

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { categories } from '@/data/categories';
+import { transactionCategories } from '@/data/categories';
 
 type CategoryProps = {
   activeCategory: string;

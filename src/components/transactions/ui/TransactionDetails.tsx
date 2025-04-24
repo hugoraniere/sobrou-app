@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Transaction } from '@/services/TransactionService';
 import { Input } from '@/components/ui/input';
@@ -54,7 +55,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
             value={transaction.amount}
             onChange={onInputChange}
             placeholder="0.00"
-            className="pr-8"
+            className="pr-10"
           />
           <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
             <span className="text-gray-500">R$</span>

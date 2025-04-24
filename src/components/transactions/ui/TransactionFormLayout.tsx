@@ -37,7 +37,10 @@ const TransactionFormLayout: React.FC<TransactionFormLayoutProps> = ({
         "data-[state=open]:duration-300",
         "dark:bg-slate-950",
         className
-      )}>
+      )}
+      // Remover o botão de fechar padrão do Dialog
+      hasCloseButton={false}
+      >
         <div className="flex flex-col h-full max-h-[85vh]">
           <DialogHeader className="p-6 pb-2">
             <div className="flex items-center justify-between">
