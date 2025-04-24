@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Transaction } from '@/services/TransactionService';
-import { FormLabel, FormItem, FormControl } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionAmountCell from '@/components/transactions/cells/TransactionAmountCell';
@@ -10,6 +9,7 @@ import TransactionCategoryCell from '@/components/transactions/cells/Transaction
 import { useTranslation } from 'react-i18next';
 import CategorySelector from '@/components/prompt/CategorySelector';
 import TransactionDatePicker from '@/components/prompt/TransactionDatePicker';
+import { Label } from '@/components/ui/label';
 
 interface TransactionDetailsProps {
   transaction: Transaction;
@@ -45,55 +45,49 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         </div>
       </div>
 
-      <FormItem>
-        <FormLabel>{t('transactions.amount', 'Valor')}</FormLabel>
-        <FormControl>
-          <Input
-            type="number"
-            name="amount"
-            value={transaction.amount}
-            onChange={onInputChange}
-            placeholder="0.00"
-          />
-        </FormControl>
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="amount">{t('transactions.amount', 'Valor')}</Label>
+        <Input
+          id="amount"
+          type="number"
+          name="amount"
+          value={transaction.amount}
+          onChange={onInputChange}
+          placeholder="0.00"
+        />
+      </div>
 
-      <FormItem>
-        <FormLabel>{t('transactions.description', 'Descrição')}</FormLabel>
-        <FormControl>
-          <Input
-            name="description"
-            value={transaction.description}
-            onChange={onInputChange}
-            placeholder={t('transactions.descriptionPlaceholder', 'Ex: Supermercado')}
-          />
-        </FormControl>
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="description">{t('transactions.description', 'Descrição')}</Label>
+        <Input
+          id="description"
+          name="description"
+          value={transaction.description}
+          onChange={onInputChange}
+          placeholder={t('transactions.descriptionPlaceholder', 'Ex: Supermercado')}
+        />
+      </div>
 
-      <FormItem>
-        <FormLabel>{t('transactions.category', 'Categoria')}</FormLabel>
-        <FormControl>
-          <CategorySelector
-            value={transaction.category}
-            onChange={(value) => handleSelectChange('category', value)}
-          />
-        </FormControl>
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="category">{t('transactions.category', 'Categoria')}</Label>
+        <CategorySelector
+          value={transaction.category}
+          onChange={(value) => handleSelectChange('category', value)}
+        />
+      </div>
 
-      <FormItem>
-        <FormLabel>{t('transactions.date', 'Data')}</FormLabel>
-        <FormControl>
-          <TransactionDatePicker
-            date={new Date(transaction.date)}
-            onDateChange={(date) => {
-              if (date) {
-                const formattedDate = date.toISOString().split('T')[0];
-                handleSelectChange('date', formattedDate);
-              }
-            }}
-          />
-        </FormControl>
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="date">{t('transactions.date', 'Data')}</Label>
+        <TransactionDatePicker
+          date={new Date(transaction.date)}
+          onDateChange={(date) => {
+            if (date) {
+              const formattedDate = date.toISOString().split('T')[0];
+              handleSelectChange('date', formattedDate);
+            }
+          }}
+        />
+      </div>
     </div>
   );
 };
