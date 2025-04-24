@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { Transaction } from '@/services/TransactionService';
 
-type SortConfig = {
+export type SortConfig = {
   key: keyof Transaction | '';
   direction: 'asc' | 'desc';
 };
