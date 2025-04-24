@@ -13,7 +13,7 @@ interface TransactionCategoryCellProps {
  */
 const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ category, className }) => {
   // Get category metadata
-  const categoryData = transactionCategories.find(c => c.value === category) || {
+  const categoryData = transactionCategories.find(c => c.value === category || c.id === category) || {
     label: category,
     value: category,
     color: 'bg-gray-100 text-gray-800',
