@@ -8,3 +8,4 @@ export const transactionCategories: CategoryType[] = expenseCategories || [];
 // Re-export important types and utilities
 export type { CategoryType };
 export * from '../utils/categoryUtils';
+
