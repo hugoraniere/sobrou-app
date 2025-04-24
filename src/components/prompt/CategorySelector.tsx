@@ -17,8 +17,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Garantir que temos uma lista válida de categorias
-  const categories = transactionCategories || [];
+  // Garantir que temos uma lista válida de categorias - nunca undefined
+  const categories = Array.isArray(transactionCategories) ? transactionCategories : [];
   
   // Encontrar a categoria selecionada ou usar um valor padrão seguro
   const selectedCategory = categories.find(c => c.value === value) || {
@@ -27,7 +27,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
     icon: null
   };
 
-  // Filtrar categorias com base na busca
+  // Filtrar categorias com base na busca - garantir que trabalhamos com um array
   const filteredCategories = searchQuery.length > 0
     ? categories.filter(category => 
         category.label.toLowerCase().includes(searchQuery.toLowerCase()))
