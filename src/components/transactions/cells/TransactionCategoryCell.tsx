@@ -2,7 +2,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { transactionCategories } from '@/data/categories';
-import { Badge } from '@/components/ui/badge';
 
 interface TransactionCategoryCellProps {
   category: string;
@@ -21,26 +20,25 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
     color: 'bg-gray-100 text-gray-800',
     icon: null
   };
-  
-  // Use the correct properties for display
-  const displayName = categoryData.name || categoryData.label;
-  
+
   return (
-    <Badge 
-      variant="outline" 
+    <div 
       className={cn(
-        "flex items-center gap-1.5 px-2.5 py-1 font-medium whitespace-nowrap",
+        "inline-flex items-center justify-start gap-2 px-3 py-1 rounded-full text-sm font-medium",
+        "transition-colors duration-200",
+        "w-auto max-w-full truncate",
+        "md:text-sm",
         categoryData.color,
         className
       )}
     >
       {categoryData.icon && (
-        <span className="flex items-center justify-center w-3.5 h-3.5">
+        <span className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
           {categoryData.icon()}
         </span>
       )}
-      <span>{displayName}</span>
-    </Badge>
+      <span className="truncate">{categoryData.label || category}</span>
+    </div>
   );
 };
 
