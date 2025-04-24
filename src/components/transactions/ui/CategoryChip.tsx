@@ -20,12 +20,12 @@ const CategoryChip: React.FC<CategoryChipProps> = ({
   return (
     <div 
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium",
+        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium h-[73px]",
         category.color,
         className
       )}
     >
-      {Icon && <Icon className="h-4 w-4" />}
+      <Icon className="h-4 w-4" />
       <span>{category.label}</span>
       {onRemove && (
         <button

@@ -1,6 +1,18 @@
 
 import { CategoryType } from '@/types/categories';
-import { Activity, ShoppingCart, Home, Car, Wifi, CreditCard, Heart, Gamepad, Package, LineChart, Users, Gift } from 'lucide-react';
+import { 
+  ShoppingCart, 
+  Home, 
+  Car, 
+  Wifi, 
+  CreditCard, 
+  Heart, 
+  Gamepad, 
+  Package, 
+  LineChart, 
+  Users, 
+  Gift 
+} from 'lucide-react';
 
 export const categoryKeywords: Record<string, string[]> = {
   food: [

@@ -1,4 +1,6 @@
 
+import { LucideIcon } from 'lucide-react';
+
 export interface CategoryType {
   id: string;
   name: string;
@@ -6,5 +8,5 @@ export interface CategoryType {
   type: 'income' | 'expense';
   label: string;
   color: string;
-  icon: () => JSX.Element;
+  icon: LucideIcon;
 }

@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { categoryKeywords, categoryMeta } from '@/data/categoryKeywords';
 import { removeAccents } from '@/lib/utils';
+import { CategoryType } from '@/types/categories';
 
 export const useCategoryDetection = (text: string) => {
   const [detectedCategories, setDetectedCategories] = useState<string[]>([]);
@@ -33,7 +34,7 @@ export const useCategoryDetection = (text: string) => {
     setDetectedCategories(Array.from(detected));
   }, [text, normalizedKeywords]);
 
-  const categories = detectedCategories.map(id => categoryMeta[id]);
+  const categories = detectedCategories.map(id => categoryMeta[id]) as CategoryType[];
   
   return {
     categories,
