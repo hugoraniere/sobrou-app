@@ -1,41 +1,48 @@
 
-import React, { useState } from 'react';
-import ProfileSection from '@/components/settings/ProfileSection';
-import NotificationsSection from '@/components/settings/NotificationsSection';
-import AppearanceSection from '@/components/settings/AppearanceSection';
-import WhatsAppSection from '@/components/settings/WhatsAppSection';
-import DangerZoneSection from '@/components/settings/DangerZoneSection';
-import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
-import ProfileEditDialog from '@/components/profile/ProfileEditDialog';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { User, Settings as SettingsIcon, MessageCircle } from 'lucide-react';
+import ProfileTab from '@/components/settings/ProfileTab';
+import PreferencesTab from '@/components/settings/PreferencesTab';
+import WhatsAppTab from '@/components/settings/WhatsAppTab';
 
 const Settings = () => {
-  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <ProfileSection onEditClick={() => setIsProfileEditOpen(true)} />
+      <h1 className="text-3xl font-bold mb-6">{t('settings.title', 'Configurações')}</h1>
+      
+      <Tabs defaultValue="profile" className="space-y-6">
+        <TabsList className="w-full max-w-full overflow-x-auto justify-start">
+          <TabsTrigger value="profile" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            {t('settings.tabs.profile', 'Perfil')}
+          </TabsTrigger>
+          <TabsTrigger value="preferences" className="flex items-center gap-2">
+            <SettingsIcon className="h-4 w-4" />
+            {t('settings.tabs.preferences', 'Preferências')}
+          </TabsTrigger>
+          <TabsTrigger value="whatsapp" className="flex items-center gap-2">
+            <MessageCircle className="h-4 w-4" />
+            {t('settings.tabs.whatsapp', 'WhatsApp')}
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="grid gap-6">
-        {/* 1. WhatsApp Section - Ocupa toda a largura */}
-        <WhatsAppSection />
-        
-        {/* 2. Notificações e Aparência - Lado a lado */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <NotificationsSection />
-          <AppearanceSection />
-        </div>
-        
-        {/* 3. Segurança e Zona de Perigo - Lado a lado */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <ChangePasswordSection />
-          <DangerZoneSection />
-        </div>
-      </div>
+        <TabsContent value="profile">
+          <ProfileTab />
+        </TabsContent>
 
-      <ProfileEditDialog 
-        isOpen={isProfileEditOpen} 
-        onClose={() => setIsProfileEditOpen(false)} 
-      />
+        <TabsContent value="preferences">
+          <PreferencesTab />
+        </TabsContent>
+
+        <TabsContent value="whatsapp">
+          <WhatsAppTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
