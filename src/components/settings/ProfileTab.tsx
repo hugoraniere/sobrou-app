@@ -7,14 +7,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera } from 'lucide-react';
+import { Camera, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
+import { useAvatar } from '@/contexts/AvatarContext';
 
 const ProfileTab = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { updateAvatarUrl } = useAvatar();
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -32,12 +34,28 @@ const ProfileTab = () => {
     return names[0][0].toUpperCase();
   };
 
+  const deleteOldAvatar = async (oldUrl: string) => {
+    try {
+      const path = oldUrl.split('/').pop();
+      if (path) {
+        await supabase.storage.from('avatars').remove([path]);
+      }
+    } catch (error) {
+      console.error('Error deleting old avatar:', error);
+    }
+  };
+
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       setIsUploading(true);
+      
+      // Delete old avatar if exists
+      if (profileData.avatarUrl) {
+        await deleteOldAvatar(profileData.avatarUrl);
+      }
       
       // Create a unique file name
       const fileExt = file.name.split('.').pop();
@@ -68,6 +86,7 @@ const ProfileTab = () => {
       if (updateError) throw updateError;
 
       setProfileData(prev => ({ ...prev, avatarUrl: publicUrl }));
+      updateAvatarUrl(publicUrl);
       toast.success(t('settings.avatarUpdated', 'Foto atualizada com sucesso'));
     } catch (error) {
       console.error('Error uploading avatar:', error);
@@ -77,12 +96,36 @@ const ProfileTab = () => {
     }
   };
 
+  const handleRemoveAvatar = async () => {
+    try {
+      if (profileData.avatarUrl) {
+        await deleteOldAvatar(profileData.avatarUrl);
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        data: { 
+          avatar_url: null,
+          full_name: profileData.fullName 
+        }
+      });
+
+      if (error) throw error;
+
+      setProfileData(prev => ({ ...prev, avatarUrl: '' }));
+      updateAvatarUrl(null);
+      toast.success(t('settings.avatarRemoved', 'Foto removida com sucesso'));
+    } catch (error) {
+      console.error('Error removing avatar:', error);
+      toast.error(t('settings.avatarRemoveError', 'Erro ao remover foto'));
+    }
+  };
+
   const handleSave = async () => {
     try {
       const { error } = await supabase.auth.updateUser({
         data: { 
           full_name: profileData.fullName,
-          avatar_url: profileData.avatarUrl
+          avatar_url: profileData.avatarUrl || null
         }
       });
 
@@ -110,27 +153,44 @@ const ProfileTab = () => {
             <div className="relative">
               <Avatar className="h-32 w-32">
                 {profileData.avatarUrl ? (
-                  <AvatarImage src={profileData.avatarUrl} alt={profileData.fullName} />
+                  <AvatarImage 
+                    src={profileData.avatarUrl} 
+                    alt={profileData.fullName}
+                    className="object-cover" 
+                  />
                 ) : (
                   <AvatarFallback className="text-2xl">
                     {getUserInitials()}
                   </AvatarFallback>
                 )}
               </Avatar>
-              <label 
-                htmlFor="avatar-upload"
-                className="absolute bottom-0 right-0 rounded-full p-2 bg-primary hover:bg-primary/90 cursor-pointer"
-              >
-                <Camera className="h-4 w-4 text-white" />
-                <input
-                  type="file"
-                  id="avatar-upload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  disabled={isUploading}
-                />
-              </label>
+              <div className="absolute -bottom-4 right-0 flex gap-2">
+                <label 
+                  htmlFor="avatar-upload"
+                  className="rounded-full p-2 bg-primary hover:bg-primary/90 cursor-pointer"
+                >
+                  <Camera className="h-4 w-4 text-white" />
+                  <input
+                    type="file"
+                    id="avatar-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    disabled={isUploading}
+                  />
+                </label>
+                {profileData.avatarUrl && (
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    className="rounded-full"
+                    onClick={handleRemoveAvatar}
+                    disabled={isUploading}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
             
             <div className="space-y-4 flex-1">

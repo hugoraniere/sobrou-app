@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FileText, Target, Settings, LogOut, ChevronRight, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, FileText, Target, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAvatar } from '@/contexts/AvatarContext';
 import Logo from '../brand/Logo';
 
 const SidebarNav = () => {
@@ -17,6 +16,7 @@ const SidebarNav = () => {
   const { t } = useTranslation();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = React.useState(false);
   const { state, toggleSidebar } = useSidebar();
+  const { avatarUrl } = useAvatar();
 
   const navigationItems = [
     {
@@ -51,7 +51,6 @@ const SidebarNav = () => {
   };
 
   const getUserInitials = () => {
-    // Usando any para acessar os metadados do usuário, já que UserProfile não tem essa propriedade
     const fullName = user ? (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário') : t('common.user', 'Usuário');
     const names = fullName.split(' ');
     if (names.length > 1) {
@@ -67,7 +66,6 @@ const SidebarNav = () => {
     return location.pathname.startsWith(path);
   };
 
-  // Obter o nome completo do usuário para exibição
   const userFullName = user ? (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário') : t('common.user', 'Usuário');
 
   return (
@@ -130,9 +128,13 @@ const SidebarNav = () => {
           <Link to="/settings?tab=profile" className="p-4 border-t border-gray-200 hover:bg-gray-50 transition-colors">
             <div className={`flex items-center ${state === 'collapsed' ? 'justify-center' : ''}`}>
               <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-white text-black">
-                  {getUserInitials()}
-                </AvatarFallback>
+                {avatarUrl ? (
+                  <AvatarImage src={avatarUrl} alt={userFullName} className="object-cover" />
+                ) : (
+                  <AvatarFallback className="bg-white text-black">
+                    {getUserInitials()}
+                  </AvatarFallback>
+                )}
               </Avatar>
               <div className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
                 <p className="text-sm font-medium">{userFullName}</p>
