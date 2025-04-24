@@ -47,11 +47,14 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
     icon: CircleDot
   };
 
-  // Filtrar categorias com base na busca
+  // Filtrar categorias com base na busca - garantindo que o array de categorias está definido
   const filteredCategories = searchQuery.length > 0
     ? categories.filter(category => 
         category.label.toLowerCase().includes(searchQuery.toLowerCase()))
     : categories;
+
+  // Garantir que o ícone está definido antes de tentar usá-lo
+  const SelectedIcon = selectedCategory.icon || CircleDot;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -63,9 +66,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
           className={cn("w-full justify-between", className)}
         >
           <div className="flex items-center gap-2">
-            {selectedCategory.icon && (
-              <selectedCategory.icon className="h-4 w-4 text-gray-500" />
-            )}
+            <SelectedIcon className="h-4 w-4 text-gray-500" />
             <span className="text-sm">{selectedCategory.label}</span>
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -84,7 +85,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
           </CommandEmpty>
           <CommandGroup className="max-h-[200px] overflow-y-auto">
             {filteredCategories.map((category) => {
-              const Icon = category.icon;
+              const Icon = category.icon || CircleDot;
               return (
                 <CommandItem
                   key={category.value || category.id}
@@ -96,7 +97,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
                   }}
                   className="flex items-center gap-2 py-2"
                 >
-                  {Icon && <Icon className="h-4 w-4 text-gray-500" />}
+                  <Icon className="h-4 w-4 text-gray-500" />
                   <span className="flex-1 text-sm">{category.label}</span>
                   {value === category.value && (
                     <Check className="h-4 w-4 text-primary" />

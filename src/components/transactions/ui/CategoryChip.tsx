@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, CircleDot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CategoryType } from '@/types/categories';
 
@@ -15,18 +15,19 @@ const CategoryChip: React.FC<CategoryChipProps> = ({
   onRemove,
   className
 }) => {
-  const Icon = category.icon;
+  // Garantir que o ícone está definido, senão usar um fallback
+  const Icon = category.icon || CircleDot;
 
   return (
     <div 
       className={cn(
         "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium",
-        category.color,
+        category.color || "bg-gray-100 text-gray-800",
         className
       )}
     >
       <Icon className="h-4 w-4" />
-      <span>{category.label}</span>
+      <span>{category.label || category.name || 'Categoria'}</span>
       {onRemove && (
         <button
           onClick={(e) => {

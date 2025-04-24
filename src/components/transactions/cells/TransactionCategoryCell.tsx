@@ -13,7 +13,8 @@ import {
   Activity, 
   Wallet, 
   Utensils, 
-  Home 
+  Home,
+  CircleDot
 } from 'lucide-react';
 
 interface TransactionCategoryCellProps {
@@ -57,7 +58,7 @@ const getCategoryIcon = (categoryId: string) => {
     case 'other':
       return <Activity className="h-4 w-4" />;
     default:
-      return <Activity className="h-4 w-4" />;
+      return <CircleDot className="h-4 w-4" />;
   }
 };
 
@@ -69,14 +70,17 @@ const getCategoryLabel = (category: string, defaultLabel: string) => {
 };
 
 const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ category, className }) => {
-  const categoryData = transactionCategories.find(c => c.id === category || c.value === category) || {
-    name: category,
-    label: category,
-    value: category,
+  // Garantir que temos acesso a transactionCategories como array
+  const safeCategories = Array.isArray(transactionCategories) ? transactionCategories : [];
+  
+  const categoryData = safeCategories.find(c => c.id === category || c.value === category) || {
+    name: category || 'Outros',
+    label: category || 'Outros',
+    value: category || 'other',
     icon: null
   };
   
-  const displayLabel = getCategoryLabel(categoryData.value, categoryData.label || category);
+  const displayLabel = getCategoryLabel(categoryData.value || '', categoryData.label || category || 'Outros');
 
   return (
     <div 
@@ -87,7 +91,7 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
     >
       <div className="flex items-center gap-2 min-w-[120px]">
         <span className="flex-shrink-0">
-          {getCategoryIcon(categoryData.value)}
+          {getCategoryIcon(categoryData.value || '')}
         </span>
         <span className="text-sm font-medium text-gray-900">
           {displayLabel}
