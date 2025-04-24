@@ -2,44 +2,55 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { transactionCategories } from '@/data/categories';
+import { Activity, Wallet, Utensils, Home, CreditCard } from 'lucide-react';
 
 interface TransactionCategoryCellProps {
   category: string;
   className?: string;
 }
 
-/**
- * Component to display a transaction category with appropriate styling
- */
+const getCategoryIcon = (categoryId: string) => {
+  switch (categoryId) {
+    case 'other-income':
+    case 'other-expense':
+      return <Activity className="w-5 h-5" />;
+    case 'salary':
+      return <Wallet className="w-5 h-5" />;
+    case 'food':
+      return <Utensils className="w-5 h-5" />;
+    case 'housing':
+    case 'moradia':
+      return <Home className="w-5 h-5" />;
+    case 'credit-card':
+      return <CreditCard className="w-5 h-5" />;
+    default:
+      return <Activity className="w-5 h-5" />;
+  }
+};
+
 const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ category, className }) => {
-  // Get category metadata - searching by both id and value for backwards compatibility
   const categoryData = transactionCategories.find(c => c.id === category || c.value === category) || {
     name: category,
     label: category,
     value: category,
-    color: 'bg-gray-100 text-gray-800',
     icon: null
   };
 
   return (
     <div 
       className={cn(
-        "inline-flex items-center justify-start gap-2 px-3 py-1 rounded-full text-sm font-medium",
-        "transition-colors duration-200",
-        "w-auto max-w-full truncate",
-        "md:text-sm",
-        categoryData.color,
+        "flex items-center gap-3 text-gray-900",
+        "text-sm",
         className
       )}
     >
-      {categoryData.icon && (
-        <span className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-          {categoryData.icon()}
-        </span>
-      )}
-      <span className="truncate">{categoryData.label || category}</span>
+      <span className="flex-shrink-0">
+        {getCategoryIcon(categoryData.value)}
+      </span>
+      <span>{categoryData.label || category}</span>
     </div>
   );
 };
 
 export default TransactionCategoryCell;
+
