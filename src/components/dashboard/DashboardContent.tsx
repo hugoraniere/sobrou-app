@@ -76,11 +76,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
                 </div> : hasTransactions ? <FinancialInsights transactions={transactions} /> : <EmptyDashboard />}
             </div>
             
-            <div>
-              <Card>
-                
-              </Card>
-            </div>
+            
           </div>
         </TabsContent>
       </Tabs>
