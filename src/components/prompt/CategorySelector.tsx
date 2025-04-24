@@ -17,11 +17,11 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Garantir que temos uma lista válida de categorias - nunca undefined
-  const categories = Array.isArray(transactionCategories) ? transactionCategories : [];
+  // Garantir que temos uma lista válida de categorias - sempre inicializada como array
+  const safeCategories = Array.isArray(transactionCategories) ? transactionCategories : [];
   
   // Encontrar a categoria selecionada ou usar um valor padrão seguro
-  const selectedCategory = categories.find(c => c.value === value) || {
+  const selectedCategory = safeCategories.find(c => c.value === value) || {
     label: 'Selecione uma categoria',
     value: '',
     icon: null
@@ -29,9 +29,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
 
   // Filtrar categorias com base na busca - garantir que trabalhamos com um array
   const filteredCategories = searchQuery.length > 0
-    ? categories.filter(category => 
+    ? safeCategories.filter(category => 
         category.label.toLowerCase().includes(searchQuery.toLowerCase()))
-    : categories;
+    : safeCategories;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -51,11 +51,12 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-white" align="start">
+      <PopoverContent className="w-full p-0 bg-white shadow-md" align="start">
         <Command>
           <CommandInput 
             placeholder="Buscar categoria..." 
             className="h-9"
+            value={searchQuery}
             onValueChange={setSearchQuery}
           />
           <CommandEmpty className="py-2 text-sm text-gray-500">

@@ -38,13 +38,6 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         </TabsList>
       </Tabs>
 
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <TransactionTypeCell type={transaction.type} />
-          <TransactionCategoryCell category={transaction.category} />
-        </div>
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="amount">{t('transactions.amount', 'Valor')}</Label>
         <div className="relative">
