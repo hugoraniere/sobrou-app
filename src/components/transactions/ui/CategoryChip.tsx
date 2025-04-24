@@ -20,7 +20,7 @@ const CategoryChip: React.FC<CategoryChipProps> = ({
   return (
     <div 
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium h-[73px]",
+        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium",
         category.color,
         className
       )}

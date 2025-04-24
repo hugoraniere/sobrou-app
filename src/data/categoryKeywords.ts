@@ -1,14 +1,14 @@
 
 import { CategoryType } from '@/types/categories';
 import { 
-  ShoppingCart, 
+  Utensils, 
   Home, 
   Car, 
   Wifi, 
   CreditCard, 
   Heart, 
   Gamepad, 
-  Package, 
+  ShoppingBag, 
   LineChart, 
   Users, 
   Gift 
@@ -20,24 +20,22 @@ export const categoryKeywords: Record<string, string[]> = {
     'restaurante', 'bar', 'padaria', 'açougue', 'lanchonete', 'lanche', 'almoço', 'jantar', 
     'delivery', 'ifood', 'rappi', 'bebidas', 'comida pronta', 'self-service', 'marmita', 
     'fast food', 'refeição', 'snacks', 'salgados', 'doces', 'sobremesa', 'pizzaria', 
-    'hamburgueria', 'pastel', 'esfiha', 'sushi', 'café', 'cafeteria', 'água', 'refrigerante', 
-    'energético', 'cerveja', 'vinho', 'churrasco'
+    'hamburgueria', 'pastel', 'esfiha', 'sushi', 'café', 'cafeteria', 'água', 'refrigerante'
   ],
   housing: [
     'aluguel', 'condomínio', 'luz', 'energia', 'água', 'esgoto', 'gás', 'manutenção', 
     'reparo', 'reforma', 'material de construção', 'pintura', 'obra', 'iptu', 'habitação', 
-    'moradia', 'faxina', 'diarista', 'zelador', 'jardinagem', 'portaria', 'dedetização', 
-    'imobiliária'
+    'moradia', 'faxina', 'diarista', 'zelador', 'jardinagem', 'portaria'
   ],
   transport: [
     'uber', '99', 'cabify', 'combustível', 'gasolina', 'diesel', 'etanol', 'álcool', 
     'passagem', 'metrô', 'ônibus', 'trem', 'pedágio', 'transporte', 'corrida', 'estacionamento', 
-    'aluguel de carro', 'oficina', 'óleo', 'pneu', 'seguro', 'revisão', 'viagem'
+    'aluguel de carro', 'oficina', 'óleo', 'pneu', 'seguro', 'revisão'
   ],
   internet: [
     'internet', 'wifi', 'banda larga', 'fibra', 'roteador', 'vivo', 'claro', 'tim', 'oi', 
     'sky', 'telefonia', 'telefone', 'celular', 'recarga', 'plano', 'netflix', 'prime', 
-    'disney', 'streaming', 'spotify', 'youtube', 'deezer', 'assinatura'
+    'disney', 'streaming', 'spotify', 'youtube'
   ],
   credit_card: [
     'cartão', 'crédito', 'fatura', 'nubank', 'visa', 'mastercard', 'elo', 'santander', 
@@ -79,8 +77,8 @@ export const categoryMeta: Record<string, CategoryType> = {
     value: 'food',
     type: 'expense',
     label: 'Alimentação',
-    color: 'bg-orange-100 text-orange-800',
-    icon: ShoppingCart
+    color: 'bg-red-100 text-red-800',
+    icon: Utensils
   },
   housing: {
     id: 'housing',
@@ -102,10 +100,10 @@ export const categoryMeta: Record<string, CategoryType> = {
   },
   internet: {
     id: 'internet',
-    name: 'Internet',
+    name: 'Internet / Telecom',
     value: 'internet',
     type: 'expense',
-    label: 'Internet',
+    label: 'Internet / Telecom',
     color: 'bg-purple-100 text-purple-800',
     icon: Wifi
   },
@@ -115,7 +113,7 @@ export const categoryMeta: Record<string, CategoryType> = {
     value: 'credit_card',
     type: 'expense',
     label: 'Cartão de Crédito',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-indigo-100 text-indigo-800',
     icon: CreditCard
   },
   health: {
@@ -129,46 +127,46 @@ export const categoryMeta: Record<string, CategoryType> = {
   },
   entertainment: {
     id: 'entertainment',
-    name: 'Lazer',
+    name: 'Lazer / Entretenimento',
     value: 'entertainment',
     type: 'expense',
-    label: 'Lazer',
+    label: 'Lazer / Entretenimento',
     color: 'bg-pink-100 text-pink-800',
     icon: Gamepad
   },
   shopping: {
     id: 'shopping',
-    name: 'Compras',
+    name: 'Compras / Outros',
     value: 'shopping',
     type: 'expense',
-    label: 'Compras',
-    color: 'bg-indigo-100 text-indigo-800',
-    icon: Package
+    label: 'Compras / Outros',
+    color: 'bg-gray-100 text-gray-800',
+    icon: ShoppingBag
   },
   investment: {
     id: 'investment',
-    name: 'Investimentos',
+    name: 'Investimentos / Poupança',
     value: 'investment',
     type: 'expense',
-    label: 'Investimentos',
+    label: 'Investimentos / Poupança',
     color: 'bg-emerald-100 text-emerald-800',
     icon: LineChart
   },
   family: {
     id: 'family',
-    name: 'Família',
+    name: 'Família / Filhos',
     value: 'family',
     type: 'expense',
-    label: 'Família',
+    label: 'Família / Filhos',
     color: 'bg-cyan-100 text-cyan-800',
     icon: Users
   },
   donation: {
     id: 'donation',
-    name: 'Doações',
+    name: 'Doações / Ajuda',
     value: 'donation',
     type: 'expense',
-    label: 'Doações',
+    label: 'Doações / Ajuda',
     color: 'bg-rose-100 text-rose-800',
     icon: Gift
   }
