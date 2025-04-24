@@ -1,4 +1,3 @@
-
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -9,7 +8,6 @@ import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
 import Goals from "./pages/Goals";
-import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import PasswordReset from "./pages/PasswordReset";
@@ -84,17 +82,6 @@ const App = () => {
                     <ProtectedRoute>
                       <AppLayout>
                         <Settings />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Profile />
                       </AppLayout>
                     </ProtectedRoute>
                   }

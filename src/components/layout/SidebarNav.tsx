@@ -127,10 +127,12 @@ const SidebarNav = () => {
         </SidebarContent>
         
         <SidebarFooter>
-          <Link to="/profile" className="p-4 border-t border-gray-200 hover:bg-gray-50 transition-colors">
+          <Link to="/settings?tab=profile" className="p-4 border-t border-gray-200 hover:bg-gray-50 transition-colors">
             <div className={`flex items-center ${state === 'collapsed' ? 'justify-center' : ''}`}>
-              <Avatar className="h-10 w-10 bg-primary text-white">
-                <AvatarFallback>{getUserInitials()}</AvatarFallback>
+              <Avatar className="h-10 w-10">
+                <AvatarFallback className="bg-white text-black">
+                  {getUserInitials()}
+                </AvatarFallback>
               </Avatar>
               <div className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
                 <p className="text-sm font-medium">{userFullName}</p>
