@@ -42,6 +42,7 @@ const getCategoryIcon = (categoryId: string) => {
       return <Phone className="h-4 w-4" />;
     case 'credit-card':
     case 'cartao':
+    case 'credit_card':
       return <CreditCard className="h-4 w-4" />;
     case 'salary':
       return <Wallet className="h-4 w-4" />;
@@ -53,9 +54,18 @@ const getCategoryIcon = (categoryId: string) => {
       return <Home className="h-4 w-4" />;
     case 'other-income':
     case 'other-expense':
+    case 'other':
+      return <Activity className="h-4 w-4" />;
     default:
       return <Activity className="h-4 w-4" />;
   }
+};
+
+const getCategoryLabel = (category: string, defaultLabel: string) => {
+  if (category === 'credit_card' || category === 'credit-card' || category === 'cartao') {
+    return 'Cartão de crédito';
+  }
+  return defaultLabel;
 };
 
 const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ category, className }) => {
@@ -65,11 +75,13 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
     value: category,
     icon: null
   };
+  
+  const displayLabel = getCategoryLabel(categoryData.value, categoryData.label || category);
 
   return (
     <div 
       className={cn(
-        "h-12 flex items-center",
+        "h-[73px] flex items-center",
         className
       )}
     >
@@ -78,7 +90,7 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
           {getCategoryIcon(categoryData.value)}
         </span>
         <span className="text-sm font-medium text-gray-900">
-          {categoryData.label || category}
+          {displayLabel}
         </span>
       </div>
     </div>
@@ -86,4 +98,3 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
 };
 
 export default TransactionCategoryCell;
-
