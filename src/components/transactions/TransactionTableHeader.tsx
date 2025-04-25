@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowUpDown } from "lucide-react";
 import { Transaction } from '@/services/TransactionService';
 import { useTranslation } from 'react-i18next';
 
@@ -22,44 +22,40 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
   const { t } = useTranslation();
   
   const renderSortIcon = (key: keyof Transaction) => {
-    if (sortConfig.key !== key) return null;
-    return sortConfig.direction === 'asc' ? 
-      <ChevronUp className="inline h-4 w-4" /> : 
-      <ChevronDown className="inline h-4 w-4" />;
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'asc' ? 
+        <ChevronUp className="h-4 w-4 transition-opacity" /> : 
+        <ChevronDown className="h-4 w-4 transition-opacity" />;
+    }
+    return <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity duration-200" />;
   };
+
+  const renderHeaderContent = (key: keyof Transaction, label: string) => (
+    <div className="flex items-center justify-between gap-2 group cursor-pointer">
+      <span>{label}</span>
+      <span className={`inline-flex ${sortConfig.key === key ? 'opacity-40 hover:opacity-100' : ''}`}>
+        {renderSortIcon(key)}
+      </span>
+    </div>
+  );
 
   return (
     <TableHeader>
       <TableRow>
-        <TableHead 
-          className="cursor-pointer min-w-[100px] whitespace-nowrap"
-          onClick={() => onSort('date')}
-        >
-          {t('transactions.date', 'Data')} {renderSortIcon('date')}
+        <TableHead className="min-w-[100px] whitespace-nowrap group">
+          {renderHeaderContent('date', t('transactions.date', 'Data'))}
         </TableHead>
-        <TableHead 
-          className="cursor-pointer min-w-[100px] whitespace-nowrap"
-          onClick={() => onSort('type')}
-        >
-          {t('transactions.type', 'Tipo')} {renderSortIcon('type')}
+        <TableHead className="min-w-[100px] whitespace-nowrap group">
+          {renderHeaderContent('type', t('transactions.type', 'Tipo'))}
         </TableHead>
-        <TableHead 
-          className="cursor-pointer min-w-[140px] whitespace-nowrap"
-          onClick={() => onSort('category')}
-        >
-          {t('transactions.category', 'Categoria')} {renderSortIcon('category')}
+        <TableHead className="min-w-[140px] whitespace-nowrap group">
+          {renderHeaderContent('category', t('transactions.category', 'Categoria'))}
         </TableHead>
-        <TableHead 
-          className="min-w-[200px] cursor-pointer"
-          onClick={() => onSort('description')}
-        >
-          {t('transactions.description', 'Descrição')} {renderSortIcon('description')}
+        <TableHead className="min-w-[200px] group">
+          {renderHeaderContent('description', t('transactions.description', 'Descrição'))}
         </TableHead>
-        <TableHead 
-          className="text-right cursor-pointer w-[160px] whitespace-nowrap"
-          onClick={() => onSort('amount')}
-        >
-          {t('transactions.amount', 'Valor')} {renderSortIcon('amount')}
+        <TableHead className="text-right w-[160px] whitespace-nowrap group">
+          {renderHeaderContent('amount', t('transactions.amount', 'Valor'))}
         </TableHead>
         <TableHead className="w-[100px] text-center whitespace-nowrap">
           {t('transactions.actions', 'Ações')}
