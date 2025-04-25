@@ -24,8 +24,8 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
   const renderSortIcon = (key: keyof Transaction) => {
     if (sortConfig.key === key) {
       return sortConfig.direction === 'asc' ? 
-        <ChevronUp className="h-4 w-4" /> : 
-        <ChevronDown className="h-4 w-4" />;
+        <ChevronUp className="h-4 w-4 transition-opacity" /> : 
+        <ChevronDown className="h-4 w-4 transition-opacity" />;
     }
     return <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity duration-200" />;
   };
@@ -33,10 +33,10 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
   const renderHeaderContent = (key: keyof Transaction, label: string) => (
     <button
       onClick={() => onSort(key)}
-      className="flex items-center justify-between w-full gap-2 group cursor-pointer"
+      className="flex items-center justify-start w-full gap-4 group cursor-pointer"
     >
       <span>{label}</span>
-      <span className={`inline-flex ${sortConfig.key === key ? 'opacity-40 hover:opacity-100' : ''}`}>
+      <span className={`inline-flex ${sortConfig.key === key ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}>
         {renderSortIcon(key)}
       </span>
     </button>
@@ -69,3 +69,4 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
 };
 
 export default TransactionTableHeader;
+
