@@ -20,33 +20,20 @@ function parseExpenseText(text: string) {
     amount = parseFloat(amountMatch[2].replace(',', '.'));
   }
   console.log("Extracted amount:", amount);
-  
+
   // Determine type (expense or income)
   const incomeKeywords = [
-    // English
-    "received", "earned", "salary", "income", "payment", "paid me", "freelance", "bonus",
-    // Portuguese
-    "recebi", "ganhei", "salário", "salario", "pagamento", "me pagou", "freelancer", "bônus", "bonus", "pix"
+    "recebi", "ganhei", "salário", "salario", "pagamento", 
+    "me pagou", "freelancer", "bônus", "bonus", "pix"
   ];
   
   const savingKeywords = [
-    // English
-    "saved", "saving", "savings", "put aside", "fund", "goal",
-    // Portuguese
-    "economizei", "poupei", "guardar", "guardei", "poupança", "poupanca", "reserva"
-  ];
-  
-  const recurringKeywords = [
-    // English
-    "monthly", "weekly", "recurring", "every month", "subscription", "bill",
-    // Portuguese
-    "mensal", "semanal", "recorrente", "todo mês", "todo mes", "assinatura", "conta"
+    "economizei", "poupei", "guardar", "guardei", "poupança", 
+    "poupanca", "reserva"
   ];
   
   let type = "expense"; // default
   let isSaving = false;
-  let isRecurring = false;
-  let recurrenceInterval = null;
   
   for (const keyword of incomeKeywords) {
     if (text.includes(keyword)) {
@@ -62,106 +49,73 @@ function parseExpenseText(text: string) {
     }
   }
   
-  for (const keyword of recurringKeywords) {
-    if (text.includes(keyword)) {
-      isRecurring = true;
-      if (text.includes("weekly") || text.includes("semanal")) {
-        recurrenceInterval = "weekly";
-      } else if (text.includes("monthly") || text.includes("mensal")) {
-        recurrenceInterval = "monthly";
-      } else if (text.includes("yearly") || text.includes("annual") || text.includes("anual")) {
-        recurrenceInterval = "yearly";
-      } else {
-        recurrenceInterval = "monthly"; // default
-      }
-      break;
-    }
-  }
-  
   // Extract date
   const today = new Date();
   let date = today.toISOString().split('T')[0];
   
-  if (text.includes("yesterday") || text.includes("ontem")) {
+  if (text.includes("ontem")) {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     date = yesterday.toISOString().split('T')[0];
-  } else if (text.includes("last week") || text.includes("semana passada")) {
+  } else if (text.includes("semana passada")) {
     const lastWeek = new Date(today);
     lastWeek.setDate(lastWeek.getDate() - 7);
     date = lastWeek.toISOString().split('T')[0];
-  } else if (text.includes("last month") || text.includes("mês passado") || text.includes("mes passado")) {
+  } else if (text.includes("mês passado") || text.includes("mes passado")) {
     const lastMonth = new Date(today);
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     date = lastMonth.toISOString().split('T')[0];
   }
   
-  // Determine category
-  let category = "Other";
-  
+  // Determine category using Portuguese keywords
   const categoryMapping: Record<string, string[]> = {
-    "Food": [
-      // English
-      "food", "grocery", "groceries", "restaurant", "lunch", "dinner", "breakfast", "meal", "snack", "coffee",
-      // Portuguese
-      "comida", "mercado", "restaurante", "almoço", "almoco", "jantar", "café da manhã", "cafe da manha", "lanche", "café", "cafe"
+    "alimentacao": [
+      "comida", "mercado", "restaurante", "almoço", "almoco", 
+      "jantar", "café", "cafe", "lanche", "supermercado"
     ],
-    "Transportation": [
-      // English
-      "transport", "uber", "lyft", "taxi", "bus", "train", "gas", "fuel", "car", "ride",
-      // Portuguese
-      "transporte", "táxi", "taxi", "ônibus", "onibus", "trem", "metrô", "metro", "gasolina", "combustível", "combustivel", "carro", "corrida"
+    "moradia": [
+      "aluguel", "condomínio", "condominio", "luz", "água", "agua", 
+      "energia", "gás", "gas", "iptu"
     ],
-    "Housing": [
-      // English
-      "rent", "mortgage", "apartment", "house", "housing",
-      // Portuguese
-      "aluguel", "hipoteca", "apartamento", "casa", "moradia", "condomínio", "condominio"
+    "transporte": [
+      "uber", "99", "taxi", "ônibus", "onibus", "metrô", "metro", 
+      "gasolina", "combustível", "combustivel"
     ],
-    "Entertainment": [
-      // English
-      "movie", "game", "entertainment", "concert", "theatre", "theater", "show",
-      // Portuguese
-      "filme", "cinema", "jogo", "entretenimento", "concerto", "teatro", "show"
+    "internet": [
+      "internet", "wifi", "telefone", "celular", "tim", "vivo", 
+      "claro", "oi"
     ],
-    "Shopping": [
-      // English
-      "clothes", "clothing", "shop", "shopping", "mall", "store", "amazon",
-      // Portuguese
-      "roupa", "roupas", "compra", "compras", "shopping", "loja", "lojinha"
+    "cartao": [
+      "cartão", "cartao", "fatura", "crédito", "credito", "nubank", 
+      "bradesco", "itaú", "itau"
     ],
-    "Utilities": [
-      // English
-      "electricity", "water", "bill", "utility", "utilities", "internet", "phone", "subscription",
-      // Portuguese
-      "eletricidade", "água", "agua", "conta", "utilidade", "utilidades", "internet", "telefone", "celular", "assinatura"
+    "saude": [
+      "médico", "medico", "hospital", "remédio", "remedio", 
+      "consulta", "exame", "farmácia", "farmacia"
     ],
-    "Health": [
-      // English
-      "doctor", "medical", "medicine", "health", "healthcare", "hospital", "therapy",
-      // Portuguese
-      "médico", "medico", "remédio", "remedio", "saúde", "saude", "hospital", "terapia", "farmácia", "farmacia"
+    "lazer": [
+      "cinema", "show", "teatro", "viagem", "passeio", "bar", 
+      "festa", "jogos", "netflix", "spotify"
     ],
-    "Education": [
-      // English
-      "book", "course", "class", "tuition", "education", "school", "college", "university",
-      // Portuguese
-      "livro", "curso", "aula", "mensalidade", "educação", "educacao", "escola", "faculdade", "universidade"
+    "compras": [
+      "roupa", "shopping", "loja", "compra", "presente", 
+      "eletrônico", "eletronico"
     ],
-    "Income": [
-      // English
-      "salary", "wage", "payment", "income", "freelance", "contract", "bonus", "received",
-      // Portuguese
-      "salário", "salario", "pagamento", "renda", "freelancer", "contrato", "bônus", "bonus", "recebi"
+    "investimentos": [
+      "investimento", "ação", "acao", "bolsa", "tesouro", "cdb", 
+      "poupança", "poupanca"
     ],
-    "Savings": [
-      // English
-      "saving", "saved", "fund", "emergency",
-      // Portuguese
-      "poupança", "poupanca", "economizei", "fundo", "emergência", "emergencia"
+    "familia": [
+      "escola", "creche", "filho", "família", "familia", "criança", 
+      "crianca"
+    ],
+    "doacoes": [
+      "doação", "doacao", "caridade", "ajuda", "ong"
     ]
   };
-  
+
+  let category = "compras"; // Default category
+
   for (const [cat, keywords] of Object.entries(categoryMapping)) {
     for (const keyword of keywords) {
       if (text.includes(keyword)) {
@@ -169,19 +123,18 @@ function parseExpenseText(text: string) {
         break;
       }
     }
-    if (category !== "Other") break;
+    if (category !== "compras") break;
   }
-  
-  // If it's an income, force category to be Income
-  if (type === "income") {
-    category = "Income";
+
+  // If it's food-related, default to 'alimentacao'
+  if (text.includes("mercado") || text.includes("comida")) {
+    category = "alimentacao";
   }
   
   // Extract saving goal name if it's a saving
   let savingGoal = null;
   if (isSaving) {
-    // Try to find phrases like "for vacation" or "para férias"
-    const savingWords = ["for", "to", "in", "into", "para", "em"];
+    const savingWords = ["para", "em"];
     for (const word of savingWords) {
       const regex = new RegExp(`${word} ([\\w\\s]+)`, "i");
       const match = text.match(regex);
@@ -191,9 +144,8 @@ function parseExpenseText(text: string) {
       }
     }
     
-    // Default saving goal if none specified
     if (!savingGoal) {
-      savingGoal = "General Savings";
+      savingGoal = "Poupança Geral";
     }
   }
   
