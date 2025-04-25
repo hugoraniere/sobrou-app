@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -137,7 +136,7 @@ const ProfileTab = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="flex flex-col md:flex-row items-start gap-8">
             <ProfileAvatar
               previewUrl={previewUrl}
               fullName={pendingChanges.fullName}
