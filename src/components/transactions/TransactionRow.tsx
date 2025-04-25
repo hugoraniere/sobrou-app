@@ -34,10 +34,10 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         className={cn("hover:bg-gray-50 relative", className)}
         onClick={() => setIsEditDialogOpen(true)}
       >
-        <TableCell className="min-w-[100px] whitespace-nowrap px-6">{formatDate(transaction.date)}</TableCell>
+        <TableCell className="min-w-[100px] whitespace-nowrap">{formatDate(transaction.date)}</TableCell>
         <TransactionTypeCell type={transaction.type} />
         <TransactionCategoryCell category={transaction.category} />
-        <TableCell className="max-w-[200px] px-6">
+        <TableCell className="max-w-[200px]">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -52,7 +52,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           </TooltipProvider>
         </TableCell>
         <TransactionAmountCell transaction={transaction} />
-        <TableCell onClick={(e) => e.stopPropagation()} className="px-6">
+        <TableCell onClick={(e) => e.stopPropagation()}>
           <ActionsCell
             isRecurring={transaction.is_recurring || false}
             onToggleRecurring={handleToggleRecurring}

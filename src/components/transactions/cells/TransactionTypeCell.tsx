@@ -21,7 +21,7 @@ const TransactionTypeCell: React.FC<TransactionTypeCellProps> = ({ type }) => {
   };
 
   return (
-    <TableCell className="min-w-[100px] whitespace-nowrap px-6">
+    <TableCell className="min-w-[100px] whitespace-nowrap">
       {getTypeLabel()}
     </TableCell>
   );

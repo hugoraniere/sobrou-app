@@ -33,6 +33,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     formatDate
   } = useTransactionList(transactions);
   
+  // Initialize with date sorting in descending order
   const { sortConfig, handleSort, sortedTransactions } = useTransactionSorter('date', 'desc');
   const { filters, handleFilterChange, handleResetFilters } = useTransactionFilters(initialFilters);
   
@@ -96,18 +97,18 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   };
   
   return (
-    <div>
-      <div className="border-b pb-6">
-        <h3 className="text-lg font-semibold mb-4">Suas Transações</h3>
+    <div className="space-y-4">
+      <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 border-b">
+          <h3 className="text-lg font-semibold mb-4">Suas Transações</h3>
+          
+          <TableFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onResetFilters={handleResetFilters}
+          />
+        </div>
         
-        <TableFilters
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onResetFilters={handleResetFilters}
-        />
-      </div>
-      
-      <div className="pt-6">
         <TransactionTableContent
           filteredTransactions={filteredTransactions}
           paginatedTransactions={paginatedTransactions}
