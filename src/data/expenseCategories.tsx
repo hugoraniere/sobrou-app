@@ -21,7 +21,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'food',
     type: 'expense',
     label: 'Alimentação',
-    color: 'bg-red-100 text-red-800',
+    color: 'text-black',
     icon: Utensils
   },
   { 
@@ -30,7 +30,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'housing',
     type: 'expense',
     label: 'Moradia',
-    color: 'bg-blue-100 text-blue-800',
+    color: 'text-black',
     icon: Home
   },
   { 
@@ -39,7 +39,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'transport',
     type: 'expense',
     label: 'Transporte',
-    color: 'bg-yellow-100 text-yellow-800',
+    color: 'text-black',
     icon: Car
   },
   { 
@@ -48,7 +48,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'internet',
     type: 'expense',
     label: 'Internet / Telecom',
-    color: 'bg-purple-100 text-purple-800',
+    color: 'text-black',
     icon: Wifi
   },
   { 
@@ -57,7 +57,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'credit_card',
     type: 'expense',
     label: 'Cartão de Crédito',
-    color: 'bg-indigo-100 text-indigo-800',
+    color: 'text-black',
     icon: CreditCard
   },
   { 
@@ -66,7 +66,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'health',
     type: 'expense',
     label: 'Saúde',
-    color: 'bg-green-100 text-green-800',
+    color: 'text-black',
     icon: Heart
   },
   { 
@@ -75,7 +75,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'entertainment',
     type: 'expense',
     label: 'Lazer / Entretenimento',
-    color: 'bg-pink-100 text-pink-800',
+    color: 'text-black',
     icon: Gamepad
   },
   { 
@@ -84,7 +84,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'shopping',
     type: 'expense',
     label: 'Compras / Outros',
-    color: 'bg-gray-100 text-gray-800',
+    color: 'text-black',
     icon: ShoppingBag
   },
   { 
@@ -93,7 +93,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'investment',
     type: 'expense',
     label: 'Investimentos / Poupança',
-    color: 'bg-emerald-100 text-emerald-800',
+    color: 'text-black',
     icon: LineChart
   },
   { 
@@ -102,7 +102,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'family',
     type: 'expense',
     label: 'Família / Filhos',
-    color: 'bg-cyan-100 text-cyan-800',
+    color: 'text-black',
     icon: Users
   },
   { 
@@ -111,7 +111,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'donation',
     type: 'expense',
     label: 'Doações / Ajuda',
-    color: 'bg-rose-100 text-rose-800',
+    color: 'text-black',
     icon: Gift
   }
 ];
