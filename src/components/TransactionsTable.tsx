@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Transaction } from '@/services/TransactionService';
 import { useTransactionSorter } from '@/hooks/useTransactionSorter';
@@ -33,7 +32,6 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     formatDate
   } = useTransactionList(transactions);
   
-  // Initialize with date sorting in descending order
   const { sortConfig, handleSort, sortedTransactions } = useTransactionSorter('date', 'desc');
   const { filters, handleFilterChange, handleResetFilters } = useTransactionFilters(initialFilters);
   
@@ -97,31 +95,29 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   };
   
   return (
-    <div className="space-y-4">
-      <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold mb-4">Suas Transações</h3>
-          
-          <TableFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onResetFilters={handleResetFilters}
-          />
-        </div>
+    <div>
+      <div className="px-6 border-b">
+        <h3 className="text-lg font-semibold mb-4">Suas Transações</h3>
         
-        <TransactionTableContent
-          filteredTransactions={filteredTransactions}
-          paginatedTransactions={paginatedTransactions}
-          totalPages={totalPages}
-          currentPage={currentPage}
-          sortConfig={sortConfig}
-          onSort={handleSort}
-          onPageChange={setCurrentPage}
-          onToggleRecurring={handleToggleRecurring}
-          formatDate={formatDate}
-          onTransactionUpdated={onTransactionUpdated}
+        <TableFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onResetFilters={handleResetFilters}
         />
       </div>
+      
+      <TransactionTableContent
+        filteredTransactions={filteredTransactions}
+        paginatedTransactions={paginatedTransactions}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        sortConfig={sortConfig}
+        onSort={handleSort}
+        onPageChange={setCurrentPage}
+        onToggleRecurring={handleToggleRecurring}
+        formatDate={formatDate}
+        onTransactionUpdated={onTransactionUpdated}
+      />
     </div>
   );
 };

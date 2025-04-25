@@ -40,22 +40,22 @@ const Transactions = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
+    <div className="container mx-auto py-8">
+      <div className="px-6 mb-6">
         <h1 className="text-3xl font-bold">{t('transactions.title', 'Transações')}</h1>
         <p className="text-gray-600 mt-2">
           {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
         </p>
       </div>
 
-      <Card className="mb-8">
-        <CardHeader>
+      <Card>
+        <CardHeader className="px-6">
           <CardTitle>{t('transactions.allTransactions', 'Todas as Transações')}</CardTitle>
           <CardDescription>
             {t('transactions.description', 'Visualize, edite e gerencie suas transações')}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
