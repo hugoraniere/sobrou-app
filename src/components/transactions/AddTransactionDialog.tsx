@@ -49,7 +49,7 @@ const parseCurrencyToNumber = (value: string): number => {
 // Schema for transaction form validation
 const transactionFormSchema = z.object({
   description: z.string().min(2, { message: "A descrição deve ter pelo menos 2 caracteres" }),
-  amount: z.string().min(1, { message: "O valor é obrigatório" }).transform((val) => parseCurrencyToNumber(val)),
+  amount: z.string().min(1, { message: "O valor é obrigatório" }).transform(val => parseCurrencyToNumber(val)),
   category: z.string().min(1, { message: "A categoria é obrigatória" }),
   date: z.date(),
   type: z.enum(["income", "expense"])
@@ -175,18 +175,17 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
                   <FormLabel>{t('transactions.amount', 'Valor')}</FormLabel>
                   <FormControl>
                     <div className="relative">
+                      <span className="absolute left-3 top-2 text-gray-500">R$</span>
                       <Input
                         type="text"
                         placeholder="0,00"
+                        className="pl-9"
                         {...field}
                         onChange={(e) => {
                           const formatted = formatCurrencyInput(e.target.value);
                           field.onChange(formatted);
                         }}
                       />
-                      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500">R$</span>
-                      </div>
                     </div>
                   </FormControl>
                   <FormMessage />

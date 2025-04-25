@@ -14,7 +14,7 @@ import {
   Wallet, 
   Utensils, 
   Home,
-  CircleDot
+  Tag
 } from 'lucide-react';
 
 interface TransactionCategoryCellProps {
@@ -26,6 +26,7 @@ const getCategoryIcon = (categoryId: string) => {
   switch (categoryId) {
     case 'gift':
     case 'presente':
+    case 'donation':
       return <Gift className="h-4 w-4" />;
     case 'entertainment':
     case 'entretenimento':
@@ -41,10 +42,12 @@ const getCategoryIcon = (categoryId: string) => {
     case 'phone':
     case 'telefone':
       return <Phone className="h-4 w-4" />;
+    case 'credit_card':
     case 'credit-card':
     case 'cartao':
       return <CreditCard className="h-4 w-4" />;
     case 'salary':
+    case 'income':
       return <Wallet className="h-4 w-4" />;
     case 'food':
     case 'alimentacao':
@@ -55,9 +58,10 @@ const getCategoryIcon = (categoryId: string) => {
     case 'other-income':
     case 'other-expense':
     case 'other':
+    case 'shopping':
       return <Activity className="h-4 w-4" />;
     default:
-      return <CircleDot className="h-4 w-4" />;
+      return <Tag className="h-4 w-4" />;
   }
 };
 
