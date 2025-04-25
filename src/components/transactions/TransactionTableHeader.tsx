@@ -24,56 +24,46 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
   const renderSortIcon = (key: keyof Transaction) => {
     if (sortConfig.key !== key) {
       return (
-        <ChevronUp className="w-4 h-4 ml-1 transition-opacity opacity-0 group-hover:opacity-30" />
+        <ChevronUp className="ml-1 w-4 h-4 opacity-0 transition-opacity group-hover:opacity-30 inline-block" />
       );
     }
     return sortConfig.direction === 'asc' ? 
-      <ChevronUp className="w-4 h-4 ml-1" /> : 
-      <ChevronDown className="w-4 h-4 ml-1" />;
+      <ChevronUp className="ml-1 w-4 h-4 inline-block" /> : 
+      <ChevronDown className="ml-1 w-4 h-4 inline-block" />;
   };
 
   return (
     <TableHeader>
       <TableRow>
         <TableHead 
-          className="group cursor-pointer min-w-[100px] whitespace-nowrap px-6 hover:text-primary flex items-center"
+          className="group cursor-pointer min-w-[100px] whitespace-nowrap px-6 hover:text-primary"
           onClick={() => onSort('date')}
         >
-          <span className="flex items-center">
-            {t('transactions.date', 'Data')} {renderSortIcon('date')}
-          </span>
+          {t('transactions.date', 'Data')} {renderSortIcon('date')}
         </TableHead>
         <TableHead 
-          className="group cursor-pointer min-w-[100px] whitespace-nowrap px-6 hover:text-primary flex items-center"
+          className="group cursor-pointer min-w-[100px] whitespace-nowrap px-6 hover:text-primary"
           onClick={() => onSort('type')}
         >
-          <span className="flex items-center">
-            {t('transactions.type', 'Tipo')} {renderSortIcon('type')}
-          </span>
+          {t('transactions.type', 'Tipo')} {renderSortIcon('type')}
         </TableHead>
         <TableHead 
-          className="group cursor-pointer min-w-[140px] whitespace-nowrap px-6 hover:text-primary flex items-center"
+          className="group cursor-pointer min-w-[140px] whitespace-nowrap px-6 hover:text-primary"
           onClick={() => onSort('category')}
         >
-          <span className="flex items-center">
-            {t('transactions.category', 'Categoria')} {renderSortIcon('category')}
-          </span>
+          {t('transactions.category', 'Categoria')} {renderSortIcon('category')}
         </TableHead>
         <TableHead 
-          className="group min-w-[200px] cursor-pointer px-6 hover:text-primary flex items-center"
+          className="group cursor-pointer min-w-[200px] px-6 hover:text-primary"
           onClick={() => onSort('description')}
         >
-          <span className="flex items-center">
-            {t('transactions.description', 'Descrição')} {renderSortIcon('description')}
-          </span>
+          {t('transactions.description', 'Descrição')} {renderSortIcon('description')}
         </TableHead>
         <TableHead 
-          className="group text-right cursor-pointer w-[160px] whitespace-nowrap px-6 hover:text-primary flex items-center justify-end"
+          className="group cursor-pointer w-[160px] whitespace-nowrap px-6 hover:text-primary text-right"
           onClick={() => onSort('amount')}
         >
-          <span className="flex items-center">
-            {t('transactions.amount', 'Valor')} {renderSortIcon('amount')}
-          </span>
+          {t('transactions.amount', 'Valor')} {renderSortIcon('amount')}
         </TableHead>
         <TableHead className="w-[100px] text-center whitespace-nowrap px-6">
           {t('transactions.actions', 'Ações')}

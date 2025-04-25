@@ -27,3 +27,10 @@ export const parseCurrencyToNumber = (value: string): number => {
   const number = parseFloat(cleanValue);
   return isNaN(number) ? 0 : number;
 };
+
+export const formatCurrency = (value: number): string => {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
+};
