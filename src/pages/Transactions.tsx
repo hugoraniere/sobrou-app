@@ -55,7 +55,7 @@ const Transactions = () => {
             {t('transactions.description', 'Visualize, edite e gerencie suas transações')}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

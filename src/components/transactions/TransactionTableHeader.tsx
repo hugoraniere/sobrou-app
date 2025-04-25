@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -36,36 +35,36 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
     <TableHeader>
       <TableRow>
         <TableHead 
-          className="group cursor-pointer min-w-[100px] whitespace-nowrap px-6 hover:text-primary"
+          className="group cursor-pointer min-w-[100px] whitespace-nowrap hover:text-primary"
           onClick={() => onSort('date')}
         >
           {t('transactions.date', 'Data')} {renderSortIcon('date')}
         </TableHead>
         <TableHead 
-          className="group cursor-pointer min-w-[100px] whitespace-nowrap px-6 hover:text-primary"
+          className="group cursor-pointer min-w-[100px] whitespace-nowrap hover:text-primary"
           onClick={() => onSort('type')}
         >
           {t('transactions.type', 'Tipo')} {renderSortIcon('type')}
         </TableHead>
         <TableHead 
-          className="group cursor-pointer min-w-[140px] whitespace-nowrap px-6 hover:text-primary"
+          className="group cursor-pointer min-w-[140px] whitespace-nowrap hover:text-primary"
           onClick={() => onSort('category')}
         >
           {t('transactions.category', 'Categoria')} {renderSortIcon('category')}
         </TableHead>
         <TableHead 
-          className="group cursor-pointer min-w-[200px] px-6 hover:text-primary"
+          className="group cursor-pointer min-w-[200px] hover:text-primary"
           onClick={() => onSort('description')}
         >
           {t('transactions.description', 'Descrição')} {renderSortIcon('description')}
         </TableHead>
         <TableHead 
-          className="group cursor-pointer w-[160px] whitespace-nowrap px-6 hover:text-primary text-right"
+          className="group cursor-pointer w-[160px] whitespace-nowrap hover:text-primary text-right"
           onClick={() => onSort('amount')}
         >
           {t('transactions.amount', 'Valor')} {renderSortIcon('amount')}
         </TableHead>
-        <TableHead className="w-[100px] text-center whitespace-nowrap px-6">
+        <TableHead className="w-[100px] text-center whitespace-nowrap">
           {t('transactions.actions', 'Ações')}
         </TableHead>
       </TableRow>

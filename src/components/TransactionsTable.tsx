@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Transaction } from '@/services/TransactionService';
 import { useTransactionSorter } from '@/hooks/useTransactionSorter';
@@ -96,7 +97,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   
   return (
     <div>
-      <div className="px-6 border-b">
+      <div className="border-b pb-6">
         <h3 className="text-lg font-semibold mb-4">Suas Transações</h3>
         
         <TableFilters
@@ -106,18 +107,20 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
         />
       </div>
       
-      <TransactionTableContent
-        filteredTransactions={filteredTransactions}
-        paginatedTransactions={paginatedTransactions}
-        totalPages={totalPages}
-        currentPage={currentPage}
-        sortConfig={sortConfig}
-        onSort={handleSort}
-        onPageChange={setCurrentPage}
-        onToggleRecurring={handleToggleRecurring}
-        formatDate={formatDate}
-        onTransactionUpdated={onTransactionUpdated}
-      />
+      <div className="pt-6">
+        <TransactionTableContent
+          filteredTransactions={filteredTransactions}
+          paginatedTransactions={paginatedTransactions}
+          totalPages={totalPages}
+          currentPage={currentPage}
+          sortConfig={sortConfig}
+          onSort={handleSort}
+          onPageChange={setCurrentPage}
+          onToggleRecurring={handleToggleRecurring}
+          formatDate={formatDate}
+          onTransactionUpdated={onTransactionUpdated}
+        />
+      </div>
     </div>
   );
 };
