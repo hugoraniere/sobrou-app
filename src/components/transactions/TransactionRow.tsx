@@ -8,8 +8,7 @@ import TransactionCategoryCell from './cells/TransactionCategoryCell';
 import TransactionAmountCell from './cells/TransactionAmountCell';
 import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
-import RecurringIndicator from './ui/RecurringIndicator';
-import DeleteIndicator from './ui/DeleteIndicator';
+import ActionsCell from './cells/ActionsCell';
 import { useTransactionRow } from '@/hooks/useTransactionRow';
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ 
@@ -24,8 +23,6 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     setIsEditDialogOpen,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
-    isHovered,
-    setIsHovered,
     handleDelete,
     handleToggleRecurring,
   } = useTransactionRow(transaction, onToggleRecurring, onTransactionUpdated);
@@ -33,25 +30,21 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   return (
     <>
       <TableRow 
-        className={cn("cursor-pointer hover:bg-gray-50 relative group", className)}
+        className={cn("hover:bg-gray-50 relative", className)}
         onClick={() => setIsEditDialogOpen(true)}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         <TableCell>{formatDate(transaction.date)}</TableCell>
         <TransactionTypeCell type={transaction.type} />
         <TransactionCategoryCell category={transaction.category} />
         <TableCell>{transaction.description}</TableCell>
         <TransactionAmountCell transaction={transaction} />
-        <TableCell className="text-center relative">
-          <RecurringIndicator 
-            isRecurring={transaction.is_recurring} 
-            onToggle={handleToggleRecurring}
-            isHovered={isHovered}
+        <TableCell onClick={(e) => e.stopPropagation()}>
+          <ActionsCell
+            isRecurring={transaction.is_recurring || false}
+            onToggleRecurring={handleToggleRecurring}
+            onDelete={handleDelete}
           />
         </TableCell>
-        
-        <DeleteIndicator onDelete={handleDelete} />
       </TableRow>
 
       <EditTransactionDialog 

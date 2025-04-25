@@ -21,7 +21,6 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
 }) => {
   const { t } = useTranslation();
   
-  // Render sort icon
   const renderSortIcon = (key: keyof Transaction) => {
     if (sortConfig.key !== key) return null;
     return sortConfig.direction === 'asc' ? 
@@ -62,11 +61,13 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
         >
           {t('transactions.amount', 'Valor')} {renderSortIcon('amount')}
         </TableHead>
-        <TableHead className="w-10">{t('transactions.recurring', 'Recorrente')}</TableHead>
-        <TableHead className="w-10">{t('transactions.actions', 'Ações')}</TableHead>
+        <TableHead className="w-[100px] text-center">
+          {t('transactions.actions', 'Ações')}
+        </TableHead>
       </TableRow>
     </TableHeader>
   );
 };
 
 export default TransactionTableHeader;
+
