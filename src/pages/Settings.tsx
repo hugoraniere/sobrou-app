@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Settings as SettingsIcon, MessageCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import ProfileTab from '@/components/settings/ProfileTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import WhatsAppTab from '@/components/settings/WhatsAppTab';
@@ -12,7 +13,7 @@ const Settings = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full">
       <h1 className="text-3xl font-bold mb-6">{t('settings.title', 'Configurações')}</h1>
       
       <Tabs defaultValue="profile" className="space-y-6">
@@ -28,6 +29,9 @@ const Settings = () => {
           <TabsTrigger value="whatsapp" className="flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
             {t('settings.tabs.whatsapp', 'WhatsApp')}
+            <Badge variant="secondary" className="ml-1.5 font-normal">
+              {t('common.comingSoon', 'Em breve')}
+            </Badge>
           </TabsTrigger>
         </TabsList>
 
@@ -48,3 +52,4 @@ const Settings = () => {
 };
 
 export default Settings;
+
