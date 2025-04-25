@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { TableCell } from "@/components/ui/table";
 import { transactionCategories } from '@/data/categories';
 import { 
   Gift, 
@@ -16,6 +15,7 @@ import {
   Home,
   Tag
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TransactionCategoryCellProps {
   category: string;
@@ -73,7 +73,6 @@ const getCategoryLabel = (category: string, defaultLabel: string) => {
 };
 
 const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ category, className }) => {
-  // Garantir que temos acesso a transactionCategories como array
   const safeCategories = Array.isArray(transactionCategories) ? transactionCategories : [];
   
   const categoryData = safeCategories.find(c => c.id === category || c.value === category) || {
@@ -86,21 +85,16 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
   const displayLabel = getCategoryLabel(categoryData.value || '', categoryData.label || category || 'Outros');
 
   return (
-    <div 
-      className={cn(
-        "h-[73px] flex items-center",
-        className
-      )}
-    >
-      <div className="flex items-center gap-2 min-w-[120px]">
+    <TableCell className={className}>
+      <div className="flex items-center gap-2">
         <span className="flex-shrink-0">
           {getCategoryIcon(categoryData.value || '')}
         </span>
-        <span className="text-sm font-medium text-gray-900">
+        <span className="text-sm font-medium">
           {displayLabel}
         </span>
       </div>
-    </div>
+    </TableCell>
   );
 };
 
