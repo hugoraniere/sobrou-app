@@ -21,7 +21,7 @@ const TransactionAmountCell: React.FC<TransactionAmountCellProps> = ({ transacti
 
   return (
     <TableCell className={cn(
-      "text-right font-medium",
+      "text-right font-medium whitespace-nowrap w-[160px]",
       transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
     )}>
       {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
@@ -30,4 +30,3 @@ const TransactionAmountCell: React.FC<TransactionAmountCellProps> = ({ transacti
 };
 
 export default TransactionAmountCell;
-

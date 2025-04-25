@@ -22,7 +22,7 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
   const Icon = categoryData.icon;
   
   return (
-    <TableCell className={className}>
+    <TableCell className={cn("min-w-[140px] whitespace-nowrap", className)}>
       <div className="flex items-center gap-2">
         <span className="flex-shrink-0">
           {Icon && <Icon className="h-4 w-4" />}

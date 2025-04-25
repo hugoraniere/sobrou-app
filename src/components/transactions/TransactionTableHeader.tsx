@@ -32,36 +32,36 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
     <TableHeader>
       <TableRow>
         <TableHead 
-          className="cursor-pointer"
+          className="cursor-pointer min-w-[100px] whitespace-nowrap"
           onClick={() => onSort('date')}
         >
           {t('transactions.date', 'Data')} {renderSortIcon('date')}
         </TableHead>
         <TableHead 
-          className="cursor-pointer"
+          className="cursor-pointer min-w-[100px] whitespace-nowrap"
           onClick={() => onSort('type')}
         >
           {t('transactions.type', 'Tipo')} {renderSortIcon('type')}
         </TableHead>
         <TableHead 
-          className="cursor-pointer"
+          className="cursor-pointer min-w-[140px] whitespace-nowrap"
           onClick={() => onSort('category')}
         >
           {t('transactions.category', 'Categoria')} {renderSortIcon('category')}
         </TableHead>
         <TableHead 
-          className="w-full cursor-pointer"
+          className="min-w-[200px] cursor-pointer"
           onClick={() => onSort('description')}
         >
           {t('transactions.description', 'Descrição')} {renderSortIcon('description')}
         </TableHead>
         <TableHead 
-          className="text-right cursor-pointer"
+          className="text-right cursor-pointer w-[160px] whitespace-nowrap"
           onClick={() => onSort('amount')}
         >
           {t('transactions.amount', 'Valor')} {renderSortIcon('amount')}
         </TableHead>
-        <TableHead className="w-[100px] text-center">
+        <TableHead className="w-[100px] text-center whitespace-nowrap">
           {t('transactions.actions', 'Ações')}
         </TableHead>
       </TableRow>
@@ -70,4 +70,3 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
 };
 
 export default TransactionTableHeader;
-
