@@ -1,7 +1,7 @@
-
-import React from 'react'
-import { cn } from "@/lib/utils"
+import React from 'react';
+import { cn } from "@/lib/utils";
 import { PiStarFourFill } from "react-icons/pi";
+import { useAIChat } from '@/contexts/AIChatContext';
 
 interface FloatingChatButtonProps {
   isOpen: boolean;
@@ -10,6 +10,10 @@ interface FloatingChatButtonProps {
 }
 
 const FloatingChatButton = ({ isOpen, onClick, className }: FloatingChatButtonProps) => {
+  const { isEnabled } = useAIChat();
+
+  if (!isEnabled) return null;
+
   return (
     <button
       onClick={onClick}
@@ -26,4 +30,4 @@ const FloatingChatButton = ({ isOpen, onClick, className }: FloatingChatButtonPr
   )
 }
 
-export default FloatingChatButton
+export default FloatingChatButton;

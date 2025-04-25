@@ -3,15 +3,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 import { useAvatar } from '@/contexts/AvatarContext';
+import ProfileAvatar from './profile/ProfileAvatar';
+import ProfileForm from './profile/ProfileForm';
 
 type PendingChanges = {
   fullName: string;
@@ -32,15 +29,6 @@ const ProfileTab = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     user?.user_metadata?.avatar_url || null
   );
-
-  const getUserInitials = () => {
-    const fullName = pendingChanges.fullName || t('common.user', 'Usuário');
-    const names = fullName.split(' ');
-    if (names.length > 1) {
-      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-    }
-    return names[0][0].toUpperCase();
-  };
 
   const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -150,88 +138,21 @@ const ProfileTab = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="relative">
-              <Avatar className="h-32 w-32">
-                {previewUrl ? (
-                  <AvatarImage 
-                    src={previewUrl} 
-                    alt={pendingChanges.fullName}
-                    className="object-cover" 
-                  />
-                ) : (
-                  <AvatarFallback className="text-2xl">
-                    {getUserInitials()}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <div className="absolute -bottom-4 right-0 flex gap-2">
-                <label 
-                  htmlFor="avatar-upload"
-                  className="rounded-full p-2 bg-primary hover:bg-primary/90 cursor-pointer"
-                >
-                  <Camera className="h-4 w-4 text-white" />
-                  <input
-                    type="file"
-                    id="avatar-upload"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    disabled={isSubmitting}
-                  />
-                </label>
-                {previewUrl && (
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="rounded-full"
-                    onClick={handleRemoveAvatar}
-                    disabled={isSubmitting}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
+            <ProfileAvatar
+              previewUrl={previewUrl}
+              fullName={pendingChanges.fullName}
+              isSubmitting={isSubmitting}
+              onAvatarUpload={handleAvatarUpload}
+              onRemoveAvatar={handleRemoveAvatar}
+            />
             
-            <div className="space-y-4 flex-1">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">{t('settings.fullName', 'Nome Completo')}</Label>
-                <Input
-                  id="fullName"
-                  value={pendingChanges.fullName}
-                  onChange={(e) => setPendingChanges(prev => ({ ...prev, fullName: e.target.value }))}
-                  disabled={isSubmitting}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('settings.email', 'Email')}</Label>
-                <Input
-                  id="email"
-                  value={user?.email || ''}
-                  disabled
-                />
-                <p className="text-sm text-muted-foreground">
-                  {t('settings.emailChangeInfo', 'Email não pode ser alterado')}
-                </p>
-              </div>
-
-              <div className="flex justify-end space-x-4 pt-4">
-                <Button 
-                  onClick={handleSave}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t('common.saving', 'Salvando...')}
-                    </>
-                  ) : (
-                    t('common.save', 'Salvar')
-                  )}
-                </Button>
-              </div>
-            </div>
+            <ProfileForm
+              fullName={pendingChanges.fullName}
+              email={user?.email}
+              isSubmitting={isSubmitting}
+              onFullNameChange={(value) => setPendingChanges(prev => ({ ...prev, fullName: value }))}
+              onSave={handleSave}
+            />
           </div>
         </CardContent>
       </Card>

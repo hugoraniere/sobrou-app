@@ -1,17 +1,17 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Settings, Bell, Lock } from 'lucide-react';
+import { useAIChat } from '@/contexts/AIChatContext';
 
 const PreferencesTab = () => {
   const { t } = useTranslation();
+  const { isEnabled, toggleAIChat } = useAIChat();
 
   return (
     <div className="grid gap-6">
-      {/* Chat Preferences */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -30,7 +30,7 @@ const PreferencesTab = () => {
                 {t('settings.enableAIDesc', 'Permite que a IA ajude com suas finanças')}
               </p>
             </div>
-            <Switch />
+            <Switch checked={isEnabled} onCheckedChange={toggleAIChat} />
           </div>
         </CardContent>
       </Card>
