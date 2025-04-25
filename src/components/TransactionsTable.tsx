@@ -36,6 +36,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
     setTransactionsState(transactions);
   }, [transactions]);
   
+  // Initialize with date sorting in descending order
   const { sortConfig, handleSort, sortedTransactions } = useTransactionSorter('date', 'desc');
   const { filters, handleFilterChange, handleResetFilters } = useTransactionFilters(initialFilters);
   

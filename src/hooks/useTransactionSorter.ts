@@ -24,6 +24,27 @@ export const useTransactionSorter = (initialSortKey: keyof Transaction = 'date',
     if (!sortConfig.key) return transactions;
     
     return [...transactions].sort((a, b) => {
+      if (sortConfig.key === 'date') {
+        // Convert strings to Date objects for proper comparison
+        const dateA = new Date(a[sortConfig.key]);
+        const dateB = new Date(b[sortConfig.key]);
+        
+        // First compare by date
+        const dateDiff = dateA.getTime() - dateB.getTime();
+        
+        if (dateDiff === 0) {
+          // If dates are equal, compare by created_at as secondary sort
+          const createdAtA = new Date(a.created_at);
+          const createdAtB = new Date(b.created_at);
+          return sortConfig.direction === 'asc' 
+            ? createdAtA.getTime() - createdAtB.getTime()
+            : createdAtB.getTime() - createdAtA.getTime();
+        }
+        
+        return sortConfig.direction === 'asc' ? dateDiff : -dateDiff;
+      }
+      
+      // For non-date fields
       if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === 'asc' ? -1 : 1;
       }
