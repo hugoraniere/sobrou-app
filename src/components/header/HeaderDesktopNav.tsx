@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import LanguageSwitcher from '../LanguageSwitcher';
 import { Home, PlusCircle, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from '@/components/ui/menubar';
@@ -106,8 +105,6 @@ const HeaderDesktopNav: React.FC<HeaderDesktopNavProps> = ({ onNewTransaction })
       </Menubar>
 
       <div className="flex items-center space-x-2 ml-4">
-        <LanguageSwitcher />
-        
         <div className="flex items-center space-x-2">
           <Avatar className="h-8 w-8 bg-primary text-white">
             <AvatarFallback>{getUserInitials()}</AvatarFallback>

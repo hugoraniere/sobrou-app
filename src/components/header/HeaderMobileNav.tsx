@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import LanguageSwitcher from '../LanguageSwitcher';
 import { Home, PlusCircle, Settings, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -119,10 +118,6 @@ const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ isPublic = false, onN
               </div>
               
               <div className="border-t border-border-subtle pt-4">
-                <div className="p-2">
-                  <LanguageSwitcher />
-                </div>
-                
                 <button 
                   className="flex items-center p-2 text-feedback-error hover:bg-background-surface rounded w-full text-left mt-2"
                   onClick={handleLogout}
@@ -133,9 +128,6 @@ const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ isPublic = false, onN
             </>
           ) : (
             <>
-              <div className="p-2">
-                <LanguageSwitcher />
-              </div>
               <Link to="/auth" className="flex items-center p-2 hover:bg-background-surface rounded" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('auth.login', 'Entrar')}
               </Link>
