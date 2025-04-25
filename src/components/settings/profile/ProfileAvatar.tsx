@@ -49,7 +49,7 @@ const ProfileAvatar = ({
       <div className="absolute -bottom-4 right-0 flex gap-2">
         <label 
           htmlFor="avatar-upload"
-          className="rounded-full p-2 bg-primary hover:bg-primary/90 cursor-pointer"
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-primary hover:bg-primary/90 cursor-pointer transition-colors"
         >
           <Camera className="h-4 w-4 text-white" />
           <input
@@ -65,7 +65,7 @@ const ProfileAvatar = ({
           <Button
             size="icon"
             variant="destructive"
-            className="rounded-full"
+            className="h-8 w-8 rounded-full"
             onClick={onRemoveAvatar}
             disabled={isSubmitting}
           >

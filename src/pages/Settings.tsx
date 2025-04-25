@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Settings as SettingsIcon, MessageCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import ProfileTab from '@/components/settings/ProfileTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import WhatsAppTab from '@/components/settings/WhatsAppTab';
@@ -17,23 +16,22 @@ const Settings = () => {
       <h1 className="text-3xl font-bold mb-6">{t('settings.title', 'Configurações')}</h1>
       
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="w-full max-w-full overflow-x-auto justify-start">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            {t('settings.tabs.profile', 'Perfil')}
-          </TabsTrigger>
-          <TabsTrigger value="preferences" className="flex items-center gap-2">
-            <SettingsIcon className="h-4 w-4" />
-            {t('settings.tabs.preferences', 'Preferências')}
-          </TabsTrigger>
-          <TabsTrigger value="whatsapp" className="flex items-center gap-2">
-            <MessageCircle className="h-4 w-4" />
-            {t('settings.tabs.whatsapp', 'WhatsApp')}
-            <Badge variant="secondary" className="ml-1.5 font-normal">
-              {t('common.comingSoon', 'Em breve')}
-            </Badge>
-          </TabsTrigger>
-        </TabsList>
+        <div className="border-b">
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              {t('settings.tabs.profile', 'Perfil')}
+            </TabsTrigger>
+            <TabsTrigger value="preferences" className="flex items-center gap-2">
+              <SettingsIcon className="h-4 w-4" />
+              {t('settings.tabs.preferences', 'Preferências')}
+            </TabsTrigger>
+            <TabsTrigger value="whatsapp" className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              {t('settings.tabs.whatsapp', 'WhatsApp')}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="profile">
           <ProfileTab />
@@ -52,4 +50,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
