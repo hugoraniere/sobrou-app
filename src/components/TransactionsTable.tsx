@@ -99,7 +99,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   return (
     <div className="space-y-4">
       <div className="w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 border-b">
+        <div className="p-6 border-b">
           <h3 className="text-lg font-semibold mb-4">Suas Transações</h3>
           
           <TableFilters

@@ -10,6 +10,7 @@ import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
 import ActionsCell from './cells/ActionsCell';
 import { useTransactionRow } from '@/hooks/useTransactionRow';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ 
   transaction, 
@@ -33,10 +34,23 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         className={cn("hover:bg-gray-50 relative", className)}
         onClick={() => setIsEditDialogOpen(true)}
       >
-        <TableCell>{formatDate(transaction.date)}</TableCell>
+        <TableCell className="min-w-[100px] whitespace-nowrap">{formatDate(transaction.date)}</TableCell>
         <TransactionTypeCell type={transaction.type} />
         <TransactionCategoryCell category={transaction.category} />
-        <TableCell>{transaction.description}</TableCell>
+        <TableCell className="max-w-[200px]">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="truncate">
+                  {transaction.description}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{transaction.description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </TableCell>
         <TransactionAmountCell transaction={transaction} />
         <TableCell onClick={(e) => e.stopPropagation()}>
           <ActionsCell
@@ -65,4 +79,3 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
 };
 
 export default TransactionRow;
-
