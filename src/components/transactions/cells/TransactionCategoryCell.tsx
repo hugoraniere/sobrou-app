@@ -43,7 +43,6 @@ const getCategoryIcon = (categoryId: string) => {
       return <Phone className="h-4 w-4" />;
     case 'credit-card':
     case 'cartao':
-    case 'credit_card':
       return <CreditCard className="h-4 w-4" />;
     case 'salary':
       return <Wallet className="h-4 w-4" />;
