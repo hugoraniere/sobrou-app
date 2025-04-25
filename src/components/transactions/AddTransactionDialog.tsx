@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CategorySelector from '@/components/prompt/CategorySelector';
 import TransactionDatePicker from '@/components/prompt/TransactionDatePicker';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,10 +21,35 @@ interface AddTransactionDialogProps {
   onTransactionAdded?: () => void;
 }
 
+// Helper function to format currency input
+const formatCurrencyInput = (value: string): string => {
+  // Remove any non-digit characters except comma
+  let cleanValue = value.replace(/[^\d,]/g, '');
+  
+  // Replace comma with dot for conversion
+  cleanValue = cleanValue.replace(',', '.');
+  
+  // Convert to number and format
+  const number = parseFloat(cleanValue);
+  if (isNaN(number)) return '';
+  
+  // Format as Brazilian currency
+  return number.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
+
+// Helper function to parse Brazilian currency to number
+const parseCurrencyToNumber = (value: string): number => {
+  const cleanValue = value.replace(/\./g, '').replace(',', '.');
+  return parseFloat(cleanValue) || 0;
+};
+
 // Schema for transaction form validation
 const transactionFormSchema = z.object({
   description: z.string().min(2, { message: "A descrição deve ter pelo menos 2 caracteres" }),
-  amount: z.number().min(0.01, { message: "O valor deve ser maior que 0" }),
+  amount: z.string().min(1, { message: "O valor é obrigatório" }).transform((val) => parseCurrencyToNumber(val)),
   category: z.string().min(1, { message: "A categoria é obrigatória" }),
   date: z.date(),
   type: z.enum(["income", "expense"])
@@ -44,7 +69,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
   // Default values for the form
   const defaultValues: Partial<TransactionFormValues> = {
     description: '',
-    amount: 0,
+    amount: '',
     category: 'other',
     date: new Date(),
     type: 'expense'
@@ -61,14 +86,12 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
     setIsSubmitting(true);
     
     try {
-      // Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {
         throw new Error('Usuário não autenticado');
       }
       
-      // Insert transaction in the database
       const { error } = await supabase
         .from('transactions')
         .insert({
@@ -84,16 +107,13 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
       
       toast.success(t('transactions.addSuccess', 'Transação adicionada com sucesso'));
       
-      // Reset form and close dialog
       form.reset(defaultValues);
       onOpenChange(false);
       
-      // Call callback if provided
       if (onTransactionAdded) {
         onTransactionAdded();
       }
       
-      // Refresh transaction data
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch (error) {
@@ -104,7 +124,6 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
     }
   };
 
-  // Get form type value to control tabs
   const transactionType = form.watch('type');
 
   return (
@@ -155,12 +174,20 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
                 <FormItem>
                   <FormLabel>{t('transactions.amount', 'Valor')}</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      placeholder="0.00" 
-                      {...field} 
-                      onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
-                    />
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        placeholder="0,00"
+                        {...field}
+                        onChange={(e) => {
+                          const formatted = formatCurrencyInput(e.target.value);
+                          field.onChange(formatted);
+                        }}
+                      />
+                      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500">R$</span>
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
