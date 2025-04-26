@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TransactionService, Transaction } from '@/services/TransactionService';
+import { Transaction, TransactionService } from '@/services/transactions';
 import TransactionsTable from '@/components/TransactionsTable';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';

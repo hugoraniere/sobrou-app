@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Transaction, TransactionService } from '@/services/TransactionService';
+import { Transaction, TransactionService } from '@/services/transactions';
 import { toast } from "sonner";
 import { useTranslation } from 'react-i18next';
 import TransactionFormLayout from './ui/TransactionFormLayout';

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
@@ -11,6 +10,7 @@ import DeleteTransactionDialog from './DeleteTransactionDialog';
 import ActionsCell from './cells/ActionsCell';
 import { useTransactionRow } from '@/hooks/useTransactionRow';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Transaction } from '@/services/transactions';
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ 
   transaction, 
