@@ -1,24 +1,19 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import BigNumberCard from '@/components/dashboard/BigNumberCard';
-import { Input } from "@/components/ui/input";
-import { AlertCircle, DollarSign, Calendar, TrendingUp } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FinancialPlanningService } from '@/services/FinancialPlanningService';
 import { useTransactionList } from '@/hooks/useTransactionList';
 import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
+import AlertSection from '@/components/financial-planning/AlertSection';
+import FinancialMetrics from '@/components/financial-planning/FinancialMetrics';
+import SimulationCard from '@/components/financial-planning/SimulationCard';
 
 const FinancialPlanning = () => {
   const { t } = useTranslation();
   const [simulatedExpense, setSimulatedExpense] = useState('');
   const { transactionsState: transactions } = useTransactionList([]);
   
-  const stats = FinancialPlanningService.calculateAvailableAmount(
-    transactions,
-    0
-  );
+  const stats = FinancialPlanningService.calculateAvailableAmount(transactions, 0);
 
   const simulatedStats = simulatedExpense 
     ? FinancialPlanningService.calculateAvailableAmount(
@@ -47,58 +42,12 @@ const FinancialPlanning = () => {
         {t('financialPlanning.title', 'Planejamento Financeiro')}
       </h1>
 
-      {stats.hasRisk && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Atenção</AlertTitle>
-          <AlertDescription>
-            Suas despesas previstas superam sua receita mensal.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <BigNumberCard
-          title={t('financialPlanning.availableToday', 'Disponível Hoje')}
-          value={simulatedStats.availableToday}
-          icon={DollarSign}
-          color={simulatedStats.availableToday < 0 ? '#ea384c' : '#4ade80'}
-          tooltip={t('financialPlanning.dailyTooltip', 'Valor disponível para gastar hoje, considerando suas receitas e despesas')}
-        />
-        <BigNumberCard
-          title={t('financialPlanning.availableWeek', 'Disponível na Semana')}
-          value={simulatedStats.availableThisWeek}
-          icon={Calendar}
-          color={simulatedStats.availableThisWeek < 0 ? '#ea384c' : '#4ade80'}
-          tooltip={t('financialPlanning.weeklyTooltip', 'Valor disponível para gastar esta semana')}
-        />
-        <BigNumberCard
-          title={t('financialPlanning.availableMonth', 'Disponível no Mês')}
-          value={simulatedStats.availableThisMonth}
-          icon={TrendingUp}
-          color={simulatedStats.availableThisMonth < 0 ? '#ea384c' : '#4ade80'}
-          tooltip={t('financialPlanning.monthlyTooltip', 'Valor disponível para gastar este mês')}
-        />
-      </div>
-
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>{t('financialPlanning.simulation', 'Simulação de Gasto')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="w-full max-w-sm">
-              <Input
-                type="text"
-                placeholder="R$ 0,00"
-                value={simulatedExpense}
-                onChange={handleSimulationChange}
-                className="text-right"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <AlertSection show={stats.hasRisk} />
+      <FinancialMetrics stats={simulatedStats} />
+      <SimulationCard 
+        simulatedExpense={simulatedExpense}
+        onSimulationChange={handleSimulationChange}
+      />
     </div>
   );
 };
