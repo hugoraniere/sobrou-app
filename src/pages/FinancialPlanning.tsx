@@ -1,40 +1,32 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FinancialPlanningService } from '@/services/FinancialPlanningService';
 import { useTransactionList } from '@/hooks/useTransactionList';
-import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
 import AlertSection from '@/components/financial-planning/AlertSection';
 import FinancialMetrics from '@/components/financial-planning/FinancialMetrics';
-import SimulationCard from '@/components/financial-planning/SimulationCard';
+import ExpenseSimulationSection from '@/components/financial-planning/ExpenseSimulationSection';
+import { useExpenseSimulation } from '@/hooks/useExpenseSimulation';
 
 const FinancialPlanning = () => {
   const { t } = useTranslation();
-  const [simulatedExpense, setSimulatedExpense] = useState('');
   const { transactionsState: transactions } = useTransactionList([]);
   
   const stats = FinancialPlanningService.calculateAvailableAmount(transactions, 0);
 
-  const simulatedStats = simulatedExpense 
-    ? FinancialPlanningService.calculateAvailableAmount(
-        [...transactions, {
-          id: 'simulated',
-          type: 'expense',
-          amount: parseCurrencyToNumber(simulatedExpense),
-          date: new Date().toISOString(),
-          description: 'Simulação',
-          category: 'other',
-          is_recurring: false,
-          user_id: '',
-          created_at: new Date().toISOString()
-        }],
-        0
-      )
-    : stats;
+  const {
+    simulatedExpense,
+    setSimulatedExpense,
+    simulatedStats,
+    calculateSimulation,
+    clearSimulation
+  } = useExpenseSimulation(transactions, stats);
 
-  const handleSimulationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSimulatedExpense(formatCurrencyInput(e.target.value));
-  };
+  const hasNegativeBalance = simulatedStats
+    ? simulatedStats.availableToday < 0 || 
+      simulatedStats.availableThisWeek < 0 || 
+      simulatedStats.availableThisMonth < 0
+    : false;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
@@ -43,10 +35,18 @@ const FinancialPlanning = () => {
       </h1>
 
       <AlertSection show={stats.hasRisk} />
-      <FinancialMetrics stats={simulatedStats} />
-      <SimulationCard 
+      
+      <FinancialMetrics 
+        stats={stats}
+        simulatedStats={simulatedStats}
+      />
+      
+      <ExpenseSimulationSection
         simulatedExpense={simulatedExpense}
-        onSimulationChange={handleSimulationChange}
+        onSimulationChange={setSimulatedExpense}
+        onCalculate={calculateSimulation}
+        onClear={clearSimulation}
+        hasNegativeBalance={hasNegativeBalance}
       />
     </div>
   );

@@ -18,6 +18,7 @@ interface BigNumberCardProps {
     isPositive: boolean;
   };
   className?: string;
+  simulatedValue?: number;
 }
 
 const BigNumberCard: React.FC<BigNumberCardProps> = ({
@@ -28,7 +29,8 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
   tooltip,
   subtitle,
   trend,
-  className
+  className,
+  simulatedValue
 }) => {
   const { t, i18n } = useTranslation();
 
@@ -49,7 +51,14 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-muted-foreground">{title}</p>
-                <h2 className="text-2xl font-bold">{formatCurrency(value)}</h2>
+                <h2 className="text-2xl font-bold">
+                  {formatCurrency(value)}
+                  {simulatedValue !== undefined && (
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                      → {formatCurrency(simulatedValue)}
+                    </span>
+                  )}
+                </h2>
                 {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
                 {trend && (
                   <div className="flex items-center gap-1 mt-1">

@@ -7,9 +7,10 @@ import { FinancialPlanningStats } from '@/services/FinancialPlanningService';
 
 interface FinancialMetricsProps {
   stats: FinancialPlanningStats;
+  simulatedStats?: FinancialPlanningStats | null;
 }
 
-const FinancialMetrics: React.FC<FinancialMetricsProps> = ({ stats }) => {
+const FinancialMetrics: React.FC<FinancialMetricsProps> = ({ stats, simulatedStats }) => {
   const { t } = useTranslation();
 
   return (
@@ -17,6 +18,7 @@ const FinancialMetrics: React.FC<FinancialMetricsProps> = ({ stats }) => {
       <BigNumberCard
         title={t('financialPlanning.availableToday', 'Disponível Hoje')}
         value={stats.availableToday}
+        simulatedValue={simulatedStats?.availableToday}
         icon={DollarSign}
         color={stats.availableToday < 0 ? '#ea384c' : '#4ade80'}
         tooltip={t('financialPlanning.dailyTooltip', 'Valor disponível para gastar hoje, considerando suas receitas e despesas')}
@@ -24,6 +26,7 @@ const FinancialMetrics: React.FC<FinancialMetricsProps> = ({ stats }) => {
       <BigNumberCard
         title={t('financialPlanning.availableWeek', 'Disponível na Semana')}
         value={stats.availableThisWeek}
+        simulatedValue={simulatedStats?.availableThisWeek}
         icon={Calendar}
         color={stats.availableThisWeek < 0 ? '#ea384c' : '#4ade80'}
         tooltip={t('financialPlanning.weeklyTooltip', 'Valor disponível para gastar esta semana')}
@@ -31,6 +34,7 @@ const FinancialMetrics: React.FC<FinancialMetricsProps> = ({ stats }) => {
       <BigNumberCard
         title={t('financialPlanning.availableMonth', 'Disponível no Mês')}
         value={stats.availableThisMonth}
+        simulatedValue={simulatedStats?.availableThisMonth}
         icon={TrendingUp}
         color={stats.availableThisMonth < 0 ? '#ea384c' : '#4ade80'}
         tooltip={t('financialPlanning.monthlyTooltip', 'Valor disponível para gastar este mês')}
