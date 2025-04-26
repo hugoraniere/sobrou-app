@@ -6,6 +6,7 @@ import { useTransactionList } from '@/hooks/useTransactionList';
 import AlertSection from '@/components/financial-planning/AlertSection';
 import FinancialMetrics from '@/components/financial-planning/FinancialMetrics';
 import ExpenseSimulationSection from '@/components/financial-planning/ExpenseSimulationSection';
+import RecurringTransactionsSection from '@/components/financial-planning/RecurringTransactionsSection';
 import { useExpenseSimulation } from '@/hooks/useExpenseSimulation';
 
 const FinancialPlanning = () => {
@@ -48,6 +49,8 @@ const FinancialPlanning = () => {
         onClear={clearSimulation}
         hasNegativeBalance={hasNegativeBalance}
       />
+
+      <RecurringTransactionsSection transactions={transactions} />
     </div>
   );
 };
