@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Transaction } from '@/services/transactions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, TrendingDown, TrendingUp, Lightbulb, DollarSign, Target } from 'lucide-react';

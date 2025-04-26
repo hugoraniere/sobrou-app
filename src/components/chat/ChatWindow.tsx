@@ -6,9 +6,8 @@ import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useDashboardData } from '@/hooks/useDashboardData'
-import { TransactionService } from '@/services/TransactionService'
-import { PiStarFourFill } from "react-icons/pi"
 import { Transaction } from '@/services/transactions'
+import { PiStarFourFill } from "react-icons/pi"
 
 interface Message {
   role: 'user' | 'assistant';
@@ -75,7 +74,6 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
     console.log("Sending transactions to API:", transactionsToSend.length);
 
     try {
-      // Adiciona mensagem temporária de "digitando..."
       setMessages(prev => [...prev, { role: 'assistant', content: 'Analisando suas finanças...' }])
 
       const { data, error } = await supabase.functions.invoke('process-chat', {
@@ -95,12 +93,10 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         throw new Error('Resposta inválida do servidor');
       }
 
-      // Remove a mensagem de "digitando..." e adiciona a resposta real
       setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: data.response }])
     } catch (error) {
       console.error('Error processing chat:', error);
       toast.error('Erro ao processar mensagem');
-      // Remove a mensagem de "digitando..." e adiciona mensagem de erro
       setMessages(prev => [...prev.slice(0, -1), { 
         role: 'assistant', 
         content: 'Desculpe, tive um problema ao processar sua mensagem. Por favor, tente novamente mais tarde.' 

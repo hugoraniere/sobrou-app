@@ -18,7 +18,7 @@ export const transactionMutationService = {
       
       const { data, error } = await supabase
         .from('transactions')
-        .insert([newTransaction])
+        .insert(newTransaction) // Alterado de array para objeto único
         .select()
         .single();
       
