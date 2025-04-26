@@ -17,8 +17,15 @@ export const transactionMutationService = {
       }
 
       const newTransaction = {
-        ...transactionData,
         user_id: user.id,
+        amount: transactionData.amount,
+        category: transactionData.category,
+        description: transactionData.description,
+        type: transactionData.type,
+        date: transactionData.date || new Date().toISOString().split('T')[0],
+        is_recurring: transactionData.is_recurring || false,
+        recurrence_frequency: transactionData.recurrence_frequency,
+        next_due_date: transactionData.next_due_date
       };
       
       const { data, error } = await supabase

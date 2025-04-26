@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from "@/components/ui/separator";
-import { formatCurrency } from '@/utils/currencyUtils';
+import { DollarSign, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { Transaction } from '@/services/transactions';
-import { TEXT } from '@/constants/text';
+import BigNumberCard from './BigNumberCard';
+import { formatCurrency } from '@/utils/currencyUtils';
 
 interface DashboardBigNumbersProps {
   transactions: Transaction[];
@@ -27,48 +26,52 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   
   // Calculate balance
   const balance = totalIncome - totalExpenses;
+
+  // Mock trends for demonstration (in a real app, these would be calculated)
+  const trends = {
+    income: { value: 5, isPositive: true },
+    expenses: { value: 3, isPositive: false },
+    balance: { value: 8, isPositive: true },
+    savings: { value: 4, isPositive: true }
+  };
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Income Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{TEXT.dashboard.bigNumbers.income}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(totalIncome)}</div>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <BigNumberCard
+        title="Receitas"
+        value={totalIncome}
+        icon={TrendingUp}
+        color="#22c55e"
+        trend={trends.income}
+        tooltip="Total de receitas no período"
+      />
       
-      {/* Expenses Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{TEXT.dashboard.bigNumbers.expenses}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
-        </CardContent>
-      </Card>
+      <BigNumberCard
+        title="Despesas"
+        value={totalExpenses}
+        icon={TrendingDown}
+        color="#ef4444"
+        trend={trends.expenses}
+        tooltip="Total de despesas no período"
+      />
       
-      {/* Balance Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{TEXT.dashboard.bigNumbers.balance}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(balance)}</div>
-        </CardContent>
-      </Card>
+      <BigNumberCard
+        title="Saldo"
+        value={balance}
+        icon={DollarSign}
+        color="#3b82f6"
+        trend={trends.balance}
+        tooltip="Saldo atual (receitas - despesas)"
+      />
       
-      {/* Savings Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{TEXT.dashboard.bigNumbers.savings}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(totalSavings)}</div>
-        </CardContent>
-      </Card>
+      <BigNumberCard
+        title="Poupança"
+        value={totalSavings}
+        icon={Wallet}
+        color="#8b5cf6"
+        trend={trends.savings}
+        tooltip="Total acumulado em poupança"
+      />
     </div>
   );
 };
