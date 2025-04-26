@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Transaction, TransactionService } from '@/services/TransactionService';
 import { toast } from "sonner";
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
 import TransactionFormLayout from './ui/TransactionFormLayout';
 import TransactionDetails from './ui/TransactionDetails';
 import TransactionControls from './ui/TransactionControls';
@@ -34,19 +33,22 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
     }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
+  const handleSelectChange = (name: string, value: string | boolean) => {
     setEditedTransaction(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
+      ...(name === 'is_recurring' && value === false 
+        ? { recurrence_frequency: undefined, next_due_date: undefined }
+        : {}),
+      ...(name === 'is_recurring' && value === true
+        ? { recurrence_frequency: 'monthly' }
+        : {})
     }));
   };
 
   const handleSave = async () => {
     try {
-      // Filter out is_recurring if it exists since the database doesn't support it
-      const { is_recurring, ...updateData } = editedTransaction as any;
-      
-      await TransactionService.updateTransaction(transaction.id, updateData);
+      await TransactionService.updateTransaction(transaction.id, editedTransaction);
       setIsOpen(false);
       onTransactionUpdated();
       toast.success(t('transactions.updateSuccess', 'Transação atualizada com sucesso'));

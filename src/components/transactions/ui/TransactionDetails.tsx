@@ -1,18 +1,15 @@
 
 import React from 'react';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/types/component-types';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TransactionAmountCell from '@/components/transactions/cells/TransactionAmountCell';
-import TransactionTypeCell from '@/components/transactions/cells/TransactionTypeCell';
-import TransactionCategoryCell from '@/components/transactions/cells/TransactionCategoryCell';
+import { Label } from '@/components/ui/label';
 import { useTranslation } from 'react-i18next';
 import CategorySelector from '@/components/prompt/CategorySelector';
 import TransactionDatePicker from '@/components/prompt/TransactionDatePicker';
-import { Label } from '@/components/ui/label';
+import RecurrenceControls from './RecurrenceControls';
 
 interface TransactionDetailsProps {
-  transaction: Transaction;
+  transaction: Partial<Transaction>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }
@@ -20,23 +17,22 @@ interface TransactionDetailsProps {
 const TransactionDetails: React.FC<TransactionDetailsProps> = ({ 
   transaction, 
   onInputChange,
-  handleSelectChange
+  handleSelectChange,
 }) => {
   const { t } = useTranslation();
 
   return (
     <div className="space-y-4">
-      <Tabs 
-        defaultValue={transaction.type} 
-        value={transaction.type}
-        onValueChange={(value) => handleSelectChange('type', value)}
-        className="w-full"
-      >
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="expense">{t('transactions.expense', 'Despesa')}</TabsTrigger>
-          <TabsTrigger value="income">{t('transactions.income', 'Receita')}</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div className="space-y-2">
+        <Label htmlFor="description">{t('transactions.description', 'Descrição')}</Label>
+        <Input
+          id="description"
+          name="description"
+          value={transaction.description || ''}
+          onChange={onInputChange}
+          placeholder={t('transactions.descriptionPlaceholder', 'Ex: Supermercado')}
+        />
+      </div>
 
       <div className="space-y-2">
         <Label htmlFor="amount">{t('transactions.amount', 'Valor')}</Label>
@@ -45,7 +41,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
             id="amount"
             type="number"
             name="amount"
-            value={transaction.amount}
+            value={transaction.amount || ''}
             onChange={onInputChange}
             placeholder="0.00"
             className="pr-10"
@@ -57,28 +53,17 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">{t('transactions.description', 'Descrição')}</Label>
-        <Input
-          id="description"
-          name="description"
-          value={transaction.description}
-          onChange={onInputChange}
-          placeholder={t('transactions.descriptionPlaceholder', 'Ex: Supermercado')}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="category">{t('transactions.category', 'Categoria')}</Label>
+        <Label>{t('transactions.category', 'Categoria')}</Label>
         <CategorySelector
-          value={transaction.category}
+          value={transaction.category || ''}
           onChange={(value) => handleSelectChange('category', value)}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="date">{t('transactions.date', 'Data')}</Label>
+        <Label>{t('transactions.date', 'Data')}</Label>
         <TransactionDatePicker
-          date={new Date(transaction.date)}
+          date={transaction.date ? new Date(transaction.date) : new Date()}
           onDateChange={(date) => {
             if (date) {
               const formattedDate = date.toISOString().split('T')[0];
@@ -87,6 +72,13 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           }}
         />
       </div>
+
+      <RecurrenceControls
+        isRecurring={transaction.is_recurring || false}
+        frequency={transaction.recurrence_frequency || 'monthly'}
+        onIsRecurringChange={(value) => handleSelectChange('is_recurring', value.toString())}
+        onFrequencyChange={(value) => handleSelectChange('recurrence_frequency', value)}
+      />
     </div>
   );
 };
