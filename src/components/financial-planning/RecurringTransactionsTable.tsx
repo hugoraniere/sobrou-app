@@ -125,3 +125,4 @@ const RecurringTransactionsTable: React.FC<RecurringTransactionsTableProps> = ({
 };
 
 export default RecurringTransactionsTable;
+
