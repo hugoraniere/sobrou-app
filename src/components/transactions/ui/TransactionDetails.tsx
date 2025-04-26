@@ -11,7 +11,7 @@ import RecurrenceControls from './RecurrenceControls';
 interface TransactionDetailsProps {
   transaction: Partial<Transaction>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
+  handleSelectChange: (name: string, value: string | boolean) => void;
 }
 
 const TransactionDetails: React.FC<TransactionDetailsProps> = ({ 
@@ -74,9 +74,9 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
       </div>
 
       <RecurrenceControls
-        isRecurring={transaction.is_recurring || false}
+        isRecurring={Boolean(transaction.is_recurring)}
         frequency={transaction.recurrence_frequency || 'monthly'}
-        onIsRecurringChange={(value) => handleSelectChange('is_recurring', value.toString())}
+        onIsRecurringChange={(value) => handleSelectChange('is_recurring', value)}
         onFrequencyChange={(value) => handleSelectChange('recurrence_frequency', value)}
       />
     </div>

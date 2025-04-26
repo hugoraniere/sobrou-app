@@ -41,7 +41,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
         ? { recurrence_frequency: undefined, next_due_date: undefined }
         : {}),
       ...(name === 'is_recurring' && value === true
-        ? { recurrence_frequency: 'monthly' }
+        ? { recurrence_frequency: prev.recurrence_frequency || 'monthly' }
         : {})
     }));
   };

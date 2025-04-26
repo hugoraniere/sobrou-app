@@ -17,24 +17,21 @@ interface CategorySelectorProps {
 const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, className }) => {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-
-  // Criar uma lista estática de categorias padrão caso não tenha categorias
-  const defaultCategories: CategoryType[] = [
-    {
-      id: 'other',
-      name: 'Outros',
-      value: 'other',
-      type: 'expense',
-      label: 'Outros',
-      color: 'bg-gray-100 text-gray-800',
-      icon: CircleDot
-    }
-  ];
-
-  // Garantir que estamos trabalhando com um array válido de categorias
-  const categories: CategoryType[] = Array.isArray(transactionCategories) && transactionCategories.length > 0
+  
+  // Garantir que sempre temos um array válido de categorias
+  const categories = Array.isArray(transactionCategories) && transactionCategories.length > 0
     ? transactionCategories
-    : defaultCategories;
+    : [
+        {
+          id: 'other',
+          name: 'Outros',
+          value: 'other',
+          type: 'expense',
+          label: 'Outros',
+          color: 'bg-gray-100 text-gray-800',
+          icon: CircleDot
+        }
+      ];
   
   // Encontrar a categoria selecionada ou usar um valor padrão seguro
   const selectedCategory = categories.find(c => c.value === value) || {
@@ -47,13 +44,13 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ value, onChange, cl
     icon: CircleDot
   };
 
-  // Filtrar categorias com base na busca - garantindo que o array de categorias está definido
+  // Filtrar categorias com base na busca
   const filteredCategories = searchQuery.length > 0
     ? categories.filter(category => 
         category.label.toLowerCase().includes(searchQuery.toLowerCase()))
     : categories;
 
-  // Garantir que o ícone está definido antes de tentar usá-lo
+  // Garantir que o ícone está definido
   const SelectedIcon = selectedCategory.icon || CircleDot;
 
   return (
