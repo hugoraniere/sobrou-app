@@ -1,179 +1,34 @@
 
 import React from 'react';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart";
-import {
-  Bar,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
-  Line,
-  ComposedChart,
-  ReferenceLine
-} from "recharts";
 import { Transaction } from '@/services/transactions';
-import EmptyStateMessage from '../dashboard/EmptyStateMessage';
-import { TEXT } from '@/constants/text';
-import { format, parseISO, isValid } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useDailyChartData } from '@/hooks/useDailyChartData';
+import { DailyChartContainer } from './DailyChartContainer';
 
 interface DailyBarChartProps {
   transactions: Transaction[];
 }
 
 const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
-  // Function to get daily data for the current month
-  const getDailyData = () => {
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    
-    // Create a map to store daily totals
-    const dailyMap = new Map<string, { 
-      day: string, 
-      income: number, 
-      expense: number,
-      balance: number,
-      cumulativeBalance: number 
-    }>();
-    
-    // Get all days in current month
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    
-    // Initialize all days
-    for (let i = 1; i <= daysInMonth; i++) {
-      const dayStr = i.toString();
-      dailyMap.set(dayStr, { 
-        day: dayStr, 
-        income: 0, 
-        expense: 0, 
-        balance: 0,
-        cumulativeBalance: 0 
-      });
-    }
-    
-    // Process transactions for the current month
-    transactions
-      .filter(transaction => {
-        const date = new Date(transaction.date);
-        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-      })
-      .forEach(transaction => {
-        const date = new Date(transaction.date);
-        const day = date.getDate().toString();
-        
-        // Get or initialize daily data
-        let dailyData = dailyMap.get(day) || { 
-          day, 
-          income: 0, 
-          expense: 0, 
-          balance: 0,
-          cumulativeBalance: 0 
-        };
-        
-        // Update income or expense
-        if (transaction.type === 'income') {
-          dailyData.income += transaction.amount;
-        } else {
-          dailyData.expense += transaction.amount;
-        }
-        
-        // Calculate daily balance
-        dailyData.balance = dailyData.income - dailyData.expense;
-        
-        // Update the map
-        dailyMap.set(day, dailyData);
-      });
-    
-    // Convert map to array and sort by day
-    let result = Array.from(dailyMap.values())
-      .sort((a, b) => parseInt(a.day) - parseInt(b.day));
-      
-    // Calculate cumulative balance
-    let runningBalance = 0;
-    result = result.map(day => {
-      runningBalance += day.balance;
-      return {
-        ...day,
-        cumulativeBalance: runningBalance
-      };
-    });
-    
-    return result;
-  };
-
-  const dailyData = getDailyData();
+  const { dailyData, getInsightMessage } = useDailyChartData(transactions);
   
-  // Find periods where balance goes negative
-  const findNegativePeriods = (data: any[]) => {
-    const negativeRanges: { start: number; end: number }[] = [];
-    let currentRange: { start: number; end: number } | null = null;
-    
-    data.forEach((day, index) => {
-      if (day.cumulativeBalance < 0) {
-        if (!currentRange) {
-          currentRange = { start: parseInt(day.day), end: parseInt(day.day) };
-        } else {
-          currentRange.end = parseInt(day.day);
-        }
-      } else if (currentRange) {
-        negativeRanges.push(currentRange);
-        currentRange = null;
-      }
-    });
-    
-    if (currentRange) {
-      negativeRanges.push(currentRange);
-    }
-    
-    return negativeRanges;
-  };
-  
-  const negativePeriods = findNegativePeriods(dailyData);
-  
-  // Create insight message
-  const getInsightMessage = () => {
-    if (negativePeriods.length === 0) {
-      return "Seu saldo se manteve positivo durante todo o mês.";
-    }
-    
-    const period = negativePeriods[0];
-    return `Seu saldo entra no vermelho entre os dias ${period.start} e ${period.end}.`;
-  };
-  
-  // Format currency based on locale
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   // Chart configuration
   const chartConfig = {
     income: {
-      label: TEXT.common.income,
+      label: "Receita",
       theme: {
         light: "#22c55e",
         dark: "#22c55e"
       }
     },
     expense: {
-      label: TEXT.common.expense,
+      label: "Despesa",
       theme: {
         light: "#ef4444",
         dark: "#ef4444"
       }
     },
     balance: {
-      label: TEXT.common.balance,
+      label: "Saldo",
       theme: {
         light: "#3b82f6",
         dark: "#3b82f6"
@@ -181,7 +36,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
     }
   };
   
-  // Se não tiver dados, retorna vazio para o componente pai mostrar o EmptyStateMessage
+  // If no data, return null for the component parent to show EmptyStateMessage
   if (dailyData.length === 0) {
     return null;
   }
@@ -193,64 +48,10 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
         <p>{getInsightMessage()}</p>
       </div>
       
-      <div className="h-[220px] w-full">
-        <ChartContainer className="h-full w-full" config={chartConfig}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart
-              data={dailyData}
-              margin={{ top: 10, right: 0, left: 0, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis 
-                dataKey="day" 
-                height={40}
-                tick={{ fontSize: 11 }}
-              />
-              <YAxis 
-                tickFormatter={(value) => `R$${value}`}
-                width={50}
-                tick={{ fontSize: 11 }}
-              />
-              <ReferenceLine y={0} stroke="#666" />
-              <ChartTooltip
-                content={({ active, payload }) => 
-                  active && payload && payload.length ? (
-                    <ChartTooltipContent 
-                      payload={payload} 
-                      formatter={(value) => `R$${value}`}
-                    />
-                  ) : null
-                }
-              />
-              <Legend 
-                verticalAlign="bottom"
-                height={36}
-              />
-              <Bar 
-                dataKey="income" 
-                name={TEXT.common.income} 
-                fill="#22c55e" 
-                maxBarSize={15} 
-              />
-              <Bar 
-                dataKey="expense" 
-                name={TEXT.common.expense} 
-                fill="#ef4444" 
-                maxBarSize={15} 
-              />
-              <Line 
-                type="monotone" 
-                dataKey="cumulativeBalance" 
-                name={TEXT.common.balance} 
-                stroke="#3b82f6" 
-                strokeWidth={2}
-                dot={{ fill: '#3b82f6', r: 3 }}
-                activeDot={{ r: 5 }}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </div>
+      <DailyChartContainer 
+        data={dailyData}
+        config={chartConfig}
+      />
     </div>
   );
 };
