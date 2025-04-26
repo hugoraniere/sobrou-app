@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   ChartContainer,
   ChartTooltip,
@@ -19,6 +18,7 @@ import {
 } from "recharts";
 import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
+import { TEXT } from '@/constants/text';
 
 interface DailyBarChartProps {
   transactions: Transaction[];
@@ -210,7 +210,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
                 tick={{ fontSize: 11 }}
               />
               <YAxis 
-                tickFormatter={formatCurrency}
+                tickFormatter={(value) => `R$${value}`}
                 width={50}
                 tick={{ fontSize: 11 }}
               />
@@ -220,7 +220,7 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
                   active && payload && payload.length ? (
                     <ChartTooltipContent 
                       payload={payload} 
-                      formatter={(value) => formatCurrency(value as number)}
+                      formatter={(value) => `R$${value}`}
                     />
                   ) : null
                 }
@@ -229,12 +229,22 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
                 verticalAlign="bottom"
                 height={36}
               />
-              <Bar dataKey="income" name={t('common.income')} fill="#22c55e" maxBarSize={15} />
-              <Bar dataKey="expense" name={t('common.expense')} fill="#ef4444" maxBarSize={15} />
+              <Bar 
+                dataKey="income" 
+                name={TEXT.common.income} 
+                fill="#22c55e" 
+                maxBarSize={15} 
+              />
+              <Bar 
+                dataKey="expense" 
+                name={TEXT.common.expense} 
+                fill="#ef4444" 
+                maxBarSize={15} 
+              />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeBalance" 
-                name={t('common.balance')} 
+                name={TEXT.common.balance} 
                 stroke="#3b82f6" 
                 strokeWidth={2}
                 dot={{ fill: '#3b82f6', r: 3 }}

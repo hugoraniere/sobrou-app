@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -12,6 +13,7 @@ import {
 import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { TEXT } from '@/constants/text';
+import { useTheme } from 'next-themes';
 
 interface MonthlyComparisonChartProps {
   expenses: Transaction[];
