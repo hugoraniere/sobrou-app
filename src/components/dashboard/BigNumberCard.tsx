@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
+import { TEXT } from '@/constants/text';
 
 interface BigNumberCardProps {
   title: string;
@@ -32,14 +32,10 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
   className,
   simulatedValue
 }) => {
-  const { t, i18n } = useTranslation();
-
   const formatCurrency = (amount: number) => {
-    const locale = i18n.language === 'pt-BR' ? 'pt-BR' : 'en-US';
-    const currency = locale === 'pt-BR' ? 'BRL' : 'USD';
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: currency
+      currency: 'BRL'
     }).format(amount);
   };
 
@@ -66,7 +62,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
                       <span>{trend.isPositive ? '↑' : '↓'}</span> {trend.value}%
                     </Badge>
                     <span className="text-xs text-muted-foreground truncate">
-                      {t('dashboard.fromLastMonth')}
+                      {TEXT.dashboard.fromLastMonth}
                     </span>
                   </div>
                 )}

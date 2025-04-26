@@ -1,6 +1,5 @@
 
-// Re-export from main text file
-import { TEXT, COMMON_TEXT, DASHBOARD_TEXT, TRANSACTIONS_TEXT, WHATSAPP_TEXT, SETTINGS_TEXT, AUTH_TEXT } from '../text';
+import { TEXT } from '../text';
 
 export {
   TEXT,
@@ -10,4 +9,4 @@ export {
   WHATSAPP_TEXT,
   SETTINGS_TEXT,
   AUTH_TEXT
-};
+} from '../text';
