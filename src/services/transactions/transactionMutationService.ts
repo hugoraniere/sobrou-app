@@ -11,6 +11,11 @@ export const transactionMutationService = {
         throw new Error('User not authenticated');
       }
 
+      // Garantir que os campos obrigatórios estão presentes
+      if (!transactionData.amount || !transactionData.category || !transactionData.description || !transactionData.type) {
+        throw new Error('Campos obrigatórios ausentes');
+      }
+
       const newTransaction = {
         ...transactionData,
         user_id: user.id,
@@ -18,7 +23,7 @@ export const transactionMutationService = {
       
       const { data, error } = await supabase
         .from('transactions')
-        .insert(newTransaction) // Alterado de array para objeto único
+        .insert([newTransaction])
         .select()
         .single();
       

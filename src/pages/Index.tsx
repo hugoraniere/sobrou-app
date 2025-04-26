@@ -4,13 +4,11 @@ import { useAuth } from '../contexts/AuthContext';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
-import { useTranslation } from 'react-i18next';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 import AIPromptInput from '../components/AIPromptInput';
 
 const Index = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { t, i18n } = useTranslation();
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   
   const {
@@ -42,17 +40,13 @@ const Index = () => {
     }
   }, [isAuthenticated, authLoading, fetchData]);
   
-  useEffect(() => {
-    i18n.changeLanguage('pt-BR');
-  }, [i18n]);
-  
   const isLoading = authLoading || dataLoading;
   
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
       <div className="mt-6 mb-6">
         <h1 className="text-3xl font-bold mb-2">Visão geral</h1>
-        <p className="text-gray-600">{t('dashboard.subtitle')}</p>
+        <p className="text-gray-600">Acompanhe suas finanças e analise seus hábitos de gastos</p>
       </div>
       
       <AIPromptInput 

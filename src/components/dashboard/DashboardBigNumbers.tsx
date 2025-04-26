@@ -1,9 +1,10 @@
+
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from '@/utils/currencyUtils';
 import { Transaction } from '@/services/transactions';
+import { TEXT } from '@/constants/text';
 
 interface DashboardBigNumbersProps {
   transactions: Transaction[];
@@ -14,8 +15,6 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   transactions,
   totalSavings
 }) => {
-  const { t } = useTranslation();
-  
   // Calculate total income
   const totalIncome = transactions
     .filter(transaction => transaction.type === 'income')
@@ -34,7 +33,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
       {/* Income Card */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('dashboard.bigNumbers.income')}</CardTitle>
+          <CardTitle>{TEXT.dashboard.bigNumbers.income}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(totalIncome)}</div>
@@ -44,7 +43,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
       {/* Expenses Card */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('dashboard.bigNumbers.expenses')}</CardTitle>
+          <CardTitle>{TEXT.dashboard.bigNumbers.expenses}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
@@ -54,7 +53,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
       {/* Balance Card */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('dashboard.bigNumbers.balance')}</CardTitle>
+          <CardTitle>{TEXT.dashboard.bigNumbers.balance}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(balance)}</div>
@@ -64,7 +63,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
       {/* Savings Card */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('dashboard.bigNumbers.savings')}</CardTitle>
+          <CardTitle>{TEXT.dashboard.bigNumbers.savings}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(totalSavings)}</div>

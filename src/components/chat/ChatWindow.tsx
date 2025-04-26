@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { X, Send } from 'lucide-react'
 import { cn } from "@/lib/utils"
@@ -40,7 +41,9 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   React.useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const data = await TransactionService.getTransactions();
+        // Usando a importação correta para TransactionService
+        const { getTransactions } = await import('@/services/transactions');
+        const data = await getTransactions();
         setLocalTransactions(data);
         console.log("Fetched transactions:", data.length);
       } catch (error) {
