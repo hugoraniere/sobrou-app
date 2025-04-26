@@ -1,15 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
-import { TEXT } from '@/constants/text';
-import SavingGoals from '../SavingGoals';
-import EmptyDashboard from '../EmptyDashboard';
+import React from 'react';
+import AIPromptInput from '../AIPromptInput';
+import FilterBar from '../FilterBar';
+import DashboardTabs from './DashboardTabs';
 import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
-import TransactionsTable from '../TransactionsTable';
-import OverviewDashboard from './OverviewDashboard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import FinancialInsights from './FinancialInsights';
 
 interface DashboardContentProps {
   transactions: Transaction[];
@@ -46,56 +41,35 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   onSavingGoalAdded,
   onSavingGoalUpdated
 }) => {
-  const [activeTab, setActiveTab] = useState("overview");
-
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      <Tabs defaultValue="overview" className="mb-8" onValueChange={setActiveTab}>
-        <TabsList className="w-full max-w-full overflow-x-auto justify-start">
-          <TabsTrigger value="overview">{TEXT.dashboard.tabs.overview}</TabsTrigger>
-          <TabsTrigger value="transactions">{TEXT.dashboard.tabs.transactions}</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
-        </TabsList>
-        
-        {/* Overview Dashboard Tab */}
-        <TabsContent value="overview">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : hasTransactions ? (
-            <OverviewDashboard transactions={transactions} savingGoals={savingGoals} />
-          ) : (
-            <EmptyDashboard />
-          )}
-        </TabsContent>
-        
-        {/* Transactions Tab */}
-        <TabsContent value="transactions">
-          <TransactionsTable 
-            transactions={filteredTransactions} 
-            filters={filters} 
-            onTransactionUpdated={onTransactionUpdated} 
-          />
-        </TabsContent>
-        
-        {/* Insights Tab */}
-        <TabsContent value="insights">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              {isLoading ? (
-                <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : hasTransactions ? (
-                <FinancialInsights transactions={transactions} />
-              ) : (
-                <EmptyDashboard />
-              )}
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+      {/* AI-powered prompt input at the top */}
+      <AIPromptInput 
+        onTransactionAdded={onTransactionUpdated}
+        onSavingAdded={onSavingGoalAdded}
+      />
+      
+      {/* Filter Bar - Only show on transactions tab */}
+      <div id="filters-container" className="mt-6">
+        <FilterBar 
+          filters={filters}
+          onFilterChange={() => {}}
+          categories={[]}
+          onResetFilters={() => {}}
+        />
+      </div>
+      
+      <div className="mt-6">
+        <DashboardTabs
+          transactions={transactions}
+          filteredTransactions={filteredTransactions}
+          savingGoals={savingGoals}
+          filters={filters}
+          isLoading={isLoading}
+          hasTransactions={hasTransactions}
+          onTransactionUpdated={onTransactionUpdated}
+        />
+      </div>
     </div>
   );
 };
