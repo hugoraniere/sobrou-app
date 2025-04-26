@@ -19,14 +19,14 @@ import {
 import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { TEXT } from '@/constants/text';
+import { format, parseISO, isValid } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface DailyBarChartProps {
   transactions: Transaction[];
 }
 
 const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
-  const { t, i18n } = useTranslation();
-  
   // Function to get daily data for the current month
   const getDailyData = () => {
     const today = new Date();
@@ -148,12 +148,9 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
   
   // Format currency based on locale
   const formatCurrency = (value: number) => {
-    const locale = i18n.language === 'pt-BR' ? 'pt-BR' : 'en-US';
-    const currency = locale === 'pt-BR' ? 'BRL' : 'USD';
-    
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency,
+      currency: 'BRL',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
@@ -162,21 +159,21 @@ const DailyBarChart: React.FC<DailyBarChartProps> = ({ transactions }) => {
   // Chart configuration
   const chartConfig = {
     income: {
-      label: t('common.income'),
+      label: TEXT.common.income,
       theme: {
         light: "#22c55e",
         dark: "#22c55e"
       }
     },
     expense: {
-      label: t('common.expense'),
+      label: TEXT.common.expense,
       theme: {
         light: "#ef4444",
         dark: "#ef4444"
       }
     },
     balance: {
-      label: t('common.balance'),
+      label: TEXT.common.balance,
       theme: {
         light: "#3b82f6",
         dark: "#3b82f6"

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -102,7 +101,7 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{TEXT.dashboard.charts.monthlyComparison}</CardTitle>
+        <CardTitle>{TEXT.dashboard.charts.balanceEvolution}</CardTitle>
       </CardHeader>
       <CardContent className="h-[320px]">
         {data.length > 0 ? (
