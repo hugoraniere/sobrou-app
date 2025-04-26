@@ -20,6 +20,7 @@ import AppLayout from "./components/layout/AppLayout";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
+import FinancialPlanning from "./pages/FinancialPlanning";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -97,6 +98,17 @@ const App = () => {
                         <ProtectedRoute>
                           <AppLayout>
                             <WhatsAppIntegration />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/financial-planning"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <FinancialPlanning />
                           </AppLayout>
                         </ProtectedRoute>
                       }

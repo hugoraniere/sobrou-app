@@ -109,6 +109,9 @@ export type Database = {
           date: string
           description: string
           id: string
+          is_recurring: boolean | null
+          next_due_date: string | null
+          recurrence_frequency: string | null
           type: string
           user_id: string
         }
@@ -119,6 +122,9 @@ export type Database = {
           date?: string
           description: string
           id?: string
+          is_recurring?: boolean | null
+          next_due_date?: string | null
+          recurrence_frequency?: string | null
           type: string
           user_id: string
         }
@@ -129,6 +135,9 @@ export type Database = {
           date?: string
           description?: string
           id?: string
+          is_recurring?: boolean | null
+          next_due_date?: string | null
+          recurrence_frequency?: string | null
           type?: string
           user_id?: string
         }
