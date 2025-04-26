@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { TransactionService } from '../services/TransactionService';
-import { SavingsService } from '../services/SavingsService';
+import { TransactionService } from '@/services/transactions';
+import { SavingsService } from '@/services/SavingsService';
 import { format } from "date-fns";
-import { getCategoryByKeyword } from '@/data/categories';
+import { getCategoryByKeyword } from '@/utils/categoryUtils';
 import { useTranslation } from 'react-i18next';
 
 // Importing our extracted components

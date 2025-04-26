@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { Transaction } from '@/services/transactions';
 
 export interface StandardProps {
   className?: string;
@@ -13,22 +15,11 @@ export interface CategorySelectorProps extends StandardProps {
   userSelected: boolean;
 }
 
-export interface Transaction {
-  id: string;
-  date: string;
-  type: 'income' | 'expense' | 'transfer';
-  category: string;
-  description: string;
-  amount: number;
-  is_recurring?: boolean;
-  user_id: string;
-  created_at: string;
-  next_due_date?: string;
-  recurrence_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
-}
+// Re-export Transaction type
+export type { Transaction };
 
 export interface TransactionDetailsProps extends StandardProps {
-  transaction: Transaction | Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at'>>;
+  transaction: Transaction | Partial<Transaction>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }

@@ -1,6 +1,7 @@
 
 import { ParsedExpense } from './types';
 import { supabase } from "@/integrations/supabase/client";
+import { getCategoryByKeyword } from "@/utils/categoryUtils";
 
 export const parseExpenseService = {
   async parseExpenseText(text: string): Promise<ParsedExpense> {

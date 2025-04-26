@@ -1,9 +1,9 @@
 
 export * from './types';
-export { parseExpenseService } from './parseExpenseService';
-export { transactionQueryService } from './transactionQueryService';
-export { transactionMutationService } from './transactionMutationService';
-export { transactionAnalyticsService } from './transactionAnalyticsService';
+import { parseExpenseService } from './parseExpenseService';
+import { transactionQueryService } from './transactionQueryService';
+import { transactionMutationService } from './transactionMutationService';
+import { transactionAnalyticsService } from './transactionAnalyticsService';
 
 export const TransactionService = {
   // Expense parsing
