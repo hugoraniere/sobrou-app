@@ -20,7 +20,7 @@ export const TRANSACTIONS_TEXT = {
   deleteConfirmation: "Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.",
   delete: "Excluir",
   deleteSuccess: "Transação excluída",
-  deleteDescription: "Sua transação foi excluída.",
+  transactionDeletedMessage: "Sua transação foi excluída.",
   deleteError: "Falha ao excluir transação",
   updateSuccess: "Transação atualizada com sucesso",
   updateError: "Falha ao atualizar transação",

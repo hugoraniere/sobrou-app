@@ -14,6 +14,7 @@ export const DASHBOARD_TEXT = {
     incomeByType: "Fontes de receita",
     dailyEvolution: "Movimentações diárias",
     balanceByAccount: "Saldo por conta/cartão",
+    monthlyComparison: "Comparação mensal",
     revenueVsExpense: "Receita vs Despesa (últimos 6 meses)",
     financialGoals: "Metas financeiras",
     balanceEvolution: "Evolução do saldo",

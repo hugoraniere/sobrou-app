@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -10,10 +9,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { useTranslation } from 'react-i18next';
 import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
-import { useTheme } from 'next-themes';
+import { TEXT } from '@/constants/text';
 
 interface MonthlyComparisonChartProps {
   expenses: Transaction[];
@@ -24,15 +22,11 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   expenses,
   chartConfig
 }) => {
-  const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
   
-  // Process data for the chart
   const processData = () => {
-    // Create a map of months to total expenses
     const monthMap: Map<string, { expenses: number, income: number }> = new Map();
     
-    // Group by month
     expenses.forEach(transaction => {
       try {
         const date = new Date(transaction.date);
@@ -52,10 +46,8 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
       }
     });
     
-    // Convert to array of objects for Recharts
     return Array.from(monthMap.entries())
       .map(([monthKey, data]) => {
-        // Parse year and month from the key
         const [year, month] = monthKey.split('-').map(Number);
         const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         
@@ -69,7 +61,6 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
         };
       })
       .sort((a, b) => {
-        // Sort by year and month
         const [monthA, yearA] = a.month.split('/');
         const [monthB, yearB] = b.month.split('/');
         
@@ -85,7 +76,6 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   
   const data = processData();
   
-  // Custom tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -108,11 +98,11 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   };
   
   return (
-    <Card className="w-full max-w-full overflow-hidden">
-      <CardHeader className="pb-2">
-        <CardTitle>{t('dashboard.charts.monthlyComparison')}</CardTitle>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>{TEXT.dashboard.charts.monthlyComparison}</CardTitle>
       </CardHeader>
-      <CardContent className="p-2 sm:p-3 md:p-4 flex justify-center items-center">
+      <CardContent className="h-[320px]">
         {data.length > 0 ? (
           <div className="h-[300px] w-full max-w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -157,7 +147,7 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
             </ResponsiveContainer>
           </div>
         ) : (
-          <EmptyStateMessage message={t('dashboard.charts.noData')} />
+          <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
         )}
       </CardContent>
     </Card>
