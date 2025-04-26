@@ -6,20 +6,20 @@ import FinancialMetricsCard from '../insights/FinancialMetricsCard';
 import InsightList from '../insights/InsightList';
 
 interface FinancialInsightsProps {
-  expenses: Transaction[];
+  transactions: Transaction[];
 }
 
-const FinancialInsights: React.FC<FinancialInsightsProps> = ({ expenses }) => {
+const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) => {
   // Calculate metrics using utility functions
-  const { totalExpenses, totalIncome, balance } = calculateInsightMetrics(expenses);
+  const { totalExpenses, totalIncome, balance } = calculateInsightMetrics(transactions);
   
   // Generate insights about spending
   const getInsights = () => {
-    if (expenses.length === 0) return [];
+    if (transactions.length === 0) return [];
     
     const insights = [];
-    const expensesByCategory = getCategoryExpenses(expenses);
-    const monthlyComparison = getMonthlyComparison(expenses);
+    const expensesByCategory = getCategoryExpenses(transactions);
+    const monthlyComparison = getMonthlyComparison(transactions);
     
     // Most expensive category
     if (expensesByCategory.length > 0) {
@@ -46,8 +46,8 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ expenses }) => {
     }
     
     // Average daily expense
-    if (expenses.length > 0) {
-      const avgDaily = totalExpenses / expenses.length;
+    if (transactions.length > 0) {
+      const avgDaily = totalExpenses / transactions.length;
       insights.push(`Average daily expense is $${avgDaily.toFixed(2)}`);
     }
     

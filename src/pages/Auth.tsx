@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
@@ -47,9 +47,9 @@ const Auth = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <div className="flex justify-center mb-4">
+            <Link to="/" className="flex justify-center mb-4 hover:opacity-80 transition-opacity">
               <Logo size="lg" />
-            </div>
+            </Link>
             <p className="text-gray-600 mt-2">Seu assistente financeiro pessoal</p>
           </div>
           

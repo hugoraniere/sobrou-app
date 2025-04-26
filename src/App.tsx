@@ -1,4 +1,3 @@
-
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -37,18 +36,13 @@ const App = () => {
               <AvatarProvider>
                 <AIChatProvider>
                   <Routes>
-                    {/* Rotas públicas */}
+                    {/* Public routes */}
+                    <Route path="/" element={<PublicLanding />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/verify" element={<EmailVerification />} />
                     <Route path="/reset-password" element={<PasswordReset />} />
                     
-                    {/* Rota principal - redireciona com base na autenticação */}
-                    <Route 
-                      path="/" 
-                      element={<Navigate to="/dashboard" replace />} 
-                    />
-                    
-                    {/* Rotas protegidas */}
+                    {/* Protected routes */}
                     <Route
                       path="/dashboard"
                       element={
