@@ -12,4 +12,3 @@ export interface ParsedExpense {
   isSaving: boolean;
   savingGoal: string | null;
 }
-

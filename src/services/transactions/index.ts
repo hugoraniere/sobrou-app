@@ -21,4 +21,3 @@ export const TransactionService = {
   // Analytics
   getTransactionSummary: transactionAnalyticsService.getTransactionSummary
 };
-

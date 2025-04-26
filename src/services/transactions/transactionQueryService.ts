@@ -55,4 +55,3 @@ export const transactionQueryService = {
     return data as Transaction[] || [];
   }
 };
-
