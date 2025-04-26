@@ -23,7 +23,7 @@ export const transactionMutationService = {
       
       const { data, error } = await supabase
         .from('transactions')
-        .insert([newTransaction])
+        .insert(newTransaction)
         .select()
         .single();
       

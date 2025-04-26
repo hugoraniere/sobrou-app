@@ -9,6 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile'
 import { useDashboardData } from '@/hooks/useDashboardData'
 import { Transaction } from '@/services/transactions'
 import { PiStarFourFill } from "react-icons/pi"
+import { transactionQueryService } from '@/services/transactions/transactionQueryService'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -41,9 +42,8 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   React.useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        // Usando a importação correta para TransactionService
-        const { getTransactions } = await import('@/services/transactions');
-        const data = await getTransactions();
+        // Usando o serviço diretamente
+        const data = await transactionQueryService.getTransactions();
         setLocalTransactions(data);
         console.log("Fetched transactions:", data.length);
       } catch (error) {

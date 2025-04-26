@@ -19,7 +19,13 @@ export const TEXT = {
     transactions: "Transações",
     goals: "Metas",
     settings: "Configurações",
-    user: "Usuário"
+    user: "Usuário",
+    daily: "Diária",
+    weekly: "Semanal",
+    monthly: "Mensal",
+    yearly: "Anual",
+    processing: "Processando...",
+    attention: "Atenção"
   },
   header: {
     dashboard: "Painel",
@@ -50,7 +56,8 @@ export const TEXT = {
       noGoals: "Nenhuma meta de economia encontrada",
       createGoal: "Criar uma meta",
       day: "Dia",
-      amount: "Valor"
+      amount: "Valor",
+      expensesOverTime: "Despesas ao longo do tempo"
     },
     bigNumbers: {
       income: "Receita",
@@ -195,14 +202,5 @@ export const TEXT = {
     confirmLogout: "Confirmar Saída",
     logoutConfirmation: "Tem certeza que deseja sair? Sua sessão será encerrada.",
     logout: "Sair"
-  },
-  common: {
-    daily: "Diária",
-    weekly: "Semanal",
-    monthly: "Mensal",
-    yearly: "Anual",
-    processing: "Processando...",
-    cancel: "Cancelar",
-    attention: "Atenção"
   }
 };
