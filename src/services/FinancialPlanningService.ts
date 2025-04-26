@@ -27,7 +27,6 @@ export const FinancialPlanningService = {
     const startMonth = startOfMonth(now);
     const endMonth = endOfMonth(now);
 
-    // Calcular receitas e despesas
     const income = transactions
       .filter(t => t.type === 'income' && new Date(t.date) <= endMonth)
       .reduce((sum, t) => sum + t.amount, 0);
@@ -36,7 +35,6 @@ export const FinancialPlanningService = {
       .filter(t => t.type === 'expense' && new Date(t.date) <= now)
       .reduce((sum, t) => sum + t.amount, 0);
 
-    // Calcular despesas recorrentes futuras
     const recurringExpenses = transactions
       .filter(t => 
         t.type === 'expense' && 
@@ -47,14 +45,10 @@ export const FinancialPlanningService = {
       )
       .reduce((sum, t) => sum + t.amount, 0);
 
-    // Calcular saldo total disponível
     const totalAvailable = income - expenses - recurringExpenses - savingsGoalAmount;
-
-    // Calcular dias restantes no mês
     const daysRemainingInMonth = endMonth.getDate() - now.getDate() + 1;
     const daysRemainingInWeek = 7 - now.getDay();
 
-    // Distribuir o saldo pelos períodos
     const dailyAmount = totalAvailable / daysRemainingInMonth;
     const weeklyAmount = dailyAmount * daysRemainingInWeek;
     const monthlyAmount = totalAvailable;

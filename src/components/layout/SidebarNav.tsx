@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FileText, Target, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, Target, Settings, LogOut, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -33,6 +33,11 @@ const SidebarNav = () => {
       name: t('common.goals', 'Metas'),
       path: '/goals',
       icon: <Target className="w-5 h-5" />,
+    },
+    {
+      name: t('financialPlanning.title', 'Planejamento Financeiro'),
+      path: '/financial-planning',
+      icon: <TrendingUp className="w-5 h-5" />,
     },
     {
       name: t('common.settings', 'Configurações'),

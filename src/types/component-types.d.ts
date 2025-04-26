@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export interface StandardProps {
@@ -24,7 +23,8 @@ export interface Transaction {
   is_recurring?: boolean;
   user_id: string;
   created_at: string;
-  recurrence_interval?: 'weekly' | 'monthly' | 'yearly';
+  next_due_date?: string;
+  recurrence_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
 }
 
 export interface TransactionDetailsProps extends StandardProps {

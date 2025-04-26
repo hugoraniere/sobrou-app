@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BigNumberCard from '@/components/dashboard/BigNumberCard';
 import { Input } from "@/components/ui/input";
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, DollarSign, Calendar, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FinancialPlanningService, FinancialPlanningStats } from '@/services/FinancialPlanningService';
-import { Transaction } from '@/types/component-types';
+import { FinancialPlanningService } from '@/services/FinancialPlanningService';
 import { useTransactionList } from '@/hooks/useTransactionList';
 import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
 
@@ -18,7 +17,7 @@ const FinancialPlanning = () => {
   
   const stats = FinancialPlanningService.calculateAvailableAmount(
     transactions,
-    0 // TODO: Integrate with savings goals when available
+    0
   );
 
   const simulatedStats = simulatedExpense 
@@ -62,19 +61,22 @@ const FinancialPlanning = () => {
         <BigNumberCard
           title={t('financialPlanning.availableToday', 'Disponível Hoje')}
           value={simulatedStats.availableToday}
-          type={simulatedStats.availableToday < 0 ? 'negative' : 'positive'}
+          icon={DollarSign}
+          color={simulatedStats.availableToday < 0 ? '#ea384c' : '#4ade80'}
           tooltip={t('financialPlanning.dailyTooltip', 'Valor disponível para gastar hoje, considerando suas receitas e despesas')}
         />
         <BigNumberCard
           title={t('financialPlanning.availableWeek', 'Disponível na Semana')}
           value={simulatedStats.availableThisWeek}
-          type={simulatedStats.availableThisWeek < 0 ? 'negative' : 'positive'}
+          icon={Calendar}
+          color={simulatedStats.availableThisWeek < 0 ? '#ea384c' : '#4ade80'}
           tooltip={t('financialPlanning.weeklyTooltip', 'Valor disponível para gastar esta semana')}
         />
         <BigNumberCard
           title={t('financialPlanning.availableMonth', 'Disponível no Mês')}
           value={simulatedStats.availableThisMonth}
-          type={simulatedStats.availableThisMonth < 0 ? 'negative' : 'positive'}
+          icon={TrendingUp}
+          color={simulatedStats.availableThisMonth < 0 ? '#ea384c' : '#4ade80'}
           tooltip={t('financialPlanning.monthlyTooltip', 'Valor disponível para gastar este mês')}
         />
       </div>
