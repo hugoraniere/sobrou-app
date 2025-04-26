@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Transaction } from '@/types/component-types';
 import { TransactionService } from '@/services/transactions';
-import { useToast } from "@/hooks/use-toast";
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
 export const useTransactionRow = (
@@ -14,7 +14,6 @@ export const useTransactionRow = (
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [deletedTransaction, setDeletedTransaction] = useState<Transaction | null>(null);
-  const { toast } = useToast();
   const { t } = useTranslation();
 
   const handleEdit = () => {
@@ -28,45 +27,46 @@ export const useTransactionRow = (
 
   const handleToggleRecurring = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    const newIsRecurring = !transaction.is_recurring;
+    
     try {
-      onToggleRecurring(transaction.id, !transaction.is_recurring);
+      // Optimistic update
+      onToggleRecurring(transaction.id, newIsRecurring);
       
-      toast({
-        title: transaction.is_recurring 
-          ? t('transactions.recurringRemoved', 'Recorrência removida') 
-          : t('transactions.recurringSet', 'Marcada como recorrente'),
-        description: transaction.is_recurring 
-          ? t('transactions.recurringRemovedDesc', 'A transação não é mais recorrente') 
-          : t('transactions.recurringSetDesc', 'A transação foi marcada como recorrente'),
+      // Update in database
+      await TransactionService.updateTransaction(transaction.id, {
+        is_recurring: newIsRecurring,
+        recurrence_frequency: newIsRecurring ? 'monthly' : undefined
       });
+      
+      toast.success(newIsRecurring 
+        ? t('transactions.setRecurring', 'Marcada como recorrente')
+        : t('transactions.removeRecurring', 'Recorrência removida')
+      );
+      
+      onTransactionUpdated();
     } catch (error) {
-      console.error('Erro ao atualizar recorrência:', error);
-      toast({
-        title: t('transactions.updateError', 'Erro ao atualizar recorrência'),
-        variant: "destructive"
-      });
+      // Revert optimistic update on error
+      onToggleRecurring(transaction.id, transaction.is_recurring);
+      
+      console.error('Error updating recurring status:', error);
+      toast.error(t('transactions.updateError', 'Erro ao atualizar recorrência'));
     }
   };
 
   const handleUndoDelete = async () => {
     if (deletedTransaction) {
       try {
-        const { id, created_at, ...transactionData } = deletedTransaction;
-        await TransactionService.addTransaction(transactionData);
-        
-        toast({
-          title: t('transactions.restoreSuccess', "Transação restaurada"),
-          description: t('transactions.restoreDescription', "Sua transação foi restaurada.")
+        await TransactionService.addTransaction({
+          ...deletedTransaction,
+          id: undefined
         });
         
+        toast.success(t('transactions.restoreSuccess', "Transação restaurada"));
         onTransactionUpdated();
       } catch (error) {
-        console.error('Erro ao restaurar transação:', error);
-        toast({
-          title: t('common.error', "Erro"),
-          description: t('transactions.restoreError', "Erro ao restaurar transação"),
-          variant: "destructive"
-        });
+        console.error('Error restoring transaction:', error);
+        toast.error(t('transactions.restoreError', "Erro ao restaurar transação"));
       }
     }
   };
@@ -85,4 +85,3 @@ export const useTransactionRow = (
     handleUndoDelete
   };
 };
-

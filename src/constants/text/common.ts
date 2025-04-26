@@ -1,0 +1,27 @@
+
+export const COMMON_TEXT = {
+  income: "Receita",
+  expense: "Despesa",
+  balance: "Saldo",
+  savings: "Poupança",
+  today: "Hoje",
+  thisMonth: "Este Mês",
+  lastMonth: "Mês Passado",
+  upcoming: "Em breve",
+  accumulated: "Acumulado",
+  cancel: "Cancelar",
+  error: "Erro",
+  save: "Salvar",
+  saving: "Salvando...",
+  dashboard: "Visão Geral",
+  transactions: "Transações",
+  goals: "Metas",
+  settings: "Configurações",
+  user: "Usuário",
+  daily: "Diária",
+  weekly: "Semanal",
+  monthly: "Mensal",
+  yearly: "Anual",
+  processing: "Processando...",
+  attention: "Atenção"
+};

@@ -17,7 +17,7 @@ const Logo = React.forwardRef<HTMLImageElement, LogoProps>(({ className, size = 
   return (
     <img 
       ref={ref}
-      src="/lovable-uploads/99c07f63-fffe-4761-a8d8-35c85d058c3a.png"
+      src="/lovable-uploads/076c0413-0b42-4810-b32c-5b627b744797.png"
       alt="Sobrou" 
       className={cn(sizeClasses[size], 'w-auto', className)}
     />
