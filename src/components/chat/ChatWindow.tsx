@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { X, Send } from 'lucide-react'
 import { cn } from "@/lib/utils"
@@ -9,6 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile'
 import { useDashboardData } from '@/hooks/useDashboardData'
 import { TransactionService } from '@/services/TransactionService'
 import { PiStarFourFill } from "react-icons/pi"
+import { Transaction } from '@/services/transactions'
 
 interface Message {
   role: 'user' | 'assistant';

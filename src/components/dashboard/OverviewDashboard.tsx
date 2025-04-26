@@ -1,6 +1,6 @@
 import React from 'react';
+import { Transaction } from '@/services/transactions';
 import { useTranslation } from 'react-i18next';
-import { Transaction } from '@/services/TransactionService';
 import { SavingGoal } from '@/services/SavingsService';
 import ExpensesByCategoryChart from '../charts/ExpensesByCategoryChart';
 import IncomeByTypeChart from '../charts/IncomeByTypeChart';
@@ -12,10 +12,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import EmptyStateMessage from './EmptyStateMessage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { transactionCategories } from '@/data/categories';
+
 interface OverviewDashboardProps {
   transactions: Transaction[];
   savingGoals: SavingGoal[];
 }
+
 const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   transactions,
   savingGoals
@@ -143,4 +145,5 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       </div>
     </div>;
 };
+
 export default OverviewDashboard;

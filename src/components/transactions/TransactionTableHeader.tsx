@@ -2,7 +2,7 @@
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronDown, ChevronUp, ArrowUpDown } from "lucide-react";
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import { useTranslation } from 'react-i18next';
 
 type SortConfig = {

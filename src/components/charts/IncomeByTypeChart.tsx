@@ -11,7 +11,7 @@ import {
   PieChart,
   Cell
 } from "recharts";
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import { useTranslation } from 'react-i18next';
 import { transactionCategories } from '@/data/categories';
 

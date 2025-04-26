@@ -12,7 +12,7 @@ import {
   Legend
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';

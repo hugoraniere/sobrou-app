@@ -16,7 +16,7 @@ import {
   LineChart,
   ReferenceLine
 } from "recharts";
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import { subMonths, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 

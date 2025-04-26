@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 
 export const useTransactionList = (
   transactions: Transaction[],

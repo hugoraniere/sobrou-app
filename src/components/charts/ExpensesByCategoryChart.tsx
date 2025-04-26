@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import { transactionCategories } from '@/data/categories';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { useTranslation } from 'react-i18next';

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
 import DashboardBigNumbers from './DashboardBigNumbers';
 import DashboardCharts from './DashboardCharts';

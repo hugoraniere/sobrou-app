@@ -17,7 +17,7 @@ import {
   ComposedChart,
   ReferenceLine
 } from "recharts";
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 
 interface DailyBarChartProps {

@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Transaction, TransactionService } from '@/services/TransactionService';
+import { Transaction, TransactionService } from '@/services/transactions';
 import { SavingGoal, SavingsService } from '@/services/SavingsService';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';

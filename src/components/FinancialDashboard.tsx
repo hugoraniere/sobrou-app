@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Transaction } from '../services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import ExpensesByCategoryChart from './charts/ExpensesByCategoryChart';
 import ExpensesOverTimeChart from './charts/ExpensesOverTimeChart';
 import MonthlyComparisonChart from './charts/MonthlyComparisonChart';

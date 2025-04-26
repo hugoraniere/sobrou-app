@@ -1,71 +1,40 @@
 
-import { CategoryType } from '../types/categories';
-import { categoryKeywords, categoryMeta } from '../data/categoryKeywords';
+import { transactionCategories } from '@/data/categories';
 
-/**
- * Detecta categorias com base no texto
- * @param text Texto para análise
- * @param categories Lista de categorias para comparação
- * @returns Lista de categorias detectadas
- */
-export const detectCategories = (
-  text: string, 
-  categories: CategoryType[]
-): CategoryType[] => {
-  if (!text || !categories || !Array.isArray(categories)) {
-    return [];
-  }
-  
-  // Implementação básica - expandir conforme necessário
-  const lowerText = text.toLowerCase();
-  return categories.filter(category => 
-    category.name.toLowerCase().includes(lowerText) || 
-    category.label.toLowerCase().includes(lowerText)
-  );
-};
-
-/**
- * Encontra uma categoria pelo seu ID ou valor
- * @param categoryId ID ou valor da categoria 
- * @param categories Lista de categorias
- * @returns Categoria encontrada ou undefined
- */
-export const findCategoryById = (
-  categoryId: string,
-  categories: CategoryType[]
-): CategoryType | undefined => {
-  if (!categoryId || !categories || !Array.isArray(categories)) {
-    return undefined;
-  }
-  
-  return categories.find(
-    category => category.id === categoryId || category.value === categoryId
-  );
-};
-
-/**
- * Detecta categoria com base em palavras-chave no texto
- * @param text Texto para análise
- * @returns Categoria detectada ou null
- */
-export const getCategoryByKeyword = (text: string): CategoryType | null => {
+export const getCategoryByKeyword = (text: string): { id: string, name: string } | null => {
   if (!text) return null;
   
-  const normalizedText = text.toLowerCase().trim();
+  const textLower = text.toLowerCase();
   
-  // Iterar sobre as palavras-chave para encontrar correspondências
-  for (const [categoryId, keywords] of Object.entries(categoryKeywords)) {
-    if (Array.isArray(keywords)) {
-      const matchesKeyword = keywords.some(keyword => 
-        normalizedText.includes(keyword.toLowerCase())
-      );
-      
-      if (matchesKeyword && categoryMeta[categoryId]) {
-        return categoryMeta[categoryId];
-      }
+  // Primeira tentativa: correspondência exata com o nome
+  const exactMatch = transactionCategories.find(
+    cat => cat.name.toLowerCase() === textLower || textLower.includes(cat.name.toLowerCase())
+  );
+  
+  if (exactMatch) return { id: exactMatch.id, name: exactMatch.name };
+  
+  // Segunda tentativa: verificar palavras-chave no texto
+  const keywordMap: Record<string, string[]> = {
+    'food': ['food', 'restaurant', 'lunch', 'dinner', 'breakfast', 'meal', 'café', 'restaurante', 'almoço', 'jantar', 'café da manhã', 'refeição'],
+    'transport': ['transport', 'car', 'gas', 'uber', 'taxi', 'bus', 'train', 'fuel', 'gasolina', 'carro', 'ônibus', 'transporte', 'metrô', 'combustível'],
+    'shopping': ['shop', 'amazon', 'purchase', 'buy', 'store', 'mall', 'mercado', 'loja', 'compra', 'comprei'],
+    'house': ['house', 'rent', 'mortgage', 'apartment', 'casa', 'aluguel', 'hipoteca', 'apartamento', 'condomínio'],
+    'utilities': ['utilities', 'electric', 'water', 'internet', 'phone', 'bill', 'conta', 'água', 'luz', 'telefone', 'celular'],
+    'entertainment': ['entertainment', 'movie', 'netflix', 'spotify', 'concert', 'theater', 'cinema', 'show', 'filme', 'entretenimento', 'teatro'],
+    'health': ['health', 'doctor', 'medicine', 'pharmacy', 'hospital', 'medical', 'saúde', 'médico', 'remédio', 'farmácia', 'hospital'],
+    'education': ['education', 'school', 'course', 'book', 'educação', 'escola', 'curso', 'livro', 'faculdade'],
+    'salary': ['salary', 'wage', 'income', 'payment', 'salário', 'renda', 'pagamento', 'salario'],
+    'investment': ['invest', 'dividend', 'stock', 'bond', 'investimento', 'dividendo', 'ação', 'título'],
+    'other': []
+  };
+  
+  for (const [categoryId, keywords] of Object.entries(keywordMap)) {
+    if (keywords.some(keyword => textLower.includes(keyword))) {
+      const category = transactionCategories.find(cat => cat.id === categoryId);
+      if (category) return { id: category.id, name: category.name };
     }
   }
   
+  // Nenhuma correspondência, retornar null
   return null;
 };
-

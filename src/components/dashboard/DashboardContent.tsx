@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import SavingGoals from '../SavingGoals';
 import EmptyDashboard from '../EmptyDashboard';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
 import TransactionsTable from '../TransactionsTable';
 import OverviewDashboard from './OverviewDashboard';

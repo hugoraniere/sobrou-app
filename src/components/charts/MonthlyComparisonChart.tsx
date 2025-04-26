@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
 import { useTheme } from 'next-themes';
 

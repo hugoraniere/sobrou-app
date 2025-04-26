@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TableBody } from "@/components/ui/table";
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 import TransactionRow from './TransactionRow';
 import TransactionPagination from './TransactionPagination';
 import EmptyTransactions from './EmptyTransactions';

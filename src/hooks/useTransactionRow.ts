@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Transaction } from '@/types/component-types';
-import { TransactionService } from '@/services/TransactionService';
+import { TransactionService } from '@/services/transactions';
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
 

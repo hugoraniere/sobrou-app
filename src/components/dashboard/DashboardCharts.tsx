@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import DailyBarChart from '../charts/DailyBarChart';
 import ExpensesByCategoryChart from '../charts/ExpensesByCategoryChart';
 import MonthlyComparisonChart from '../charts/MonthlyComparisonChart';
-import { Transaction } from '@/services/TransactionService';
+import { Transaction } from '@/services/transactions';
 
 interface DashboardChartsProps {
   transactions: Transaction[];

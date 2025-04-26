@@ -1,6 +1,5 @@
-
-import React, { useState } from 'react';
-import { Transaction } from '@/services/TransactionService';
+import React from 'react';
+import { Transaction } from '@/services/transactions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, TrendingDown, TrendingUp, Lightbulb, DollarSign, Target } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -23,7 +22,6 @@ interface InsightItem {
 const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) => {
   const [showAllTips, setShowAllTips] = useState(false);
   
-  // Análise de dados
   const getInsights = (): InsightItem[] => {
     const insights: InsightItem[] = [];
     
@@ -31,25 +29,21 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       return [];
     }
     
-    // Calcular despesas totais por categoria
     const categoryExpenses: Record<string, number> = {};
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     
-    // Filtrar transações do mês atual
     const currentMonthTransactions = transactions.filter(t => {
       const date = new Date(t.date);
       return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
     });
     
-    // Calcular despesas por categoria do mês atual
     currentMonthTransactions.forEach(transaction => {
       if (transaction.type === 'expense') {
         categoryExpenses[transaction.category] = (categoryExpenses[transaction.category] || 0) + transaction.amount;
       }
     });
     
-    // Encontrar a categoria com maior gasto
     let highestExpenseCategory = '';
     let highestExpenseAmount = 0;
     
@@ -60,7 +54,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       }
     });
     
-    // Calcular o total de despesas e receitas
     const totalExpenses = currentMonthTransactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
@@ -69,7 +62,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
     
-    // Insight sobre categoria com maior gasto
     if (highestExpenseCategory) {
       const categoryName = transactionCategories.find(c => c.id === highestExpenseCategory)?.name || highestExpenseCategory;
       const percentOfTotal = ((highestExpenseAmount / totalExpenses) * 100).toFixed(0);
@@ -84,7 +76,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       });
     }
     
-    // Insight sobre balanço mensal
     const monthlyBalance = totalIncome - totalExpenses;
     if (monthlyBalance < 0) {
       insights.push({
@@ -104,7 +95,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       });
     }
     
-    // Dicas de economia baseadas na categoria com maior gasto
     const savingTips: Record<string, string[]> = {
       food: [
         "Faça uma lista antes de ir ao supermercado e siga-a rigorosamente.",
@@ -138,7 +128,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       ]
     };
     
-    // Adicionar dicas de economia relevantes
     if (highestExpenseCategory && savingTips[highestExpenseCategory]) {
       const categoryTips = savingTips[highestExpenseCategory];
       const categoryName = transactionCategories.find(c => c.id === highestExpenseCategory)?.name || highestExpenseCategory;
@@ -155,7 +144,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       });
     }
     
-    // Dicas gerais de economia
     const generalTips = [
       "Estabeleça um orçamento mensal e siga-o rigorosamente.",
       "Use a regra 50-30-20: 50% para necessidades, 30% para desejos e 20% para economias.",
@@ -177,7 +165,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       });
     });
     
-    // Dicas baseadas em metas
     insights.push({
       id: 'saving-goal-tip',
       title: "Estabeleça metas de economia",
@@ -193,7 +180,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
   const warnings = insights.filter(insight => insight.type === 'warning' || insight.type === 'success');
   const tips = insights.filter(insight => insight.type === 'tip' || insight.type === 'info');
   
-  // Mostrar apenas 3 dicas inicialmente, a menos que showAllTips seja true
   const displayedTips = showAllTips ? tips : tips.slice(0, 3);
   
   const renderIcon = (insight: InsightItem) => {
@@ -214,7 +200,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
         </Card>
       ) : (
         <>
-          {/* Alertas e Destaques */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Alertas e Destaques</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -238,7 +223,6 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
             </div>
           </div>
           
-          {/* Dicas de Economia */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Dicas de Economia</h3>
             <div className="grid grid-cols-1 gap-4">

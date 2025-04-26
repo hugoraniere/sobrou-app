@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TransactionService } from '@/services/TransactionService';
+import { TransactionService } from '@/services/transactions';
 import {
   AlertDialog,
   AlertDialogAction,
