@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { DollarSign, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Wallet } from 'lucide-react';
 import { Transaction } from '@/services/transactions';
 import BigNumberCard from './BigNumberCard';
-import { formatCurrency } from '@/utils/currencyUtils';
+import { TEXT } from '@/constants/text';
 
 interface DashboardBigNumbersProps {
   transactions: Transaction[];
@@ -26,51 +26,43 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   
   // Calculate balance
   const balance = totalIncome - totalExpenses;
-
-  // Mock trends for demonstration (in a real app, these would be calculated)
-  const trends = {
-    income: { value: 5, isPositive: true },
-    expenses: { value: 3, isPositive: false },
-    balance: { value: 8, isPositive: true },
-    savings: { value: 4, isPositive: true }
-  };
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <BigNumberCard
-        title="Receitas"
+        title={TEXT.common.income}
         value={totalIncome}
         icon={TrendingUp}
         color="#22c55e"
-        trend={trends.income}
-        tooltip="Total de receitas no período"
+        trend={{ value: 5, isPositive: true }}
+        tooltip={TEXT.dashboard.bigNumbers.monthlyIncomeTooltip}
       />
       
       <BigNumberCard
-        title="Despesas"
+        title={TEXT.common.expense}
         value={totalExpenses}
         icon={TrendingDown}
         color="#ef4444"
-        trend={trends.expenses}
-        tooltip="Total de despesas no período"
+        trend={{ value: 3, isPositive: false }}
+        tooltip={TEXT.dashboard.bigNumbers.monthlyExpensesTooltip}
       />
       
       <BigNumberCard
-        title="Saldo"
+        title={TEXT.common.balance}
         value={balance}
         icon={DollarSign}
         color="#3b82f6"
-        trend={trends.balance}
-        tooltip="Saldo atual (receitas - despesas)"
+        trend={{ value: 8, isPositive: true }}
+        tooltip={TEXT.dashboard.bigNumbers.availableBalanceTooltip}
       />
       
       <BigNumberCard
-        title="Poupança"
+        title={TEXT.common.savings}
         value={totalSavings}
         icon={Wallet}
         color="#8b5cf6"
-        trend={trends.savings}
-        tooltip="Total acumulado em poupança"
+        trend={{ value: 4, isPositive: true }}
+        tooltip={TEXT.dashboard.bigNumbers.totalSavingsTooltip}
       />
     </div>
   );

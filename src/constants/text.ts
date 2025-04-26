@@ -1,4 +1,3 @@
-
 // Textos em português para a aplicação
 export const TEXT = {
   common: {
@@ -73,11 +72,7 @@ export const TEXT = {
       pendingBalance: "Saldo Pendente",
       pendingBalanceTooltip: "Transações agendadas futuras",
       totalSavings: "Total de Economias",
-      totalSavingsTooltip: "Suas economias acumuladas em todas as metas",
-      today: "Hoje",
-      thisMonth: "Este Mês",
-      upcoming: "Em breve",
-      accumulated: "Acumulado"
+      totalSavingsTooltip: "Suas economias acumuladas em todas as metas"
     },
     emptyState: {
       message: "Comece a registrar para ver seus dados"
