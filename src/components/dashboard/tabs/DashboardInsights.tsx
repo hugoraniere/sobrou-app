@@ -8,7 +8,11 @@ interface DashboardInsightsProps {
 }
 
 const DashboardInsights: React.FC<DashboardInsightsProps> = ({ transactions }) => {
-  return <FinancialInsights transactions={transactions} />;
+  return (
+    <div className="w-full">
+      <FinancialInsights transactions={transactions} />
+    </div>
+  );
 };
 
 export default DashboardInsights;

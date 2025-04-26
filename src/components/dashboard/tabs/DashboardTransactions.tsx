@@ -1,6 +1,7 @@
 
 import React from 'react';
 import TransactionsTable from '@/components/TransactionsTable';
+import FilterBar from '@/components/FilterBar';
 import { Transaction } from '@/services/transactions';
 
 interface DashboardTransactionsProps {
@@ -21,11 +22,19 @@ const DashboardTransactions: React.FC<DashboardTransactionsProps> = ({
   onTransactionUpdated
 }) => {
   return (
-    <TransactionsTable 
-      transactions={transactions}
-      filters={filters}
-      onTransactionUpdated={onTransactionUpdated}
-    />
+    <div className="space-y-6">
+      <FilterBar 
+        filters={filters}
+        onFilterChange={() => {}}
+        categories={[]}
+        onResetFilters={() => {}}
+      />
+      <TransactionsTable 
+        transactions={transactions}
+        filters={filters}
+        onTransactionUpdated={onTransactionUpdated}
+      />
+    </div>
   );
 };
 

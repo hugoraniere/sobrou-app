@@ -1,7 +1,5 @@
 
 import React from 'react';
-import AIPromptInput from '../AIPromptInput';
-import FilterBar from '../FilterBar';
 import DashboardTabs from './DashboardTabs';
 import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
@@ -43,22 +41,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
 }) => {
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      {/* AI-powered prompt input at the top */}
-      <AIPromptInput 
-        onTransactionAdded={onTransactionUpdated}
-        onSavingAdded={onSavingGoalAdded}
-      />
-      
-      {/* Filter Bar - Only show on transactions tab */}
-      <div id="filters-container" className="mt-6">
-        <FilterBar 
-          filters={filters}
-          onFilterChange={() => {}}
-          categories={[]}
-          onResetFilters={() => {}}
-        />
-      </div>
-      
       <div className="mt-6">
         <DashboardTabs
           transactions={transactions}

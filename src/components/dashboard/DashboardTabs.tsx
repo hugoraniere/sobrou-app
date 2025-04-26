@@ -6,6 +6,8 @@ import DashboardOverview from './tabs/DashboardOverview';
 import DashboardTransactions from './tabs/DashboardTransactions';
 import DashboardInsights from './tabs/DashboardInsights';
 import EmptyDashboard from '../EmptyDashboard';
+import { Transaction } from '@/services/transactions';
+import { SavingGoal } from '@/services/SavingsService';
 
 interface DashboardTabsProps {
   transactions: Transaction[];
@@ -61,19 +63,15 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="insights">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : hasTransactions ? (
-              <DashboardInsights transactions={transactions} />
-            ) : (
-              <EmptyDashboard />
-            )}
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
-        </div>
+        ) : hasTransactions ? (
+          <DashboardInsights transactions={transactions} />
+        ) : (
+          <EmptyDashboard />
+        )}
       </TabsContent>
     </Tabs>
   );
