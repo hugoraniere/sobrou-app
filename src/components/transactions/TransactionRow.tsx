@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
@@ -9,8 +10,9 @@ import EditTransactionDialog from './EditTransactionDialog';
 import DeleteTransactionDialog from './DeleteTransactionDialog';
 import ActionsCell from './cells/ActionsCell';
 import { useTransactionRow } from '@/hooks/useTransactionRow';
+import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Transaction } from '@/services/transactions';
+import { Transaction, TransactionService } from '@/services/transactions';
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ 
   transaction, 
@@ -25,8 +27,30 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleDelete,
-    handleToggleRecurring,
+    handleToggleRecurring: baseHandleToggleRecurring,
   } = useTransactionRow(transaction, onToggleRecurring, onTransactionUpdated);
+
+  const handleToggleRecurring = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      // Optimistically update the UI
+      onToggleRecurring(transaction.id, !transaction.is_recurring);
+      
+      // Update the database
+      await TransactionService.updateTransaction(transaction.id, {
+        is_recurring: !transaction.is_recurring
+      });
+      
+      // Call the base handler for toast notifications
+      baseHandleToggleRecurring(e);
+    } catch (error) {
+      // Revert the optimistic update on error
+      onToggleRecurring(transaction.id, transaction.is_recurring);
+      
+      console.error('Error updating recurring status:', error);
+      toast.error('Erro ao atualizar status de recorrência');
+    }
+  };
 
   return (
     <>

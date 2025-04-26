@@ -44,7 +44,7 @@ export const TEXT = {
       analytics: "Análises"
     },
     charts: {
-      categoryBreakdown: "Para onde foi seu dinheiro este mês",
+      categoryBreakdown: "Distribuição por categoria",
       incomeByType: "Fontes de receita",
       dailyEvolution: "Movimentações diárias",
       balanceByAccount: "Saldo por conta/cartão",

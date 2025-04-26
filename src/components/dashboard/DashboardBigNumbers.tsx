@@ -28,7 +28,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   const balance = totalIncome - totalExpenses;
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="flex flex-wrap gap-6">
       <BigNumberCard
         title={TEXT.common.income}
         value={totalIncome}
