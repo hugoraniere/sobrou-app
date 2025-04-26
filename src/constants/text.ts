@@ -59,16 +59,12 @@ export const TEXT = {
       expensesOverTime: "Despesas ao longo do tempo"
     },
     bigNumbers: {
-      income: "Receita",
-      expenses: "Despesas",
-      balance: "Saldo",
-      savings: "Poupança",
-      availableBalance: "Saldo Disponível",
-      availableBalanceTooltip: "Seu saldo disponível atual em todas as contas",
       monthlyExpenses: "Despesas Mensais",
       monthlyExpensesTooltip: "Total de despesas do mês atual",
       monthlyIncome: "Receita Mensal",
       monthlyIncomeTooltip: "Total de receitas do mês atual",
+      availableBalance: "Saldo Disponível",
+      availableBalanceTooltip: "Seu saldo disponível atual em todas as contas",
       pendingBalance: "Saldo Pendente",
       pendingBalanceTooltip: "Transações agendadas futuras",
       totalSavings: "Total de Economias",
