@@ -1,38 +1,17 @@
 
 project_id = "jevsazpwfowhmjupuuzw"
 
-[api]
-enabled = true
-port = 8080
-schemas = ["public", "storage"]
-extra_search_path = ["public", "extensions"]
-max_rows = 1000
+[functions.whatsapp-webhook]
+verify_jwt = false
 
-[db]
-port = 5432
-shadow_port = 5431
-major_version = 15
+[functions.whatsapp-test]
+verify_jwt = false
 
-[studio]
-enabled = true
-port = 8082
-api_url = "http://localhost"
+[functions.parse-expense]
+verify_jwt = false
 
-[inbucket]
-enabled = true
-port = 8084
-
-[storage]
-enabled = true
-port = 8085
-
-[auth]
-enabled = true
-port = 8083
-
-[realtime]
-enabled = true
-
-[functions]
 [functions.generate-insights]
-verify_jwt = true
+verify_jwt = false
+
+[functions.send-whatsapp-welcome]
+verify_jwt = false

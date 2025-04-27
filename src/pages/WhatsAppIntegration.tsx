@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import ConnectionCard from '@/components/whatsapp/ConnectionCard';
 import StatusCard from '@/components/whatsapp/StatusCard';
 import InstructionsCard from '@/components/whatsapp/InstructionsCard';
+import DebugCard from '@/components/whatsapp/DebugCard';
 
 const WhatsAppIntegration = () => {
   const { t } = useTranslation();
@@ -18,6 +19,8 @@ const WhatsAppIntegration = () => {
       </div>
       
       <StatusCard />
+      
+      <DebugCard />
     </div>
   );
 };
