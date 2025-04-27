@@ -1,4 +1,3 @@
-
 export const WHATSAPP_TEXT = {
   connection: "Conexão WhatsApp",
   description: "Conecte seu WhatsApp para registrar transações automaticamente",
@@ -27,5 +26,9 @@ export const WHATSAPP_TEXT = {
   canSendMessages: "Envio habilitado",
   canSendMessagesDesc: "Você pode enviar mensagens para registrar transações.",
   successWelcomeMessage: "Mensagem de boas-vindas enviada!",
-  chatButton: "WhatsApp"
+  chatButton: "WhatsApp",
+  disconnect: "Desconectar WhatsApp",
+  disconnecting: "Desconectando...",
+  disconnectionSuccess: "WhatsApp desconectado com sucesso!",
+  errorDisconnection: "Erro ao desconectar WhatsApp",
 };

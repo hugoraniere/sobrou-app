@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { MessageCircle, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ const ConnectionCard = () => {
   const { user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
 
   useEffect(() => {
@@ -110,6 +111,36 @@ const ConnectionCard = () => {
     }
   };
 
+  const handleDisconnectWhatsApp = async () => {
+    try {
+      setIsDisconnecting(true);
+      
+      // Remove WhatsApp number from user metadata
+      const { error: userError } = await supabase.auth.updateUser({
+        data: { whatsapp_number: null }
+      });
+
+      if (userError) throw userError;
+
+      // Remove WhatsApp number from profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ whatsapp_number: null })
+        .eq('id', user?.id);
+
+      if (profileError) throw profileError;
+      
+      setConnectionStatus('disconnected');
+      setPhoneNumber('');
+      toast.success(t('whatsapp.disconnectionSuccess', 'WhatsApp desconectado com sucesso!'));
+    } catch (error: any) {
+      console.error('WhatsApp disconnection error:', error);
+      toast.error(error.message || t('whatsapp.errorDisconnection', 'Erro ao desconectar WhatsApp'));
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -136,23 +167,36 @@ const ConnectionCard = () => {
             placeholder="+55 (11) 98765-4321"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            disabled={connectionStatus === 'connected'}
           />
           <p className="text-sm text-muted-foreground">
             {t('whatsapp.phoneNumberHint', 'Inclua o código do país e DDD')}
           </p>
         </div>
         
-        <Button 
-          onClick={handleWhatsAppConnection} 
-          disabled={isConnecting || connectionStatus === 'connected'}
-          className="w-full"
-        >
-          {isConnecting ? 
-            t('whatsapp.connecting', 'Conectando...') : 
-            connectionStatus === 'connected' ? 
-              t('whatsapp.updateConnection', 'Atualizar Conexão') : 
-              t('whatsapp.connect', 'Conectar')}
-        </Button>
+        {connectionStatus === 'connected' ? (
+          <Button 
+            onClick={handleDisconnectWhatsApp} 
+            variant="destructive"
+            disabled={isDisconnecting}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            {isDisconnecting 
+              ? t('whatsapp.disconnecting', 'Desconectando...') 
+              : t('whatsapp.disconnect', 'Desconectar WhatsApp')}
+          </Button>
+        ) : (
+          <Button 
+            onClick={handleWhatsAppConnection} 
+            disabled={isConnecting}
+            className="w-full"
+          >
+            {isConnecting 
+              ? t('whatsapp.connecting', 'Conectando...') 
+              : t('whatsapp.connect', 'Conectar')}
+          </Button>
+        )}
         
         {connectionStatus === 'connected' && (
           <div className="bg-green-50 border border-green-100 rounded p-3 mt-2 flex items-start">
