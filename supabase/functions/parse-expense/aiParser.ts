@@ -30,6 +30,7 @@ export async function aiParseTransaction(text: string) {
               - If amount is unclear or missing, return error
               - Detect saving intentions ("poupar", "guardar", "economizar")
               - Default type to "expense" unless clear income indicators present
+              - If category is unclear, use "compras" as default
               
               Return ONLY a JSON object with these exact fields.`
           },
@@ -47,9 +48,24 @@ export async function aiParseTransaction(text: string) {
     console.log("AI Response:", data);
     
     const parsedResult = data.choices[0].message.content;
-    return JSON.parse(parsedResult);
+    const parsed = JSON.parse(parsedResult);
+    
+    // Garantir que sempre temos uma categoria válida
+    if (!parsed.category) {
+      parsed.category = 'compras';
+    }
+    
+    return parsed;
   } catch (error) {
     console.error("AI parsing error:", error);
-    return null;
+    // Retornar um objeto com valores padrão em caso de erro
+    return {
+      amount: 0,
+      type: 'expense',
+      category: 'compras',
+      description: text,
+      isSaving: false,
+      savingGoal: null
+    };
   }
 }

@@ -66,7 +66,6 @@ serve(async (req) => {
     console.log("Payload recebido:", JSON.stringify(payload, null, 2));
 
     // Processar payload do webhook do WhatsApp Business API
-    // Formato: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples
     if (!payload.object || payload.object !== 'whatsapp_business_account') {
       return new Response(
         JSON.stringify({ error: 'Payload inválido: não é uma mensagem do WhatsApp Business' }),
@@ -200,6 +199,9 @@ serve(async (req) => {
     console.log("Dados processados:", parsedData);
 
     try {
+      // Garantir que temos uma categoria válida
+      const category = parsedData.category?.toLowerCase() || 'compras';  // Usar 'compras' como categoria padrão
+      
       // Criar a transação no banco de dados
       const { data: transaction, error: transactionError } = await supabase
         .from('transactions')
@@ -207,9 +209,9 @@ serve(async (req) => {
           user_id: userId,
           amount: parsedData.amount,
           description: parsedData.description,
-          category: parsedData.category.toLowerCase(),
-          type: parsedData.type,
-          date: parsedData.date
+          category: category,
+          type: parsedData.type || 'expense', // Garantir um tipo padrão
+          date: parsedData.date || new Date().toISOString().split('T')[0]
         }])
         .select()
         .single();
@@ -221,11 +223,10 @@ serve(async (req) => {
 
       console.log(`Transação criada com sucesso: ${transaction.id}`);
       
-      // Envia confirmação para o usuário
-      const confirmationMsg = `✅ Transação registrada!\n\nValor: R$ ${parsedData.amount}\nCategoria: ${parsedData.category}\nDescrição: ${parsedData.description}`;
+      // Envia confirmação para o usuário com mais detalhes
+      const confirmationMsg = `✅ Transação registrada!\n\nValor: R$ ${parsedData.amount}\nCategoria: ${category}\nDescrição: ${parsedData.description}`;
       await sendWhatsAppMessage(from, confirmationMsg);
 
-      // Resposta de sucesso
       return new Response(
         JSON.stringify({
           status: 'success',
@@ -238,8 +239,8 @@ serve(async (req) => {
         }
       );
     } catch (error) {
-      // Em caso de erro, notificar o usuário
-      const errorMsg = "Desculpe, ocorreu um erro ao registrar sua transação. Por favor, tente novamente.";
+      console.error("Erro ao processar transação:", error);
+      const errorMsg = "Desculpe, ocorreu um erro ao registrar sua transação. Por favor, tente novamente com o formato: 'Gastei R$50 no mercado'";
       await sendWhatsAppMessage(from, errorMsg);
       throw error;
     }
