@@ -1,10 +1,67 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
-/**
- * Simple NLP function to parse expense information from user text input
- * Now with support for Portuguese and improved currency handling
- */
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Enhanced transaction parsing with AI
+async function aiParseTransaction(text: string) {
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a financial transaction parser. Extract these fields from the user's message:
+              - amount (number, required)
+              - type ("expense" or "income")
+              - category (must be one of: alimentacao, moradia, transporte, internet, cartao, saude, lazer, compras, investimentos, familia, doacoes)
+              - description (string)
+              - isSaving (boolean)
+              - savingGoal (string or null)
+              
+              Rules:
+              - If amount contains "k" (e.g., "2k"), multiply by 1000
+              - For Brazilian currency (R$), extract just the number
+              - If amount is unclear or missing, return error
+              - Detect saving intentions ("poupar", "guardar", "economizar")
+              - Default type to "expense" unless clear income indicators present
+              
+              Return ONLY a JSON object with these exact fields.`
+          },
+          { role: "user", content: text }
+        ],
+        temperature: 0.1
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("AI Response:", data);
+    
+    const parsedResult = data.choices[0].message.content;
+    return JSON.parse(parsedResult);
+  } catch (error) {
+    console.error("AI parsing error:", error);
+    return null;
+  }
+}
+
+// Original keyword-based parsing function
 function parseExpenseText(text: string) {
   text = text.toLowerCase();
   console.log("Parsing text:", text);
@@ -170,27 +227,35 @@ function parseExpenseText(text: string) {
 }
 
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    };
-    
-    // Handle CORS preflight requests
-    if (req.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
-    }
-    
     const { text } = await req.json();
     console.log("Received text to parse:", text);
-    
+
     if (!text) {
       return new Response(
         JSON.stringify({ error: "Text input is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
+    // Try AI parsing first
+    const aiResult = await aiParseTransaction(text);
+    console.log("AI parsing result:", aiResult);
+
+    // If AI parsing succeeds and has valid amount, use it
+    if (aiResult && aiResult.amount && !isNaN(aiResult.amount)) {
+      return new Response(
+        JSON.stringify(aiResult),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Fallback to original parsing if AI fails
+    console.log("Falling back to rule-based parsing");
     const parsedData = parseExpenseText(text);
     
     return new Response(
@@ -201,7 +266,7 @@ serve(async (req) => {
     console.error("Error in parse-expense function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
