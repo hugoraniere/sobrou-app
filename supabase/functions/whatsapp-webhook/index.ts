@@ -116,20 +116,54 @@ serve(async (req) => {
     
     console.log(`Mensagem recebida de ${from}: ${text}`);
 
-    // Encontrar usuário pelo número de telefone
-    const { data: profiles, error: profileError } = await supabase
+    // Normalizar o número de telefone para facilitar a busca
+    // Esta função remove caracteres não numéricos e considera vários formatos possíveis
+    const normalizePhoneNumber = (phone: string): string => {
+      // Remover todos os caracteres não numéricos
+      return phone.replace(/\D/g, '');
+    };
+    
+    // Normalizar o número recebido
+    const normalizedFrom = normalizePhoneNumber(from);
+    
+    // Buscar usuário de várias maneiras possíveis
+    let userId: string | null = null;
+    
+    // Primeiro, buscar pela correspondência exata
+    const { data: exactProfiles, error: exactError } = await supabase
       .from('profiles')
       .select('id')
       .eq('whatsapp_number', from)
       .maybeSingle();
-
-    if (profileError) {
-      console.error("Erro ao buscar perfil:", profileError);
-      throw profileError;
+      
+    if (exactError) {
+      console.error("Erro ao buscar perfil com número exato:", exactError);
+    } else if (exactProfiles) {
+      userId = exactProfiles.id;
+    }
+    
+    // Se não encontrou com correspondência exata, buscar usando o número normalizado
+    if (!userId) {
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, whatsapp_number');
+        
+      if (profileError) {
+        console.error("Erro ao buscar perfis:", profileError);
+        throw profileError;
+      }
+      
+      // Comparar números normalizados
+      for (const profile of profiles || []) {
+        if (profile.whatsapp_number && normalizePhoneNumber(profile.whatsapp_number) === normalizedFrom) {
+          userId = profile.id;
+          break;
+        }
+      }
     }
 
     // Se nenhum usuário for encontrado com este número
-    if (!profiles) {
+    if (!userId) {
       console.log(`Nenhum usuário encontrado com o número ${from}`);
       
       // Enviar resposta informando que o número não está registrado
@@ -144,7 +178,6 @@ serve(async (req) => {
       );
     }
 
-    const userId = profiles.id;
     console.log(`Usuário encontrado: ${userId}`);
 
     // Chama a função parse-expense para interpretar a mensagem
