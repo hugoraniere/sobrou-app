@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { transactionCategories } from '@/data/categories';
 import { toast } from 'sonner';
+import { determineBestCategory, getCategoryByKeyword } from '@/utils/categoryUtils';
 
 // Interface para a transação extraída
 export interface ExtractedTransaction {
@@ -14,8 +15,11 @@ export interface ExtractedTransaction {
 }
 
 // Função para mapear categorias da IA para categorias válidas do sistema
-const mapToValidCategory = (aiCategory: string | undefined): string => {
-  if (!aiCategory) return 'compras'; // Categoria padrão
+const mapToValidCategory = (aiCategory: string | undefined, description: string, amount: number, type: string): string => {
+  if (!aiCategory) {
+    // Se não temos categoria, usar nossa função aprimorada de detecção
+    return determineBestCategory(description, amount, type);
+  }
 
   // Converter para um formato padronizado (minúsculas sem acentos)
   const normalizedCategory = aiCategory.toLowerCase().trim();
@@ -98,9 +102,14 @@ const mapToValidCategory = (aiCategory: string | undefined): string => {
     }
   }
 
-  // Retornar a categoria original se não conseguirmos mapear
-  // Isso permitirá que o usuário veja a categoria detectada pela IA e escolha uma apropriada
-  return aiCategory;
+  // Tentar obter uma categoria a partir da descrição
+  const categoryByDescription = getCategoryByKeyword(description);
+  if (categoryByDescription) {
+    return categoryByDescription.id;
+  }
+
+  // Usar nossa função de determinação de categoria como último recurso
+  return determineBestCategory(description, amount, type);
 };
 
 export const bankStatementService = {
@@ -113,8 +122,23 @@ export const bankStatementService = {
       if (response.error) {
         throw new Error(response.error.message || 'Erro ao analisar extrato bancário');
       }
+      
+      // Obter transações do resultado
+      const extractedTransactions = response.data.transactions || [];
+      
+      // Aplicar um mapeamento melhorado das categorias para cada transação
+      const enhancedTransactions = extractedTransactions.map((tx: ExtractedTransaction) => {
+        // Tentar obter uma categoria válida para esta transação
+        const mappedCategory = mapToValidCategory(tx.category, tx.description, tx.amount, tx.type);
+        
+        return {
+          ...tx,
+          category: mappedCategory,
+          selected: true  // Todas são selecionadas por padrão
+        };
+      });
 
-      return response.data.transactions || [];
+      return enhancedTransactions || [];
     } catch (error: any) {
       console.error("Erro ao extrair transações:", error);
       throw new Error(error.message || "Não foi possível extrair transações do extrato");
@@ -134,12 +158,18 @@ export const bankStatementService = {
 
     // Converter para o formato de transação do sistema com validação de categoria
     const transactionsToInsert = selectedTransactions.map(tx => {
-      // Tentar mapear para uma categoria válida, mas não forçar
+      // Tentar mapear para uma categoria válida
       let categoryToUse = tx.category;
       
-      // Se a categoria não for válida, deixar sem categoria (null)
-      if (categoryToUse && !validCategories.includes(categoryToUse)) {
-        categoryToUse = null;
+      // Se a categoria não for válida, tentar obter uma a partir da descrição
+      if (!categoryToUse || !validCategories.includes(categoryToUse)) {
+        const categoryByDescription = getCategoryByKeyword(tx.description);
+        if (categoryByDescription) {
+          categoryToUse = categoryByDescription.id;
+        } else {
+          // Se não conseguirmos, usar nossa função de determinação de melhor categoria
+          categoryToUse = determineBestCategory(tx.description, tx.amount, tx.type);
+        }
       }
 
       return {

@@ -38,6 +38,12 @@ export const ConfirmTransactionsDialog: React.FC<ConfirmTransactionsDialogProps>
   const hasInvalidCategories = transactions
     .filter(tx => tx.selected)
     .some(tx => !tx.category || !transactionCategories.some(cat => cat.id === tx.category));
+    
+  // Contar categorias inválidas
+  const invalidCategoriesCount = transactions
+    .filter(tx => tx.selected)
+    .filter(tx => !tx.category || !transactionCategories.some(cat => cat.id === tx.category))
+    .length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -51,7 +57,7 @@ export const ConfirmTransactionsDialog: React.FC<ConfirmTransactionsDialogProps>
             {hasInvalidCategories && (
               <div className="flex items-center gap-2 mt-2 text-amber-600">
                 <AlertCircle className="h-4 w-4" />
-                <span>Existem categorias que precisam ser revisadas (destacadas em vermelho)</span>
+                <span>{invalidCategoriesCount} {invalidCategoriesCount === 1 ? 'categoria precisa' : 'categorias precisam'} de revisão</span>
               </div>
             )}
           </DialogDescription>
@@ -93,7 +99,7 @@ export const ConfirmTransactionsDialog: React.FC<ConfirmTransactionsDialogProps>
             {hasInvalidCategories ? (
               <span className="flex items-center text-amber-600">
                 <AlertCircle className="h-4 w-4 mr-1" />
-                Categorias inválidas serão importadas sem categoria
+                {invalidCategoriesCount} {invalidCategoriesCount === 1 ? 'categoria será importada' : 'categorias serão importadas'} sem categorização correta
               </span>
             ) : (
               <span>Todas as categorias estão válidas</span>

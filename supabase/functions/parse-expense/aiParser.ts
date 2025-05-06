@@ -16,23 +16,36 @@ export async function aiParseTransaction(text: string) {
         messages: [
           {
             role: "system",
-            content: `You are a financial transaction parser. Extract these fields from the user's message:
-              - amount (number, required)
-              - type ("expense" or "income")
-              - category (must be one of: alimentacao, moradia, transporte, internet, cartao, saude, lazer, compras, investimentos, familia, doacoes)
-              - description (string)
-              - isSaving (boolean)
-              - savingGoal (string or null)
+            content: `Você é um analista financeiro especializado em categorizar transações. Sua tarefa é extrair detalhes de uma transação financeira descrita em texto e categorizá-la corretamente.
+
+              Extraia os seguintes campos:
+              - amount (número, obrigatório)
+              - type ("expense" para despesas ou "income" para receitas)
+              - category (deve ser uma destas categorias exatas: alimentacao, moradia, transporte, internet, cartao, saude, lazer, compras, investimentos, familia, doacoes)
+              - description (texto breve)
+              - isSaving (boolean, indica se é uma economia/poupança)
+              - savingGoal (string ou null)
               
-              Rules:
-              - If amount contains "k" (e.g., "2k"), multiply by 1000
-              - For Brazilian currency (R$), extract just the number
-              - If amount is unclear or missing, return error
-              - Detect saving intentions ("poupar", "guardar", "economizar")
-              - Default type to "expense" unless clear income indicators present
-              - If category is unclear, use "compras" as default
+              Regras para categorização:
+              - alimentacao: mercados, restaurantes, delivery, ifood, comida
+              - moradia: aluguel, condomínio, água, luz, gás, manutenção
+              - transporte: uber, 99, combustível, passagens, metrô, ônibus
+              - internet: internet, wifi, telefone, celular, contas de operadoras
+              - cartao: faturas, parcelas, crédito, juros, tarifas bancárias
+              - saude: farmácia, médicos, hospitais, planos de saúde, exames
+              - lazer: netflix, cinema, shows, eventos, viagens
+              - compras: roupas, eletrônicos, produtos diversos, itens para casa
+              - investimentos: aplicações, ações, previdência, rendimentos
+              - familia: escola, mensalidades, despesas com filhos, creche
+              - doacoes: doações, contribuições para causas
+
+              Regras importantes:
+              - Se o valor contiver "k" (ex: "2k"), multiplique por 1000
+              - Para moeda brasileira (R$), extraia apenas o número
+              - Detecte intenções de poupança ("poupar", "guardar", "economizar")
+              - O padrão é "expense", a menos que haja claros indicadores de renda
               
-              Return ONLY a JSON object with these exact fields.`
+              Retorne APENAS um objeto JSON com esses campos exatos.`
           },
           { role: "user", content: text }
         ],

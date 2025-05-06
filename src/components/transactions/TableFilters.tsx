@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -8,12 +9,14 @@ import type { TransactionFilters } from '@/hooks/useTransactionFilters';
 import ImportBankStatementButton from './ImportBankStatementButton';
 import { Filter } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 interface TableFiltersProps {
   filters: TransactionFilters;
   onFilterChange: (key: string, value: string) => void;
   onResetFilters: () => void;
   onTransactionsAdded: () => void;
 }
+
 const TableFilters: React.FC<TableFiltersProps> = ({
   filters,
   onFilterChange,
@@ -25,6 +28,7 @@ const TableFilters: React.FC<TableFiltersProps> = ({
   } = useTranslation();
   const [open, setOpen] = useState(false);
   const hasActiveFilters = filters.type !== 'all' || filters.category !== 'all' || filters.dateRange !== 'all' || !!filters.minAmount || !!filters.maxAmount;
+
   return <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Suas Transações</h3>
@@ -32,10 +36,14 @@ const TableFilters: React.FC<TableFiltersProps> = ({
         <div className="flex gap-2">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`flex items-center gap-2 ${hasActiveFilters ? 'border-primary text-primary' : ''}`}>
+              <Button 
+                variant={hasActiveFilters ? "outline" : "ghost"} 
+                size="sm" 
+                className={`flex items-center gap-2 ${hasActiveFilters ? 'border-primary text-primary font-medium' : ''}`}
+              >
                 <Filter className="h-4 w-4" />
                 Filtros
-                {hasActiveFilters}
+                {hasActiveFilters && <span className="text-xs bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center">!</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-96 p-4" align="end">
@@ -122,4 +130,5 @@ const TableFilters: React.FC<TableFiltersProps> = ({
       </div>
     </div>;
 };
+
 export default TableFilters;
