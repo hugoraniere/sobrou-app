@@ -60,11 +60,9 @@ const ChangePasswordSection: React.FC = () => {
         throw new Error('Senha atual incorreta');
       }
 
-      // Atualizar a senha e invalidar todas as sessões
+      // Atualizar a senha
       const { error } = await supabase.auth.updateUser({
         password: values.newPassword
-      }, {
-        invalidateAllSessions: true
       });
 
       if (error) throw error;

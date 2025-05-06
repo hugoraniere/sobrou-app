@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Transaction, TransactionService } from '@/services/transactions';
 import TransactionsTable from '@/components/TransactionsTable';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
+import BankStatementUpload from '@/components/transactions/BankStatementUpload';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -41,11 +43,14 @@ const Transactions = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t('transactions.title', 'Transações')}</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('transactions.title', 'Transações')}</h1>
         <p className="text-gray-600 mt-2">
           {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
         </p>
       </div>
+
+      {/* Componente de upload de extrato bancário */}
+      <BankStatementUpload onTransactionsAdded={handleTransactionUpdated} />
 
       <Card className="mb-8">
         <CardHeader>

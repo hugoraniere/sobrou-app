@@ -3,14 +3,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Settings, Bell } from 'lucide-react';
+import { Settings, Bell, Trash2 } from 'lucide-react';
 import { useAIChat } from '@/contexts/AIChatContext';
 import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
+import ResetAccountDataDialog from '@/components/settings/ResetAccountDataDialog';
 
 const PreferencesTab = () => {
   const { t } = useTranslation();
   const { isEnabled, toggleAIChat } = useAIChat();
+  const [isResetDialogOpen, setIsResetDialogOpen] = React.useState(false);
 
   return (
     <div className="grid gap-6">
@@ -63,6 +66,40 @@ const PreferencesTab = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Danger Zone - Reset Account Data */}
+      <Card className="border-red-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-500">
+            <Trash2 className="h-5 w-5" />
+            {t('settings.dangerZone', 'Zona de Perigo')}
+          </CardTitle>
+          <CardDescription>
+            {t('settings.dangerZoneDesc', 'Ações que podem causar perda de dados')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>{t('settings.resetAccountData', 'Resetar Dados da Conta')}</Label>
+              <p className="text-sm text-muted-foreground">
+                {t('settings.resetAccountDataDesc', 'Exclui todas as suas transações')}
+              </p>
+            </div>
+            <Button 
+              variant="destructive"
+              onClick={() => setIsResetDialogOpen(true)}
+            >
+              {t('settings.resetData', 'Resetar Dados')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <ResetAccountDataDialog 
+        open={isResetDialogOpen} 
+        onOpenChange={setIsResetDialogOpen} 
+      />
     </div>
   );
 };
