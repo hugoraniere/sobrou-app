@@ -3,9 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Transaction, TransactionService } from '@/services/transactions';
 import TransactionsTable from '@/components/TransactionsTable';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
-import BankStatementUpload from '@/components/transactions/BankStatementUpload';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -49,30 +47,17 @@ const Transactions = () => {
         </p>
       </div>
 
-      {/* Componente de upload de extrato bancário */}
-      <BankStatementUpload onTransactionsAdded={handleTransactionUpdated} />
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>{t('transactions.allTransactions', 'Todas as Transações')}</CardTitle>
-          <CardDescription>
-            {t('transactions.description', 'Visualize, edite e gerencie suas transações')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <TransactionsTable 
-              transactions={transactions} 
-              filters={filters}
-              onTransactionUpdated={handleTransactionUpdated}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {isLoading ? (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <TransactionsTable 
+          transactions={transactions} 
+          filters={filters}
+          onTransactionUpdated={handleTransactionUpdated}
+        />
+      )}
     </div>
   );
 };
