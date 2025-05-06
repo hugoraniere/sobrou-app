@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LockIcon } from 'lucide-react';
+import { LockIcon, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const passwordChangeSchema = z.object({
@@ -33,6 +33,9 @@ type FormValues = z.infer<typeof passwordChangeSchema>;
 const ChangePasswordSection: React.FC = () => {
   const { t } = useTranslation();
   const [isChanging, setIsChanging] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(passwordChangeSchema),
@@ -57,9 +60,11 @@ const ChangePasswordSection: React.FC = () => {
         throw new Error('Senha atual incorreta');
       }
 
-      // Atualizar a senha
+      // Atualizar a senha e invalidar todas as sessões
       const { error } = await supabase.auth.updateUser({
         password: values.newPassword
+      }, {
+        invalidateAllSessions: true
       });
 
       if (error) throw error;
@@ -110,13 +115,24 @@ const ChangePasswordSection: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('settings.currentPassword', 'Senha Atual')}</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="password" 
-                      placeholder="••••••••" 
-                      {...field} 
-                    />
-                  </FormControl>
+                  <div className="relative">
+                    <FormControl>
+                      <Input 
+                        type={showCurrentPassword ? "text" : "password"} 
+                        placeholder="••••••••" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    >
+                      {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -127,13 +143,24 @@ const ChangePasswordSection: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('settings.newPassword', 'Nova Senha')}</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="password" 
-                      placeholder="••••••••" 
-                      {...field} 
-                    />
-                  </FormControl>
+                  <div className="relative">
+                    <FormControl>
+                      <Input 
+                        type={showNewPassword ? "text" : "password"} 
+                        placeholder="••••••••" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -144,13 +171,24 @@ const ChangePasswordSection: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('settings.confirmPassword', 'Confirmar Nova Senha')}</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="password" 
-                      placeholder="••••••••" 
-                      {...field} 
-                    />
-                  </FormControl>
+                  <div className="relative">
+                    <FormControl>
+                      <Input 
+                        type={showConfirmPassword ? "text" : "password"} 
+                        placeholder="••••••••" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

@@ -59,6 +59,7 @@ serve(async (req) => {
         <h2>Olá ${userName},</h2>
         <p>Sua senha foi alterada com sucesso.</p>
         <p>Se você não realizou esta alteração, entre em contato com nosso suporte imediatamente.</p>
+        <p>Esta alteração desconectou todas as suas sessões ativas por razões de segurança.</p>
         <p>Atenciosamente,<br>Equipe Sobrou</p>
       `;
     } else if (type === 'reset') {

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Settings, Bell, Lock } from 'lucide-react';
+import { Settings, Bell } from 'lucide-react';
 import { useAIChat } from '@/contexts/AIChatContext';
 import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
 
@@ -33,30 +33,6 @@ const PreferencesTab = () => {
               </p>
             </div>
             <Switch checked={isEnabled} onCheckedChange={toggleAIChat} />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Security Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
-            {t('settings.security', 'Segurança')}
-          </CardTitle>
-          <CardDescription>
-            {t('settings.securityDesc', 'Gerencie as configurações de segurança')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>{t('settings.twoFactor', 'Autenticação em dois fatores')}</Label>
-              <p className="text-sm text-muted-foreground">
-                {t('settings.twoFactorDesc', 'Adicione uma camada extra de segurança')}
-              </p>
-            </div>
-            <Switch />
           </div>
         </CardContent>
       </Card>
