@@ -108,6 +108,9 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
 
       toast.success(`${selectedTransactions.length} transações importadas com sucesso!`);
       setShowConfirmDialog(false);
+      setExtractedTransactions([]);
+      setFileName(null);
+      setFileContent(null);
       onTransactionsAdded(); // Atualizar lista de transações
       
     } catch (error: any) {

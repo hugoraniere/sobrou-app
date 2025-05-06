@@ -1,101 +1,89 @@
 
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
+import { formatDate, formatCurrency } from '@/lib/utils';
+import { ExtractedTransaction } from '@/services/bankStatementService';
 import { Badge } from '@/components/ui/badge';
-import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-
-interface ExtractedTransaction {
-  date: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  category?: string;
-  selected?: boolean;
-}
+import { transactionCategories } from '@/data/categories';
 
 interface ExtractedTransactionsTableProps {
   transactions: ExtractedTransaction[];
   onToggleSelection: (index: number) => void;
 }
 
-export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProps> = ({ 
-  transactions, 
-  onToggleSelection 
+export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProps> = ({
+  transactions,
+  onToggleSelection,
 }) => {
-  const { t } = useTranslation();
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(parseISO(dateString), 'dd/MM/yyyy', { locale: ptBR });
-    } catch (error) {
-      console.error('Invalid date format:', dateString);
-      return dateString;
-    }
+  // Função para obter label de categoria pelo ID
+  const getCategoryName = (categoryId?: string): string => {
+    if (!categoryId) return 'Outros';
+    
+    const category = transactionCategories.find(c => c.id === categoryId);
+    return category ? category.name : categoryId;
   };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(amount);
-  };
-
-  if (transactions.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">{t('transactions.noTransactionsExtracted', 'Nenhuma transação extraída')}</p>
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="overflow-auto max-h-[500px] border rounded-lg">
+    <div className="border rounded-md">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-12"></TableHead>
-            <TableHead>{t('transactions.date', 'Data')}</TableHead>
-            <TableHead>{t('transactions.description', 'Descrição')}</TableHead>
-            <TableHead>{t('transactions.category', 'Categoria')}</TableHead>
-            <TableHead>{t('transactions.type', 'Tipo')}</TableHead>
-            <TableHead className="text-right">{t('transactions.amount', 'Valor')}</TableHead>
+            <TableHead className="w-[50px]"></TableHead>
+            <TableHead>Data</TableHead>
+            <TableHead>Descrição</TableHead>
+            <TableHead>Categoria</TableHead>
+            <TableHead>Tipo</TableHead>
+            <TableHead className="text-right">Valor</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {transactions.map((transaction, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Checkbox 
-                  checked={transaction.selected} 
-                  onCheckedChange={() => onToggleSelection(index)}
-                />
-              </TableCell>
-              <TableCell>{formatDate(transaction.date)}</TableCell>
-              <TableCell className="max-w-[200px] truncate">{transaction.description}</TableCell>
-              <TableCell>
-                {transaction.category ? (
-                  <Badge variant="outline">{transaction.category}</Badge>
-                ) : (
-                  <Badge variant="outline">outros</Badge>
-                )}
-              </TableCell>
-              <TableCell>
-                <Badge variant={transaction.type === 'income' ? 'success' : 'destructive'}>
-                  {transaction.type === 'income' 
-                    ? t('transactions.income', 'Receita') 
-                    : t('transactions.expense', 'Despesa')}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right font-medium">
-                <span className={transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}>
-                  {formatCurrency(transaction.amount)}
-                </span>
+          {transactions.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-4">
+                Nenhuma transação encontrada
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            transactions.map((tx, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Checkbox 
+                    checked={tx.selected} 
+                    onCheckedChange={() => onToggleSelection(index)}
+                  />
+                </TableCell>
+                <TableCell>{formatDate(tx.date)}</TableCell>
+                <TableCell className="max-w-[200px] truncate">
+                  <span title={tx.description}>
+                    {tx.description}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {tx.category ? (
+                    <Badge variant="outline" className="capitalize">
+                      {getCategoryName(tx.category)}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">Outros</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={tx.type === 'income' ? 'success' : 'destructive'}
+                    className="capitalize"
+                  >
+                    {tx.type === 'income' ? 'Receita' : 'Despesa'}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right font-mono">
+                  <span className={tx.type === 'income' ? 'text-green-600' : 'text-red-600'}>
+                    {formatCurrency(tx.amount)}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>
