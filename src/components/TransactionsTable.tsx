@@ -27,6 +27,8 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const {
     currentPage,
     setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
     transactionsState,
     setTransactionsState,
     getPaginatedTransactions,
@@ -84,7 +86,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   }, [transactionsState, filters]);
   
   const sortedFilteredTransactions = sortedTransactions(filteredTransactions);
-  const { paginatedTransactions, totalPages } = getPaginatedTransactions(sortedFilteredTransactions);
+  const { paginatedTransactions, totalPages, totalItems } = getPaginatedTransactions(sortedFilteredTransactions);
   
   const handleToggleRecurring = async (id: string, isRecurring: boolean) => {
     setTransactionsState(prevState => 
@@ -94,6 +96,10 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
           : transaction
       )
     );
+  };
+
+  const handleItemsPerPageChange = (value: number) => {
+    setItemsPerPage(value);
   };
   
   return (
@@ -112,10 +118,13 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
           filteredTransactions={filteredTransactions}
           paginatedTransactions={paginatedTransactions}
           totalPages={totalPages}
+          totalItems={totalItems}
           currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
           sortConfig={sortConfig}
           onSort={handleSort}
           onPageChange={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
           onToggleRecurring={handleToggleRecurring}
           formatDate={formatDate}
           onTransactionUpdated={onTransactionUpdated}

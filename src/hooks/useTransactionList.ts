@@ -1,23 +1,31 @@
+
 import { useState, useEffect } from 'react';
 import { Transaction } from '@/services/transactions';
 
 export const useTransactionList = (
   transactions: Transaction[],
-  itemsPerPage: number = 10
+  defaultItemsPerPage: number = 10
 ) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(defaultItemsPerPage);
   const [transactionsState, setTransactionsState] = useState<Transaction[]>(transactions);
   
   useEffect(() => {
     setTransactionsState(transactions);
   }, [transactions]);
+  
+  useEffect(() => {
+    // Reset to first page when items per page changes
+    setCurrentPage(1);
+  }, [itemsPerPage]);
 
   const getPaginatedTransactions = (sortedFilteredTransactions: Transaction[]) => {
     const totalPages = Math.ceil(sortedFilteredTransactions.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     return {
       paginatedTransactions: sortedFilteredTransactions.slice(startIndex, startIndex + itemsPerPage),
-      totalPages
+      totalPages,
+      totalItems: sortedFilteredTransactions.length
     };
   };
 
@@ -29,6 +37,8 @@ export const useTransactionList = (
   return {
     currentPage,
     setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
     transactionsState,
     setTransactionsState,
     getPaginatedTransactions,

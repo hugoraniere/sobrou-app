@@ -19,6 +19,7 @@ import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { transactionCategories } from '@/data/categories';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ 
   transaction, 
@@ -77,14 +78,20 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
 
   const handleValueChange = (field: keyof typeof editValues, value: any) => {
     setEditValues(prev => ({ ...prev, [field]: value }));
+    
+    // Auto-salvar para campos de seleção (data, tipo, categoria)
+    if (field === 'date' || field === 'type' || field === 'category') {
+      saveChange(field, value);
+    }
   };
 
-  const saveChange = async (field: keyof typeof isEditing) => {
+  const saveChange = async (field: keyof typeof isEditing, value?: any) => {
     try {
-      const updatedValue = field === 'date' 
-        ? editValues.date.toISOString().split('T')[0]
-        : editValues[field];
-        
+      const updatedValue = value !== undefined ? value : 
+        field === 'date' 
+          ? editValues.date.toISOString().split('T')[0]
+          : editValues[field];
+          
       await TransactionService.updateTransaction(transaction.id, {
         [field]: updatedValue
       });
@@ -104,30 +111,24 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     if (isEditing.date) {
       return (
         <TableCell className="min-w-[100px] whitespace-nowrap">
-          <div className="flex flex-col gap-2">
-            <TransactionDatePicker
-              date={editValues.date}
-              onDateChange={(date) => handleValueChange('date', date || new Date())}
-              className="h-9 w-full"
-            />
-            <div className="flex justify-end gap-1">
-              <Button 
-                size="icon" 
-                className="h-6 w-6" 
-                variant="ghost"
-                onClick={() => cancelEditing('date')}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="icon" 
-                className="h-6 w-6" 
-                onClick={() => saveChange('date')}
-              >
-                <Check className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <Popover open={true} onOpenChange={(open) => !open && cancelEditing('date')}>
+            <PopoverTrigger asChild>
+              <div className="h-9 w-full cursor-pointer bg-gray-50 px-3 py-2 rounded border border-gray-200 flex items-center">
+                {formatDate(transaction.date)}
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <TransactionDatePicker
+                date={editValues.date}
+                onDateChange={(date) => {
+                  if (date) {
+                    handleValueChange('date', date);
+                  }
+                }}
+                className="h-9 w-full hidden"
+              />
+            </PopoverContent>
+          </Popover>
         </TableCell>
       );
     }
@@ -145,37 +146,29 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     if (isEditing.type) {
       return (
         <TableCell className="min-w-[100px]">
-          <div className="flex flex-col gap-2">
-            <Select 
-              value={editValues.type} 
-              onValueChange={(value) => handleValueChange('type', value)}
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="income">Receita</SelectItem>
-                <SelectItem value="expense">Despesa</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex justify-end gap-1">
-              <Button 
-                size="icon" 
-                className="h-6 w-6" 
-                variant="ghost"
-                onClick={() => cancelEditing('type')}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="icon" 
-                className="h-6 w-6" 
-                onClick={() => saveChange('type')}
-              >
-                <Check className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <Popover open={true} onOpenChange={(open) => !open && cancelEditing('type')}>
+            <PopoverTrigger asChild>
+              <div className="cursor-pointer bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-0">
+              <div className="py-1">
+                <div 
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleValueChange('type', 'income')}
+                >
+                  Receita
+                </div>
+                <div 
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleValueChange('type', 'expense')}
+                >
+                  Despesa
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </TableCell>
       );
     }
@@ -193,43 +186,29 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     if (isEditing.category) {
       return (
         <TableCell className="min-w-[140px]">
-          <div className="flex flex-col gap-2">
-            <Select 
-              value={editValues.category} 
-              onValueChange={(value) => handleValueChange('category', value)}
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[300px]">
+          <Popover open={true} onOpenChange={(open) => !open && cancelEditing('category')}>
+            <PopoverTrigger asChild>
+              <div className="cursor-pointer bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                <TransactionCategoryCell category={transaction.category} />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-2" align="start">
+              <div className="grid grid-cols-2 gap-1 max-h-[300px] overflow-y-auto">
                 {transactionCategories.map(category => (
-                  <SelectItem key={category.id} value={category.id}>
-                    <div className="flex items-center gap-2">
+                  <div
+                    key={category.id}
+                    className="flex items-center space-x-2 rounded-md px-2 py-1 hover:bg-muted cursor-pointer"
+                    onClick={() => handleValueChange('category', category.id)}
+                  >
+                    <span className="flex h-5 w-5 items-center justify-center">
                       {category.icon && <category.icon className="h-4 w-4" />}
-                      <span>{category.name}</span>
-                    </div>
-                  </SelectItem>
+                    </span>
+                    <span className="text-sm">{category.name}</span>
+                  </div>
                 ))}
-              </SelectContent>
-            </Select>
-            <div className="flex justify-end gap-1">
-              <Button 
-                size="icon" 
-                className="h-6 w-6" 
-                variant="ghost"
-                onClick={() => cancelEditing('category')}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="icon" 
-                className="h-6 w-6" 
-                onClick={() => saveChange('category')}
-              >
-                <Check className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </TableCell>
       );
     }
@@ -247,16 +226,17 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     if (isEditing.description) {
       return (
         <TableCell className="max-w-[200px]">
-          <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-1">
             <Input
               value={editValues.description}
               onChange={(e) => handleValueChange('description', e.target.value)}
               className="h-9"
+              autoFocus
             />
-            <div className="flex justify-end gap-1">
+            <div className="flex">
               <Button 
                 size="icon" 
-                className="h-6 w-6" 
+                className="h-9 w-9" 
                 variant="ghost"
                 onClick={() => cancelEditing('description')}
               >
@@ -264,7 +244,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
               </Button>
               <Button 
                 size="icon" 
-                className="h-6 w-6" 
+                className="h-9 w-9" 
                 onClick={() => saveChange('description')}
               >
                 <Check className="h-4 w-4" />
@@ -299,17 +279,19 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     if (isEditing.amount) {
       return (
         <TableCell className="text-left whitespace-nowrap w-[160px]">
-          <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-1">
             <Input
               type="number"
+              step="0.01"
               value={editValues.amount}
               onChange={(e) => handleValueChange('amount', parseFloat(e.target.value))}
               className="h-9"
+              autoFocus
             />
-            <div className="flex justify-end gap-1">
+            <div className="flex">
               <Button 
                 size="icon" 
-                className="h-6 w-6" 
+                className="h-9 w-9" 
                 variant="ghost"
                 onClick={() => cancelEditing('amount')}
               >
@@ -317,7 +299,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
               </Button>
               <Button 
                 size="icon" 
-                className="h-6 w-6" 
+                className="h-9 w-9" 
                 onClick={() => saveChange('amount')}
               >
                 <Check className="h-4 w-4" />
@@ -337,10 +319,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
         )}>
           {transaction.type === 'income' ? '+' : '-'}
-          {`R$${transaction.amount.toLocaleString('pt-BR', { 
-            minimumFractionDigits: transaction.amount % 1 !== 0 ? 2 : 0,
-            maximumFractionDigits: 2
-          })}`}
+          {`R$${transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
         </div>
       </TableCell>
     );

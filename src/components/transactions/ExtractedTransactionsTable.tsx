@@ -45,8 +45,9 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
   const handleCategoryChange = (index: number, categoryId: string) => {
     if (onUpdateCategory) {
       onUpdateCategory(index, categoryId);
-      setEditingCategoryIndex(null);
     }
+    // Fechar o popover após selecionar a categoria
+    setEditingCategoryIndex(null);
   };
   
   return (
@@ -89,8 +90,8 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
                     <Popover 
                       open={editingCategoryIndex === index} 
                       onOpenChange={(open) => {
-                        if (!open) setEditingCategoryIndex(null);
-                        else if (open) setEditingCategoryIndex(index);
+                        if (open) setEditingCategoryIndex(index);
+                        else setEditingCategoryIndex(null);
                       }}
                     >
                       <PopoverTrigger asChild>

@@ -7,7 +7,7 @@ import { transactionCategories } from '@/data/categories';
 import { useTranslation } from 'react-i18next';
 import type { TransactionFilters } from '@/hooks/useTransactionFilters';
 import ImportBankStatementButton from './ImportBankStatementButton';
-import { Filter, X } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface TableFiltersProps {
@@ -42,15 +42,16 @@ const TableFilters: React.FC<TableFiltersProps> = ({
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button 
-                variant={hasActiveFilters ? "default" : "outline"} 
+                variant="outline" 
                 size="sm"
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${hasActiveFilters ? 'border-primary text-primary' : ''}`}
               >
                 <Filter className="h-4 w-4" />
                 Filtros
                 {hasActiveFilters && (
-                  <span className="bg-primary-foreground text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    !
+                  <span className="bg-gray-100 text-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                    {/* Ícone indicativo sem exclamação */}
+                    ✓
                   </span>
                 )}
               </Button>
@@ -68,7 +69,6 @@ const TableFilters: React.FC<TableFiltersProps> = ({
                     }}
                     className="h-8 px-2 text-sm"
                   >
-                    <X className="h-4 w-4 mr-1" />
                     Limpar
                   </Button>
                 </div>
@@ -124,7 +124,10 @@ const TableFilters: React.FC<TableFiltersProps> = ({
                         <SelectItem value="all">Todas as categorias</SelectItem>
                         {transactionCategories.map(category => (
                           <SelectItem key={category.id} value={category.id}>
-                            {category.name}
+                            <div className="flex items-center gap-2">
+                              {category.icon && <category.icon className="h-4 w-4" />}
+                              <span>{category.name}</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>

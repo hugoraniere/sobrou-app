@@ -12,10 +12,13 @@ interface TransactionTableContentProps {
   filteredTransactions: Transaction[];
   paginatedTransactions: Transaction[];
   totalPages: number;
+  totalItems: number;
   currentPage: number;
+  itemsPerPage: number;
   sortConfig: SortConfig;
   onSort: (key: keyof Transaction) => void;
   onPageChange: (page: number) => void;
+  onItemsPerPageChange: (value: number) => void;
   onToggleRecurring: (id: string, isRecurring: boolean) => void;
   formatDate: (dateString: string) => string;
   onTransactionUpdated: () => void;
@@ -25,10 +28,13 @@ const TransactionTableContent: React.FC<TransactionTableContentProps> = ({
   filteredTransactions,
   paginatedTransactions,
   totalPages,
+  totalItems,
   currentPage,
+  itemsPerPage,
   sortConfig,
   onSort,
   onPageChange,
+  onItemsPerPageChange,
   onToggleRecurring,
   formatDate,
   onTransactionUpdated,
@@ -59,7 +65,10 @@ const TransactionTableContent: React.FC<TransactionTableContentProps> = ({
       <TransactionPagination 
         currentPage={currentPage}
         totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
         onPageChange={onPageChange}
+        onItemsPerPageChange={onItemsPerPageChange}
       />
     </>
   );

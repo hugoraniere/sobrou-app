@@ -10,13 +10,8 @@ interface TransactionAmountCellProps {
 
 const TransactionAmountCell: React.FC<TransactionAmountCellProps> = ({ transaction }) => {
   const formatCurrency = (value: number) => {
-    const hasDecimals = value % 1 !== 0;
-    
-    if (hasDecimals) {
-      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    } else {
-      return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-    }
+    // Sempre formatar com 2 casas decimais, independente de ter decimais ou não
+    return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   return (
