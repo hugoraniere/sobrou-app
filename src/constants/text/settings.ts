@@ -17,6 +17,7 @@ export const SETTINGS_TEXT = {
   enableAIDesc: "Permite que a IA ajude com suas finanças",
   security: "Segurança",
   securityDesc: "Gerencie as configurações de segurança",
+  securityDescription: "Altere sua senha e gerencie informações de segurança",
   twoFactor: "Autenticação em dois fatores",
   twoFactorDesc: "Adicione uma camada extra de segurança",
   notifications: "Notificações",
@@ -41,5 +42,10 @@ export const SETTINGS_TEXT = {
   whatsappTips: "Como usar o WhatsApp",
   whatsappTip1: "Envie mensagens como \"Gastei R$50 no mercado\"",
   whatsappTip2: "Transações serão adicionadas automaticamente",
-  whatsappTip3: "Suporte a várias categorias de despesas"
+  whatsappTip3: "Suporte a várias categorias de despesas",
+  currentPassword: "Senha Atual",
+  newPassword: "Nova Senha",
+  confirmPassword: "Confirmar Nova Senha",
+  changePassword: "Alterar Senha",
+  passwordChanged: "Senha alterada com sucesso"
 };

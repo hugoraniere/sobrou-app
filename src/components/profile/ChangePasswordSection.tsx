@@ -64,6 +64,22 @@ const ChangePasswordSection: React.FC = () => {
 
       if (error) throw error;
 
+      // Enviar email de confirmação de alteração de senha
+      const userEmail = (await supabase.auth.getUser()).data.user?.email;
+      if (userEmail) {
+        try {
+          await supabase.functions.invoke('send-password-email', {
+            body: {
+              email: userEmail,
+              type: 'changed'
+            }
+          });
+        } catch (emailError) {
+          console.error('Erro ao enviar email de confirmação:', emailError);
+          // Não interrompe o fluxo se o email falhar
+        }
+      }
+
       toast.success('Senha atualizada com sucesso!');
       form.reset();
       
@@ -149,7 +165,6 @@ const ChangePasswordSection: React.FC = () => {
           </form>
         </Form>
       </CardContent>
-      {/* Card footer with "Forgot Password" button has been removed as requested */}
     </Card>
   );
 };

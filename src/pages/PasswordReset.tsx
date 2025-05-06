@@ -36,6 +36,7 @@ const PasswordReset: React.FC = () => {
   const { user } = useAuth();
   const [isResetting, setIsResetting] = useState(false);
   const [resetType, setResetType] = useState<'token' | 'logged-in'>('token');
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const form = useForm<{
     password: string;
@@ -56,9 +57,19 @@ const PasswordReset: React.FC = () => {
     
     if ((accessToken || tokenHash) && type === 'recovery') {
       setResetType('token');
-      // Aqui não terminamos a autenticação, apenas permitimos que o usuário defina a nova senha
+      
+      // Tentar obter o email do usuário a partir do token
+      const getEmailFromSession = async () => {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user?.email) {
+          setUserEmail(data.session.user.email);
+        }
+      };
+      
+      getEmailFromSession();
     } else if (user) {
       setResetType('logged-in');
+      setUserEmail(user.email);
     } else {
       // Se não há token de recuperação e nem usuário logado, redireciona para a autenticação
       navigate('/auth');
@@ -77,6 +88,21 @@ const PasswordReset: React.FC = () => {
 
         if (error) throw error;
 
+        // Enviar email de confirmação de redefinição de senha
+        if (userEmail) {
+          try {
+            await supabase.functions.invoke('send-password-email', {
+              body: {
+                email: userEmail,
+                type: 'reset'
+              }
+            });
+          } catch (emailError) {
+            console.error('Erro ao enviar email de confirmação:', emailError);
+            // Não interrompe o fluxo se o email falhar
+          }
+        }
+
         toast.success('Senha redefinida com sucesso!');
         navigate('/auth');
       } else {
@@ -86,6 +112,21 @@ const PasswordReset: React.FC = () => {
         });
 
         if (error) throw error;
+
+        // Enviar email de confirmação de alteração de senha
+        if (userEmail) {
+          try {
+            await supabase.functions.invoke('send-password-email', {
+              body: {
+                email: userEmail,
+                type: 'changed'
+              }
+            });
+          } catch (emailError) {
+            console.error('Erro ao enviar email de confirmação:', emailError);
+            // Não interrompe o fluxo se o email falhar
+          }
+        }
 
         toast.success('Senha atualizada com sucesso!');
         navigate('/settings');

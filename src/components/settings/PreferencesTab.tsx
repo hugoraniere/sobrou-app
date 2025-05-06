@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -5,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Settings, Bell, Lock } from 'lucide-react';
 import { useAIChat } from '@/contexts/AIChatContext';
+import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
 
 const PreferencesTab = () => {
   const { t } = useTranslation();
@@ -58,6 +60,9 @@ const PreferencesTab = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Change Password Section */}
+      <ChangePasswordSection />
 
       {/* Notification Settings */}
       <Card>
