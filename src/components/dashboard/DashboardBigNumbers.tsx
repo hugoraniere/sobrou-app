@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, DollarSign, Wallet } from 'lucide-react';
 import { Transaction } from '@/services/transactions';
 import BigNumberCard from './BigNumberCard';
 import { TEXT } from '@/constants/text';
+import { useNavigate } from 'react-router-dom';
 
 interface DashboardBigNumbersProps {
   transactions: Transaction[];
@@ -14,6 +15,8 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   transactions,
   totalSavings
 }) => {
+  const navigate = useNavigate();
+  
   // Calculate total income
   const totalIncome = transactions
     .filter(transaction => transaction.type === 'income')
@@ -26,6 +29,16 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   
   // Calculate balance
   const balance = totalIncome - totalExpenses;
+
+  // Navigate to transactions page with income filter
+  const navigateToIncome = () => {
+    navigate('/transactions', { state: { initialFilter: { type: 'income' } } });
+  };
+
+  // Navigate to transactions page with expense filter
+  const navigateToExpenses = () => {
+    navigate('/transactions', { state: { initialFilter: { type: 'expense' } } });
+  };
   
   return (
     <div className="flex flex-wrap gap-6">
@@ -36,6 +49,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
         color="#22c55e"
         trend={{ value: 5, isPositive: true }}
         tooltip={TEXT.dashboard.bigNumbers.monthlyIncomeTooltip}
+        onClick={navigateToIncome}
       />
       
       <BigNumberCard
@@ -45,6 +59,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
         color="#ef4444"
         trend={{ value: 3, isPositive: false }}
         tooltip={TEXT.dashboard.bigNumbers.monthlyExpensesTooltip}
+        onClick={navigateToExpenses}
       />
       
       <BigNumberCard

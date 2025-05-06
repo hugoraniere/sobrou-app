@@ -30,10 +30,10 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
     return <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity duration-200" />;
   };
 
-  const renderHeaderContent = (key: keyof Transaction, label: string) => (
+  const renderHeaderContent = (key: keyof Transaction, label: string, align: 'start' | 'center' | 'end' = 'start') => (
     <button
       onClick={() => onSort(key)}
-      className="flex items-center justify-start w-full gap-4 group cursor-pointer"
+      className={`flex items-center w-full gap-4 group cursor-pointer ${align === 'end' ? 'justify-end' : align === 'center' ? 'justify-center' : 'justify-start'}`}
     >
       <span>{label}</span>
       <span className={`inline-flex ${sortConfig.key === key ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}>
@@ -58,7 +58,7 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
           {renderHeaderContent('description', t('transactions.description', 'Descrição'))}
         </TableHead>
         <TableHead className="text-right w-[160px] whitespace-nowrap group">
-          {renderHeaderContent('amount', t('transactions.amount', 'Valor'))}
+          {renderHeaderContent('amount', t('transactions.amount', 'Valor'), 'end')}
         </TableHead>
         <TableHead className="w-[100px] text-center whitespace-nowrap">
           {t('transactions.actions', 'Ações')}
@@ -69,4 +69,3 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
 };
 
 export default TransactionTableHeader;
-

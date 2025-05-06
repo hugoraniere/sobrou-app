@@ -162,6 +162,7 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
         onSelectAll={handleSelectAll}
         onImport={handleImportTransactions}
         isProcessing={isProcessing}
+        onUpdateCategory={handleUpdateCategory}
       />
     </>
   );

@@ -170,6 +170,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         onSelectAll={handleSelectAll}
         onImport={handleImportTransactions}
         isProcessing={isProcessing}
+        onUpdateCategory={handleUpdateCategory}
       />
     </>
   );

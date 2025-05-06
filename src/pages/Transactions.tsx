@@ -5,17 +5,21 @@ import { Transaction, TransactionService } from '@/services/transactions';
 import TransactionsTable from '@/components/TransactionsTable';
 import { toast } from 'sonner';
 import AIPromptInput from '@/components/AIPromptInput';
+import { useLocation } from 'react-router-dom';
 
 const Transactions = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const initialFilter = location.state?.initialFilter || {};
+  
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({
-    category: '',
-    type: '',
-    dateRange: '',
-    minAmount: '',
-    maxAmount: '',
+    category: initialFilter.category || '',
+    type: initialFilter.type || '',
+    dateRange: initialFilter.dateRange || '',
+    minAmount: initialFilter.minAmount || '',
+    maxAmount: initialFilter.maxAmount || '',
   });
 
   const fetchTransactions = async () => {

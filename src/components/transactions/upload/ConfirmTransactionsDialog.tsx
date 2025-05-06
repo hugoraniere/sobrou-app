@@ -17,6 +17,7 @@ interface ConfirmTransactionsDialogProps {
   onSelectAll: (selected: boolean) => void;
   onImport: () => void;
   isProcessing: boolean;
+  onUpdateCategory?: (index: number, newCategory: string) => void;
 }
 
 export const ConfirmTransactionsDialog: React.FC<ConfirmTransactionsDialogProps> = ({
@@ -27,6 +28,7 @@ export const ConfirmTransactionsDialog: React.FC<ConfirmTransactionsDialogProps>
   onSelectAll,
   onImport,
   isProcessing,
+  onUpdateCategory,
 }) => {
   const { t } = useTranslation();
 
@@ -36,17 +38,6 @@ export const ConfirmTransactionsDialog: React.FC<ConfirmTransactionsDialogProps>
   const hasInvalidCategories = transactions
     .filter(tx => tx.selected)
     .some(tx => !tx.category || !transactionCategories.some(cat => cat.id === tx.category));
-
-  // Handler para atualizar a categoria de uma transação
-  const handleUpdateCategory = (index: number, newCategory: string) => {
-    const updatedTransactions = [...transactions];
-    updatedTransactions[index] = {
-      ...updatedTransactions[index],
-      category: newCategory
-    };
-    // Como não podemos mutar diretamente transactions, vamos notificar o componente pai
-    // Isso seria implementado no BankStatementUpload.tsx
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,11 +79,13 @@ export const ConfirmTransactionsDialog: React.FC<ConfirmTransactionsDialogProps>
             </Button>
           </div>
           
-          <ExtractedTransactionsTable
-            transactions={transactions}
-            onToggleSelection={onToggleSelection}
-            onUpdateCategory={handleUpdateCategory}
-          />
+          <div className="max-h-[50vh] overflow-auto">
+            <ExtractedTransactionsTable
+              transactions={transactions}
+              onToggleSelection={onToggleSelection}
+              onUpdateCategory={onUpdateCategory}
+            />
+          </div>
         </div>
 
         <div className="flex justify-between items-center space-x-2 mt-4">
