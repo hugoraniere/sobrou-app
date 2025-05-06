@@ -1,21 +1,32 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import { ExtractedTransaction } from '@/services/bankStatementService';
 import { Badge } from '@/components/ui/badge';
 import { transactionCategories } from '@/data/categories';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Check, Edit2, AlertCircle } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface ExtractedTransactionsTableProps {
   transactions: ExtractedTransaction[];
   onToggleSelection: (index: number) => void;
+  onUpdateCategory?: (index: number, newCategory: string) => void;
 }
 
 export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProps> = ({
   transactions,
   onToggleSelection,
+  onUpdateCategory,
 }) => {
+  const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
+  
   // Função para obter label de categoria pelo ID
   const getCategoryName = (categoryId?: string): string => {
     if (!categoryId) return 'Outros';
@@ -23,11 +34,25 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
     const category = transactionCategories.find(c => c.id === categoryId);
     return category ? category.name : categoryId;
   };
+
+  // Verificar se uma categoria é válida no sistema
+  const isCategoryValid = (categoryId?: string): boolean => {
+    if (!categoryId) return false;
+    return transactionCategories.some(c => c.id === categoryId);
+  };
+  
+  // Função para alterar a categoria de uma transação
+  const handleCategoryChange = (index: number, categoryId: string) => {
+    if (onUpdateCategory) {
+      onUpdateCategory(index, categoryId);
+    }
+    setEditingCategoryIndex(null);
+  };
   
   return (
-    <div className="border rounded-md">
+    <ScrollArea className="h-[400px] border rounded-md">
       <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 bg-white z-10">
           <TableRow>
             <TableHead className="w-[50px]"></TableHead>
             <TableHead>Data</TableHead>
@@ -46,7 +71,7 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
             </TableRow>
           ) : (
             transactions.map((tx, index) => (
-              <TableRow key={index}>
+              <TableRow key={index} className={!isCategoryValid(tx.category) ? "bg-amber-50" : ""}>
                 <TableCell>
                   <Checkbox 
                     checked={tx.selected} 
@@ -60,13 +85,49 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
                   </span>
                 </TableCell>
                 <TableCell>
-                  {tx.category ? (
-                    <Badge variant="outline" className="capitalize">
-                      {getCategoryName(tx.category)}
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline">Outros</Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Popover open={editingCategoryIndex === index} onOpenChange={(open) => {
+                      if (!open) setEditingCategoryIndex(null);
+                    }}>
+                      <PopoverTrigger asChild>
+                        <Badge 
+                          variant={isCategoryValid(tx.category) ? "outline" : "destructive"} 
+                          className="capitalize cursor-pointer hover:bg-gray-100"
+                          onClick={() => setEditingCategoryIndex(index)}
+                        >
+                          {getCategoryName(tx.category)}
+                          {!isCategoryValid(tx.category) && (
+                            <AlertCircle className="h-3 w-3 ml-1" />
+                          )}
+                        </Badge>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64 p-1" align="start">
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium px-2 pt-1">
+                            Selecione uma categoria:
+                          </p>
+                          <div className="grid grid-cols-2 gap-1 p-1 max-h-[200px] overflow-y-auto">
+                            {transactionCategories.map((category) => (
+                              <div
+                                key={category.id}
+                                className="flex items-center space-x-2 rounded-md px-2 py-1 hover:bg-muted cursor-pointer"
+                                onClick={() => handleCategoryChange(index, category.id)}
+                              >
+                                <span className="flex h-5 w-5 items-center justify-center">
+                                  {category.icon && <category.icon className="h-4 w-4" />}
+                                </span>
+                                <span className="text-sm">{category.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <Edit2 
+                      className="h-4 w-4 text-gray-400 hover:text-gray-700 cursor-pointer" 
+                      onClick={() => setEditingCategoryIndex(index)}
+                    />
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Badge 
@@ -86,6 +147,6 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
           )}
         </TableBody>
       </Table>
-    </div>
+    </ScrollArea>
   );
 };

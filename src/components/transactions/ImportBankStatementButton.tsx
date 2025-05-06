@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { FileText, Upload } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRef } from 'react';
 import { usePdfExtractor } from '@/hooks/usePdfExtractor';
@@ -94,6 +94,14 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
   const handleSelectAll = (selected: boolean) => {
     setExtractedTransactions(prev => 
       prev.map(tx => ({ ...tx, selected }))
+    );
+  };
+  
+  const handleUpdateCategory = (index: number, newCategory: string) => {
+    setExtractedTransactions(prev => 
+      prev.map((tx, i) => 
+        i === index ? { ...tx, category: newCategory } : tx
+      )
     );
   };
 

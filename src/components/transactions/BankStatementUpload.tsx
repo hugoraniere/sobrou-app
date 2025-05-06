@@ -90,6 +90,14 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
       prev.map(tx => ({ ...tx, selected }))
     );
   };
+  
+  const handleUpdateCategory = (index: number, newCategory: string) => {
+    setExtractedTransactions(prev => 
+      prev.map((tx, i) => 
+        i === index ? { ...tx, category: newCategory } : tx
+      )
+    );
+  };
 
   const handleImportTransactions = async () => {
     try {

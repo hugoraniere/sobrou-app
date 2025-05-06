@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Transaction, TransactionService } from '@/services/transactions';
 import TransactionsTable from '@/components/TransactionsTable';
 import { toast } from 'sonner';
+import AIPromptInput from '@/components/AIPromptInput';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -46,6 +47,11 @@ const Transactions = () => {
           {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
         </p>
       </div>
+
+      <AIPromptInput 
+        onTransactionAdded={handleTransactionUpdated}
+        onSavingAdded={handleTransactionUpdated}
+      />
 
       {isLoading ? (
         <div className="flex justify-center py-8">

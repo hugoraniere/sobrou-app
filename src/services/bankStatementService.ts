@@ -98,8 +98,9 @@ const mapToValidCategory = (aiCategory: string | undefined): string => {
     }
   }
 
-  // Se ainda não encontrou, retorna a categoria padrão
-  return 'compras';
+  // Retornar a categoria original se não conseguirmos mapear
+  // Isso permitirá que o usuário veja a categoria detectada pela IA e escolha uma apropriada
+  return aiCategory;
 };
 
 export const bankStatementService = {
@@ -133,12 +134,12 @@ export const bankStatementService = {
 
     // Converter para o formato de transação do sistema com validação de categoria
     const transactionsToInsert = selectedTransactions.map(tx => {
-      // Mapear a categoria da IA para uma categoria válida do sistema
-      const mappedCategory = mapToValidCategory(tx.category);
+      // Tentar mapear para uma categoria válida, mas não forçar
+      let categoryToUse = tx.category;
       
-      // Verificar se a categoria mapeada é válida
-      if (!validCategories.includes(mappedCategory)) {
-        console.warn(`Categoria inválida '${tx.category}' mapeada para '${mappedCategory}', usando 'compras' como fallback`);
+      // Se a categoria não for válida, deixar sem categoria (null)
+      if (categoryToUse && !validCategories.includes(categoryToUse)) {
+        categoryToUse = null;
       }
 
       return {
@@ -147,7 +148,7 @@ export const bankStatementService = {
         description: tx.description,
         amount: tx.amount,
         type: tx.type,
-        category: mappedCategory // Usamos a categoria mapeada
+        category: categoryToUse || 'compras' // Usar compras como fallback se for null
       };
     });
 
@@ -163,11 +164,6 @@ export const bankStatementService = {
       }
     } catch (error: any) {
       console.error("Detalhes do erro:", error);
-      
-      // Fornecer mensagem de erro mais específica
-      if (error.message && error.message.includes("violates check constraint")) {
-        throw new Error("Erro: Uma ou mais categorias não são válidas. Verifique as categorias e tente novamente.");
-      }
       throw error;
     }
   }
