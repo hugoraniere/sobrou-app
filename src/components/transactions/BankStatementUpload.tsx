@@ -1,31 +1,17 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Upload, FileText, Check, X } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { ExtractedTransactionsTable } from './ExtractedTransactionsTable';
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Importante: Definir o worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-
-// Interface para a transação extraída
-interface ExtractedTransaction {
-  date: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  category?: string;
-  selected?: boolean;
-}
+import { FileUploadArea } from './upload/FileUploadArea';
+import { ConfirmTransactionsDialog } from './upload/ConfirmTransactionsDialog';
+import { usePdfExtractor } from '@/hooks/usePdfExtractor';
+import { bankStatementService, ExtractedTransaction } from '@/services/bankStatementService';
 
 const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ onTransactionsAdded }) => {
   const { t } = useTranslation();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { extractTextFromPDF } = usePdfExtractor();
   
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -33,37 +19,13 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
   const [extractedTransactions, setExtractedTransactions] = useState<ExtractedTransaction[]>([]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  
-  // Função para extrair texto de um arquivo PDF
-  const extractTextFromPDF = async (file: File): Promise<string> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Ler o arquivo como ArrayBuffer
-        const arrayBuffer = await file.arrayBuffer();
-        
-        // Carregar o PDF usando pdfjs
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        
-        let fullText = '';
-        
-        // Extrair texto de todas as páginas
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          
-          // Concatenar o texto de todos os itens
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(' ');
-            
-          fullText += pageText + '\n';
-        }
-        
-        resolve(fullText);
-      } catch (error) {
-        console.error("Erro ao extrair texto do PDF:", error);
-        reject(error);
-      }
+
+  const readFileAsText = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('Falha ao ler o arquivo'));
+      reader.readAsText(file);
     });
   };
 
@@ -95,7 +57,7 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
       toast.info("Analisando extrações bancárias com IA...");
       
       // Analisar o conteúdo do extrato com a IA
-      const extractedData = await extractTransactionsFromContent(text);
+      const extractedData = await bankStatementService.extractTransactionsFromContent(text);
       
       if (!extractedData || extractedData.length === 0) {
         throw new Error("Não foi possível identificar transações no extrato. Tente com outro formato de arquivo.");
@@ -112,36 +74,6 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
       toast.error(error.message || "Erro ao processar arquivo");
     } finally {
       setIsUploading(false);
-      // Limpar o input para permitir o upload do mesmo arquivo novamente
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const readFileAsText = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error('Falha ao ler o arquivo'));
-      reader.readAsText(file);
-    });
-  };
-
-  const extractTransactionsFromContent = async (content: string): Promise<ExtractedTransaction[]> => {
-    try {
-      const response = await supabase.functions.invoke('parse-bank-statement', {
-        body: { textContent: content }
-      });
-      
-      if (response.error) {
-        throw new Error(response.error.message || 'Erro ao analisar extrato bancário');
-      }
-
-      return response.data.transactions || [];
-    } catch (error: any) {
-      console.error("Erro ao extrair transações:", error);
-      throw new Error(error.message || "Não foi possível extrair transações do extrato");
     }
   };
 
@@ -172,31 +104,7 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
         return;
       }
       
-      // Obter usuário atual
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error("Usuário não autenticado");
-      }
-
-      // Converter para o formato de transação do sistema
-      const transactionsToInsert = selectedTransactions.map(tx => ({
-        user_id: user.id,
-        date: tx.date,
-        description: tx.description,
-        amount: tx.amount,
-        type: tx.type,
-        category: tx.category || 'outros'
-      }));
-
-      // Inserir transações no banco
-      const { error } = await supabase
-        .from('transactions')
-        .insert(transactionsToInsert);
-
-      if (error) {
-        throw error;
-      }
+      await bankStatementService.importTransactions(selectedTransactions);
 
       toast.success(`${selectedTransactions.length} transações importadas com sucesso!`);
       setShowConfirmDialog(false);
@@ -223,112 +131,27 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept=".pdf,.txt,.csv"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            
-            {fileName ? (
-              <div className="flex flex-col items-center">
-                <FileText className="h-10 w-10 text-blue-500 mb-2" />
-                <p className="font-medium">{fileName}</p>
-                <div className="mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setFileName(null);
-                      setFileContent(null);
-                    }}
-                    className="mr-2"
-                  >
-                    {t('common.cancel', 'Cancelar')}
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                <p className="text-lg font-medium mb-1">
-                  {t('transactions.uploadFile', 'Arraste seu arquivo ou clique para selecionar')}
-                </p>
-                <p className="text-sm text-gray-500 mb-4">
-                  {t('transactions.supportedFormats', 'PDF, TXT e CSV')}
-                </p>
-                <Button 
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                >
-                  {isUploading ? 
-                    t('common.uploading', 'Enviando...') : 
-                    t('transactions.selectFile', 'Selecionar Arquivo')}
-                </Button>
-              </div>
-            )}
-          </div>
+          <FileUploadArea 
+            fileName={fileName}
+            isUploading={isUploading}
+            onFileSelect={handleFileChange}
+            onCancel={() => {
+              setFileName(null);
+              setFileContent(null);
+            }}
+          />
         </CardContent>
       </Card>
 
-      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>
-              {t('transactions.reviewExtractedTransactions', 'Revisar Transações Extraídas')}
-            </DialogTitle>
-            <DialogDescription>
-              {t('transactions.selectTransactionsToImport', 'Selecione as transações que deseja importar')}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="my-4">
-            <div className="flex justify-end mb-2 space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleSelectAll(true)}
-                className="text-xs"
-              >
-                <Check className="h-3 w-3 mr-1" />
-                {t('common.selectAll', 'Selecionar Todos')}
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleSelectAll(false)}
-                className="text-xs"
-              >
-                <X className="h-3 w-3 mr-1" />
-                {t('common.deselectAll', 'Desselecionar Todos')}
-              </Button>
-            </div>
-            
-            <ExtractedTransactionsTable
-              transactions={extractedTransactions}
-              onToggleSelection={handleToggleSelection}
-            />
-          </div>
-
-          <div className="flex justify-end space-x-2 mt-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowConfirmDialog(false)}
-            >
-              {t('common.cancel', 'Cancelar')}
-            </Button>
-            <Button 
-              onClick={handleImportTransactions} 
-              disabled={isProcessing || !extractedTransactions.some(tx => tx.selected)}
-            >
-              {isProcessing ? 
-                t('common.processing', 'Processando...') : 
-                t('transactions.importSelectedTransactions', 'Importar Selecionados')}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ConfirmTransactionsDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        transactions={extractedTransactions}
+        onToggleSelection={handleToggleSelection}
+        onSelectAll={handleSelectAll}
+        onImport={handleImportTransactions}
+        isProcessing={isProcessing}
+      />
     </>
   );
 };
