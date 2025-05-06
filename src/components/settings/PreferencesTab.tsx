@@ -5,14 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Settings, Bell, Trash2 } from 'lucide-react';
+import { Settings, Bell, Trash2, MessageCircle } from 'lucide-react';
 import { useAIChat } from '@/contexts/AIChatContext';
+import { useWhatsAppButton } from '@/contexts/WhatsAppButtonContext';
 import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
 import ResetAccountDataDialog from '@/components/settings/ResetAccountDataDialog';
+import { SETTINGS_TEXT } from '@/constants/text/settings';
 
 const PreferencesTab = () => {
   const { t } = useTranslation();
   const { isEnabled, toggleAIChat } = useAIChat();
+  const { isWhatsAppButtonEnabled, toggleWhatsAppButton } = useWhatsAppButton();
   const [isResetDialogOpen, setIsResetDialogOpen] = React.useState(false);
 
   return (
@@ -21,21 +24,31 @@ const PreferencesTab = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            {t('settings.chatPreferences', 'Preferências de Chat')}
+            {t('settings.chatPreferences', SETTINGS_TEXT.chatPreferences)}
           </CardTitle>
           <CardDescription>
-            {t('settings.chatPreferencesDesc', 'Configure suas preferências de chat')}
+            {t('settings.chatPreferencesDesc', SETTINGS_TEXT.chatPreferencesDesc)}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>{t('settings.enableAI', 'Ativar IA')}</Label>
+              <Label>{t('settings.enableAI', SETTINGS_TEXT.enableAI)}</Label>
               <p className="text-sm text-muted-foreground">
-                {t('settings.enableAIDesc', 'Permite que a IA ajude com suas finanças')}
+                {t('settings.enableAIDesc', SETTINGS_TEXT.enableAIDesc)}
               </p>
             </div>
             <Switch checked={isEnabled} onCheckedChange={toggleAIChat} />
+          </div>
+          
+          <div className="flex items-center justify-between border-t pt-4">
+            <div className="space-y-0.5">
+              <Label>{t('settings.showWhatsAppButton', 'Exibir Botão do WhatsApp')}</Label>
+              <p className="text-sm text-muted-foreground">
+                {t('settings.showWhatsAppButtonDesc', 'Exibe o botão flutuante do WhatsApp na aplicação')}
+              </p>
+            </div>
+            <Switch checked={isWhatsAppButtonEnabled} onCheckedChange={toggleWhatsAppButton} />
           </div>
         </CardContent>
       </Card>

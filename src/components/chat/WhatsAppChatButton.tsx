@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useWhatsAppButton } from '@/contexts/WhatsAppButtonContext';
 
 interface WhatsAppChatButtonProps {
   className?: string;
@@ -13,6 +14,7 @@ interface WhatsAppChatButtonProps {
 
 const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) => {
   const { user } = useAuth();
+  const { isWhatsAppButtonEnabled } = useWhatsAppButton();
   const [hasWhatsApp, setHasWhatsApp] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const navigate = useNavigate();
@@ -71,7 +73,7 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
     }
   };
 
-  if (isLoading) return null;
+  if (isLoading || !isWhatsAppButtonEnabled) return null;
 
   return (
     <button

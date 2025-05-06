@@ -7,6 +7,7 @@ import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { AIChatProvider } from "./contexts/AIChatContext";
+import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
@@ -35,84 +36,86 @@ const App = () => {
             <AuthProvider>
               <AvatarProvider>
                 <AIChatProvider>
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path="/" element={<PublicLanding />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/verify" element={<EmailVerification />} />
-                    <Route path="/reset-password" element={<PasswordReset />} />
+                  <WhatsAppButtonProvider>
+                    <Routes>
+                      {/* Public routes */}
+                      <Route path="/" element={<PublicLanding />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/verify" element={<EmailVerification />} />
+                      <Route path="/reset-password" element={<PasswordReset />} />
+                      
+                      {/* Protected routes */}
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <Index />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      
+                      <Route
+                        path="/transactions"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <Transactions />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      
+                      <Route
+                        path="/goals"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <Goals />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      
+                      <Route
+                        path="/settings"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <Settings />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      
+                      <Route
+                        path="/whatsapp-integration"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <WhatsAppIntegration />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      
+                      <Route
+                        path="/financial-planning"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <FinancialPlanning />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
                     
-                    {/* Protected routes */}
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <ProtectedRoute>
-                          <AppLayout>
-                            <Index />
-                          </AppLayout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    
-                    <Route
-                      path="/transactions"
-                      element={
-                        <ProtectedRoute>
-                          <AppLayout>
-                            <Transactions />
-                          </AppLayout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    
-                    <Route
-                      path="/goals"
-                      element={
-                        <ProtectedRoute>
-                          <AppLayout>
-                            <Goals />
-                          </AppLayout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    
-                    <Route
-                      path="/settings"
-                      element={
-                        <ProtectedRoute>
-                          <AppLayout>
-                            <Settings />
-                          </AppLayout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    
-                    <Route
-                      path="/whatsapp-integration"
-                      element={
-                        <ProtectedRoute>
-                          <AppLayout>
-                            <WhatsAppIntegration />
-                          </AppLayout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    
-                    <Route
-                      path="/financial-planning"
-                      element={
-                        <ProtectedRoute>
-                          <AppLayout>
-                            <FinancialPlanning />
-                          </AppLayout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                  
-                  <WhatsAppChatButton />
+                    <WhatsAppChatButton />
+                  </WhatsAppButtonProvider>
                 </AIChatProvider>
               </AvatarProvider>
             </AuthProvider>

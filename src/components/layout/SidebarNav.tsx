@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -132,7 +133,7 @@ const SidebarNav = () => {
         <SidebarFooter>
           <Link to="/settings?tab=profile" className="p-4 border-t border-gray-200 hover:bg-gray-50 transition-colors">
             <div className={`flex items-center ${state === 'collapsed' ? 'justify-center' : ''}`}>
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-10 w-10 ring-2 ring-primary ring-offset-2">
                 {avatarUrl ? (
                   <AvatarImage src={avatarUrl} alt={userFullName} className="object-cover" />
                 ) : (

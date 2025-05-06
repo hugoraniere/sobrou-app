@@ -135,7 +135,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       />
       
       <Button
-        variant="outline"
+        variant="default"
         size="sm"
         className="flex items-center gap-2"
         onClick={() => fileInputRef.current?.click()}
