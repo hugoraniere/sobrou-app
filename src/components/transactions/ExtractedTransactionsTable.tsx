@@ -45,8 +45,8 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
   const handleCategoryChange = (index: number, categoryId: string) => {
     if (onUpdateCategory) {
       onUpdateCategory(index, categoryId);
+      setEditingCategoryIndex(null);
     }
-    setEditingCategoryIndex(null);
   };
   
   return (
@@ -59,7 +59,7 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
             <TableHead>Descrição</TableHead>
             <TableHead>Categoria</TableHead>
             <TableHead>Tipo</TableHead>
-            <TableHead className="text-right">Valor</TableHead>
+            <TableHead className="text-left">Valor</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -86,27 +86,31 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Popover open={editingCategoryIndex === index} onOpenChange={(open) => {
-                      if (!open) setEditingCategoryIndex(null);
-                    }}>
+                    <Popover 
+                      open={editingCategoryIndex === index} 
+                      onOpenChange={(open) => {
+                        if (!open) setEditingCategoryIndex(null);
+                        else if (open) setEditingCategoryIndex(index);
+                      }}
+                    >
                       <PopoverTrigger asChild>
                         <Badge 
                           variant={isCategoryValid(tx.category) ? "outline" : "destructive"} 
-                          className="capitalize cursor-pointer hover:bg-gray-100"
-                          onClick={() => setEditingCategoryIndex(index)}
+                          className="capitalize cursor-pointer hover:bg-gray-100 flex items-center gap-1"
                         >
                           {getCategoryName(tx.category)}
                           {!isCategoryValid(tx.category) && (
                             <AlertCircle className="h-3 w-3 ml-1" />
                           )}
+                          <Edit2 className="h-3 w-3 text-gray-400" />
                         </Badge>
                       </PopoverTrigger>
-                      <PopoverContent className="w-64 p-1" align="start">
+                      <PopoverContent className="w-64 p-3" align="start">
                         <div className="space-y-2">
-                          <p className="text-sm font-medium px-2 pt-1">
+                          <p className="text-sm font-medium">
                             Selecione uma categoria:
                           </p>
-                          <div className="grid grid-cols-2 gap-1 p-1 max-h-[200px] overflow-y-auto">
+                          <div className="grid grid-cols-2 gap-1 max-h-[200px] overflow-y-auto">
                             {transactionCategories.map((category) => (
                               <div
                                 key={category.id}
@@ -123,10 +127,6 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
                         </div>
                       </PopoverContent>
                     </Popover>
-                    <Edit2 
-                      className="h-4 w-4 text-gray-400 hover:text-gray-700 cursor-pointer" 
-                      onClick={() => setEditingCategoryIndex(index)}
-                    />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -137,7 +137,7 @@ export const ExtractedTransactionsTable: React.FC<ExtractedTransactionsTableProp
                     {tx.type === 'income' ? 'Receita' : 'Despesa'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="text-left font-mono">
                   <span className={tx.type === 'income' ? 'text-green-600' : 'text-red-600'}>
                     {formatCurrency(tx.amount)}
                   </span>

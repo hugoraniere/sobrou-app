@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { FileText } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRef } from 'react';
 import { usePdfExtractor } from '@/hooks/usePdfExtractor';
@@ -143,7 +143,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       />
       
       <Button
-        variant="default"
+        variant="outline"
         size="sm"
         className="flex items-center gap-2"
         onClick={() => fileInputRef.current?.click()}
@@ -156,7 +156,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
           </>
         ) : (
           <>
-            <FileText className="h-4 w-4" />
+            <Upload className="h-4 w-4" />
             {t('transactions.importStatement', 'Importar Extrato')}
           </>
         )}

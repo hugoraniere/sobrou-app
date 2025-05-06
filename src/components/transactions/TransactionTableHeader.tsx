@@ -57,8 +57,8 @@ const TransactionTableHeader: React.FC<TransactionTableHeaderProps> = ({
         <TableHead className="min-w-[200px] group">
           {renderHeaderContent('description', t('transactions.description', 'Descrição'))}
         </TableHead>
-        <TableHead className="text-right w-[160px] whitespace-nowrap group">
-          {renderHeaderContent('amount', t('transactions.amount', 'Valor'), 'end')}
+        <TableHead className="text-left w-[160px] whitespace-nowrap group">
+          {renderHeaderContent('amount', t('transactions.amount', 'Valor'), 'start')}
         </TableHead>
         <TableHead className="w-[100px] text-center whitespace-nowrap">
           {t('transactions.actions', 'Ações')}

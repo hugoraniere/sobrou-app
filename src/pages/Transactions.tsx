@@ -6,6 +6,7 @@ import TransactionsTable from '@/components/TransactionsTable';
 import { toast } from 'sonner';
 import AIPromptInput from '@/components/AIPromptInput';
 import { useLocation } from 'react-router-dom';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -44,31 +45,33 @@ const Transactions = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">{t('transactions.title', 'Transações')}</h1>
-        <p className="text-gray-600 mt-2">
-          {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
-        </p>
-      </div>
-
-      <AIPromptInput 
-        onTransactionAdded={handleTransactionUpdated}
-        onSavingAdded={handleTransactionUpdated}
-      />
-
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    <TooltipProvider>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">{t('transactions.title', 'Transações')}</h1>
+          <p className="text-gray-600 mt-2">
+            {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
+          </p>
         </div>
-      ) : (
-        <TransactionsTable 
-          transactions={transactions} 
-          filters={filters}
-          onTransactionUpdated={handleTransactionUpdated}
+
+        <AIPromptInput 
+          onTransactionAdded={handleTransactionUpdated}
+          onSavingAdded={handleTransactionUpdated}
         />
-      )}
-    </div>
+
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <TransactionsTable 
+            transactions={transactions} 
+            filters={filters}
+            onTransactionUpdated={handleTransactionUpdated}
+          />
+        )}
+      </div>
+    </TooltipProvider>
   );
 };
 

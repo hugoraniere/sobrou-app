@@ -33,7 +33,7 @@ const InsightsList: React.FC<InsightsListProps> = ({ insights, isLoading, onRefr
     );
   }
 
-  // Sort insights by priority (lowest number = highest priority)
+  // Ordenar insights por prioridade (número mais baixo = prioridade mais alta)
   const sortedInsights = [...insights].sort((a, b) => a.priority - b.priority);
 
   return (

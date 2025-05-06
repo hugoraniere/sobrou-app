@@ -18,22 +18,22 @@ serve(async (req) => {
     if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
       return new Response(
         JSON.stringify({ 
-          error: 'No transactions provided or invalid format',
+          error: 'Nenhuma transação fornecida ou formato inválido',
           insights: [] 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
     
-    console.log(`Processing ${transactions.length} transactions for insights`)
+    console.log(`Processando ${transactions.length} transações para insights`)
 
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
     if (!OPENAI_API_KEY) {
-      console.error('Error: Missing OpenAI API key')
-      throw new Error('Missing OpenAI API key')
+      console.error('Erro: Chave da API OpenAI ausente')
+      throw new Error('Chave da API OpenAI ausente')
     }
 
-    // Calculate basic financial metrics for context
+    // Calcular métricas financeiras básicas para contexto
     const totalExpense = transactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0)
@@ -44,7 +44,7 @@ serve(async (req) => {
     
     const balance = totalIncome - totalExpense
     
-    // Group transactions by category for expense analysis
+    // Agrupar transações por categoria para análise de despesas
     const expensesByCategory = transactions
       .filter(t => t.type === 'expense')
       .reduce((acc, t) => {
@@ -52,12 +52,12 @@ serve(async (req) => {
         return acc
       }, {} as Record<string, number>)
     
-    // Sort categories by amount spent
+    // Ordenar categorias por valor gasto
     const topCategories = Object.entries(expensesByCategory)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
     
-    // Format transaction data for OpenAI
+    // Formatar dados de transação para OpenAI
     const transactionSummary = {
       totalExpense,
       totalIncome,
@@ -69,7 +69,7 @@ serve(async (req) => {
         .slice(0, 10)
     }
 
-    // Call OpenAI to generate insights
+    // Chamar OpenAI para gerar insights
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -81,26 +81,27 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a financial analyst AI that provides personalized insights based on transaction data. 
-            Generate 3-5 specific, actionable insights from the user's transaction data. 
-            Each insight should be categorized as one of: "warning", "opportunity", "pattern", "suggestion", or "achievement".
+            content: `Você é um analista financeiro IA que fornece insights personalizados baseados em dados de transações.
+            Gere de 3 a 5 insights específicos e acionáveis a partir dos dados de transações do usuário.
+            Cada insight deve ser categorizado como um dos seguintes: "warning" (aviso), "opportunity" (oportunidade), "pattern" (padrão), "suggestion" (sugestão) ou "achievement" (conquista).
             
-            Format the response as a JSON array of objects with the following structure:
+            Formate a resposta como um array JSON de objetos com a seguinte estrutura:
             [{
-              "title": "Brief attention-grabbing title",
-              "description": "Detailed explanation with specific amounts and percentages when relevant",
+              "title": "Título breve e chamativo",
+              "description": "Explicação detalhada com valores específicos e percentuais quando relevante",
               "category": "warning|opportunity|pattern|suggestion|achievement",
-              "priority": 1-5 (1 being highest priority)
+              "priority": 1-5 (1 sendo a maior prioridade)
             }]
             
-            Focus on:
-            1. Unusual spending patterns
-            2. Budget opportunities
-            3. Saving recommendations
-            4. Income/expense ratio
-            5. Category-specific insights
+            Foque em:
+            1. Padrões de gastos incomuns
+            2. Oportunidades de orçamento
+            3. Recomendações de economia
+            4. Relação receita/despesa
+            5. Insights específicos por categoria
             
-            Be very specific with numbers and actionable advice. Use the actual transaction data.`
+            IMPORTANTE: Todas as respostas DEVEM ser em português brasileiro.
+            Seja muito específico com números e conselhos acionáveis. Use os dados reais das transações.`
           },
           {
             role: 'user',
@@ -116,19 +117,19 @@ serve(async (req) => {
     const data = await response.json()
     
     if (data.error) {
-      console.error('OpenAI API error:', data.error)
-      throw new Error(`OpenAI API error: ${data.error.message || 'Unknown error'}`)
+      console.error('Erro na API OpenAI:', data.error)
+      throw new Error(`Erro na API OpenAI: ${data.error.message || 'Erro desconhecido'}`)
     }
     
-    console.log('Successfully generated insights')
+    console.log('Insights gerados com sucesso')
     
     let insights = []
     try {
       const content = data.choices[0].message.content
       insights = JSON.parse(content).insights || []
     } catch (error) {
-      console.error('Error parsing OpenAI response:', error)
-      throw new Error('Error parsing OpenAI response')
+      console.error('Erro ao analisar resposta da OpenAI:', error)
+      throw new Error('Erro ao analisar resposta da OpenAI')
     }
 
     return new Response(
@@ -137,10 +138,10 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error generating insights:', error)
+    console.error('Erro ao gerar insights:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Unknown error', 
+        error: error.message || 'Erro desconhecido', 
         insights: [] 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
