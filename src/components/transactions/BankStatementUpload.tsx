@@ -8,6 +8,10 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ExtractedTransactionsTable } from './ExtractedTransactionsTable';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Importante: Definir o worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 // Interface para a transação extraída
 interface ExtractedTransaction {
@@ -30,18 +34,38 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Referência para o worker de PDF
-  const pdfWorker = useRef<Worker | null>(null);
-
-  // Inicializa o worker do PDF.js (em um ambiente real, precisaríamos carregar a biblioteca PDF.js)
-  React.useEffect(() => {
-    return () => {
-      // Limpar o worker quando o componente for desmontado
-      if (pdfWorker.current) {
-        pdfWorker.current.terminate();
+  // Função para extrair texto de um arquivo PDF
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Ler o arquivo como ArrayBuffer
+        const arrayBuffer = await file.arrayBuffer();
+        
+        // Carregar o PDF usando pdfjs
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        
+        let fullText = '';
+        
+        // Extrair texto de todas as páginas
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          
+          // Concatenar o texto de todos os itens
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(' ');
+            
+          fullText += pageText + '\n';
+        }
+        
+        resolve(fullText);
+      } catch (error) {
+        console.error("Erro ao extrair texto do PDF:", error);
+        reject(error);
       }
-    };
-  }, []);
+    });
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,19 +75,38 @@ const BankStatementUpload: React.FC<{ onTransactionsAdded: () => void }> = ({ on
     setIsUploading(true);
 
     try {
-      // Para PDFs reais, usaríamos PDF.js, mas para o caso de exercício
-      // vamos simular lendo o arquivo como texto
-      const text = await readFileAsText(file);
+      let text = '';
+      
+      // Processar o arquivo de acordo com seu tipo
+      if (file.type === 'application/pdf') {
+        toast.info("Extraindo texto do PDF, aguarde...");
+        text = await extractTextFromPDF(file);
+      } else if (file.type === 'text/plain' || file.type === 'text/csv') {
+        text = await readFileAsText(file);
+      } else {
+        throw new Error("Formato de arquivo não suportado. Por favor, envie PDF, TXT ou CSV.");
+      }
+      
+      if (!text || text.trim().length === 0) {
+        throw new Error("Não foi possível extrair texto do arquivo. Tente com outro arquivo.");
+      }
+      
       setFileContent(text);
+      toast.info("Analisando extrações bancárias com IA...");
       
       // Analisar o conteúdo do extrato com a IA
       const extractedData = await extractTransactionsFromContent(text);
+      
+      if (!extractedData || extractedData.length === 0) {
+        throw new Error("Não foi possível identificar transações no extrato. Tente com outro formato de arquivo.");
+      }
       
       // Adicionar propriedade 'selected' para cada transação
       const transactionsWithSelection = extractedData.map(tx => ({ ...tx, selected: true }));
       
       setExtractedTransactions(transactionsWithSelection);
       setShowConfirmDialog(true);
+      toast.success("Extrato analisado com sucesso!");
     } catch (error: any) {
       console.error("Erro ao processar arquivo:", error);
       toast.error(error.message || "Erro ao processar arquivo");

@@ -34,6 +34,7 @@ serve(async (req) => {
     }
 
     console.log("Processando conteúdo do extrato bancário...");
+    console.log("Tamanho do conteúdo:", textContent.length);
     
     // Chamar a API da OpenAI para extrair as transações
     const transactions = await extractTransactionsWithAI(textContent);
@@ -60,6 +61,45 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
       throw new Error('API key do OpenAI não configurada');
     }
     
+    // Limitar o tamanho do texto para evitar exceder limites de tokens
+    const maxLength = 15000;
+    const trimmedContent = textContent.length > maxLength 
+      ? textContent.substring(0, maxLength) + "..." 
+      : textContent;
+    
+    // Modelo instrucional mais detalhado e específico
+    const systemPrompt = `
+    Você é um especialista em extrair transações financeiras de extratos bancários.
+    Analise o texto do extrato bancário com atenção aos detalhes e extraia todas as transações encontradas.
+    
+    Regras importantes:
+    1. Identifique padrões de datas no formato brasileiro (dd/mm/yyyy ou dd/mm)
+    2. Identifique valores monetários (podem estar no formato: R$ 1.234,56 ou 1.234,56 ou 1234.56)
+    3. Converta todos os valores para números sem símbolos (1234.56)
+    4. Classifique cada transação como "income" (entrada/crédito) ou "expense" (saída/débito)
+    5. Tente inferir a categoria com base na descrição (alimentação, transporte, salário, etc.)
+    6. Normalize as datas para o formato ISO (YYYY-MM-DD)
+    7. Identifique a descrição de cada transação
+    
+    Responda APENAS com um array JSON válido de transações. Não inclua explicações ou comentários.
+    Exemplo do formato esperado:
+    [
+      {
+        "date": "2023-05-15",
+        "description": "COMPRA SUPERMERCADO XYZ",
+        "amount": 152.35,
+        "type": "expense",
+        "category": "alimentacao"
+      },
+      {
+        "date": "2023-05-10",
+        "description": "SALÁRIO",
+        "amount": 3500,
+        "type": "income",
+        "category": "salario"
+      }
+    ]`;
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -67,52 +107,25 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',  // Usando um modelo mais poderoso
         messages: [
-          {
-            role: 'system',
-            content: `Você é um assistente especializado em extrair transações bancárias de extratos. 
-            Analise o texto do extrato bancário e extraia informações sobre cada transação.
-            
-            Para cada transação encontrada, identifique:
-            1. Data (no formato YYYY-MM-DD)
-            2. Descrição (o que foi a transação)
-            3. Valor numérico (apenas o número, sem símbolos)
-            4. Tipo (income para entradas/créditos, expense para saídas/débitos)
-            5. Categoria (opcional - tente inferir baseado na descrição)
-            
-            Responda APENAS com um array JSON de transações, sem explicações.
-            Exemplo:
-            [
-              {
-                "date": "2023-05-15",
-                "description": "COMPRA SUPERMERCADO XYZ",
-                "amount": 152.35,
-                "type": "expense",
-                "category": "alimentacao"
-              },
-              {
-                "date": "2023-05-10",
-                "description": "SALÁRIO",
-                "amount": 3500,
-                "type": "income",
-                "category": "salario"
-              }
-            ]`
-          },
-          { role: 'user', content: textContent }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: trimmedContent }
         ],
-        temperature: 0.1
+        temperature: 0.1,
+        max_tokens: 4000  // Aumentando o limite de tokens para resposta
       }),
     });
 
     const data = await response.json();
     
     if (!response.ok) {
+      console.error("Resposta da API da OpenAI:", data);
       throw new Error(`Erro na API OpenAI: ${data.error?.message || 'Erro desconhecido'}`);
     }
     
     const content = data.choices[0].message.content;
+    console.log("Resposta da IA:", content.substring(0, 500) + "...");
     
     try {
       // Procurar por array JSON na resposta

@@ -65,4 +65,3 @@ verify_jwt = true
 [[functions]]
 name = "parse-bank-statement"
 verify_jwt = true
-
