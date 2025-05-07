@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Transaction, TransactionService } from '@/services/transactions';
 import { toast } from 'sonner';
@@ -20,11 +20,13 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showNewTransactionForm, setShowNewTransactionForm] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(Date.now());
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await TransactionService.getTransactions();
+      console.log(`Buscando transações: ${data.length} encontradas`);
       setTransactions(data);
     } catch (error) {
       console.error('Error fetching transactions:', error);
@@ -32,16 +34,17 @@ const Transactions = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [fetchTransactions, lastUpdate]);
 
-  const handleTransactionUpdated = () => {
-    fetchTransactions();
+  const handleTransactionUpdated = useCallback(() => {
+    console.log("Atualizando transações...");
+    setLastUpdate(Date.now()); // Força uma nova busca das transações
     setShowNewTransactionForm(false);
-  };
+  }, []);
 
   const toggleNewTransactionForm = () => {
     setShowNewTransactionForm(!showNewTransactionForm);
@@ -87,6 +90,7 @@ const Transactions = () => {
             transactions={transactions}
             onTransactionUpdated={handleTransactionUpdated}
             className="mt-6"
+            key={`transactions-list-${lastUpdate}`} // Forçar rerender quando as transações são atualizadas
           />
         )}
       </div>

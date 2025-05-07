@@ -62,7 +62,7 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     }
     
     // Limitar o tamanho do texto para evitar exceder limites de tokens
-    const maxLength = 15000;
+    const maxLength = 10000;
     const trimmedContent = textContent.length > maxLength 
       ? textContent.substring(0, maxLength) + "..." 
       : textContent;
@@ -107,13 +107,13 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',  // Usando um modelo mais poderoso
+        model: 'gpt-4o-mini',  // Usando um modelo mais rápido e mais barato
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: trimmedContent }
         ],
         temperature: 0.1,
-        max_tokens: 4000  // Aumentando o limite de tokens para resposta
+        max_tokens: 4000
       }),
     });
 

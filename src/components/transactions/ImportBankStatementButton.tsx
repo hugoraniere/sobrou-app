@@ -24,6 +24,8 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
   const [extractedTransactions, setExtractedTransactions] = useState<ExtractedTransaction[]>([]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStep, setProcessingStep] = useState<string>('');
+  const [processingProgress, setProcessingProgress] = useState(0);
 
   const readFileAsText = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -39,15 +41,21 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
     if (!file) return;
 
     setIsUploading(true);
+    setProcessingStep('Iniciando processamento');
+    setProcessingProgress(5);
 
     try {
       let text = '';
       
       // Processar o arquivo de acordo com seu tipo
       if (file.type === 'application/pdf') {
+        setProcessingStep('Extraindo texto do PDF');
+        setProcessingProgress(20);
         toast.info("Extraindo texto do PDF, aguarde...");
         text = await extractTextFromPDF(file);
       } else if (file.type === 'text/plain' || file.type === 'text/csv') {
+        setProcessingStep('Lendo conteúdo do arquivo');
+        setProcessingProgress(30);
         text = await readFileAsText(file);
       } else {
         throw new Error("Formato de arquivo não suportado. Por favor, envie PDF, TXT ou CSV.");
@@ -57,6 +65,8 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         throw new Error("Não foi possível extrair texto do arquivo. Tente com outro arquivo.");
       }
       
+      setProcessingStep('Analisando transações com IA');
+      setProcessingProgress(50);
       toast.info("Analisando extrações bancárias com IA...");
       
       // Analisar o conteúdo do extrato com a IA
@@ -69,14 +79,17 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       // Adicionar propriedade 'selected' para cada transação
       const transactionsWithSelection = extractedData.map(tx => ({ ...tx, selected: true }));
       
+      setProcessingProgress(100);
       setExtractedTransactions(transactionsWithSelection);
       setShowConfirmDialog(true);
-      toast.success("Extrato analisado com sucesso!");
+      toast.success(`${transactionsWithSelection.length} transações identificadas com sucesso!`);
     } catch (error: any) {
       console.error("Erro ao processar arquivo:", error);
       toast.error(error.message || "Erro ao processar arquivo");
     } finally {
       setIsUploading(false);
+      setProcessingStep('');
+      setProcessingProgress(0);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -108,6 +121,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
   const handleImportTransactions = async () => {
     try {
       setIsProcessing(true);
+      setProcessingStep('Importando transações');
       
       // Filtrar apenas as transações selecionadas
       const selectedTransactions = extractedTransactions.filter(tx => tx.selected);
@@ -118,17 +132,26 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         return;
       }
       
-      await bankStatementService.importTransactions(selectedTransactions);
-
-      toast.success(`${selectedTransactions.length} transações importadas com sucesso!`);
-      setShowConfirmDialog(false);
-      onTransactionsAdded(); // Atualizar lista de transações
+      const result = await bankStatementService.importTransactions(selectedTransactions);
       
+      if (result.success) {
+        toast.success(`${selectedTransactions.length} transações importadas com sucesso!`);
+        setShowConfirmDialog(false);
+        setExtractedTransactions([]);
+        
+        // Importante: Garantir que a lista de transações seja atualizada
+        setTimeout(() => {
+          onTransactionsAdded();
+        }, 300);
+      } else {
+        toast.error(result.message || "Erro ao importar transações");
+      }
     } catch (error: any) {
       console.error("Erro ao importar transações:", error);
       toast.error(error.message || "Erro ao importar transações");
     } finally {
       setIsProcessing(false);
+      setProcessingStep('');
     }
   };
 
@@ -151,7 +174,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         {isUploading ? (
           <>
             <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-            {t('common.processing', 'Processando...')}
+            {processingStep ? processingStep : t('common.processing', 'Processando...')}
           </>
         ) : (
           <>
@@ -170,6 +193,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         onImport={handleImportTransactions}
         isProcessing={isProcessing}
         onUpdateCategory={handleUpdateCategory}
+        processingStep={processingStep}
       />
     </>
   );
