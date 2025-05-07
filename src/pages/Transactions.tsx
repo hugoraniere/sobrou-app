@@ -9,7 +9,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
+import ImportBankStatementButton from '@/components/transactions/ImportBankStatementButton';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -56,13 +57,16 @@ const Transactions = () => {
               {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
             </p>
           </div>
-          <Button 
-            onClick={toggleNewTransactionForm} 
-            className="rounded-full"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nova transação
-          </Button>
+          <div className="flex items-center space-x-2">
+            <ImportBankStatementButton onTransactionsAdded={handleTransactionUpdated} />
+            <Button 
+              onClick={toggleNewTransactionForm} 
+              className="rounded-full"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Nova transação
+            </Button>
+          </div>
         </div>
 
         {showNewTransactionForm && (

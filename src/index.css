@@ -8,13 +8,13 @@
 @layer base {
   :root {
     --background: 0 0% 98%; /* Cinza mais neutro */
-    --foreground: 12 5% 11%;
+    --foreground: 210 11% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 12 5% 11%;
+    --card-foreground: 210 11% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 12 5% 11%;
+    --popover-foreground: 210 11% 15%;
 
     --primary: 147 90% 31%;
     --primary-foreground: 0 0% 100%;
@@ -31,8 +31,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 147 90% 31%;
 
     --radius: 0.75rem; /* Aumentando o arredondamento */

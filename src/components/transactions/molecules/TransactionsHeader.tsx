@@ -24,7 +24,7 @@ const TransactionsHeader: React.FC<TransactionsHeaderProps> = ({
 }) => {
   return (
     <Card className={cn("p-4", className)}>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <MonthNavigator 
           currentDate={currentDate} 
           onDateChange={onDateChange}
@@ -34,6 +34,7 @@ const TransactionsHeader: React.FC<TransactionsHeaderProps> = ({
         <QuickFilters 
           selectedFilter={selectedFilter}
           onFilterChange={onFilterChange}
+          className="flex-shrink-0"
         />
       </div>
     </Card>

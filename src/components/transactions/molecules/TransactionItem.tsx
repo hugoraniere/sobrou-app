@@ -34,11 +34,11 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
       />
       
       <div className="flex flex-col flex-grow ml-3 mr-4">
-        <h3 className="font-medium text-gray-900 truncate max-w-[220px] sm:max-w-[300px] mb-2">
+        <h3 className="font-medium text-gray-900 truncate max-w-[220px] sm:max-w-[300px] mb-1">
           {transaction.description}
         </h3>
         
-        <CategoryChip categoryId={transaction.category} />
+        <CategoryChip categoryId={transaction.category} className="mt-1" />
       </div>
       
       <div className="flex items-center">
@@ -51,6 +51,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
           <TransactionDate 
             date={transaction.date} 
             format="dd/MM/yyyy"
+            className="text-xs text-gray-500"
           />
         </div>
         

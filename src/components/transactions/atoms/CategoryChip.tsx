@@ -14,21 +14,21 @@ const CategoryChip: React.FC<CategoryChipProps> = ({ categoryId, className }) =>
     id: 'compras',
     name: 'Compras',
     icon: CircleDot,
-    color: 'bg-gray-100'
+    color: 'text-gray-500'
   };
   
   const IconComponent = category.icon || CircleDot;
   
   // Extrair a cor do background do category.color
-  const bgColorClass = category.color?.replace('text-', 'bg-') || 'bg-gray-100';
+  const bgColorClass = category.color?.replace('text-', 'bg-') || 'bg-gray-200';
   
   // Determinar a cor do texto baseado no background (preto para cores claras, branco para cores escuras)
-  const isDarkBg = bgColorClass.includes('bg-blue') || 
+  const isDarkBg = bgColorClass.includes('bg-blue-600') || 
                    bgColorClass.includes('bg-purple') || 
                    bgColorClass.includes('bg-indigo') || 
-                   bgColorClass.includes('bg-green') || 
-                   bgColorClass.includes('bg-red') || 
-                   bgColorClass.includes('bg-pink') || 
+                   bgColorClass.includes('bg-green-600') ||
+                   bgColorClass.includes('bg-red-600') || 
+                   bgColorClass.includes('bg-pink-600') || 
                    bgColorClass.includes('bg-gray-800');
   
   const textColorClass = isDarkBg ? 'text-white' : 'text-gray-900';
@@ -36,7 +36,7 @@ const CategoryChip: React.FC<CategoryChipProps> = ({ categoryId, className }) =>
   return (
     <div className={cn(
       "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-      bgColorClass.replace('text-', 'bg-').replace('-800', '-200'),
+      bgColorClass,
       textColorClass,
       className
     )}>

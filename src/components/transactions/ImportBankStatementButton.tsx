@@ -144,19 +144,18 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       
       <Button
         variant="outline"
-        size="sm"
-        className="flex items-center gap-2"
+        className="rounded-full"
         onClick={() => fileInputRef.current?.click()}
         disabled={isUploading}
       >
         {isUploading ? (
           <>
-            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
+            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
             {t('common.processing', 'Processando...')}
           </>
         ) : (
           <>
-            <Upload className="h-4 w-4" />
+            <Upload className="h-4 w-4 mr-2" />
             {t('transactions.importStatement', 'Importar Extrato')}
           </>
         )}

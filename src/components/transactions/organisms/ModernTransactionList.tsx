@@ -8,7 +8,6 @@ import DeleteTransactionDialog from '../../transactions/DeleteTransactionDialog'
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
-import ImportBankStatementButton from '../../transactions/ImportBankStatementButton';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -49,18 +48,14 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   
   return (
     <div className={`space-y-4 ${className}`}>
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <TransactionsHeader
-          currentDate={currentDate}
-          onDateChange={handleDateChange}
-          selectedFilter={selectedFilter}
-          onFilterChange={handleFilterChange}
-          hasTransactionsInNextMonth={hasTransactionsInNextMonth}
-          className="w-full"
-        />
-        
-        <ImportBankStatementButton onTransactionsAdded={onTransactionUpdated} />
-      </div>
+      <TransactionsHeader
+        currentDate={currentDate}
+        onDateChange={handleDateChange}
+        selectedFilter={selectedFilter}
+        onFilterChange={handleFilterChange}
+        hasTransactionsInNextMonth={hasTransactionsInNextMonth}
+        className="w-full"
+      />
       
       {filteredTransactions.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-12 text-center p-6">

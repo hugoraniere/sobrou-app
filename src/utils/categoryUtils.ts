@@ -175,7 +175,7 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
     'eletrodomestico': 'compras',
     'eletrônico': 'compras',
     'eletronico': 'compras',
-    'celular': 'compras',
+    // 'celular' já definido em 'internet'
     'computador': 'compras',
     'notebook': 'compras',
     'mercado livre': 'compras',
