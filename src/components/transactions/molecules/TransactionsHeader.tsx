@@ -23,12 +23,6 @@ const TransactionsHeader: React.FC<TransactionsHeaderProps> = ({
   hasTransactionsInNextMonth,
   className
 }) => {
-  // Formatação do mês e ano para exibição
-  const formatMonthYear = (date: Date): string => {
-    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-      .replace(/^\w/, (c) => c.toUpperCase());
-  };
-
   return (
     <Card className={cn("p-4", className)}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -38,9 +32,7 @@ const TransactionsHeader: React.FC<TransactionsHeaderProps> = ({
             onDateChange={onDateChange}
             hasTransactionsInNextMonth={hasTransactionsInNextMonth}
           />
-          <div className="hidden sm:block ml-3 px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700 font-medium">
-            {formatMonthYear(currentDate)}
-          </div>
+          {/* Removido o chip duplicado do mês */}
         </div>
         
         <div className="w-full sm:w-auto">

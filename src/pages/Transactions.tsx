@@ -9,21 +9,33 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, AlertCircle } from 'lucide-react';
 import ImportBankStatementButton from '@/components/transactions/ImportBankStatementButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Transactions = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const initialFilter = location.state?.initialFilter || {};
+  const { isAuthenticated, session } = useAuth();
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [showNewTransactionForm, setShowNewTransactionForm] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   const fetchTransactions = useCallback(async () => {
+    if (!isAuthenticated || !session) {
+      console.log('Usuário não autenticado, não é possível buscar transações');
+      setIsLoading(false);
+      setHasError(true);
+      return;
+    }
+
     setIsLoading(true);
+    setHasError(false);
+    
     try {
       const data = await TransactionService.getTransactions();
       console.log(`Buscando transações: ${data.length} encontradas`);
@@ -31,10 +43,11 @@ const Transactions = () => {
     } catch (error) {
       console.error('Error fetching transactions:', error);
       toast.error(t('transactions.fetchError', 'Erro ao carregar transações'));
+      setHasError(true);
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [t, isAuthenticated, session]);
 
   useEffect(() => {
     fetchTransactions();
@@ -77,6 +90,7 @@ const Transactions = () => {
             <AIPromptInput 
               onTransactionAdded={handleTransactionUpdated}
               onSavingAdded={handleTransactionUpdated}
+              className="bg-white"
             />
           </Card>
         )}
@@ -85,6 +99,28 @@ const Transactions = () => {
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
+        ) : hasError ? (
+          <Card className="p-6 flex flex-col items-center justify-center text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Erro ao carregar transações</h3>
+            <p className="text-gray-600 mb-4">
+              Não foi possível carregar suas transações. Verifique sua conexão e tente novamente.
+            </p>
+            <Button onClick={fetchTransactions}>Tentar novamente</Button>
+          </Card>
+        ) : transactions.length === 0 ? (
+          <Card className="p-6 flex flex-col items-center justify-center text-center">
+            <h3 className="text-xl font-semibold mb-2">Nenhuma transação encontrada</h3>
+            <p className="text-gray-600 mb-4">
+              Você ainda não possui transações registradas. Adicione sua primeira transação agora!
+            </p>
+            {!showNewTransactionForm && (
+              <Button onClick={toggleNewTransactionForm}>
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar transação
+              </Button>
+            )}
+          </Card>
         ) : (
           <ModernTransactionList
             transactions={transactions}

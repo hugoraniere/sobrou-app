@@ -11,13 +11,17 @@ import { useTranslation } from 'react-i18next';
 // Importing our extracted components
 import PromptInputField from './prompt/PromptInputField';
 import PromptExampleFooter from './prompt/PromptExampleFooter';
+
 interface AIPromptInputProps {
   onTransactionAdded: () => void;
   onSavingAdded: () => void;
+  className?: string;
 }
+
 const AIPromptInput: React.FC<AIPromptInputProps> = ({
   onTransactionAdded,
-  onSavingAdded
+  onSavingAdded,
+  className
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -26,9 +30,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   const [userSelectedCategory, setUserSelectedCategory] = useState<string | null>(null);
   const [isCategoryPopoverOpen, setIsCategoryPopoverOpen] = useState(false);
   const inputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (inputTimeoutRef.current) {
@@ -124,15 +126,32 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   };
 
   const categoryId = userSelectedCategory || detectedCategory;
-  return <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+  
+  // Removido o Card component que causava o nesting
+  return (
+    <div className={className}>
       <h2 className="text-xl font-semibold mb-4">Inserir sua transação</h2>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-        <PromptInputField inputValue={inputValue} onInputChange={handleInputChange} categoryId={categoryId} userSelectedCategory={userSelectedCategory} isCategoryPopoverOpen={isCategoryPopoverOpen} setIsCategoryPopoverOpen={setIsCategoryPopoverOpen} handleCategorySelect={handleCategorySelect} resetCategory={resetCategory} selectedDate={selectedDate} onDateChange={setSelectedDate} isProcessing={isProcessing} />
+        <PromptInputField 
+          inputValue={inputValue} 
+          onInputChange={handleInputChange} 
+          categoryId={categoryId} 
+          userSelectedCategory={userSelectedCategory} 
+          isCategoryPopoverOpen={isCategoryPopoverOpen} 
+          setIsCategoryPopoverOpen={setIsCategoryPopoverOpen} 
+          handleCategorySelect={handleCategorySelect} 
+          resetCategory={resetCategory} 
+          selectedDate={selectedDate} 
+          onDateChange={setSelectedDate} 
+          isProcessing={isProcessing} 
+        />
         <Button type="submit" disabled={isProcessing} className="min-w-[100px]">
           {isProcessing ? "Processando..." : "Adicionar"}
         </Button>
       </form>
       <PromptExampleFooter selectedDate={selectedDate} />
-    </div>;
+    </div>
+  );
 };
+
 export default AIPromptInput;
