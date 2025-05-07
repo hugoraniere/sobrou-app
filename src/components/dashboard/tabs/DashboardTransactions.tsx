@@ -1,7 +1,7 @@
 
 import React from 'react';
-import TransactionsTable from '@/components/TransactionsTable';
 import { Transaction } from '@/services/transactions';
+import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 
 interface DashboardTransactionsProps {
   transactions: Transaction[];
@@ -17,13 +17,11 @@ interface DashboardTransactionsProps {
 
 const DashboardTransactions: React.FC<DashboardTransactionsProps> = ({
   transactions,
-  filters,
   onTransactionUpdated
 }) => {
   return (
-    <TransactionsTable 
+    <ModernTransactionList 
       transactions={transactions}
-      filters={filters}
       onTransactionUpdated={onTransactionUpdated}
     />
   );

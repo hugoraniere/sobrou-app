@@ -27,23 +27,25 @@ export async function aiParseTransaction(text: string) {
               - savingGoal (string ou null)
               
               Regras para categorização:
-              - alimentacao: mercados, restaurantes, delivery, ifood, comida
-              - moradia: aluguel, condomínio, água, luz, gás, manutenção
-              - transporte: uber, 99, combustível, passagens, metrô, ônibus
-              - internet: internet, wifi, telefone, celular, contas de operadoras
-              - cartao: faturas, parcelas, crédito, juros, tarifas bancárias
-              - saude: farmácia, médicos, hospitais, planos de saúde, exames
-              - lazer: netflix, cinema, shows, eventos, viagens
-              - compras: roupas, eletrônicos, produtos diversos, itens para casa
-              - investimentos: aplicações, ações, previdência, rendimentos
-              - familia: escola, mensalidades, despesas com filhos, creche
-              - doacoes: doações, contribuições para causas
+              - alimentacao: mercados, restaurantes, delivery, ifood, comida, refeição, fast-food, lanchonetes
+              - moradia: aluguel, condomínio, água, luz, gás, manutenção, IPTU, decoração, reforma, móveis
+              - transporte: uber, 99, combustível, passagens, metrô, ônibus, estacionamento, pedágio, manutenção de veículos
+              - internet: internet, wifi, telefone, celular, contas de operadoras, streaming (Netflix, Spotify, etc)
+              - cartao: faturas, parcelas, crédito, juros, tarifas bancárias, empréstimos
+              - saude: farmácia, médicos, hospitais, planos de saúde, exames, dentista, psicólogo
+              - lazer: netflix (quando é lazer), cinema, shows, eventos, viagens, bares, restaurantes (quando é lazer)
+              - compras: roupas, eletrônicos, produtos diversos, itens para casa, acessórios
+              - investimentos: aplicações, ações, previdência, rendimentos, poupança, tesouro direto
+              - familia: escola, mensalidades, despesas com filhos, creche, material escolar
+              - doacoes: doações, contribuições para causas, caridade, dízimo
 
               Regras importantes:
+              - Analise o contexto completo da transação para determinar a categoria correta
               - Se o valor contiver "k" (ex: "2k"), multiplique por 1000
               - Para moeda brasileira (R$), extraia apenas o número
               - Detecte intenções de poupança ("poupar", "guardar", "economizar")
               - O padrão é "expense", a menos que haja claros indicadores de renda
+              - Examine palavras-chave como: pagamento, compra, depósito, recebimento, salário
               
               Retorne APENAS um objeto JSON com esses campos exatos.`
           },

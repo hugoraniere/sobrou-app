@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Transaction, TransactionService } from '@/services/transactions';
-import TransactionsTable from '@/components/TransactionsTable';
 import { toast } from 'sonner';
 import AIPromptInput from '@/components/AIPromptInput';
 import { useLocation } from 'react-router-dom';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -15,13 +15,6 @@ const Transactions = () => {
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    category: initialFilter.category || '',
-    type: initialFilter.type || '',
-    dateRange: initialFilter.dateRange || '',
-    minAmount: initialFilter.minAmount || '',
-    maxAmount: initialFilter.maxAmount || '',
-  });
 
   const fetchTransactions = async () => {
     setIsLoading(true);
@@ -64,10 +57,10 @@ const Transactions = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <TransactionsTable 
-            transactions={transactions} 
-            filters={filters}
+          <ModernTransactionList
+            transactions={transactions}
             onTransactionUpdated={handleTransactionUpdated}
+            className="mt-6"
           />
         )}
       </div>

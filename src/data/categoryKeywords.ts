@@ -1,54 +1,91 @@
 
-import { CategoryType } from '@/types/categories';
-import { expenseCategories } from './expenseCategories';
-
+// Palavras-chave específicas para cada categoria
+// Essas palavras-chave serão usadas para categorizar automaticamente transações
 export const categoryKeywords: Record<string, string[]> = {
-  alimentacao: [
-    'mercado', 'supermercado', 'feira', 'hortifruti', 'sacolão', 'alimentação', 'comida', 
-    'restaurante', 'bar', 'padaria', 'açougue', 'lanchonete', 'lanche', 'almoço', 'jantar', 
-    'delivery', 'ifood', 'rappi', 'bebidas', 'refeição', 'café'
+  // Alimentação
+  'alimentacao': [
+    'restaurante', 'lanchonete', 'bar', 'pizzaria', 'hambúrguer', 'hamburger',
+    'fast food', 'churrascaria', 'sushi', 'comida', 'almoço', 'jantar', 'café',
+    'padaria', 'supermercado', 'mercado', 'hortifruti', 'feira', 'delivery', 'ifood',
+    'rappi', 'uber eats', 'james', 'food', 'bistro', 'snack', 'cantina'
   ],
-  moradia: [
-    'aluguel', 'condomínio', 'luz', 'energia', 'água', 'esgoto', 'gás', 'manutenção', 
-    'reparo', 'reforma', 'iptu', 'habitação', 'moradia'
+  
+  // Moradia
+  'moradia': [
+    'aluguel', 'condomínio', 'condominio', 'água', 'agua', 'luz', 'energia', 'gás',
+    'gas', 'iptu', 'taxa', 'imobiliária', 'imobiliaria', 'reforma', 'manutenção',
+    'manutencao', 'mobília', 'mobilia', 'decoração', 'decoracao', 'obra', 'arquiteto',
+    'engenheiro', 'pedreiro', 'pintor', 'eletricista', 'encanador', 'seguro residencial'
   ],
-  transporte: [
-    'uber', '99', 'cabify', 'combustível', 'gasolina', 'diesel', 'etanol', 'álcool', 
-    'passagem', 'metrô', 'ônibus', 'trem', 'pedágio', 'transporte'
+  
+  // Transporte
+  'transporte': [
+    'uber', '99', 'taxi', 'cabify', 'gasolina', 'combustível', 'combustivel', 'álcool',
+    'alcool', 'etanol', 'diesel', 'estacionamento', 'pedágio', 'pedagio', 'metrô', 'metro',
+    'ônibus', 'onibus', 'trem', 'passagem', 'bilhete', 'carro', 'moto', 'seguro auto',
+    'mecânico', 'mecanico', 'oficina', 'revisão', 'revisao', 'pneu', 'peças', 'pecas'
   ],
-  internet: [
-    'internet', 'wifi', 'banda larga', 'fibra', 'vivo', 'claro', 'tim', 'oi', 
-    'telefonia', 'telefone', 'celular', 'recarga'
+  
+  // Internet
+  'internet': [
+    'internet', 'wifi', 'fibra', 'banda larga', 'net', 'vivo', 'claro', 'oi', 'tim',
+    'operadora', 'telefone', 'celular', 'plano', 'dados', 'móvel', 'movel', 'tv',
+    'streaming', 'netflix', 'amazon', 'prime', 'disney', 'hbo', 'spotify', 'deezer',
+    'youtube premium', 'globoplay', 'telecomunicações', 'telecomunicacoes'
   ],
-  cartao: [
-    'cartão', 'crédito', 'fatura', 'nubank', 'parcela', 'parcelado', 'anuidade'
+  
+  // Cartão de crédito
+  'cartao': [
+    'fatura', 'cartão', 'cartao', 'crédito', 'credito', 'débito', 'debito', 'banco',
+    'bradesco', 'itaú', 'itau', 'santander', 'caixa', 'bb', 'brasil', 'nubank',
+    'inter', 'c6', 'visa', 'mastercard', 'elo', 'american express', 'amex', 'taxa',
+    'juros', 'parcela', 'anuidade', 'financiamento', 'empréstimo', 'emprestimo'
   ],
-  saude: [
-    'farmácia', 'plano de saúde', 'exame', 'consulta', 'hospital', 'remédio', 'medicamentos', 
-    'odontologia', 'dentista', 'psicólogo', 'terapia'
+  
+  // Saúde
+  'saude': [
+    'farmácia', 'farmacia', 'drogaria', 'remédio', 'remedio', 'médico', 'medico',
+    'consulta', 'exame', 'hospital', 'clínica', 'clinica', 'laboratório', 'laboratorio',
+    'dentista', 'psicólogo', 'psicologo', 'fisioterapeuta', 'terapia', 'plano de saúde',
+    'plano', 'suplemento', 'vitamina', 'academia', 'fitness', 'treino', 'vacina'
   ],
-  lazer: [
-    'cinema', 'filme', 'teatro', 'show', 'concerto', 'festival', 'evento', 'ingresso', 
-    'balada', 'festa', 'parque', 'museu', 'viagem', 'lazer', 'diversão'
+  
+  // Lazer
+  'lazer': [
+    'cinema', 'teatro', 'show', 'concerto', 'balada', 'festa', 'ingresso', 'entrada',
+    'evento', 'parque', 'viagem', 'passagem aérea', 'passagem', 'hotel', 'hospedagem',
+    'pousada', 'resort', 'passeio', 'tour', 'excursão', 'excursao', 'praia', 'camping',
+    'bar', 'bebida', 'álcool', 'diversão', 'lazer', 'entretenimento', 'hobby'
   ],
-  compras: [
-    'compras', 'roupas', 'vestuário', 'calçados', 'tênis', 'sapato', 'acessórios', 'presente', 
-    'loja', 'shopping', 'eletrônico', 'móveis', 'decoração', 'outros'
+  
+  // Compras
+  'compras': [
+    'loja', 'shopping', 'magazine', 'americanas', 'amazon', 'mercado livre', 'aliexpress',
+    'shein', 'roupas', 'calçados', 'calcados', 'sapatos', 'tênis', 'tenis', 'vestuário',
+    'vestuario', 'eletrônico', 'eletronico', 'celular', 'computador', 'notebook', 'gadget',
+    'móveis', 'moveis', 'decoração', 'decoracao', 'utensílios', 'utensilios'
   ],
-  investimentos: [
-    'investimento', 'aporte', 'aplicação', 'poupança', 'cdb', 'tesouro', 'fundo', 'ações', 
-    'bolsa', 'bitcoin', 'cripto', 'previdência'
+  
+  // Investimentos
+  'investimentos': [
+    'investimento', 'aplicação', 'aplicacao', 'tesouro', 'cdb', 'lci', 'lca', 'ações',
+    'acoes', 'bolsa', 'b3', 'fundo', 'previdência', 'previdencia', 'aposentadoria',
+    'poupança', 'poupanca', 'rendimento', 'dividendo', 'juros', 'corretora', 'xp',
+    'clear', 'rico', 'modal', 'btg', 'nubainvest', 'warren', 'bitcoin', 'cripto'
   ],
-  familia: [
-    'filhos', 'escola', 'mensalidade', 'creche', 'berçário', 'educação', 'material escolar', 
-    'uniforme', 'fraldas', 'brinquedos'
+  
+  // Família
+  'familia': [
+    'escola', 'colégio', 'colegio', 'creche', 'mensalidade', 'uniforme', 'material',
+    'livro', 'caderno', 'filho', 'filha', 'criança', 'crianca', 'bebê', 'bebe',
+    'fralda', 'brinquedo', 'roupa infantil', 'pediatra', 'educação', 'educacao',
+    'curso', 'faculdade', 'universidade', 'matrícula', 'matricula', 'formatura'
   ],
-  doacoes: [
-    'doação', 'contribuição', 'caridade', 'ajuda', 'apoio', 'vaquinha', 'solidariedade'
+  
+  // Doações
+  'doacoes': [
+    'doação', 'doacao', 'caridade', 'contribuição', 'contribuicao', 'ajuda', 'igreja',
+    'templo', 'ong', 'organização', 'organizacao', 'campanha', 'solidariedade', 'apoio',
+    'esmola', 'dízimo', 'dizimo', 'oferta', 'instituição', 'instituicao', 'causa'
   ]
 };
-
-export const categoryMeta: Record<string, CategoryType> = expenseCategories.reduce((acc, category) => {
-  acc[category.id] = category;
-  return acc;
-}, {} as Record<string, CategoryType>);
