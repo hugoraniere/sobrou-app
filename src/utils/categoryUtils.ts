@@ -1,3 +1,4 @@
+
 import { transactionCategories } from '@/data/categories';
 import { categoryKeywords } from '@/data/categoryKeywords';
 
@@ -93,7 +94,7 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
     'santander': 'cartao',
     'inter': 'cartao',
     'caixa': 'cartao',
-    'bb ': 'cartao',
+    'bb': 'cartao',
     'tarifa': 'cartao',
     'mastercard': 'cartao',
     'visa': 'cartao',
@@ -238,7 +239,7 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
     'voluntariado': 'doacoes',
     'apoio': 'doacoes',
     'instituição': 'doacoes',
-    'instituicao': 'doacoes',
+    'instituicao': 'doacoes'
   };
   
   for (const [synonym, categoryId] of Object.entries(synonymMap)) {

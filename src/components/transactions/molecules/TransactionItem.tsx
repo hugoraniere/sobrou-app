@@ -22,7 +22,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
 }) => {
   return (
     <div className={cn(
-      "group flex justify-between items-center p-4 border-b hover:bg-gray-50/80 transition-colors rounded-lg relative",
+      "group flex justify-between items-start p-4 border-b hover:bg-gray-50/80 transition-colors rounded-lg relative",
       className
     )}>
       {/* Barra vertical colorida */}
@@ -34,16 +34,11 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
       />
       
       <div className="flex flex-col flex-grow ml-3 mr-4">
-        <div className="flex items-start justify-between mb-1">
-          <h3 className="font-medium text-gray-900 truncate max-w-[220px] sm:max-w-[300px]">
-            {transaction.description}
-          </h3>
-        </div>
+        <h3 className="font-medium text-gray-900 truncate max-w-[220px] sm:max-w-[300px] mb-2">
+          {transaction.description}
+        </h3>
         
-        <div className="flex items-center space-x-2">
-          <CategoryChip categoryId={transaction.category} />
-          <TransactionDate date={transaction.date} />
-        </div>
+        <CategoryChip categoryId={transaction.category} />
       </div>
       
       <div className="flex items-center">

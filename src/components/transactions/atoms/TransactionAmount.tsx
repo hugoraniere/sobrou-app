@@ -18,7 +18,7 @@ const TransactionAmount: React.FC<TransactionAmountProps> = ({
 }) => {
   return (
     <div className={cn(
-      "text-right font-medium",
+      "text-right font-semibold",
       type === 'income' ? 'text-green-600' : 'text-red-600',
       className
     )}>

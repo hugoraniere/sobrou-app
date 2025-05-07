@@ -14,15 +14,30 @@ const CategoryChip: React.FC<CategoryChipProps> = ({ categoryId, className }) =>
     id: 'compras',
     name: 'Compras',
     icon: CircleDot,
-    color: 'bg-gray-100 text-gray-800'
+    color: 'bg-gray-100'
   };
   
   const IconComponent = category.icon || CircleDot;
+  
+  // Extrair a cor do background do category.color
+  const bgColorClass = category.color?.replace('text-', 'bg-') || 'bg-gray-100';
+  
+  // Determinar a cor do texto baseado no background (preto para cores claras, branco para cores escuras)
+  const isDarkBg = bgColorClass.includes('bg-blue') || 
+                   bgColorClass.includes('bg-purple') || 
+                   bgColorClass.includes('bg-indigo') || 
+                   bgColorClass.includes('bg-green') || 
+                   bgColorClass.includes('bg-red') || 
+                   bgColorClass.includes('bg-pink') || 
+                   bgColorClass.includes('bg-gray-800');
+  
+  const textColorClass = isDarkBg ? 'text-white' : 'text-gray-900';
 
   return (
     <div className={cn(
       "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-      category.color || "bg-gray-100 text-gray-800",
+      bgColorClass.replace('text-', 'bg-').replace('-800', '-200'),
+      textColorClass,
       className
     )}>
       <IconComponent className="h-3.5 w-3.5" />

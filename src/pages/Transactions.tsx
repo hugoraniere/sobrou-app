@@ -8,6 +8,8 @@ import { useLocation } from 'react-router-dom';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -16,6 +18,7 @@ const Transactions = () => {
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showNewTransactionForm, setShowNewTransactionForm] = useState(false);
 
   const fetchTransactions = async () => {
     setIsLoading(true);
@@ -36,24 +39,40 @@ const Transactions = () => {
 
   const handleTransactionUpdated = () => {
     fetchTransactions();
+    setShowNewTransactionForm(false);
+  };
+
+  const toggleNewTransactionForm = () => {
+    setShowNewTransactionForm(!showNewTransactionForm);
   };
 
   return (
     <TooltipProvider>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">{t('transactions.title', 'Transações')}</h1>
-          <p className="text-gray-600 mt-2">
-            {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
-          </p>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{t('transactions.title', 'Transações')}</h1>
+            <p className="text-gray-600">
+              {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
+            </p>
+          </div>
+          <Button 
+            onClick={toggleNewTransactionForm} 
+            className="rounded-full"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Nova transação
+          </Button>
         </div>
 
-        <Card className="p-6 mb-6">
-          <AIPromptInput 
-            onTransactionAdded={handleTransactionUpdated}
-            onSavingAdded={handleTransactionUpdated}
-          />
-        </Card>
+        {showNewTransactionForm && (
+          <Card className="p-6 mb-6">
+            <AIPromptInput 
+              onTransactionAdded={handleTransactionUpdated}
+              onSavingAdded={handleTransactionUpdated}
+            />
+          </Card>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center py-8">

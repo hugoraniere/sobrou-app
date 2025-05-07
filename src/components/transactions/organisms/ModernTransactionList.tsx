@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { format, startOfToday, startOfMonth, subDays, startOfYear } from 'date-fns';
 import { Transaction } from '@/services/transactions';
 import TransactionsHeader from '../molecules/TransactionsHeader';
 import TransactionItem from '../molecules/TransactionItem';
@@ -57,6 +56,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
           selectedFilter={selectedFilter}
           onFilterChange={handleFilterChange}
           hasTransactionsInNextMonth={hasTransactionsInNextMonth}
+          className="w-full"
         />
         
         <ImportBankStatementButton onTransactionsAdded={onTransactionUpdated} />

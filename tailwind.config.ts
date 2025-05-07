@@ -25,8 +25,8 @@ export default {
         ring: 'hsl(var(--ring))',
         background: {
           DEFAULT: 'hsl(var(--background))',
-          base: '#F2FCE2', // Novo tom de cinza esverdeado
-          surface: '#F5F7F0' // Novo tom de cinza esverdeado mais claro
+          base: '#F8F8F8', // Cinza neutro
+          surface: '#F2F2F2' // Cinza neutro mais claro
         },
         foreground: 'hsl(var(--foreground))',
         primary: {
