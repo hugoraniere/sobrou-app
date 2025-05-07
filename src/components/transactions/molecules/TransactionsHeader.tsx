@@ -22,7 +22,7 @@ const TransactionsHeader: React.FC<TransactionsHeaderProps> = ({
   className
 }) => {
   return (
-    <div className={cn("flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center", className)}>
+    <div className={cn("flex flex-col space-y-4", className)}>
       <MonthNavigator 
         currentDate={currentDate} 
         onDateChange={onDateChange}

@@ -7,6 +7,7 @@ import AIPromptInput from '@/components/AIPromptInput';
 import { useLocation } from 'react-router-dom';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
+import { Card } from '@/components/ui/card';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -47,10 +48,12 @@ const Transactions = () => {
           </p>
         </div>
 
-        <AIPromptInput 
-          onTransactionAdded={handleTransactionUpdated}
-          onSavingAdded={handleTransactionUpdated}
-        />
+        <Card className="p-6 mb-6">
+          <AIPromptInput 
+            onTransactionAdded={handleTransactionUpdated}
+            onSavingAdded={handleTransactionUpdated}
+          />
+        </Card>
 
         {isLoading ? (
           <div className="flex justify-center py-8">

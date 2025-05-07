@@ -36,7 +36,7 @@ const QuickFilters: React.FC<QuickFiltersProps> = ({
           variant={selectedFilter === filter.id ? "default" : "outline"}
           size="sm"
           className={cn(
-            "text-xs min-w-[70px]",
+            "text-xs rounded-full",
             selectedFilter === filter.id && "bg-primary"
           )}
           onClick={() => onFilterChange(filter.id)}

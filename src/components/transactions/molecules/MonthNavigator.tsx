@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, subMonths, addMonths, isSameMonth, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 interface MonthNavigatorProps {
   currentDate: Date;
@@ -36,12 +37,12 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
   const capitalizedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
   return (
-    <div className={`flex items-center space-x-4 ${className}`}>
+    <Card className={`flex items-center justify-between p-3 ${className}`}>
       <Button 
         variant="ghost" 
         size="icon" 
         onClick={goToPreviousMonth}
-        className="h-8 w-8"
+        className="h-8 w-8 rounded-full"
       >
         <ChevronLeft className="h-4 w-4" />
         <span className="sr-only">Mês anterior</span>
@@ -56,12 +57,12 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
         size="icon" 
         onClick={goToNextMonth}
         disabled={!canGoToNextMonth}
-        className="h-8 w-8"
+        className="h-8 w-8 rounded-full"
       >
         <ChevronRight className="h-4 w-4" />
         <span className="sr-only">Próximo mês</span>
       </Button>
-    </div>
+    </Card>
   );
 };
 

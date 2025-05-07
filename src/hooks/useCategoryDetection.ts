@@ -1,8 +1,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
-import { categoryKeywords, categoryMeta } from '@/data/categoryKeywords';
+import { categoryKeywords } from '@/data/categoryKeywords';
 import { removeAccents } from '@/lib/utils';
 import { CategoryType } from '@/types/categories';
+import { transactionCategories } from '@/data/categories';
 
 export const useCategoryDetection = (text: string) => {
   const [detectedCategories, setDetectedCategories] = useState<string[]>([]);
@@ -34,7 +35,10 @@ export const useCategoryDetection = (text: string) => {
     setDetectedCategories(Array.from(detected));
   }, [text, normalizedKeywords]);
 
-  const categories = detectedCategories.map(id => categoryMeta[id]) as CategoryType[];
+  // Encontrar os objetos de categoria baseados nos IDs detectados
+  const categories = detectedCategories
+    .map(id => transactionCategories.find(cat => cat.id === id))
+    .filter(Boolean) as CategoryType[];
   
   return {
     categories,

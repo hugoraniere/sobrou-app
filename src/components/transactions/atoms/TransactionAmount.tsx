@@ -7,12 +7,14 @@ interface TransactionAmountProps {
   amount: number;
   type: 'income' | 'expense';
   className?: string;
+  showSign?: boolean;
 }
 
 const TransactionAmount: React.FC<TransactionAmountProps> = ({ 
   amount, 
   type,
-  className 
+  className,
+  showSign = true
 }) => {
   return (
     <div className={cn(
@@ -20,7 +22,7 @@ const TransactionAmount: React.FC<TransactionAmountProps> = ({
       type === 'income' ? 'text-green-600' : 'text-red-600',
       className
     )}>
-      {type === 'income' ? '+' : '-'} {formatCurrency(amount)}
+      {showSign && (type === 'income' ? '+' : '-')} {formatCurrency(amount)}
     </div>
   );
 };
