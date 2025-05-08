@@ -26,8 +26,7 @@ export const transactionQueryService = {
         .from('transactions')
         .select('*')
         .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .timeout(10000); // Adicionando timeout para evitar esperas infinitas
+        .order('date', { ascending: false });
       
       if (error) {
         console.error('Supabase error:', error.message);
@@ -71,8 +70,7 @@ export const transactionQueryService = {
         .eq('user_id', user.id)
         .gte('date', startDate)
         .lte('date', endDate)
-        .order('date', { ascending: false })
-        .timeout(10000); // Adicionando timeout para evitar esperas infinitas
+        .order('date', { ascending: false });
       
       if (error) {
         console.error('Supabase error:', error.message);
