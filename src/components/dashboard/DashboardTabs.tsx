@@ -8,6 +8,7 @@ import DashboardInsights from './tabs/DashboardInsights';
 import EmptyDashboard from '../EmptyDashboard';
 import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
+import { LoadingSpinner } from '@/components/ui/spinner';
 
 interface DashboardTabsProps {
   transactions: Transaction[];
@@ -44,9 +45,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
       
       <TabsContent value="overview">
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
+          <LoadingSpinner message="Carregando dados..." />
         ) : hasTransactions ? (
           <DashboardOverview transactions={transactions} savingGoals={savingGoals} />
         ) : (
@@ -59,14 +58,13 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({
           transactions={filteredTransactions}
           filters={filters}
           onTransactionUpdated={onTransactionUpdated}
+          isLoading={isLoading}
         />
       </TabsContent>
       
       <TabsContent value="insights">
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
+          <LoadingSpinner message="Carregando insights..." />
         ) : hasTransactions ? (
           <DashboardInsights transactions={transactions} />
         ) : (

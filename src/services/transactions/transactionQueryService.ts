@@ -26,7 +26,8 @@ export const transactionQueryService = {
         .from('transactions')
         .select('*')
         .eq('user_id', user.id)
-        .order('date', { ascending: false });
+        .order('date', { ascending: false })
+        .timeout(10000); // Adicionando timeout para evitar esperas infinitas
       
       if (error) {
         console.error('Supabase error:', error.message);
@@ -35,9 +36,12 @@ export const transactionQueryService = {
       
       // Adicionar logs para debug
       console.log('Transactions fetched:', data?.length || 0);
-      return data as Transaction[];
+      
+      // Garantir que retorna um array mesmo que data seja nulo
+      return data || [];
     } catch (error) {
       console.error('Error fetching transactions:', error);
+      // Garantir que o erro é propagado para ser tratado
       throw error;
     }
   },
@@ -67,7 +71,8 @@ export const transactionQueryService = {
         .eq('user_id', user.id)
         .gte('date', startDate)
         .lte('date', endDate)
-        .order('date', { ascending: false });
+        .order('date', { ascending: false })
+        .timeout(10000); // Adicionando timeout para evitar esperas infinitas
       
       if (error) {
         console.error('Supabase error:', error.message);
@@ -75,9 +80,10 @@ export const transactionQueryService = {
       }
       
       console.log('Transactions fetched for date range:', data?.length || 0);
-      return data as Transaction[];
+      return data || []; // Garantir que retorna um array mesmo que data seja nulo
     } catch (error) {
       console.error('Error fetching transactions by date range:', error);
+      // Garantir que o erro é propagado para ser tratado
       throw error;
     }
   }

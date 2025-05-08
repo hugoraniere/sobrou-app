@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Upload, AlertCircle } from 'lucide-react';
 import ImportBankStatementButton from '@/components/transactions/ImportBankStatementButton';
 import { useAuth } from '@/contexts/AuthContext';
+import { LoadingSpinner } from '@/components/ui/spinner';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -40,17 +41,27 @@ const Transactions = () => {
       const data = await TransactionService.getTransactions();
       console.log(`Buscando transações: ${data.length} encontradas`);
       setTransactions(data);
+      setIsLoading(false); // Garantir que o loading é desativado após sucesso
     } catch (error) {
       console.error('Error fetching transactions:', error);
       toast.error(t('transactions.fetchError', 'Erro ao carregar transações'));
       setHasError(true);
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Garantir que o loading é desativado após erro
     }
   }, [t, isAuthenticated, session]);
 
   useEffect(() => {
     fetchTransactions();
+    
+    // Adiciona um timeout para garantir que o estado de loading não fica preso
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        console.log('Loading timeout reached, forcing reset of loading state');
+        setIsLoading(false);
+      }
+    }, 15000); // 15 segundos de timeout
+
+    return () => clearTimeout(timeout);
   }, [fetchTransactions, lastUpdate]);
 
   const handleTransactionUpdated = useCallback(() => {
@@ -96,9 +107,7 @@ const Transactions = () => {
         )}
 
         {isLoading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
+          <LoadingSpinner message="Carregando transações..." />
         ) : hasError ? (
           <Card className="p-6 flex flex-col items-center justify-center text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
