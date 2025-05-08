@@ -9,10 +9,13 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Upload, AlertCircle } from 'lucide-react';
+import { Plus, Upload, AlertCircle, RefreshCcw } from 'lucide-react';
 import ImportBankStatementButton from '@/components/transactions/ImportBankStatementButton';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/spinner';
+
+const MAX_RETRY_COUNT = 2;
+const RETRY_DELAY = 3000; // 3 segundos
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -23,14 +26,17 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [showNewTransactionForm, setShowNewTransactionForm] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
+  const [retryCount, setRetryCount] = useState(0);
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchTransactions = useCallback(async (retry = false) => {
     if (!isAuthenticated || !session) {
       console.log('Usuário não autenticado, não é possível buscar transações');
       setIsLoading(false);
       setHasError(true);
+      setErrorMessage("Você precisa estar autenticado para ver suas transações.");
       return;
     }
 
@@ -38,19 +44,34 @@ const Transactions = () => {
     setHasError(false);
     
     try {
+      console.log(`Tentativa de buscar transações: ${retry ? 'retry' : 'initial'}`);
       const data = await TransactionService.getTransactions();
       console.log(`Buscando transações: ${data.length} encontradas`);
       setTransactions(data);
-      setIsLoading(false); // Garantir que o loading é desativado após sucesso
+      setIsLoading(false);
+      setRetryCount(0); // Resetar contador de tentativas após sucesso
     } catch (error) {
       console.error('Error fetching transactions:', error);
-      toast.error(t('transactions.fetchError', 'Erro ao carregar transações'));
-      setHasError(true);
-      setIsLoading(false); // Garantir que o loading é desativado após erro
+      
+      // Lógica de retry
+      if (retryCount < MAX_RETRY_COUNT) {
+        console.log(`Tentativa ${retryCount + 1} de ${MAX_RETRY_COUNT}. Tentando novamente em ${RETRY_DELAY}ms`);
+        setRetryCount(prevCount => prevCount + 1);
+        setTimeout(() => fetchTransactions(true), RETRY_DELAY);
+      } else {
+        toast.error(t('transactions.fetchError', 'Erro ao carregar transações'));
+        setHasError(true);
+        setErrorMessage(error instanceof Error ? error.message : "Erro desconhecido ao buscar transações");
+        setIsLoading(false);
+      }
     }
-  }, [t, isAuthenticated, session]);
+  }, [t, isAuthenticated, session, retryCount]);
 
   useEffect(() => {
+    // Resetar estado e iniciar busca
+    setIsLoading(true);
+    setHasError(false);
+    setRetryCount(0);
     fetchTransactions();
     
     // Adiciona um timeout para garantir que o estado de loading não fica preso
@@ -58,11 +79,15 @@ const Transactions = () => {
       if (isLoading) {
         console.log('Loading timeout reached, forcing reset of loading state');
         setIsLoading(false);
+        if (transactions.length === 0) {
+          setHasError(true);
+          setErrorMessage("Tempo limite excedido ao carregar transações.");
+        }
       }
     }, 15000); // 15 segundos de timeout
 
     return () => clearTimeout(timeout);
-  }, [fetchTransactions, lastUpdate]);
+  }, [lastUpdate]);
 
   const handleTransactionUpdated = useCallback(() => {
     console.log("Atualizando transações...");
@@ -107,15 +132,21 @@ const Transactions = () => {
         )}
 
         {isLoading ? (
-          <LoadingSpinner message="Carregando transações..." />
+          <LoadingSpinner 
+            message="Carregando transações..." 
+            timeout={5000}
+          />
         ) : hasError ? (
           <Card className="p-6 flex flex-col items-center justify-center text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
             <h3 className="text-xl font-semibold mb-2">Erro ao carregar transações</h3>
             <p className="text-gray-600 mb-4">
-              Não foi possível carregar suas transações. Verifique sua conexão e tente novamente.
+              {errorMessage || "Não foi possível carregar suas transações. Verifique sua conexão e tente novamente."}
             </p>
-            <Button onClick={fetchTransactions}>Tentar novamente</Button>
+            <Button onClick={() => fetchTransactions()} className="flex items-center gap-2">
+              <RefreshCcw className="h-4 w-4" />
+              Tentar novamente
+            </Button>
           </Card>
         ) : transactions.length === 0 ? (
           <Card className="p-6 flex flex-col items-center justify-center text-center">

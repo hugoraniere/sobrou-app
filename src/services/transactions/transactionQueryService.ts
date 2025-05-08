@@ -3,6 +3,28 @@ import { Transaction } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subMonths } from 'date-fns';
 
+// Função auxiliar para validar e converter o tipo da transação
+const validateTransactionType = (type: string): "income" | "expense" | "transfer" => {
+  if (type === 'income' || type === 'expense' || type === 'transfer') {
+    return type;
+  }
+  // Valor padrão caso receba um tipo inválido
+  console.warn(`Tipo de transação inválido detectado: ${type}, convertendo para 'expense'`);
+  return 'expense';
+};
+
+// Função auxiliar para converter dados do Supabase para o tipo Transaction
+const mapToTransaction = (rawData: any): Transaction => {
+  return {
+    ...rawData,
+    type: validateTransactionType(rawData.type),
+    // Garantir que outros campos opcionais estejam corretamente tipados
+    is_recurring: Boolean(rawData.is_recurring),
+    recurrence_frequency: rawData.recurrence_frequency || undefined,
+    next_due_date: rawData.next_due_date || undefined
+  };
+};
+
 export const transactionQueryService = {
   async getTransactions(): Promise<Transaction[]> {
     try {
@@ -36,8 +58,8 @@ export const transactionQueryService = {
       // Adicionar logs para debug
       console.log('Transactions fetched:', data?.length || 0);
       
-      // Garantir que retorna um array mesmo que data seja nulo
-      return data || [];
+      // Converter dados para o tipo Transaction
+      return data ? data.map(mapToTransaction) : [];
     } catch (error) {
       console.error('Error fetching transactions:', error);
       // Garantir que o erro é propagado para ser tratado
@@ -78,7 +100,9 @@ export const transactionQueryService = {
       }
       
       console.log('Transactions fetched for date range:', data?.length || 0);
-      return data || []; // Garantir que retorna um array mesmo que data seja nulo
+      
+      // Converter dados para o tipo Transaction
+      return data ? data.map(mapToTransaction) : [];
     } catch (error) {
       console.error('Error fetching transactions by date range:', error);
       // Garantir que o erro é propagado para ser tratado

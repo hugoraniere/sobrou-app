@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Loader } from "lucide-react";
+import { Loader, AlertCircle } from "lucide-react";
 
 interface SpinnerProps {
   className?: string;
@@ -26,17 +26,40 @@ export const Spinner = ({ className, size = "md" }: SpinnerProps) => {
   );
 };
 
-export const LoadingSpinner = ({ 
+interface LoadingSpinnerProps {
+  className?: string;
+  message?: string;
+  timeout?: number; // Tempo em ms após o qual mostramos uma mensagem adicional
+}
+
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
   className, 
-  message 
-}: { 
-  className?: string,
-  message?: string 
+  message = "Carregando...",
+  timeout = 10000 // 10 segundos por padrão
 }) => {
+  const [isLongWait, setIsLongWait] = useState(false);
+
+  useEffect(() => {
+    // Se o componente permanecer montado por mais tempo que o timeout,
+    // indicamos que a espera está sendo longa
+    const timer = setTimeout(() => {
+      setIsLongWait(true);
+    }, timeout);
+
+    return () => clearTimeout(timer);
+  }, [timeout]);
+
   return (
     <div className={cn("flex flex-col items-center justify-center py-8", className)}>
       <Spinner size="lg" />
       {message && <p className="mt-3 text-sm text-muted-foreground">{message}</p>}
+      
+      {isLongWait && (
+        <div className="mt-4 flex items-center gap-2 text-amber-500 text-xs">
+          <AlertCircle className="h-4 w-4" />
+          <p>Isso está demorando mais que o esperado. Se continuar, tente atualizar a página.</p>
+        </div>
+      )}
     </div>
   );
 };
