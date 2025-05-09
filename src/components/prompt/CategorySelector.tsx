@@ -20,10 +20,22 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   onChange, 
   className 
 }) => {
+  // Encontrar a categoria selecionada para exibir o texto corretamente
+  const selectedCategory = transactionCategories.find(cat => cat.value === value);
+  
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger className={className}>
-        <SelectValue placeholder="Selecione uma categoria" />
+        <SelectValue>
+          {selectedCategory ? (
+            <span className="flex items-center gap-2">
+              {selectedCategory.icon && <selectedCategory.icon className="h-4 w-4 text-gray-500" />}
+              <span>{selectedCategory.label}</span>
+            </span>
+          ) : (
+            "Selecione uma categoria"
+          )}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent className="z-[1000] bg-white">
         {transactionCategories.map((category) => {

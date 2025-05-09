@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Transaction } from '@/services/transactions';
 import TransactionsHeader from '../molecules/TransactionsHeader';
@@ -8,6 +7,7 @@ import DeleteTransactionDialog from '../../transactions/DeleteTransactionDialog'
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
+import cn from 'classnames';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -47,7 +47,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   };
   
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={cn("flex flex-col space-y-4", className)}>
       <TransactionsHeader
         currentDate={currentDate}
         onDateChange={handleDateChange}
@@ -64,7 +64,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
         </Card>
       ) : (
         <>
-          <div className="space-y-4"> {/* Adicionando espaçamento entre os cards (16px) */}
+          <div className="space-y-4"> {/* Garantindo espaço de 16px entre cada card */}
             {paginatedTransactions.map((transaction) => (
               <Card key={transaction.id} className="overflow-hidden">
                 <TransactionItem

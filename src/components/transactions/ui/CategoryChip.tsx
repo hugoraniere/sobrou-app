@@ -21,10 +21,11 @@ const CategoryChip: React.FC<CategoryChipProps> = ({
   return (
     <div 
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium w-fit", // Adicionando w-fit para garantir que o chip não se estique
+        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium w-fit max-w-full", // w-fit garante um tamanho baseado no conteúdo
         category.color || "bg-gray-100 text-gray-800",
         className
       )}
+      style={{ flexShrink: 0, flexGrow: 0 }} // Impede a expansão ou contração do chip
     >
       <Icon className="h-4 w-4 flex-shrink-0" />
       <span className="truncate">{category.label || category.name || 'Categoria'}</span>

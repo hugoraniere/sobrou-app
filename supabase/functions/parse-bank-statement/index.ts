@@ -46,6 +46,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Erro ao analisar extrato:", error);
     
+    // Garantir que todos os erros retornem com os cabeçalhos CORS
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao processar extrato bancário" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -107,7 +108,7 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',  // Usando um modelo mais rápido e mais barato
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: trimmedContent }
@@ -128,21 +129,28 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     console.log("Resposta da IA:", content.substring(0, 500) + "...");
     
     try {
-      // Procurar por array JSON na resposta
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      // Uso de regex aprimorado para encontrar arrays JSON
+      const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
       if (jsonMatch) {
         const jsonStr = jsonMatch[0];
         return JSON.parse(jsonStr) as ExtractedTransaction[];
       }
       
-      // Se não encontrou, tenta parsear a resposta completa
-      return JSON.parse(content) as ExtractedTransaction[];
+      // Segunda tentativa: tentar remover backticks e markdown se presentes
+      const cleanedContent = content
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+      
+      // Tentar parsear o conteúdo limpo
+      return JSON.parse(cleanedContent) as ExtractedTransaction[];
     } catch (parseError) {
       console.error("Erro ao parsear resposta da IA:", parseError);
+      console.log("Conteúdo que falhou ao parsear:", content);
       throw new Error("Não foi possível extrair transações do formato retornado pela IA");
     }
   } catch (error) {
-    console.error("Erro ao extrair transações com IA:", error);
+    console.error("Erro detalhado ao extrair transações com IA:", error);
     throw error;
   }
 }

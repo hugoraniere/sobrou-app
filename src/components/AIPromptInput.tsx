@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -13,8 +12,8 @@ import PromptInputField from './prompt/PromptInputField';
 import PromptExampleFooter from './prompt/PromptExampleFooter';
 
 interface AIPromptInputProps {
-  onTransactionAdded: () => void;
-  onSavingAdded: () => void;
+  onTransactionAdded?: (closeForm?: boolean) => void;
+  onSavingAdded?: (closeForm?: boolean) => void;
   className?: string;
 }
 
@@ -79,7 +78,9 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
           const goal = await SavingsService.findOrCreateSavingGoal(parsedData.savingGoal);
           await SavingsService.addToSavingGoal(goal.id, parsedData.amount, parsedData.date);
           toast.success(`Adicionado R$${parsedData.amount.toFixed(2)} à sua poupança ${goal.name}!`);
-          onSavingAdded();
+          if (onSavingAdded) {
+            onSavingAdded(false); // Não fechar o formulário
+          }
         } catch (savingError) {
           console.error('Error processing saving:', savingError);
           toast.error("Não foi possível adicionar à poupança. Por favor, tente novamente.");
@@ -94,7 +95,9 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
             date: parsedData.date
           });
           toast.success(parsedData.type === 'income' ? `Registrado receita de R$${parsedData.amount.toFixed(2)}` : `Registrado despesa de R$${parsedData.amount.toFixed(2)}`);
-          onTransactionAdded();
+          if (onTransactionAdded) {
+            onTransactionAdded(false); // Não fechar o formulário
+          }
         } catch (transactionError) {
           console.error('Error adding transaction:', transactionError);
           toast.error("Não foi possível adicionar a transação. Por favor, tente novamente.");

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar as CalendarIcon } from 'lucide-react';
@@ -22,9 +22,17 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pt-BR' ? ptBR : undefined;
+  const [open, setOpen] = useState(false);
+
+  // Função para alternar o estado do popover
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(prev => !prev);
+  };
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -34,17 +42,21 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon className="mr-2 h-4 w-4 cursor-pointer" onClick={handleIconClick} />
           {date ? format(date, 'PPP', { locale }) : <span>{t('common.pickDate', 'Escolha uma data')}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent className="w-auto p-0 z-[1000]">
         <Calendar
           mode="single"
           selected={date}
-          onSelect={onDateChange}
+          onSelect={(date) => {
+            onDateChange(date);
+            setOpen(false);
+          }}
           initialFocus
           locale={locale}
+          className="pointer-events-auto"
         />
       </PopoverContent>
     </Popover>

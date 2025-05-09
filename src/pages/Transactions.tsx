@@ -120,10 +120,14 @@ const Transactions = () => {
     return () => clearTimeout(timeout);
   }, [lastUpdate]);
 
-  const handleTransactionUpdated = useCallback(() => {
+  const handleTransactionUpdated = useCallback((closeForm = false) => {
     console.log("Atualizando transações...");
     setLastUpdate(Date.now()); // Força uma nova busca das transações
-    setShowNewTransactionForm(false);
+    
+    // Só fecha o formulário se explicitamente solicitado
+    if (closeForm) {
+      setShowNewTransactionForm(false);
+    }
   }, []);
 
   const toggleNewTransactionForm = () => {
@@ -155,8 +159,8 @@ const Transactions = () => {
         {showNewTransactionForm && (
           <Card className="p-6 mb-6">
             <AIPromptInput 
-              onTransactionAdded={handleTransactionUpdated}
-              onSavingAdded={handleTransactionUpdated}
+              onTransactionAdded={() => handleTransactionUpdated(false)} // Não fechar o formulário após adição
+              onSavingAdded={() => handleTransactionUpdated(false)} // Não fechar o formulário após adição
               className="bg-white"
             />
           </Card>
@@ -196,7 +200,7 @@ const Transactions = () => {
           <ModernTransactionList
             transactions={transactions}
             onTransactionUpdated={handleTransactionUpdated}
-            className="mt-6"
+            className="mt-6 space-y-4" // Adicionando espaçamento entre os cards (16px)
             key={`transactions-list-${lastUpdate}`} // Forçar rerender quando as transações são atualizadas
           />
         )}
