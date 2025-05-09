@@ -16,6 +16,7 @@ import { LoadingSpinner } from '@/components/ui/spinner';
 
 const MAX_RETRY_COUNT = 2;
 const RETRY_DELAY = 3000; // 3 segundos
+const MAX_LOADING_TIME = 15000; // 15 segundos
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ const Transactions = () => {
   const [showNewTransactionForm, setShowNewTransactionForm] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [retryCount, setRetryCount] = useState(0);
+  const [fetchAborted, setFetchAborted] = useState(false);
 
   const fetchTransactions = useCallback(async (retry = false) => {
     if (!isAuthenticated || !session) {
@@ -40,18 +42,47 @@ const Transactions = () => {
       return;
     }
 
+    // Se já temos transações e é um retry, continuar mostrando o que temos
+    if (retry && transactions.length > 0) {
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setHasError(false);
+    setFetchAborted(false);
     
     try {
       console.log(`Tentativa de buscar transações: ${retry ? 'retry' : 'initial'}`);
-      const data = await TransactionService.getTransactions();
+      const data = await Promise.race([
+        TransactionService.getTransactions(),
+        new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            setFetchAborted(true);
+            reject(new Error('Tempo limite excedido ao buscar transações'));
+          }, MAX_LOADING_TIME);
+        })
+      ]) as Transaction[];
+      
       console.log(`Buscando transações: ${data.length} encontradas`);
       setTransactions(data);
       setIsLoading(false);
       setRetryCount(0); // Resetar contador de tentativas após sucesso
     } catch (error) {
       console.error('Error fetching transactions:', error);
+      
+      if (fetchAborted) {
+        // Se temos transações e o fetch foi abortado, continuar mostrando o que temos
+        if (transactions.length > 0) {
+          setIsLoading(false);
+          toast.error("A busca demorou muito tempo, mas estamos exibindo as transações já carregadas.");
+        } else {
+          setHasError(true);
+          setErrorMessage("Tempo limite excedido ao carregar transações. Por favor, tente novamente.");
+          setIsLoading(false);
+        }
+        return;
+      }
       
       // Lógica de retry
       if (retryCount < MAX_RETRY_COUNT) {
@@ -65,7 +96,7 @@ const Transactions = () => {
         setIsLoading(false);
       }
     }
-  }, [t, isAuthenticated, session, retryCount]);
+  }, [t, isAuthenticated, session, retryCount, transactions]);
 
   useEffect(() => {
     // Resetar estado e iniciar busca
@@ -81,10 +112,10 @@ const Transactions = () => {
         setIsLoading(false);
         if (transactions.length === 0) {
           setHasError(true);
-          setErrorMessage("Tempo limite excedido ao carregar transações.");
+          setErrorMessage("Tempo limite excedido ao carregar transações. Algumas funcionalidades podem não estar disponíveis.");
         }
       }
-    }, 15000); // 15 segundos de timeout
+    }, MAX_LOADING_TIME + 1000); // Um pouco mais que o timeout da requisição
 
     return () => clearTimeout(timeout);
   }, [lastUpdate]);

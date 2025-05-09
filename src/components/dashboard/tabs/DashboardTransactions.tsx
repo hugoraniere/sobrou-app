@@ -20,6 +20,7 @@ interface DashboardTransactionsProps {
   isLoading?: boolean;
   hasError?: boolean;
   onRetry?: () => void;
+  errorMessage?: string;
 }
 
 const DashboardTransactions: React.FC<DashboardTransactionsProps> = ({
@@ -27,7 +28,8 @@ const DashboardTransactions: React.FC<DashboardTransactionsProps> = ({
   onTransactionUpdated,
   isLoading = false,
   hasError = false,
-  onRetry
+  onRetry,
+  errorMessage
 }) => {
   if (isLoading) {
     return <LoadingSpinner message="Carregando transações..." timeout={5000} />;
@@ -39,7 +41,7 @@ const DashboardTransactions: React.FC<DashboardTransactionsProps> = ({
         <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
         <h3 className="text-xl font-semibold mb-2">Erro ao carregar transações</h3>
         <p className="text-gray-600 mb-4">
-          Não foi possível carregar suas transações. Verifique sua conexão e tente novamente.
+          {errorMessage || "Não foi possível carregar suas transações. Verifique sua conexão e tente novamente."}
         </p>
         {onRetry && (
           <Button onClick={onRetry}>Tentar novamente</Button>

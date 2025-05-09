@@ -15,14 +15,29 @@ const validateTransactionType = (type: string): "income" | "expense" | "transfer
 
 // Função auxiliar para converter dados do Supabase para o tipo Transaction
 const mapToTransaction = (rawData: any): Transaction => {
-  return {
-    ...rawData,
-    type: validateTransactionType(rawData.type),
-    // Garantir que outros campos opcionais estejam corretamente tipados
-    is_recurring: Boolean(rawData.is_recurring),
-    recurrence_frequency: rawData.recurrence_frequency || undefined,
-    next_due_date: rawData.next_due_date || undefined
-  };
+  if (!rawData) {
+    throw new Error('Dados de transação inválidos');
+  }
+  
+  try {
+    return {
+      id: rawData.id,
+      date: rawData.date,
+      description: rawData.description || '',
+      amount: typeof rawData.amount === 'number' ? rawData.amount : parseFloat(rawData.amount),
+      type: validateTransactionType(rawData.type),
+      category: rawData.category || 'compras',
+      // Garantir que outros campos opcionais estejam corretamente tipados
+      is_recurring: Boolean(rawData.is_recurring),
+      recurrence_frequency: rawData.recurrence_frequency || undefined,
+      next_due_date: rawData.next_due_date || undefined,
+      user_id: rawData.user_id,
+      created_at: rawData.created_at
+    };
+  } catch (error) {
+    console.error('Erro ao converter dados da transação:', error, rawData);
+    throw new Error('Falha ao processar dados da transação');
+  }
 };
 
 export const transactionQueryService = {
@@ -58,8 +73,24 @@ export const transactionQueryService = {
       // Adicionar logs para debug
       console.log('Transactions fetched:', data?.length || 0);
       
-      // Converter dados para o tipo Transaction
-      return data ? data.map(mapToTransaction) : [];
+      if (!data) {
+        return [];
+      }
+      
+      // Converter dados para o tipo Transaction com validação adicional
+      const transactions: Transaction[] = [];
+      
+      for (const item of data) {
+        try {
+          const transaction = mapToTransaction(item);
+          transactions.push(transaction);
+        } catch (err) {
+          console.error('Erro ao processar transação individual:', err);
+          // Continua processando outras transações
+        }
+      }
+      
+      return transactions;
     } catch (error) {
       console.error('Error fetching transactions:', error);
       // Garantir que o erro é propagado para ser tratado
@@ -101,8 +132,24 @@ export const transactionQueryService = {
       
       console.log('Transactions fetched for date range:', data?.length || 0);
       
-      // Converter dados para o tipo Transaction
-      return data ? data.map(mapToTransaction) : [];
+      if (!data) {
+        return [];
+      }
+      
+      // Converter dados com validação adicional
+      const transactions: Transaction[] = [];
+      
+      for (const item of data) {
+        try {
+          const transaction = mapToTransaction(item);
+          transactions.push(transaction);
+        } catch (err) {
+          console.error('Erro ao processar transação na consulta por data:', err);
+          // Continua processando outras transações
+        }
+      }
+      
+      return transactions;
     } catch (error) {
       console.error('Error fetching transactions by date range:', error);
       // Garantir que o erro é propagado para ser tratado

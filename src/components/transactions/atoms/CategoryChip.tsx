@@ -35,13 +35,13 @@ const CategoryChip: React.FC<CategoryChipProps> = ({ categoryId, className }) =>
 
   return (
     <div className={cn(
-      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium w-fit", // Adicionando w-fit para garantir que o chip não se estique
       bgColorClass,
       textColorClass,
       className
     )}>
-      <IconComponent className="h-3.5 w-3.5" />
-      <span>{category.name}</span>
+      <IconComponent className="h-3.5 w-3.5 flex-shrink-0" />
+      <span className="truncate">{category.name}</span>
     </div>
   );
 };

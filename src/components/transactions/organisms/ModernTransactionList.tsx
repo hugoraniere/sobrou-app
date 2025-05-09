@@ -64,16 +64,17 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
         </Card>
       ) : (
         <>
-          <Card className="overflow-hidden">
+          <div className="space-y-4"> {/* Adicionando espaçamento entre os cards (16px) */}
             {paginatedTransactions.map((transaction) => (
-              <TransactionItem
-                key={transaction.id}
-                transaction={transaction}
-                onEdit={() => handleEdit(transaction)}
-                onDelete={() => handleDelete(transaction.id)}
-              />
+              <Card key={transaction.id} className="overflow-hidden">
+                <TransactionItem
+                  transaction={transaction}
+                  onEdit={() => handleEdit(transaction)}
+                  onDelete={() => handleDelete(transaction.id)}
+                />
+              </Card>
             ))}
-          </Card>
+          </div>
           
           {totalPages > 1 && (
             <Pagination className="mt-4">

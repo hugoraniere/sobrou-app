@@ -21,20 +21,20 @@ const CategoryChip: React.FC<CategoryChipProps> = ({
   return (
     <div 
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium",
+        "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium w-fit", // Adicionando w-fit para garantir que o chip não se estique
         category.color || "bg-gray-100 text-gray-800",
         className
       )}
     >
-      <Icon className="h-4 w-4" />
-      <span>{category.label || category.name || 'Categoria'}</span>
+      <Icon className="h-4 w-4 flex-shrink-0" />
+      <span className="truncate">{category.label || category.name || 'Categoria'}</span>
       {onRemove && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
           }}
-          className="ml-1 hover:text-gray-700 transition-colors"
+          className="ml-1 hover:text-gray-700 transition-colors flex-shrink-0"
         >
           <X className="h-3 w-3" />
           <span className="sr-only">Remover categoria</span>
