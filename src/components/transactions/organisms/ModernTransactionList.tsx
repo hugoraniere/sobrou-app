@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Transaction } from '@/services/transactions';
 import TransactionsHeader from '../molecules/TransactionsHeader';
@@ -7,7 +8,7 @@ import DeleteTransactionDialog from '../../transactions/DeleteTransactionDialog'
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
-import cn from 'classnames';
+import { cn } from '@/lib/utils';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
