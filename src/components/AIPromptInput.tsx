@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { TransactionService } from '@/services/transactions';
@@ -31,24 +32,35 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   const inputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation();
 
+  // Otimizado para detectar categoria com menos atraso
+  const detectCategory = useCallback((text: string) => {
+    if (text.trim().length > 3 && !userSelectedCategory) {
+      const category = getCategoryByKeyword(text);
+      setDetectedCategory(category ? category.id : null);
+    } else if (text.trim().length <= 3 && !userSelectedCategory) {
+      setDetectedCategory(null);
+    }
+  }, [userSelectedCategory]);
+
+  // Usando o useEffect com a função de callback otimizada
   useEffect(() => {
     if (inputTimeoutRef.current) {
       clearTimeout(inputTimeoutRef.current);
     }
-    if (inputValue.trim().length > 3 && !userSelectedCategory) {
+    
+    if (inputValue.trim().length > 0) {
+      // Reduzindo o timeout para melhorar a responsividade
       inputTimeoutRef.current = setTimeout(() => {
-        const category = getCategoryByKeyword(inputValue);
-        setDetectedCategory(category ? category.id : null);
-      }, 500);
-    } else if (inputValue.trim().length <= 3 && !userSelectedCategory) {
-      setDetectedCategory(null);
+        detectCategory(inputValue);
+      }, 200);
     }
+    
     return () => {
       if (inputTimeoutRef.current) {
         clearTimeout(inputTimeoutRef.current);
       }
     };
-  }, [inputValue, userSelectedCategory]);
+  }, [inputValue, detectCategory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +68,42 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       toast.error("Por favor, descreva sua transação");
       return;
     }
+    
     setIsProcessing(true);
+    
     try {
-      const parsedData = await TransactionService.parseExpenseText(inputValue);
+      // Parseamento local simples para casos comuns, para ser mais rápido
+      let quickParsed = false;
+      let quickResult = null;
+      
+      // Tentar detectar um padrão simples no formato "X reais em Y"
+      const simplePattern = /(\d+)\s*reais\s*(com|em|no|na|para)\s*(.+)/i;
+      const match = inputValue.match(simplePattern);
+      
+      if (match) {
+        const amount = parseInt(match[1], 10);
+        const description = match[3];
+        const category = detectedCategory || userSelectedCategory || 'compras';
+        
+        quickResult = {
+          amount,
+          description,
+          category,
+          type: 'expense',
+          date: format(selectedDate, 'yyyy-MM-dd'),
+          isSaving: false
+        };
+        
+        quickParsed = true;
+      }
+      
+      // Se não conseguimos fazer parseamento rápido, usar a API
+      const parsedData = quickParsed ? quickResult : await TransactionService.parseExpenseText(inputValue);
       console.log("Parsed data:", parsedData);
+
+      if (!parsedData) {
+        throw new Error("Não foi possível interpretar sua transação");
+      }
 
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       parsedData.date = formattedDate;
@@ -67,6 +111,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       if (userSelectedCategory) {
         parsedData.category = userSelectedCategory;
       }
+      
       if (!parsedData || parsedData.amount <= 0) {
         toast.error("Não foi possível detectar um valor válido. Por favor, inclua um número na sua descrição.");
         setIsProcessing(false);
@@ -130,10 +175,8 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
 
   const categoryId = userSelectedCategory || detectedCategory;
   
-  // Removido o Card component que causava o nesting
   return (
     <div className={className}>
-      <h2 className="text-xl font-semibold mb-4">Inserir sua transação</h2>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <PromptInputField 
           inputValue={inputValue} 

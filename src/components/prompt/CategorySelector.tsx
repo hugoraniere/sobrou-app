@@ -28,23 +28,22 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
       <SelectTrigger className={className}>
         <SelectValue>
           {selectedCategory ? (
-            <span className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               {selectedCategory.icon && <selectedCategory.icon className="h-4 w-4 text-gray-500" />}
               <span>{selectedCategory.label}</span>
-            </span>
+            </div>
           ) : (
             "Selecione uma categoria"
           )}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="z-[1000] bg-white">
+      <SelectContent className="max-h-[300px]">
         {transactionCategories.map((category) => {
           const Icon = category.icon;
           return (
             <SelectItem 
               key={category.value} 
               value={category.value}
-              className="flex items-center gap-2"
             >
               <div className="flex items-center gap-2">
                 <Icon className="h-4 w-4 text-gray-500" />

@@ -129,21 +129,30 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     console.log("Resposta da IA:", content.substring(0, 500) + "...");
     
     try {
-      // Uso de regex aprimorado para encontrar arrays JSON
-      const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
-      if (jsonMatch) {
-        const jsonStr = jsonMatch[0];
-        return JSON.parse(jsonStr) as ExtractedTransaction[];
+      // Primeiro, tentar fazer o parse diretamente
+      try {
+        return JSON.parse(content) as ExtractedTransaction[];
+      } catch (directParseError) {
+        // Se falhar, tentar usar regex para extrair JSON
+        const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        
+        if (jsonMatch) {
+          const jsonStr = jsonMatch[0];
+          return JSON.parse(jsonStr) as ExtractedTransaction[];
+        }
+        
+        // Tentar remover markdown e backticks se presentes
+        const cleanedContent = content
+          .replace(/```json\s*/g, '')
+          .replace(/```\s*/g, '')
+          .trim();
+        
+        if (cleanedContent.startsWith('[') && cleanedContent.endsWith(']')) {
+          return JSON.parse(cleanedContent) as ExtractedTransaction[];
+        }
+        
+        throw new Error("Formato de resposta da IA inválido: não foi possível extrair um JSON válido");
       }
-      
-      // Segunda tentativa: tentar remover backticks e markdown se presentes
-      const cleanedContent = content
-        .replace(/```json/g, '')
-        .replace(/```/g, '')
-        .trim();
-      
-      // Tentar parsear o conteúdo limpo
-      return JSON.parse(cleanedContent) as ExtractedTransaction[];
     } catch (parseError) {
       console.error("Erro ao parsear resposta da IA:", parseError);
       console.log("Conteúdo que falhou ao parsear:", content);

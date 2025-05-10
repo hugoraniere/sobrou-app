@@ -1,8 +1,10 @@
 
 import React from 'react';
-import DashboardTabs from './DashboardTabs';
 import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
+import DashboardOverview from './tabs/DashboardOverview';
+import DashboardInsights from './tabs/DashboardInsights';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface DashboardContentProps {
   transactions: Transaction[];
@@ -27,30 +29,34 @@ interface DashboardContentProps {
 
 const DashboardContent: React.FC<DashboardContentProps> = ({
   transactions,
-  filteredTransactions,
   savingGoals,
-  filters,
   isLoading,
   hasTransactions,
   onTransactionUpdated,
-  showOnboarding,
-  setShowOnboarding,
-  whatsAppConnected,
-  onSavingGoalAdded,
-  onSavingGoalUpdated
 }) => {
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
-      <div className="mt-6">
-        <DashboardTabs
-          transactions={transactions}
-          filteredTransactions={filteredTransactions}
-          savingGoals={savingGoals}
-          filters={filters}
-          isLoading={isLoading}
-          hasTransactions={hasTransactions}
-          onTransactionUpdated={onTransactionUpdated}
-        />
+    <div className="w-full max-w-full overflow-x-hidden space-y-6">
+      {/* Visão Geral */}
+      <div>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Visão Geral</CardTitle>
+          </CardHeader>
+          <DashboardOverview 
+            transactions={transactions} 
+            savingGoals={savingGoals} 
+          />
+        </Card>
+      </div>
+      
+      {/* Insights */}
+      <div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Insights</CardTitle>
+          </CardHeader>
+          <DashboardInsights transactions={transactions} />
+        </Card>
       </div>
     </div>
   );

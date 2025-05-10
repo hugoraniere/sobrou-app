@@ -1,15 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
-import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
-import AIPromptInput from '../components/AIPromptInput';
 
 const Index = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   
   const {
     transactions,
@@ -19,14 +16,11 @@ const Index = () => {
     showOnboarding,
     setShowOnboarding,
     fetchData,
-    toggleWhatsApp,
     hasTransactions
   } = useDashboardData();
   
   const {
     filters,
-    handleFilterChange,
-    handleResetFilters,
     filteredTransactions
   } = useFilteredTransactions(transactions);
   
@@ -48,11 +42,6 @@ const Index = () => {
         <h1 className="text-3xl font-bold mb-2">Visão geral</h1>
         <p className="text-gray-600">Acompanhe suas finanças e analise seus hábitos de gastos</p>
       </div>
-      
-      <AIPromptInput 
-        onTransactionAdded={fetchData}
-        onSavingAdded={fetchData}
-      />
       
       <DashboardContent
         transactions={transactions}
