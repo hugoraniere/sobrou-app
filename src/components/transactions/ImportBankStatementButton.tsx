@@ -65,6 +65,9 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         throw new Error("Não foi possível extrair texto do arquivo. Tente com outro arquivo.");
       }
       
+      console.log("Texto extraído do arquivo:", text.substring(0, 100) + "...");
+      console.log("Tamanho total do texto:", text.length);
+      
       setProcessingStep('Analisando transações com IA');
       setProcessingProgress(50);
       toast.info("Analisando extrações bancárias com IA...");

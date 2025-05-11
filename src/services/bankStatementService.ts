@@ -154,11 +154,17 @@ const mapToValidCategory = (aiCategory: string | undefined, description: string,
 
 export const bankStatementService = {
   async extractTransactionsFromContent(content: string): Promise<ExtractedTransaction[]> {
+    if (!content || content.trim() === '') {
+      console.error("Conteúdo vazio enviado para análise");
+      throw new Error("O conteúdo do extrato está vazio");
+    }
+    
     try {
       // Pré-processar o conteúdo para reduzir seu tamanho
       const processedContent = this.preprocessContent(content);
       
       console.log("Enviando conteúdo para análise:", processedContent.length, "caracteres");
+      console.log("Amostra do conteúdo:", processedContent.substring(0, 200) + "...");
       
       const response = await supabase.functions.invoke('parse-bank-statement', {
         body: { textContent: processedContent }
@@ -166,6 +172,8 @@ export const bankStatementService = {
         console.error("Erro na chamada da função edge:", error);
         throw new Error("Falha na comunicação com o serviço de análise de extratos: " + error.message);
       });
+      
+      console.log("Resposta da função edge:", response);
       
       if (response.error) {
         console.error("Erro na função de parse:", response.error);

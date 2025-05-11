@@ -17,17 +17,23 @@ interface ExtractedTransaction {
 }
 
 serve(async (req) => {
+  console.log("Requisição recebida pela função parse-bank-statement");
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log("Requisição OPTIONS recebida, retornando headers CORS");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     // Obter os dados do corpo da requisição
+    console.log("Tentando parsear corpo da requisição");
     const requestData = await req.json().catch(error => {
       console.error("Erro ao parsear JSON da requisição:", error);
       throw new Error("Formato de requisição inválido: " + error.message);
     });
+    
+    console.log("Corpo da requisição recebido:", JSON.stringify(requestData));
     
     const { textContent } = requestData;
     
