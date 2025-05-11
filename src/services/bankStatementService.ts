@@ -166,6 +166,14 @@ export const bankStatementService = {
       console.log("Enviando conteúdo para análise:", processedContent.length, "caracteres");
       console.log("Amostra do conteúdo:", processedContent.substring(0, 200) + "...");
       
+      // Verificação adicional que o conteúdo existe e não está vazio
+      if (!processedContent || processedContent.trim() === '') {
+        throw new Error("O conteúdo processado está vazio");
+      }
+      
+      // Realizar a chamada para a função edge usando invoke
+      console.log("Iniciando chamada para parse-bank-statement com tamanho:", processedContent.length);
+      
       const response = await supabase.functions.invoke('parse-bank-statement', {
         body: { textContent: processedContent }
       }).catch(error => {
@@ -173,7 +181,7 @@ export const bankStatementService = {
         throw new Error("Falha na comunicação com o serviço de análise de extratos: " + error.message);
       });
       
-      console.log("Resposta da função edge:", response);
+      console.log("Resposta da função edge recebida:", response);
       
       if (response.error) {
         console.error("Erro na função de parse:", response.error);
@@ -191,47 +199,52 @@ export const bankStatementService = {
       
       if (extractedTransactions.length === 0) {
         console.warn("Nenhuma transação encontrada no extrato");
+        throw new Error("Nenhuma transação foi identificada no extrato. Verifique o formato do arquivo.");
       }
       
       // Aplicar um mapeamento melhorado das categorias para cada transação
-      const enhancedTransactions = extractedTransactions.map((tx: ExtractedTransaction) => {
-        try {
-          // Validar dados
-          const validDate = validateDate(tx.date);
-          const validDescription = validateDescription(tx.description);
-          const validAmount = typeof tx.amount === 'number' ? tx.amount : parseFloat(String(tx.amount));
-          const validType = tx.type === 'income' || tx.type === 'expense' ? tx.type : 'expense';
-          
-          // Tentar obter uma categoria válida para esta transação
-          const mappedCategory = mapToValidCategory(tx.category, validDescription, validAmount, validType);
-          
-          return {
-            date: validDate,
-            description: validDescription,
-            amount: validAmount,
-            type: validType,
-            category: mappedCategory,
-            selected: true  // Todas são selecionadas por padrão
-          };
-        } catch (error) {
-          console.error("Erro ao processar transação individual:", error);
-          // Retornar objeto com valores padrão para não quebrar o fluxo
-          return {
-            date: new Date().toISOString().split('T')[0],
-            description: "Erro ao processar transação",
-            amount: 0,
-            type: 'expense' as const,
-            category: 'compras',
-            selected: false
-          };
-        }
-      });
-
+      const enhancedTransactions = this.enhanceTransactions(extractedTransactions);
+      
       return enhancedTransactions || [];
     } catch (error: any) {
       console.error("Erro ao extrair transações:", error);
       throw new Error(error.message || "Não foi possível extrair transações do extrato");
     }
+  },
+  
+  enhanceTransactions(transactions: ExtractedTransaction[]): ExtractedTransaction[] {
+    return transactions.map((tx: ExtractedTransaction) => {
+      try {
+        // Validar dados
+        const validDate = validateDate(tx.date);
+        const validDescription = validateDescription(tx.description);
+        const validAmount = typeof tx.amount === 'number' ? tx.amount : parseFloat(String(tx.amount));
+        const validType = tx.type === 'income' || tx.type === 'expense' ? tx.type : 'expense';
+        
+        // Tentar obter uma categoria válida para esta transação
+        const mappedCategory = mapToValidCategory(tx.category, validDescription, validAmount, validType);
+        
+        return {
+          date: validDate,
+          description: validDescription,
+          amount: validAmount,
+          type: validType,
+          category: mappedCategory,
+          selected: true  // Todas são selecionadas por padrão
+        };
+      } catch (error) {
+        console.error("Erro ao processar transação individual:", error);
+        // Retornar objeto com valores padrão para não quebrar o fluxo
+        return {
+          date: new Date().toISOString().split('T')[0],
+          description: "Erro ao processar transação",
+          amount: 0,
+          type: 'expense' as const,
+          category: 'compras',
+          selected: false
+        };
+      }
+    });
   },
   
   // Pré-processamento do conteúdo para reduzir seu tamanho e melhorar a performance
@@ -242,8 +255,17 @@ export const bankStatementService = {
     }
     
     try {
+      console.log("Iniciando pré-processamento do conteúdo. Tamanho original:", content.length);
+      
+      // Remover caracteres especiais e espaços em excesso
+      let processedContent = content
+        .replace(/\r\n|\r/g, '\n') // Normalizar quebras de linha
+        .replace(/\t/g, ' ')      // Substituir tabs por espaços
+        .replace(/\s{2,}/g, ' ')  // Substituir múltiplos espaços por um espaço
+        .trim();
+      
       // Remover linhas muito longas (provavelmente código, imagens codificadas, etc)
-      const lines = content.split('\n');
+      const lines = processedContent.split('\n');
       const filteredLines = lines.filter(line => line.trim().length < 500);
       
       // Remover linhas duplicadas
@@ -251,11 +273,14 @@ export const bankStatementService = {
       
       // Limitar o tamanho total
       const maxLength = 10000;
-      let processedContent = uniqueLines.join('\n');
+      processedContent = uniqueLines.join('\n');
+      
       if (processedContent.length > maxLength) {
+        console.log(`Conteúdo excede o tamanho máximo. Truncando de ${processedContent.length} para ${maxLength} caracteres.`);
         processedContent = processedContent.substring(0, maxLength);
       }
       
+      console.log("Pré-processamento concluído. Novo tamanho:", processedContent.length);
       return processedContent;
     } catch (error) {
       console.error("Erro no pré-processamento do conteúdo:", error);

@@ -28,12 +28,24 @@ serve(async (req) => {
   try {
     // Obter os dados do corpo da requisição
     console.log("Tentando parsear corpo da requisição");
-    const requestData = await req.json().catch(error => {
-      console.error("Erro ao parsear JSON da requisição:", error);
-      throw new Error("Formato de requisição inválido: " + error.message);
-    });
     
-    console.log("Corpo da requisição recebido:", JSON.stringify(requestData));
+    // Log raw request to help debug
+    const bodyText = await req.text();
+    console.log("Corpo bruto da requisição:", bodyText);
+    
+    // Parse the request body
+    let requestData;
+    try {
+      requestData = JSON.parse(bodyText);
+    } catch (error) {
+      console.error("Erro ao parsear JSON da requisição:", error);
+      return new Response(
+        JSON.stringify({ error: "Formato de requisição inválido: " + error.message }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    console.log("Corpo da requisição parseado:", JSON.stringify(requestData));
     
     const { textContent } = requestData;
     
@@ -47,9 +59,12 @@ serve(async (req) => {
 
     console.log("Processando conteúdo do extrato bancário...");
     console.log("Tamanho do conteúdo:", textContent.length);
+    console.log("Amostra do conteúdo:", textContent.substring(0, 100) + "...");
     
     // Chamar a API da OpenAI para extrair as transações
     const transactions = await extractTransactionsWithAI(textContent);
+    
+    console.log("Transações extraídas com sucesso:", transactions.length);
     
     return new Response(
       JSON.stringify({ transactions }),
@@ -143,7 +158,7 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     
     const data = await response.json();
     const content = data.choices[0].message.content;
-    console.log("Resposta da IA recebida:", content.substring(0, 100) + "...");
+    console.log("Resposta da IA recebida:", content.substring(0, 200) + "...");
     
     // Melhorando a extração do JSON com múltiplos métodos
     return extractJSONFromContent(content);
@@ -172,7 +187,7 @@ function extractJSONFromContent(content: string): ExtractedTransaction[] {
     const jsonMatch = content.match(jsonRegex);
     
     if (jsonMatch && jsonMatch.length > 0) {
-      console.log("JSON encontrado com regex:", jsonMatch[0].substring(0, 50) + "...");
+      console.log("JSON encontrado com regex:", jsonMatch[0].substring(0, 100) + "...");
       return JSON.parse(jsonMatch[0]) as ExtractedTransaction[];
     }
   } catch (regexError) {
@@ -203,7 +218,7 @@ function extractJSONFromContent(content: string): ExtractedTransaction[] {
     
     if (arrayStart !== -1 && arrayEnd !== -1 && arrayStart < arrayEnd) {
       const possibleJson = content.substring(arrayStart, arrayEnd + 1);
-      console.log("Possível JSON encontrado:", possibleJson.substring(0, 50) + "...");
+      console.log("Possível JSON encontrado:", possibleJson.substring(0, 100) + "...");
       return JSON.parse(possibleJson) as ExtractedTransaction[];
     }
   } catch (structureError) {

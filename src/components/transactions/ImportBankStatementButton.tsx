@@ -68,6 +68,10 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       console.log("Texto extraído do arquivo:", text.substring(0, 100) + "...");
       console.log("Tamanho total do texto:", text.length);
       
+      if (text.length < 50) {
+        throw new Error("O texto extraído é muito curto para ser um extrato válido. Tente com outro arquivo.");
+      }
+      
       setProcessingStep('Analisando transações com IA');
       setProcessingProgress(50);
       toast.info("Analisando extrações bancárias com IA...");
