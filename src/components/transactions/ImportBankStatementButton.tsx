@@ -69,8 +69,12 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       setProcessingProgress(50);
       toast.info("Analisando extrações bancárias com IA...");
       
+      console.log("Enviando texto para análise, tamanho:", text.length);
+      
       // Analisar o conteúdo do extrato com a IA
       const extractedData = await bankStatementService.extractTransactionsFromContent(text);
+      
+      console.log("Dados extraídos recebidos:", extractedData?.length || 0, "transações");
       
       if (!extractedData || extractedData.length === 0) {
         throw new Error("Não foi possível identificar transações no extrato. Tente com outro formato de arquivo.");

@@ -24,9 +24,15 @@ serve(async (req) => {
 
   try {
     // Obter os dados do corpo da requisição
-    const { textContent } = await req.json();
+    const requestData = await req.json().catch(error => {
+      console.error("Erro ao parsear JSON da requisição:", error);
+      throw new Error("Formato de requisição inválido: " + error.message);
+    });
+    
+    const { textContent } = requestData;
     
     if (!textContent) {
+      console.error("Erro: Conteúdo do extrato não fornecido");
       return new Response(
         JSON.stringify({ error: "Conteúdo do extrato é obrigatório" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -59,6 +65,7 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     
     if (!openAIApiKey) {
+      console.error("API key do OpenAI não configurada");
       throw new Error('API key do OpenAI não configurada');
     }
     
@@ -117,6 +124,9 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
         temperature: 0.1,
         max_tokens: 4000
       }),
+    }).catch(error => {
+      console.error("Erro na requisição para OpenAI:", error);
+      throw new Error(`Falha na comunicação com a API OpenAI: ${error.message}`);
     });
 
     if (!response.ok) {
@@ -129,48 +139,73 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     const content = data.choices[0].message.content;
     console.log("Resposta da IA recebida:", content.substring(0, 100) + "...");
     
-    try {
-      // Tentar fazer parse diretamente do conteúdo
-      try {
-        console.log("Tentando fazer parse direto do conteúdo");
-        return JSON.parse(content) as ExtractedTransaction[];
-      } catch (directParseError) {
-        console.log("Parse direto falhou, tentando métodos alternativos");
-        
-        // Método 1: Tentar extrair JSON com regex
-        const jsonRegex = /\[\s*\{[\s\S]*\}\s*\]/;
-        const jsonMatch = content.match(jsonRegex);
-        
-        if (jsonMatch) {
-          console.log("Extraindo JSON usando regex");
-          const jsonStr = jsonMatch[0];
-          return JSON.parse(jsonStr) as ExtractedTransaction[];
-        }
-        
-        // Método 2: Limpar markdown e backticks
-        console.log("Tentando limpar markdown e backticks");
-        const cleanContent = content
-          .replace(/```json\s*/g, '')
-          .replace(/```\s*/g, '')
-          .trim();
-        
-        if (cleanContent.startsWith('[') && cleanContent.endsWith(']')) {
-          return JSON.parse(cleanContent) as ExtractedTransaction[];
-        }
-        
-        console.error("Todos os métodos de parse falharam");
-        console.log("Conteúdo que falhou:", content);
-        throw new Error("Formato de resposta da IA inválido: não foi possível extrair um JSON válido");
-      }
-    } catch (parseError) {
-      console.error("Erro ao parsear resposta da IA:", parseError);
-      console.error("Conteúdo que falhou ao parsear:", content);
-      
-      // Fallback para array vazio com mensagem de erro clara
-      throw new Error("Não foi possível extrair transações do formato retornado pela IA. Verifique se o extrato contém informações de transações.");
-    }
+    // Melhorando a extração do JSON com múltiplos métodos
+    return extractJSONFromContent(content);
   } catch (error) {
     console.error("Erro detalhado ao extrair transações com IA:", error);
     throw error;
   }
+}
+
+function extractJSONFromContent(content: string): ExtractedTransaction[] {
+  console.log("Iniciando extração de JSON da resposta");
+  
+  // Método 1: Tentar fazer parse diretamente do conteúdo
+  try {
+    console.log("Método 1: Parse direto");
+    return JSON.parse(content) as ExtractedTransaction[];
+  } catch (directParseError) {
+    console.log("Parse direto falhou, tentando métodos alternativos");
+  }
+  
+  // Método 2: Tentar extrair JSON com regex mais robusta
+  try {
+    console.log("Método 2: Extração com regex");
+    // Regex melhorada para encontrar arrays JSON válidos
+    const jsonRegex = /\[\s*\{[\s\S]*?\}\s*\]/g;
+    const jsonMatch = content.match(jsonRegex);
+    
+    if (jsonMatch && jsonMatch.length > 0) {
+      console.log("JSON encontrado com regex:", jsonMatch[0].substring(0, 50) + "...");
+      return JSON.parse(jsonMatch[0]) as ExtractedTransaction[];
+    }
+  } catch (regexError) {
+    console.log("Extração com regex falhou:", regexError);
+  }
+  
+  // Método 3: Limpar markdown e backticks
+  try {
+    console.log("Método 3: Limpeza de markdown");
+    const cleanContent = content
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
+    
+    if (cleanContent.startsWith('[') && cleanContent.endsWith(']')) {
+      console.log("JSON encontrado após limpeza de markdown");
+      return JSON.parse(cleanContent) as ExtractedTransaction[];
+    }
+  } catch (cleanupError) {
+    console.log("Limpeza de markdown falhou:", cleanupError);
+  }
+  
+  // Método 4: Tentar encontrar qualquer estrutura que pareça um array JSON
+  try {
+    console.log("Método 4: Busca por estrutura de array");
+    const arrayStart = content.indexOf('[');
+    const arrayEnd = content.lastIndexOf(']');
+    
+    if (arrayStart !== -1 && arrayEnd !== -1 && arrayStart < arrayEnd) {
+      const possibleJson = content.substring(arrayStart, arrayEnd + 1);
+      console.log("Possível JSON encontrado:", possibleJson.substring(0, 50) + "...");
+      return JSON.parse(possibleJson) as ExtractedTransaction[];
+    }
+  } catch (structureError) {
+    console.log("Busca por estrutura de array falhou:", structureError);
+  }
+  
+  // Se nada funcionar, retornar array vazio e logar o conteúdo para debug
+  console.error("Todos os métodos de extração de JSON falharam");
+  console.error("Conteúdo que falhou ao parsear:", content);
+  throw new Error("Formato de resposta da IA inválido: não foi possível extrair um JSON válido");
 }

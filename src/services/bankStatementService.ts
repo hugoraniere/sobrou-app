@@ -162,11 +162,19 @@ export const bankStatementService = {
       
       const response = await supabase.functions.invoke('parse-bank-statement', {
         body: { textContent: processedContent }
+      }).catch(error => {
+        console.error("Erro na chamada da função edge:", error);
+        throw new Error("Falha na comunicação com o serviço de análise de extratos: " + error.message);
       });
       
       if (response.error) {
         console.error("Erro na função de parse:", response.error);
         throw new Error(response.error.message || 'Erro ao analisar extrato bancário');
+      }
+      
+      if (!response.data) {
+        console.error("Resposta da função sem dados:", response);
+        throw new Error("A resposta do serviço de análise não contém dados");
       }
       
       // Obter transações do resultado
@@ -183,7 +191,7 @@ export const bankStatementService = {
           // Validar dados
           const validDate = validateDate(tx.date);
           const validDescription = validateDescription(tx.description);
-          const validAmount = typeof tx.amount === 'number' ? tx.amount : parseFloat(tx.amount as any);
+          const validAmount = typeof tx.amount === 'number' ? tx.amount : parseFloat(String(tx.amount));
           const validType = tx.type === 'income' || tx.type === 'expense' ? tx.type : 'expense';
           
           // Tentar obter uma categoria válida para esta transação
@@ -220,73 +228,94 @@ export const bankStatementService = {
   
   // Pré-processamento do conteúdo para reduzir seu tamanho e melhorar a performance
   preprocessContent(content: string): string {
-    // Remover linhas muito longas (provavelmente código, imagens codificadas, etc)
-    const lines = content.split('\n');
-    const filteredLines = lines.filter(line => line.trim().length < 500);
-    
-    // Remover linhas duplicadas
-    const uniqueLines = Array.from(new Set(filteredLines));
-    
-    // Limitar o tamanho total
-    const maxLength = 10000;
-    let processedContent = uniqueLines.join('\n');
-    if (processedContent.length > maxLength) {
-      processedContent = processedContent.substring(0, maxLength);
+    if (!content) {
+      console.warn("Conteúdo vazio enviado para pré-processamento");
+      return "";
     }
     
-    return processedContent;
+    try {
+      // Remover linhas muito longas (provavelmente código, imagens codificadas, etc)
+      const lines = content.split('\n');
+      const filteredLines = lines.filter(line => line.trim().length < 500);
+      
+      // Remover linhas duplicadas
+      const uniqueLines = Array.from(new Set(filteredLines));
+      
+      // Limitar o tamanho total
+      const maxLength = 10000;
+      let processedContent = uniqueLines.join('\n');
+      if (processedContent.length > maxLength) {
+        processedContent = processedContent.substring(0, maxLength);
+      }
+      
+      return processedContent;
+    } catch (error) {
+      console.error("Erro no pré-processamento do conteúdo:", error);
+      // Em caso de erro, retornar uma versão truncada do conteúdo original
+      return content.substring(0, 8000);
+    }
   },
 
   async importTransactions(selectedTransactions: ExtractedTransaction[]): Promise<ImportResult> {
     try {
       console.log("Iniciando importação de", selectedTransactions.length, "transações");
       // Obter usuário atual
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await supabase.auth.getUser();
       
-      if (!user) {
+      if (userError) {
+        console.error("Erro ao obter o usuário:", userError);
+        throw new Error("Erro ao autenticar usuário: " + userError.message);
+      }
+      
+      if (!userData || !userData.user) {
         throw new Error("Usuário não autenticado");
       }
+      
+      const user = userData.user;
 
       // Lista de categorias válidas no sistema
       const validCategories = transactionCategories.map(cat => cat.id);
 
       // Converter para o formato de transação do sistema com validação de categoria
-      const transactionsToInsert = selectedTransactions.map(tx => {
-        try {
-          // Validação de dados
-          const validDate = validateDate(tx.date);
-          const validDescription = validateDescription(tx.description);
-          const validAmount = typeof tx.amount === 'number' ? tx.amount : parseFloat(tx.amount as any);
-          const validType = tx.type === 'income' || tx.type === 'expense' ? tx.type : 'expense';
-          
-          // Tentar mapear para uma categoria válida
-          let categoryToUse = tx.category;
-          
-          // Se a categoria não for válida, tentar obter uma a partir da descrição
-          if (!categoryToUse || !validCategories.includes(categoryToUse)) {
-            const categoryByDescription = getCategoryByKeyword(validDescription);
-            if (categoryByDescription) {
-              categoryToUse = categoryByDescription.id;
-            } else {
-              // Se não conseguirmos, usar nossa função de determinação de melhor categoria
-              categoryToUse = determineBestCategory(validDescription, validAmount, validType);
+      const transactionsToInsert = selectedTransactions
+        .filter(tx => tx !== null && tx !== undefined)
+        .map(tx => {
+          try {
+            // Validação de dados
+            const validDate = validateDate(tx.date);
+            const validDescription = validateDescription(tx.description);
+            const validAmount = typeof tx.amount === 'number' ? tx.amount : parseFloat(String(tx.amount));
+            const validType = tx.type === 'income' || tx.type === 'expense' ? tx.type : 'expense';
+            
+            // Tentar mapear para uma categoria válida
+            let categoryToUse = tx.category;
+            
+            // Se a categoria não for válida, tentar obter uma a partir da descrição
+            if (!categoryToUse || !validCategories.includes(categoryToUse)) {
+              const categoryByDescription = getCategoryByKeyword(validDescription);
+              if (categoryByDescription) {
+                categoryToUse = categoryByDescription.id;
+              } else {
+                // Se não conseguirmos, usar nossa função de determinação de melhor categoria
+                categoryToUse = determineBestCategory(validDescription, validAmount, validType);
+              }
             }
-          }
 
-          return {
-            user_id: user.id,
-            date: validDate,
-            description: validDescription,
-            amount: validAmount,
-            type: validType,
-            category: categoryToUse || 'compras' // Usar compras como fallback se for null
-          };
-        } catch (error) {
-          console.error("Erro ao preparar transação para inserção:", error);
-          // Retornar null para filtrar depois
-          return null;
-        }
-      }).filter(tx => tx !== null); // Remover transações inválidas
+            return {
+              user_id: user.id,
+              date: validDate,
+              description: validDescription,
+              amount: validAmount,
+              type: validType,
+              category: categoryToUse || 'compras' // Usar compras como fallback se for null
+            };
+          } catch (error) {
+            console.error("Erro ao preparar transação para inserção:", error);
+            // Retornar null para filtrar depois
+            return null;
+          }
+        })
+        .filter(tx => tx !== null); // Remover transações inválidas
 
       if (transactionsToInsert.length === 0) {
         return {
@@ -311,7 +340,8 @@ export const bankStatementService = {
           
         if (error) {
           console.error("Erro ao inserir lote de transações:", error);
-          console.error("Detalhes do lote com erro:", batch);
+          console.error("Detalhes do lote com erro:", JSON.stringify(batch, null, 2));
+          
           // Continuar mesmo com erro em um lote
           results.push({ success: false, error });
         } else {
