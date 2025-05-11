@@ -11,11 +11,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 interface TransactionDatePickerProps {
   date: Date | undefined;
   onDateChange: (date: Date | undefined) => void;
+  className?: string;
 }
 
 const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
   date,
-  onDateChange
+  onDateChange,
+  className
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -37,7 +39,8 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
+            className
           )}
         >
           <div className="flex justify-between w-full items-center">

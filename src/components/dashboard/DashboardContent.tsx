@@ -37,27 +37,23 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6">
       {/* Visão Geral */}
-      <div>
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Visão Geral</CardTitle>
-          </CardHeader>
-          <DashboardOverview 
-            transactions={transactions} 
-            savingGoals={savingGoals} 
-          />
-        </Card>
-      </div>
+      <Card className="mb-6 bg-white">
+        <CardHeader>
+          <CardTitle>Visão Geral</CardTitle>
+        </CardHeader>
+        <DashboardOverview 
+          transactions={transactions} 
+          savingGoals={savingGoals} 
+        />
+      </Card>
       
       {/* Insights */}
-      <div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Insights</CardTitle>
-          </CardHeader>
-          <DashboardInsights transactions={transactions} />
-        </Card>
-      </div>
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle>Insights</CardTitle>
+        </CardHeader>
+        <DashboardInsights transactions={transactions} />
+      </Card>
     </div>
   );
 };

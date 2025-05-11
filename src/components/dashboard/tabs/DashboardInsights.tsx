@@ -14,7 +14,7 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({ transactions }) =
   const { insights, isLoading, refreshInsights } = useFinancialInsights(transactions);
 
   return (
-    <CardContent className="p-6">
+    <CardContent className="p-6 bg-white">
       <div className="w-full space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">

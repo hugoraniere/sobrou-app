@@ -39,7 +39,6 @@ const TransactionFormLayout: React.FC<TransactionFormLayoutProps> = ({
           "dark:bg-slate-950",
           className
         )}
-        hideCloseButton={true}
       >
         <div className="flex flex-col h-full max-h-[85vh]">
           <DialogHeader className="p-6 pb-2">

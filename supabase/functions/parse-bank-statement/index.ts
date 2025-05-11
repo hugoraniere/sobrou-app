@@ -101,6 +101,7 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
       }
     ]`;
     
+    console.log("Enviando requisição para a OpenAI...");
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -118,45 +119,55 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
       }),
     });
 
-    const data = await response.json();
-    
     if (!response.ok) {
-      console.error("Resposta da API da OpenAI:", data);
-      throw new Error(`Erro na API OpenAI: ${data.error?.message || 'Erro desconhecido'}`);
+      const errorData = await response.json();
+      console.error("Resposta de erro da API da OpenAI:", errorData);
+      throw new Error(`Erro na API OpenAI: ${errorData.error?.message || 'Erro desconhecido'}`);
     }
     
+    const data = await response.json();
     const content = data.choices[0].message.content;
-    console.log("Resposta da IA:", content.substring(0, 500) + "...");
+    console.log("Resposta da IA recebida:", content.substring(0, 100) + "...");
     
     try {
-      // Primeiro, tentar fazer o parse diretamente
+      // Tentar fazer parse diretamente do conteúdo
       try {
+        console.log("Tentando fazer parse direto do conteúdo");
         return JSON.parse(content) as ExtractedTransaction[];
       } catch (directParseError) {
-        // Se falhar, tentar usar regex para extrair JSON
-        const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        console.log("Parse direto falhou, tentando métodos alternativos");
+        
+        // Método 1: Tentar extrair JSON com regex
+        const jsonRegex = /\[\s*\{[\s\S]*\}\s*\]/;
+        const jsonMatch = content.match(jsonRegex);
         
         if (jsonMatch) {
+          console.log("Extraindo JSON usando regex");
           const jsonStr = jsonMatch[0];
           return JSON.parse(jsonStr) as ExtractedTransaction[];
         }
         
-        // Tentar remover markdown e backticks se presentes
-        const cleanedContent = content
+        // Método 2: Limpar markdown e backticks
+        console.log("Tentando limpar markdown e backticks");
+        const cleanContent = content
           .replace(/```json\s*/g, '')
           .replace(/```\s*/g, '')
           .trim();
         
-        if (cleanedContent.startsWith('[') && cleanedContent.endsWith(']')) {
-          return JSON.parse(cleanedContent) as ExtractedTransaction[];
+        if (cleanContent.startsWith('[') && cleanContent.endsWith(']')) {
+          return JSON.parse(cleanContent) as ExtractedTransaction[];
         }
         
+        console.error("Todos os métodos de parse falharam");
+        console.log("Conteúdo que falhou:", content);
         throw new Error("Formato de resposta da IA inválido: não foi possível extrair um JSON válido");
       }
     } catch (parseError) {
       console.error("Erro ao parsear resposta da IA:", parseError);
-      console.log("Conteúdo que falhou ao parsear:", content);
-      throw new Error("Não foi possível extrair transações do formato retornado pela IA");
+      console.error("Conteúdo que falhou ao parsear:", content);
+      
+      // Fallback para array vazio com mensagem de erro clara
+      throw new Error("Não foi possível extrair transações do formato retornado pela IA. Verifique se o extrato contém informações de transações.");
     }
   } catch (error) {
     console.error("Erro detalhado ao extrair transações com IA:", error);

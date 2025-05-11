@@ -21,7 +21,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   className 
 }) => {
   // Encontrar a categoria selecionada para exibir o texto corretamente
-  const selectedCategory = transactionCategories.find(cat => cat.value === value);
+  const selectedCategory = transactionCategories.find(cat => cat.value === value || cat.id === value);
   
   return (
     <Select value={value} onValueChange={onChange}>
@@ -29,8 +29,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         <SelectValue>
           {selectedCategory ? (
             <div className="flex items-center gap-2">
-              {selectedCategory.icon && <selectedCategory.icon className="h-4 w-4 text-gray-500" />}
-              <span>{selectedCategory.label}</span>
+              {selectedCategory.icon && React.createElement(selectedCategory.icon, { className: "h-4 w-4 text-gray-500" })}
+              <span>{selectedCategory.label || selectedCategory.name}</span>
             </div>
           ) : (
             "Selecione uma categoria"
@@ -38,20 +38,17 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         </SelectValue>
       </SelectTrigger>
       <SelectContent className="max-h-[300px]">
-        {transactionCategories.map((category) => {
-          const Icon = category.icon;
-          return (
-            <SelectItem 
-              key={category.value} 
-              value={category.value}
-            >
-              <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4 text-gray-500" />
-                <span>{category.label}</span>
-              </div>
-            </SelectItem>
-          );
-        })}
+        {transactionCategories.map((category) => (
+          <SelectItem 
+            key={category.value || category.id} 
+            value={category.value || category.id}
+          >
+            <div className="flex items-center gap-2">
+              {category.icon && React.createElement(category.icon, { className: "h-4 w-4 text-gray-500" })}
+              <span>{category.label || category.name}</span>
+            </div>
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

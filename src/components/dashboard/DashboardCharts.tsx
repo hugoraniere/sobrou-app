@@ -19,7 +19,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ transactions }) => {
           <CardHeader className="pb-2">
             <CardTitle>{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-white">
             <DailyBarChart transactions={transactions} />
           </CardContent>
         </Card>
@@ -27,7 +27,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ transactions }) => {
           <CardHeader className="pb-2">
             <CardTitle>{TEXT.dashboard.charts.categoryBreakdown}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-white">
             <ExpensesByCategoryChart expenses={transactions} chartConfig={{}} />
           </CardContent>
         </Card>
@@ -37,7 +37,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ transactions }) => {
         <CardHeader className="pb-2">
           <CardTitle>{TEXT.dashboard.charts.balanceEvolution}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-white">
           <MonthlyComparisonChart expenses={transactions} chartConfig={{}} />
         </CardContent>
       </Card>

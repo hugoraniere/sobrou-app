@@ -78,7 +78,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
       <HoverCardTrigger asChild>
         <Card 
           style={{ borderColor: color }} 
-          className={`min-w-[240px] flex-1 ${className} ${onClick ? 'cursor-pointer' : ''}`}
+          className={`min-w-[240px] flex-1 bg-white ${className} ${onClick ? 'cursor-pointer' : ''}`}
           onClick={onClick}
         >
           {cardContent}
