@@ -68,6 +68,11 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
     setIsUploading(true);
     setProcessingStep('Iniciando processamento');
     setProcessingProgress(5);
+    
+    // Mostrar toast mais visível indicando o início do processamento
+    const processingToast = toast.loading("Processando extrato bancário. Isso pode demorar alguns segundos...", {
+      duration: 60000, // Manter por 60 segundos ou até ser fechado
+    });
 
     try {
       let text = '';
@@ -76,14 +81,19 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       if (file.type === 'application/pdf') {
         setProcessingStep('Extraindo texto do PDF');
         setProcessingProgress(20);
-        toast.info("Extraindo texto do PDF, aguarde...");
         console.log("Iniciando extração de texto do PDF");
+        
+        // Toast de progresso
+        toast.loading("Extraindo texto do PDF...", { id: processingToast });
+        
         text = await extractTextFromPDF(file);
         
         // Verificar se o texto foi extraído corretamente
         if (!text || text.trim().length === 0) {
           // Tentar método alternativo para PDFs que não conseguimos extrair texto facilmente
           console.warn("Texto não extraído do PDF com método padrão, tentando alternativa");
+          toast.loading("Usando método alternativo de extração...", { id: processingToast });
+          
           try {
             const buffer = await readFileAsArrayBuffer(file);
             const bytes = new Uint8Array(buffer);
@@ -100,12 +110,14 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         setProcessingStep('Lendo conteúdo do arquivo');
         setProcessingProgress(30);
         console.log("Iniciando leitura de arquivo texto");
+        toast.loading("Lendo arquivo texto...", { id: processingToast });
         text = await readFileAsText(file);
       } else if (file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         // Arquivos Excel
         setProcessingStep('Processando planilha Excel');
         setProcessingProgress(30);
         console.log("Arquivo Excel detectado");
+        toast.loading("Processando arquivo Excel...", { id: processingToast });
         text = await readFileAsText(file);
         if (!text || text.trim().length === 0) {
           // Para arquivos Excel muitas vezes não conseguimos extrair texto diretamente
@@ -141,12 +153,18 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       
       setProcessingStep('Analisando transações com IA');
       setProcessingProgress(50);
-      toast.info("Analisando extrações bancárias com IA...");
+      toast.loading("Analisando extrações bancárias com IA...", { id: processingToast });
       
       console.log("Enviando texto para análise, tamanho:", text.length);
       
-      // Analisar o conteúdo do extrato com a IA
-      const extractedData = await bankStatementService.extractTransactionsFromContent(text);
+      // Estabelecendo um timeout para a análise da IA
+      const timeoutPromise = new Promise<ExtractedTransaction[]>((_, reject) => {
+        setTimeout(() => reject(new Error("Tempo limite excedido ao analisar extrato. Tente novamente.")), 60000);
+      });
+      
+      // Analisar o conteúdo do extrato com a IA com timeout
+      const extractionPromise = bankStatementService.extractTransactionsFromContent(text);
+      const extractedData = await Promise.race([extractionPromise, timeoutPromise]);
       
       console.log("Dados extraídos recebidos:", extractedData?.length || 0, "transações");
       
@@ -160,10 +178,16 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       setProcessingProgress(100);
       setExtractedTransactions(transactionsWithSelection);
       setShowConfirmDialog(true);
-      toast.success(`${transactionsWithSelection.length} transações identificadas com sucesso!`);
+      
+      // Fechar o toast de processamento e mostrar sucesso
+      toast.success(`${transactionsWithSelection.length} transações identificadas com sucesso!`, {
+        id: processingToast, // Substitui o toast de loading
+      });
     } catch (error: any) {
       console.error("Erro ao processar arquivo:", error);
-      toast.error(error.message || "Erro ao processar arquivo");
+      toast.error(error.message || "Erro ao processar arquivo", {
+        id: processingToast, // Substitui o toast de loading
+      });
     } finally {
       setIsUploading(false);
       setProcessingStep('');
@@ -211,10 +235,14 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       }
       
       console.log(`Iniciando importação de ${selectedTransactions.length} transações`);
+      
+      // Criar um toast de feedback
+      const importToastId = toast.loading(`Importando ${selectedTransactions.length} transações...`);
+      
       const result = await bankStatementService.importTransactions(selectedTransactions);
       
       if (result.success) {
-        toast.success(`${selectedTransactions.length} transações importadas com sucesso!`);
+        toast.success(`${selectedTransactions.length} transações importadas com sucesso!`, { id: importToastId });
         setShowConfirmDialog(false);
         setExtractedTransactions([]);
         
@@ -223,7 +251,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
           onTransactionsAdded();
         }, 300);
       } else {
-        toast.error(result.message || "Erro ao importar transações");
+        toast.error(result.message || "Erro ao importar transações", { id: importToastId });
       }
     } catch (error: any) {
       console.error("Erro ao importar transações:", error);

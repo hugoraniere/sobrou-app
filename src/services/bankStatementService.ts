@@ -174,22 +174,9 @@ export const bankStatementService = {
     console.log("Tamanho do conteúdo original:", content.length);
     
     try {
-      // Pré-processar o conteúdo para garantir integridade
-      const processedContent = this.preprocessContent(content);
-      
-      if (!processedContent || processedContent.trim() === '') {
-        console.error("Conteúdo processado está vazio após pré-processamento");
-        // Em vez de lançar erro, tentar enviar o conteúdo original
-        console.log("Tentando enviar o conteúdo original sem pré-processamento");
-        if (content.trim() !== '') {
-          console.log("Usando conteúdo original para análise");
-        } else {
-          throw new Error("O conteúdo do extrato está vazio");
-        }
-      }
-      
-      // Usar o conteúdo processado se disponível, caso contrário usar o original
-      const contentToSend = processedContent && processedContent.trim() !== '' ? processedContent : content;
+      // Enviar conteúdo sem pré-processamento agressivo
+      // Isso resolve o problema de "Conteúdo vazio após pré-processamento"
+      const contentToSend = content;
       
       console.log("Enviando conteúdo para análise:", contentToSend.length, "caracteres");
       console.log("Amostra do conteúdo:", contentToSend.substring(0, 200) + "...");
@@ -227,6 +214,7 @@ export const bankStatementService = {
       
       // Aplicar um mapeamento melhorado das categorias para cada transação
       const enhancedTransactions = this.enhanceTransactions(extractedTransactions);
+      console.log("Transações aprimoradas:", enhancedTransactions.length);
       
       return enhancedTransactions || [];
     } catch (error: any) {
@@ -268,83 +256,6 @@ export const bankStatementService = {
         };
       }
     });
-  },
-  
-  // Pré-processamento melhorado do conteúdo
-  preprocessContent(content: string): string {
-    if (!content) {
-      console.warn("Conteúdo vazio enviado para pré-processamento");
-      return '';
-    }
-    
-    try {
-      console.log("Iniciando pré-processamento do conteúdo. Tamanho original:", content.length);
-      
-      // Verificar se o conteúdo é realmente uma string
-      if (typeof content !== 'string') {
-        console.error("Tipo de conteúdo inválido:", typeof content);
-        return '';
-      }
-      
-      // Normalizar quebras de linha e espaços - MENOS AGRESSIVO
-      let processedContent = content
-        .replace(/\r\n|\r/g, '\n')  // Normalizar quebras de linha
-        .replace(/\t/g, ' ');       // Substituir tabs por espaços
-      
-      // IMPORTANTE: Não remover espaços no início e fim para preservar estrutura
-      
-      // Remover sequências de caracteres não imprimíveis e estranhos - MENOS AGRESSIVO
-      processedContent = processedContent
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');  // Remover apenas caracteres de controle específicos
-                                     
-      // Dividir em linhas para melhor processamento
-      const lines = processedContent.split('\n');
-      
-      // Remover linhas muito longas (provavelmente código, imagens codificadas, etc)
-      // MENOS AGRESSIVO: Aumentado o limite para 1000 caracteres
-      const filteredLines = lines.filter(line => {
-        // Manter todas as linhas, exceto as extremamente longas
-        return line.length < 1000;
-      });
-      
-      // Remover linhas duplicadas consecutivas, mas de forma menos agressiva
-      const deduplicatedLines = [];
-      let previousLine = '';
-      
-      for (const line of filteredLines) {
-        // Só remove duplicatas exatas consecutivas
-        if (line !== previousLine) {
-          deduplicatedLines.push(line);
-          previousLine = line;
-        }
-      }
-      
-      // Juntar novamente as linhas
-      processedContent = deduplicatedLines.join('\n');
-      
-      // Verificar se ainda temos conteúdo
-      if (!processedContent || processedContent.trim() === '') {
-        console.error("Conteúdo vazio após processamento de linhas");
-        return content; // Retornar o conteúdo original se o processamento falhar
-      }
-      
-      // Limitar o tamanho total (para não exceder limites de tokens da API)
-      // MENOS AGRESSIVO: Aumentando o limite máximo
-      const maxLength = 18000;
-      if (processedContent.length > maxLength) {
-        console.log(`Conteúdo excede o tamanho máximo. Truncando de ${processedContent.length} para ${maxLength} caracteres.`);
-        processedContent = processedContent.substring(0, maxLength);
-      }
-      
-      console.log("Pré-processamento concluído. Novo tamanho:", processedContent.length);
-      console.log("Amostra após pré-processamento:", processedContent.substring(0, 100) + "...");
-      
-      return processedContent;
-    } catch (error) {
-      console.error("Erro no pré-processamento do conteúdo:", error);
-      // Em caso de erro no processamento, retornar o conteúdo original
-      return content; 
-    }
   },
 
   async importTransactions(selectedTransactions: ExtractedTransaction[]): Promise<ImportResult> {
@@ -417,8 +328,8 @@ export const bankStatementService = {
 
       console.log("Transações válidas para inserção:", transactionsToInsert.length);
 
-      // Inserir transações no banco em lotes de 10 para melhorar performance
-      const batchSize = 10;
+      // Inserir transações no banco em lotes de 20 para melhorar performance
+      const batchSize = 20; // Aumentado de 10 para 20
       const results = [];
 
       for (let i = 0; i < transactionsToInsert.length; i += batchSize) {

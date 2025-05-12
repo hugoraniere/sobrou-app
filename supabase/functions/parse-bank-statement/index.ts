@@ -155,47 +155,36 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
       throw new Error('Conteúdo do extrato inválido ou vazio');
     }
     
-    // Limitar o tamanho do texto para evitar exceder limites de tokens - MENOS AGRESSIVO
-    const maxLength = 15000; // Aumentado o limite máximo
+    // Limitar o tamanho do texto para evitar exceder limites de tokens mas ser menos agressivo
+    const maxLength = 20000; // Aumentado para 20K caracteres
     const trimmedContent = textContent.length > maxLength 
       ? textContent.substring(0, maxLength) + "..." 
       : textContent;
     
-    // Modelo instrucional mais detalhado e específico
+    // Modelo instrucional otimizado para faturas de cartão de crédito e extratos bancários
     const systemPrompt = `
-    Você é um especialista em extrair transações financeiras de extratos bancários.
-    Analise o texto do extrato bancário com atenção aos detalhes e extraia todas as transações encontradas.
+    Você é um especialista financeiro focado em extrair transações de extratos bancários e faturas de cartão de crédito.
     
     Regras importantes:
-    1. Identifique padrões de datas no formato brasileiro (dd/mm/yyyy ou dd/mm)
-    2. Identifique valores monetários (podem estar no formato: R$ 1.234,56 ou 1.234,56 ou 1234.56)
-    3. Converta todos os valores para números sem símbolos (1234.56)
-    4. Classifique cada transação como "income" (entrada/crédito) ou "expense" (saída/débito)
-    5. Tente inferir a categoria com base na descrição (alimentação, transporte, salário, etc.)
-    6. Normalize as datas para o formato ISO (YYYY-MM-DD)
-    7. Identifique a descrição de cada transação
+    1. Identifique datas no formato brasileiro (dd/mm ou dd/mm/yy ou dd/mm/yyyy)
+    2. Valores monetários: R$ XX,XX ou XX.XX ou XX,XX
+    3. Classifique como "income" (entrada) ou "expense" (saída/compra)
+    4. Use categorias: alimentacao, moradia, transporte, internet, cartao, saude, lazer, compras, investimentos, familia, doacoes
+    5. Para faturas de cartão, todas as compras são "expense"
+    6. Pagamentos de faturas geralmente são "expense" tipo "cartao"
+    7. Normalize as datas para o formato ISO (YYYY-MM-DD)
     
-    Responda APENAS com um array JSON válido de transações. Não inclua explicações ou comentários.
-    Exemplo do formato esperado:
+    IMPORTANTE: Este é um fatura de cartão de crédito, portanto a maioria dos itens são compras (expenses).
+    
+    Retorne APENAS um JSON válido com um array de transações. Formato:
     [
-      {
-        "date": "2023-05-15",
-        "description": "COMPRA SUPERMERCADO XYZ",
-        "amount": 152.35,
-        "type": "expense",
-        "category": "alimentacao"
-      },
-      {
-        "date": "2023-05-10",
-        "description": "SALÁRIO",
-        "amount": 3500,
-        "type": "income",
-        "category": "salario"
-      }
+      {"date": "2023-05-15", "description": "MERCADO XYZ", "amount": 152.35, "type": "expense", "category": "alimentacao"},
+      {"date": "2023-05-10", "description": "PAGAMENTO RECEBIDO", "amount": 3500, "type": "income", "category": "salario"}
     ]`;
     
-    console.log("Enviando requisição para a OpenAI...");
-    console.log("Tamanho do conteúdo enviado:", trimmedContent.length);
+    console.log("Enviando requisição para OpenAI. Tamanho do conteúdo:", trimmedContent.length);
+
+    // Usamos streaming para melhorar a performance e evitar timeouts
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -203,17 +192,15 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o-mini', // Modelo mais rápido
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: trimmedContent }
         ],
-        temperature: 0.1,
-        max_tokens: 4000
+        temperature: 0.0, // Reduzir a criatividade para extrações mais precisas
+        max_tokens: 4000,
+        response_format: { type: "json_object" } // Forçar resposta em formato JSON
       }),
-    }).catch(error => {
-      console.error("Erro na requisição para OpenAI:", error);
-      throw new Error(`Falha na comunicação com a API OpenAI: ${error.message}`);
     });
 
     if (!response.ok) {
@@ -234,100 +221,29 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     console.log("Resposta da IA recebida. Tamanho:", content.length);
     console.log("Amostra:", content.substring(0, 200) + "...");
     
-    // Melhorando a extração do JSON com múltiplos métodos
-    return extractJSONFromContent(content);
+    // Extrair JSON da resposta formatada
+    const jsonResponse = JSON.parse(content);
+    
+    // Verificar se temos o campo 'transactions' ou se é um array diretamente
+    let extractedTransactions;
+    if (Array.isArray(jsonResponse)) {
+      extractedTransactions = jsonResponse;
+    } else if (jsonResponse.transactions && Array.isArray(jsonResponse.transactions)) {
+      extractedTransactions = jsonResponse.transactions;
+    } else {
+      // Tentar encontrar qualquer array no objeto de resposta
+      const possibleArrays = Object.values(jsonResponse).filter(v => Array.isArray(v));
+      if (possibleArrays.length > 0 && possibleArrays[0].length > 0) {
+        extractedTransactions = possibleArrays[0];
+      } else {
+        throw new Error("Formato de resposta inválido: não foi possível encontrar um array de transações");
+      }
+    }
+    
+    console.log(`Extração bem-sucedida: ${extractedTransactions.length} transações encontradas`);
+    return extractedTransactions;
   } catch (error) {
     console.error("Erro detalhado ao extrair transações com IA:", error);
     throw error;
   }
-}
-
-function extractJSONFromContent(content: string): ExtractedTransaction[] {
-  console.log("Iniciando extração de JSON da resposta");
-  
-  if (!content || content.trim() === '') {
-    throw new Error("Conteúdo da resposta da IA está vazio");
-  }
-  
-  // Método 1: Tentar fazer parse diretamente do conteúdo
-  try {
-    console.log("Método 1: Parse direto");
-    return JSON.parse(content) as ExtractedTransaction[];
-  } catch (directParseError) {
-    console.log("Parse direto falhou, tentando métodos alternativos");
-  }
-  
-  // Método 2: Tentar extrair JSON com regex mais robusta
-  try {
-    console.log("Método 2: Extração com regex");
-    // Regex melhorada para encontrar arrays JSON válidos
-    const jsonRegex = /\[\s*\{[\s\S]*?\}\s*\]/g;
-    const jsonMatch = content.match(jsonRegex);
-    
-    if (jsonMatch && jsonMatch.length > 0) {
-      console.log("JSON encontrado com regex:", jsonMatch[0].substring(0, 100) + "...");
-      return JSON.parse(jsonMatch[0]) as ExtractedTransaction[];
-    }
-  } catch (regexError) {
-    console.log("Extração com regex falhou:", regexError);
-  }
-  
-  // Método 3: Limpar markdown e backticks
-  try {
-    console.log("Método 3: Limpeza de markdown");
-    const cleanContent = content
-      .replace(/```json\s*/g, '')
-      .replace(/```\s*/g, '')
-      .trim();
-    
-    if (cleanContent.startsWith('[') && cleanContent.endsWith(']')) {
-      console.log("JSON encontrado após limpeza de markdown");
-      return JSON.parse(cleanContent) as ExtractedTransaction[];
-    }
-  } catch (cleanupError) {
-    console.log("Limpeza de markdown falhou:", cleanupError);
-  }
-  
-  // Método 4: Tentar encontrar qualquer estrutura que pareça um array JSON
-  try {
-    console.log("Método 4: Busca por estrutura de array");
-    const arrayStart = content.indexOf('[');
-    const arrayEnd = content.lastIndexOf(']');
-    
-    if (arrayStart !== -1 && arrayEnd !== -1 && arrayStart < arrayEnd) {
-      const possibleJson = content.substring(arrayStart, arrayEnd + 1);
-      console.log("Possível JSON encontrado:", possibleJson.substring(0, 100) + "...");
-      return JSON.parse(possibleJson) as ExtractedTransaction[];
-    }
-  } catch (structureError) {
-    console.log("Busca por estrutura de array falhou:", structureError);
-  }
-  
-  // Método 5: Tentativa final - construir um array de um único item se tudo falhar
-  try {
-    console.log("Método 5: Construindo array manualmente com dados disponíveis");
-    // Procurar por padrões de data, valor e descrição
-    const dateMatch = content.match(/\d{4}-\d{2}-\d{2}/);
-    const amountMatch = content.match(/\d+(\.\d+)?/);
-    
-    if (dateMatch && amountMatch) {
-      const fallbackTransaction = {
-        date: dateMatch[0],
-        description: "Transação extraída manualmente",
-        amount: parseFloat(amountMatch[0]),
-        type: "expense" as const, // default to expense
-        category: "compras"
-      };
-      
-      console.log("Construído array manual com uma transação:", fallbackTransaction);
-      return [fallbackTransaction];
-    }
-  } catch (fallbackError) {
-    console.log("Construção manual falhou:", fallbackError);
-  }
-  
-  // Se nada funcionar, retornar array vazio e logar o conteúdo para debug
-  console.error("Todos os métodos de extração de JSON falharam");
-  console.error("Conteúdo que falhou ao parsear:", content);
-  throw new Error("Formato de resposta da IA inválido: não foi possível extrair um JSON válido");
 }
