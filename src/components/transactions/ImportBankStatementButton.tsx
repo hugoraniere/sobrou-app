@@ -38,8 +38,12 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log("Nenhum arquivo selecionado");
+      return;
+    }
 
+    console.log("Arquivo selecionado:", file.name, "tipo:", file.type, "tamanho:", file.size);
     setIsUploading(true);
     setProcessingStep('Iniciando processamento');
     setProcessingProgress(5);
@@ -52,23 +56,29 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         setProcessingStep('Extraindo texto do PDF');
         setProcessingProgress(20);
         toast.info("Extraindo texto do PDF, aguarde...");
+        console.log("Iniciando extração de texto do PDF");
         text = await extractTextFromPDF(file);
-      } else if (file.type === 'text/plain' || file.type === 'text/csv') {
+      } else if (file.type === 'text/plain' || file.type === 'text/csv' || file.name.endsWith('.csv')) {
         setProcessingStep('Lendo conteúdo do arquivo');
         setProcessingProgress(30);
+        console.log("Iniciando leitura de arquivo texto");
         text = await readFileAsText(file);
       } else {
+        console.error("Formato de arquivo não suportado:", file.type);
         throw new Error("Formato de arquivo não suportado. Por favor, envie PDF, TXT ou CSV.");
       }
       
       if (!text || text.trim().length === 0) {
+        console.error("Texto extraído está vazio");
         throw new Error("Não foi possível extrair texto do arquivo. Tente com outro arquivo.");
       }
       
       console.log("Texto extraído do arquivo:", text.substring(0, 100) + "...");
       console.log("Tamanho total do texto:", text.length);
       
+      // Verificação mínima para garantir que temos conteúdo suficiente
       if (text.length < 50) {
+        console.warn("Texto extraído é muito curto:", text);
         throw new Error("O texto extraído é muito curto para ser um extrato válido. Tente com outro arquivo.");
       }
       
@@ -143,6 +153,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         return;
       }
       
+      console.log(`Iniciando importação de ${selectedTransactions.length} transações`);
       const result = await bankStatementService.importTransactions(selectedTransactions);
       
       if (result.success) {

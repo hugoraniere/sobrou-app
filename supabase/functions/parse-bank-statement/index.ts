@@ -31,12 +31,21 @@ serve(async (req) => {
     
     // Log raw request to help debug
     const bodyText = await req.text();
-    console.log("Corpo bruto da requisição:", bodyText);
+    console.log("Corpo bruto da requisição recebido. Tamanho:", bodyText.length);
+    
+    if (!bodyText || bodyText.trim() === '') {
+      console.error("Erro: Corpo da requisição está vazio");
+      return new Response(
+        JSON.stringify({ error: "Corpo da requisição está vazio" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     
     // Parse the request body
     let requestData;
     try {
       requestData = JSON.parse(bodyText);
+      console.log("Corpo da requisição parseado com sucesso");
     } catch (error) {
       console.error("Erro ao parsear JSON da requisição:", error);
       return new Response(
@@ -45,7 +54,7 @@ serve(async (req) => {
       );
     }
     
-    console.log("Corpo da requisição parseado:", JSON.stringify(requestData));
+    console.log("Dados da requisição:", JSON.stringify(requestData).substring(0, 200) + "...");
     
     const { textContent } = requestData;
     
@@ -53,6 +62,22 @@ serve(async (req) => {
       console.error("Erro: Conteúdo do extrato não fornecido");
       return new Response(
         JSON.stringify({ error: "Conteúdo do extrato é obrigatório" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (typeof textContent !== 'string') {
+      console.error("Erro: textContent não é uma string:", typeof textContent);
+      return new Response(
+        JSON.stringify({ error: "O conteúdo do extrato deve ser uma string" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (textContent.trim() === '') {
+      console.error("Erro: textContent está vazio após trim");
+      return new Response(
+        JSON.stringify({ error: "O conteúdo do extrato não pode estar vazio" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -88,6 +113,11 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     if (!openAIApiKey) {
       console.error("API key do OpenAI não configurada");
       throw new Error('API key do OpenAI não configurada');
+    }
+    
+    console.log("Validando conteúdo antes de enviar para OpenAI...");
+    if (!textContent || typeof textContent !== 'string') {
+      throw new Error('Conteúdo do extrato inválido ou vazio');
     }
     
     // Limitar o tamanho do texto para evitar exceder limites de tokens
@@ -130,6 +160,7 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     ]`;
     
     console.log("Enviando requisição para a OpenAI...");
+    console.log("Tamanho do conteúdo enviado:", trimmedContent.length);
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -157,8 +188,16 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     }
     
     const data = await response.json();
+    console.log("Resposta da OpenAI recebida. Status:", response.status);
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error("Resposta da OpenAI não contém mensagem:", data);
+      throw new Error("Resposta inválida da API OpenAI");
+    }
+    
     const content = data.choices[0].message.content;
-    console.log("Resposta da IA recebida:", content.substring(0, 200) + "...");
+    console.log("Resposta da IA recebida. Tamanho:", content.length);
+    console.log("Amostra:", content.substring(0, 200) + "...");
     
     // Melhorando a extração do JSON com múltiplos métodos
     return extractJSONFromContent(content);
@@ -170,6 +209,10 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
 
 function extractJSONFromContent(content: string): ExtractedTransaction[] {
   console.log("Iniciando extração de JSON da resposta");
+  
+  if (!content || content.trim() === '') {
+    throw new Error("Conteúdo da resposta da IA está vazio");
+  }
   
   // Método 1: Tentar fazer parse diretamente do conteúdo
   try {

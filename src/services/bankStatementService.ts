@@ -154,31 +154,45 @@ const mapToValidCategory = (aiCategory: string | undefined, description: string,
 
 export const bankStatementService = {
   async extractTransactionsFromContent(content: string): Promise<ExtractedTransaction[]> {
-    if (!content || content.trim() === '') {
+    console.log("Iniciando extração de transações do conteúdo");
+    
+    if (!content) {
       console.error("Conteúdo vazio enviado para análise");
       throw new Error("O conteúdo do extrato está vazio");
     }
     
+    if (typeof content !== 'string') {
+      console.error("Tipo de conteúdo inválido:", typeof content);
+      throw new Error(`O conteúdo deve ser uma string, recebido: ${typeof content}`);
+    }
+    
+    if (content.trim() === '') {
+      console.error("Conteúdo contém apenas espaços em branco");
+      throw new Error("O conteúdo do extrato contém apenas espaços em branco");
+    }
+    
+    console.log("Tamanho do conteúdo original:", content.length);
+    
     try {
-      // Pré-processar o conteúdo para reduzir seu tamanho
+      // Pré-processar o conteúdo para garantir integridade
       const processedContent = this.preprocessContent(content);
+      
+      if (!processedContent || processedContent.trim() === '') {
+        console.error("Conteúdo processado está vazio após pré-processamento");
+        throw new Error("O conteúdo processado está vazio");
+      }
       
       console.log("Enviando conteúdo para análise:", processedContent.length, "caracteres");
       console.log("Amostra do conteúdo:", processedContent.substring(0, 200) + "...");
       
-      // Verificação adicional que o conteúdo existe e não está vazio
-      if (!processedContent || processedContent.trim() === '') {
-        throw new Error("O conteúdo processado está vazio");
-      }
-      
       // Realizar a chamada para a função edge usando invoke
-      console.log("Iniciando chamada para parse-bank-statement com tamanho:", processedContent.length);
+      console.log("Iniciando chamada para parse-bank-statement");
       
       const response = await supabase.functions.invoke('parse-bank-statement', {
         body: { textContent: processedContent }
       }).catch(error => {
         console.error("Erro na chamada da função edge:", error);
-        throw new Error("Falha na comunicação com o serviço de análise de extratos: " + error.message);
+        throw new Error("Falha na comunicação com o serviço de análise de extratos: " + (error.message || "erro desconhecido"));
       });
       
       console.log("Resposta da função edge recebida:", response);
@@ -247,45 +261,85 @@ export const bankStatementService = {
     });
   },
   
-  // Pré-processamento do conteúdo para reduzir seu tamanho e melhorar a performance
+  // Pré-processamento melhorado do conteúdo
   preprocessContent(content: string): string {
     if (!content) {
       console.warn("Conteúdo vazio enviado para pré-processamento");
-      return "";
+      throw new Error("O conteúdo está vazio");
     }
     
     try {
       console.log("Iniciando pré-processamento do conteúdo. Tamanho original:", content.length);
       
-      // Remover caracteres especiais e espaços em excesso
+      // Verificar se o conteúdo é realmente uma string
+      if (typeof content !== 'string') {
+        console.error("Tipo de conteúdo inválido:", typeof content);
+        throw new Error(`O conteúdo deve ser uma string, recebido: ${typeof content}`);
+      }
+      
+      // Normalizar quebras de linha e espaços
       let processedContent = content
-        .replace(/\r\n|\r/g, '\n') // Normalizar quebras de linha
-        .replace(/\t/g, ' ')      // Substituir tabs por espaços
-        .replace(/\s{2,}/g, ' ')  // Substituir múltiplos espaços por um espaço
-        .trim();
+        .replace(/\r\n|\r/g, '\n')  // Normalizar quebras de linha
+        .replace(/\t/g, ' ')        // Substituir tabs por espaços
+        .trim();                    // Remover espaços no início e fim
+      
+      // Verificar se o conteúdo não está vazio após normalização
+      if (!processedContent || processedContent.trim() === '') {
+        console.error("Conteúdo vazio após normalização");
+        throw new Error("O conteúdo está vazio após normalização");
+      }
+      
+      // Remover sequências de caracteres não imprimíveis e estranhos
+      processedContent = processedContent
+        .replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')  // Remover caracteres de controle
+        .replace(/\s{3,}/g, ' ')                                // Reduzir múltiplos espaços para um único
+        .replace(/[^\x20-\x7E\xA0-\xFF\s]/g, '');               // Manter apenas caracteres latinos úteis
+      
+      // Dividir em linhas para melhor processamento
+      const lines = processedContent.split('\n');
       
       // Remover linhas muito longas (provavelmente código, imagens codificadas, etc)
-      const lines = processedContent.split('\n');
-      const filteredLines = lines.filter(line => line.trim().length < 500);
+      const filteredLines = lines.filter(line => {
+        const trimmed = line.trim();
+        // Manter linhas não vazias e que não sejam muito longas
+        return trimmed.length > 0 && trimmed.length < 500;
+      });
       
-      // Remover linhas duplicadas
-      const uniqueLines = Array.from(new Set(filteredLines));
+      // Remover linhas duplicadas consecutivas
+      const deduplicatedLines = [];
+      let previousLine = '';
       
-      // Limitar o tamanho total
-      const maxLength = 10000;
-      processedContent = uniqueLines.join('\n');
+      for (const line of filteredLines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine !== previousLine) {
+          deduplicatedLines.push(trimmedLine);
+          previousLine = trimmedLine;
+        }
+      }
       
+      // Juntar novamente as linhas
+      processedContent = deduplicatedLines.join('\n');
+      
+      // Verificar se ainda temos conteúdo
+      if (!processedContent || processedContent.trim() === '') {
+        console.error("Conteúdo vazio após processamento de linhas");
+        throw new Error("O conteúdo ficou vazio após processamento");
+      }
+      
+      // Limitar o tamanho total (para não exceder limites de tokens da API)
+      const maxLength = 12000;
       if (processedContent.length > maxLength) {
         console.log(`Conteúdo excede o tamanho máximo. Truncando de ${processedContent.length} para ${maxLength} caracteres.`);
         processedContent = processedContent.substring(0, maxLength);
       }
       
       console.log("Pré-processamento concluído. Novo tamanho:", processedContent.length);
+      console.log("Amostra após pré-processamento:", processedContent.substring(0, 100) + "...");
+      
       return processedContent;
     } catch (error) {
       console.error("Erro no pré-processamento do conteúdo:", error);
-      // Em caso de erro, retornar uma versão truncada do conteúdo original
-      return content.substring(0, 8000);
+      throw new Error(`Erro no pré-processamento: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   },
 
