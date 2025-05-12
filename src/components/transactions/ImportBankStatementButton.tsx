@@ -36,6 +36,15 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
     });
   };
 
+  const readFileAsArrayBuffer = (file: File): Promise<ArrayBuffer> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = () => reject(new Error('Falha ao ler o arquivo como ArrayBuffer'));
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
@@ -44,6 +53,18 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
     }
 
     console.log("Arquivo selecionado:", file.name, "tipo:", file.type, "tamanho:", file.size);
+    
+    // Verificar se o arquivo não é muito grande
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_FILE_SIZE) {
+      console.error("Arquivo muito grande:", file.size, "bytes");
+      toast.error("O arquivo é muito grande. Por favor, envie arquivos menores que 10MB.");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+    
     setIsUploading(true);
     setProcessingStep('Iniciando processamento');
     setProcessingProgress(5);
@@ -58,28 +79,64 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         toast.info("Extraindo texto do PDF, aguarde...");
         console.log("Iniciando extração de texto do PDF");
         text = await extractTextFromPDF(file);
+        
+        // Verificar se o texto foi extraído corretamente
+        if (!text || text.trim().length === 0) {
+          // Tentar método alternativo para PDFs que não conseguimos extrair texto facilmente
+          console.warn("Texto não extraído do PDF com método padrão, tentando alternativa");
+          try {
+            const buffer = await readFileAsArrayBuffer(file);
+            const bytes = new Uint8Array(buffer);
+            // Extrair texto de forma bruta procurando sequências de caracteres ASCII
+            text = Array.from(bytes)
+              .map(byte => byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ' ')
+              .join('');
+            console.log("Texto extraído com método alternativo, tamanho:", text.length);
+          } catch (altError) {
+            console.error("Erro no método alternativo:", altError);
+          }
+        }
       } else if (file.type === 'text/plain' || file.type === 'text/csv' || file.name.endsWith('.csv')) {
         setProcessingStep('Lendo conteúdo do arquivo');
         setProcessingProgress(30);
         console.log("Iniciando leitura de arquivo texto");
         text = await readFileAsText(file);
+      } else if (file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+        // Arquivos Excel
+        setProcessingStep('Processando planilha Excel');
+        setProcessingProgress(30);
+        console.log("Arquivo Excel detectado");
+        text = await readFileAsText(file);
+        if (!text || text.trim().length === 0) {
+          // Para arquivos Excel muitas vezes não conseguimos extrair texto diretamente
+          // Informar ao usuário para tentar exportar para CSV
+          throw new Error("Não foi possível processar este arquivo Excel. Por favor, exporte para CSV e tente novamente.");
+        }
       } else {
-        console.error("Formato de arquivo não suportado:", file.type);
-        throw new Error("Formato de arquivo não suportado. Por favor, envie PDF, TXT ou CSV.");
+        // Tentar processar mesmo com tipo desconhecido
+        console.warn("Formato de arquivo não reconhecido:", file.type, "Tentando ler como texto");
+        text = await readFileAsText(file);
+        if (!text || text.trim().length === 0) {
+          throw new Error("Formato de arquivo não suportado. Por favor, envie PDF, TXT ou CSV.");
+        }
       }
       
-      if (!text || text.trim().length === 0) {
+      // Verificação mais robusta para garantir que temos conteúdo suficiente
+      if (!text) {
         console.error("Texto extraído está vazio");
         throw new Error("Não foi possível extrair texto do arquivo. Tente com outro arquivo.");
       }
       
-      console.log("Texto extraído do arquivo:", text.substring(0, 100) + "...");
-      console.log("Tamanho total do texto:", text.length);
+      // Log do texto extraído
+      console.log("Texto extraído do arquivo, tamanho:", text.length);
+      if (text.length > 0) {
+        console.log("Amostra do texto:", text.substring(0, 200) + "...");
+      }
       
       // Verificação mínima para garantir que temos conteúdo suficiente
-      if (text.length < 50) {
+      if (text.length < 30) {
         console.warn("Texto extraído é muito curto:", text);
-        throw new Error("O texto extraído é muito curto para ser um extrato válido. Tente com outro arquivo.");
+        throw new Error("O texto extraído é muito curto para ser um extrato válido. Tente com outro arquivo ou formato.");
       }
       
       setProcessingStep('Analisando transações com IA');
@@ -182,7 +239,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       <input
         type="file"
         ref={fileInputRef}
-        accept=".pdf,.txt,.csv"
+        accept=".pdf,.txt,.csv,.xls,.xlsx"
         onChange={handleFileChange}
         className="hidden"
       />

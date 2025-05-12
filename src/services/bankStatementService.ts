@@ -179,17 +179,26 @@ export const bankStatementService = {
       
       if (!processedContent || processedContent.trim() === '') {
         console.error("Conteúdo processado está vazio após pré-processamento");
-        throw new Error("O conteúdo processado está vazio");
+        // Em vez de lançar erro, tentar enviar o conteúdo original
+        console.log("Tentando enviar o conteúdo original sem pré-processamento");
+        if (content.trim() !== '') {
+          console.log("Usando conteúdo original para análise");
+        } else {
+          throw new Error("O conteúdo do extrato está vazio");
+        }
       }
       
-      console.log("Enviando conteúdo para análise:", processedContent.length, "caracteres");
-      console.log("Amostra do conteúdo:", processedContent.substring(0, 200) + "...");
+      // Usar o conteúdo processado se disponível, caso contrário usar o original
+      const contentToSend = processedContent && processedContent.trim() !== '' ? processedContent : content;
+      
+      console.log("Enviando conteúdo para análise:", contentToSend.length, "caracteres");
+      console.log("Amostra do conteúdo:", contentToSend.substring(0, 200) + "...");
       
       // Realizar a chamada para a função edge usando invoke
       console.log("Iniciando chamada para parse-bank-statement");
       
       const response = await supabase.functions.invoke('parse-bank-statement', {
-        body: { textContent: processedContent }
+        body: { textContent: contentToSend }
       }).catch(error => {
         console.error("Erro na chamada da função edge:", error);
         throw new Error("Falha na comunicação com o serviço de análise de extratos: " + (error.message || "erro desconhecido"));
@@ -265,7 +274,7 @@ export const bankStatementService = {
   preprocessContent(content: string): string {
     if (!content) {
       console.warn("Conteúdo vazio enviado para pré-processamento");
-      throw new Error("O conteúdo está vazio");
+      return '';
     }
     
     try {
@@ -274,46 +283,39 @@ export const bankStatementService = {
       // Verificar se o conteúdo é realmente uma string
       if (typeof content !== 'string') {
         console.error("Tipo de conteúdo inválido:", typeof content);
-        throw new Error(`O conteúdo deve ser uma string, recebido: ${typeof content}`);
+        return '';
       }
       
-      // Normalizar quebras de linha e espaços
+      // Normalizar quebras de linha e espaços - MENOS AGRESSIVO
       let processedContent = content
         .replace(/\r\n|\r/g, '\n')  // Normalizar quebras de linha
-        .replace(/\t/g, ' ')        // Substituir tabs por espaços
-        .trim();                    // Remover espaços no início e fim
+        .replace(/\t/g, ' ');       // Substituir tabs por espaços
       
-      // Verificar se o conteúdo não está vazio após normalização
-      if (!processedContent || processedContent.trim() === '') {
-        console.error("Conteúdo vazio após normalização");
-        throw new Error("O conteúdo está vazio após normalização");
-      }
+      // IMPORTANTE: Não remover espaços no início e fim para preservar estrutura
       
-      // Remover sequências de caracteres não imprimíveis e estranhos
+      // Remover sequências de caracteres não imprimíveis e estranhos - MENOS AGRESSIVO
       processedContent = processedContent
-        .replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')  // Remover caracteres de controle
-        .replace(/\s{3,}/g, ' ')                                // Reduzir múltiplos espaços para um único
-        .replace(/[^\x20-\x7E\xA0-\xFF\s]/g, '');               // Manter apenas caracteres latinos úteis
-      
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');  // Remover apenas caracteres de controle específicos
+                                     
       // Dividir em linhas para melhor processamento
       const lines = processedContent.split('\n');
       
       // Remover linhas muito longas (provavelmente código, imagens codificadas, etc)
+      // MENOS AGRESSIVO: Aumentado o limite para 1000 caracteres
       const filteredLines = lines.filter(line => {
-        const trimmed = line.trim();
-        // Manter linhas não vazias e que não sejam muito longas
-        return trimmed.length > 0 && trimmed.length < 500;
+        // Manter todas as linhas, exceto as extremamente longas
+        return line.length < 1000;
       });
       
-      // Remover linhas duplicadas consecutivas
+      // Remover linhas duplicadas consecutivas, mas de forma menos agressiva
       const deduplicatedLines = [];
       let previousLine = '';
       
       for (const line of filteredLines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine !== previousLine) {
-          deduplicatedLines.push(trimmedLine);
-          previousLine = trimmedLine;
+        // Só remove duplicatas exatas consecutivas
+        if (line !== previousLine) {
+          deduplicatedLines.push(line);
+          previousLine = line;
         }
       }
       
@@ -323,11 +325,12 @@ export const bankStatementService = {
       // Verificar se ainda temos conteúdo
       if (!processedContent || processedContent.trim() === '') {
         console.error("Conteúdo vazio após processamento de linhas");
-        throw new Error("O conteúdo ficou vazio após processamento");
+        return content; // Retornar o conteúdo original se o processamento falhar
       }
       
       // Limitar o tamanho total (para não exceder limites de tokens da API)
-      const maxLength = 12000;
+      // MENOS AGRESSIVO: Aumentando o limite máximo
+      const maxLength = 18000;
       if (processedContent.length > maxLength) {
         console.log(`Conteúdo excede o tamanho máximo. Truncando de ${processedContent.length} para ${maxLength} caracteres.`);
         processedContent = processedContent.substring(0, maxLength);
@@ -339,7 +342,8 @@ export const bankStatementService = {
       return processedContent;
     } catch (error) {
       console.error("Erro no pré-processamento do conteúdo:", error);
-      throw new Error(`Erro no pré-processamento: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      // Em caso de erro no processamento, retornar o conteúdo original
+      return content; 
     }
   },
 

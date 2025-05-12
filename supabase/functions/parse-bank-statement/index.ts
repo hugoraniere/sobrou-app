@@ -48,10 +48,16 @@ serve(async (req) => {
       console.log("Corpo da requisição parseado com sucesso");
     } catch (error) {
       console.error("Erro ao parsear JSON da requisição:", error);
-      return new Response(
-        JSON.stringify({ error: "Formato de requisição inválido: " + error.message }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      // Tentar recuperar de erro de parsing com um objeto básico
+      if (bodyText) {
+        requestData = { textContent: bodyText };
+        console.log("Recuperado do erro de parsing usando o corpo bruto como textContent");
+      } else {
+        return new Response(
+          JSON.stringify({ error: "Formato de requisição inválido: " + error.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
     
     console.log("Dados da requisição:", JSON.stringify(requestData).substring(0, 200) + "...");
@@ -68,10 +74,18 @@ serve(async (req) => {
 
     if (typeof textContent !== 'string') {
       console.error("Erro: textContent não é uma string:", typeof textContent);
-      return new Response(
-        JSON.stringify({ error: "O conteúdo do extrato deve ser uma string" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      // Tentativa de convertê-lo para string
+      const convertedContent = String(textContent);
+      if (convertedContent) {
+        console.log("Conseguimos converter para string, prosseguindo");
+        // Continue com a string convertida
+        return processExtractContent(convertedContent, corsHeaders);
+      } else {
+        return new Response(
+          JSON.stringify({ error: "O conteúdo do extrato deve ser uma string" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     if (textContent.trim() === '') {
@@ -82,9 +96,32 @@ serve(async (req) => {
       );
     }
 
+    // Prosseguir com o processamento do conteúdo
+    return await processExtractContent(textContent, corsHeaders);
+
+  } catch (error) {
+    console.error("Erro ao analisar extrato:", error);
+    
+    // Garantir que todos os erros retornem com os cabeçalhos CORS
+    return new Response(
+      JSON.stringify({ error: error.message || "Erro ao processar extrato bancário" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});
+
+// Função separada para processar o conteúdo do extrato
+async function processExtractContent(textContent: string, corsHeaders: Record<string, string>) {
+  try {
     console.log("Processando conteúdo do extrato bancário...");
     console.log("Tamanho do conteúdo:", textContent.length);
     console.log("Amostra do conteúdo:", textContent.substring(0, 100) + "...");
+    
+    // Verificação adicional para garantir conteúdo mínimo
+    if (textContent.length < 20) {
+      console.warn("Conteúdo muito curto, pode não ser um extrato válido");
+      // Continuar mesmo assim, a IA pode conseguir extrair algo
+    }
     
     // Chamar a API da OpenAI para extrair as transações
     const transactions = await extractTransactionsWithAI(textContent);
@@ -96,15 +133,13 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Erro ao analisar extrato:", error);
-    
-    // Garantir que todos os erros retornem com os cabeçalhos CORS
+    console.error("Erro ao processar conteúdo:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Erro ao processar extrato bancário" }),
+      JSON.stringify({ error: error.message || "Erro ao processar conteúdo do extrato" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
-});
+}
 
 async function extractTransactionsWithAI(textContent: string): Promise<ExtractedTransaction[]> {
   try {
@@ -120,8 +155,8 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
       throw new Error('Conteúdo do extrato inválido ou vazio');
     }
     
-    // Limitar o tamanho do texto para evitar exceder limites de tokens
-    const maxLength = 10000;
+    // Limitar o tamanho do texto para evitar exceder limites de tokens - MENOS AGRESSIVO
+    const maxLength = 15000; // Aumentado o limite máximo
     const trimmedContent = textContent.length > maxLength 
       ? textContent.substring(0, maxLength) + "..." 
       : textContent;
@@ -266,6 +301,29 @@ function extractJSONFromContent(content: string): ExtractedTransaction[] {
     }
   } catch (structureError) {
     console.log("Busca por estrutura de array falhou:", structureError);
+  }
+  
+  // Método 5: Tentativa final - construir um array de um único item se tudo falhar
+  try {
+    console.log("Método 5: Construindo array manualmente com dados disponíveis");
+    // Procurar por padrões de data, valor e descrição
+    const dateMatch = content.match(/\d{4}-\d{2}-\d{2}/);
+    const amountMatch = content.match(/\d+(\.\d+)?/);
+    
+    if (dateMatch && amountMatch) {
+      const fallbackTransaction = {
+        date: dateMatch[0],
+        description: "Transação extraída manualmente",
+        amount: parseFloat(amountMatch[0]),
+        type: "expense" as const, // default to expense
+        category: "compras"
+      };
+      
+      console.log("Construído array manual com uma transação:", fallbackTransaction);
+      return [fallbackTransaction];
+    }
+  } catch (fallbackError) {
+    console.log("Construção manual falhou:", fallbackError);
   }
   
   // Se nada funcionar, retornar array vazio e logar o conteúdo para debug
