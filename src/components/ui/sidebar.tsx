@@ -164,29 +164,35 @@ interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 }
 
 const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
-  ({ className, isActive, asChild, children, ...props }, ref) => {
-    const Comp = asChild ? React.Fragment : "button";
-    const childProps = asChild ? { className: cn(
+  ({ className, isActive, asChild, children, tooltip, ...props }, ref) => {
+    const baseClasses = cn(
       "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors relative",
       isActive ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
       className
-    )} : {};
+    );
+    
+    if (asChild && children) {
+      // Use React.cloneElement instead of Fragment for asChild
+      const child = React.Children.only(children) as React.ReactElement;
+      return React.cloneElement(child, {
+        className: cn(baseClasses, child.props.className),
+        ref,
+        ...props
+      });
+    }
     
     return (
-      <Comp
+      <button
         ref={ref}
-        className={!asChild ? cn(
-          "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors relative w-full text-left",
-          isActive ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-          className
-        ) : undefined}
-        {...(!asChild ? props : {})}
+        className={cn(
+          baseClasses,
+          "w-full text-left"
+        )}
+        {...props}
+        title={tooltip}
       >
-        {asChild ? React.cloneElement(children as React.ReactElement, {
-          ...childProps,
-          ...props
-        }) : children}
-      </Comp>
+        {children}
+      </button>
     );
   }
 );
@@ -227,7 +233,6 @@ interface SidebarItemProps
 
 const SidebarItem = React.forwardRef<HTMLDivElement, SidebarItemProps>(
   ({ className, variant, active, icon, children, ...props }, ref) => {
-    // Corrigir a comparação de tipos incompatíveis aqui - problema estava na linha 242
     return (
       <div
         ref={ref}

@@ -100,7 +100,11 @@ const SidebarNav = () => {
               const isActive = isActiveRoute(item.path);
               return (
                 <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton asChild isActive={isActive} tooltip={state === 'collapsed' ? item.name : undefined}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={isActive} 
+                    tooltip={state === 'collapsed' ? item.name : undefined}
+                  >
                     <Link 
                       to={item.path} 
                       className={cn(
@@ -129,7 +133,11 @@ const SidebarNav = () => {
             })}
             
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setIsLogoutDialogOpen(true)} className="text-red-500 hover:text-red-600" tooltip={state === 'collapsed' ? t('auth.logout', 'Sair') : undefined}>
+              <SidebarMenuButton 
+                onClick={() => setIsLogoutDialogOpen(true)} 
+                className="text-red-500 hover:text-red-600" 
+                tooltip={state === 'collapsed' ? t('auth.logout', 'Sair') : undefined}
+              >
                 <LogOut className="w-5 h-5" />
                 <span className={`ml-3 transition-all duration-200 ${state === 'collapsed' ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
                   {t('auth.logout', 'Sair')}

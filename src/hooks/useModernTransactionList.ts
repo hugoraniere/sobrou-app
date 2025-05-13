@@ -24,7 +24,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     let filtered = [...transactions];
     const today = startOfToday();
     
-    // Apply quick filter
+    // Apply quick filter - less restrictive defaults
     switch (selectedFilter) {
       case 'today':
         filtered = filtered.filter(tx => 
@@ -38,29 +38,20 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
         );
         break;
       case 'thisMonth':
-        const firstDayOfMonth = startOfMonth(currentDate);
-        const lastDayOfMonth = new Date(
-          currentDate.getFullYear(), 
-          currentDate.getMonth() + 1, 
-          0
-        );
-        
+        // Simplified month filtering to just check the month and year
         filtered = filtered.filter(tx => {
           const txDate = new Date(tx.date);
-          return txDate >= firstDayOfMonth && txDate <= lastDayOfMonth;
+          return (
+            txDate.getMonth() === currentDate.getMonth() && 
+            txDate.getFullYear() === currentDate.getFullYear()
+          );
         });
         break;
       case 'thisYear':
-        const firstDayOfYear = startOfYear(currentDate);
-        const lastDayOfYear = new Date(
-          currentDate.getFullYear(), 
-          11, 
-          31
-        );
-        
+        // Simplified year filtering to just check the year
         filtered = filtered.filter(tx => {
           const txDate = new Date(tx.date);
-          return txDate >= firstDayOfYear && txDate <= lastDayOfYear;
+          return txDate.getFullYear() === currentDate.getFullYear();
         });
         break;
       default:

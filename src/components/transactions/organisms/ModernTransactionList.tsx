@@ -9,6 +9,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -40,7 +41,11 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   // Monitorar mudanças nas transações
   useEffect(() => {
     console.log(`ModernTransactionList recebeu ${transactions.length} transações`);
-  }, [transactions]);
+    if (transactions.length > 0 && filteredTransactions.length === 0) {
+      // Se temos transações mas nenhuma está sendo mostrada, exibir toast informativo
+      toast.info("Altere o filtro para ver mais transações");
+    }
+  }, [transactions, filteredTransactions]);
   
   // Handle edit
   const handleEdit = (transaction: Transaction) => {
@@ -66,7 +71,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
       {filteredTransactions.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-12 text-center p-6">
           <p className="text-xl font-medium text-gray-900 mb-2">Nenhuma transação encontrada</p>
-          <p className="text-gray-500">Não há transações para o período selecionado.</p>
+          <p className="text-gray-500">Não há transações para o período selecionado. Tente mudar o filtro acima.</p>
         </Card>
       ) : (
         <>
