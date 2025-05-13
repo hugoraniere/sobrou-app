@@ -5,7 +5,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { LayoutDashboard, FileText, Target, Settings, LogOut, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
+import { 
+  Sidebar, 
+  SidebarContent, 
+  SidebarFooter, 
+  SidebarHeader,
+  SidebarItem,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  useSidebar
+} from '@/components/ui/sidebar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAvatar } from '@/contexts/AvatarContext';
@@ -76,7 +86,7 @@ const SidebarNav = () => {
 
   return (
     <>
-      <Sidebar variant="sidebar" className="fixed h-screen w-64 transition-all duration-300 z-10 border-r border-gray-200 shadow-sm">
+      <Sidebar variant="default" className="fixed h-screen w-64 transition-all duration-300 z-10 border-r border-gray-200 shadow-sm">
         <SidebarHeader className="my-[16px]">
           <div className="flex items-center p-4 justify-between">
             <div className="flex items-center">

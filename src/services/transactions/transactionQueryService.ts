@@ -41,7 +41,7 @@ const mapToTransaction = (rawData: any): Transaction => {
 };
 
 export const transactionQueryService = {
-  async getTransactions(): Promise<Transaction[]> {
+  async getTransactions(limit?: number, page?: number): Promise<Transaction[]> {
     try {
       // Verificar se o usuário está autenticado antes de buscar as transações
       const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -56,22 +56,32 @@ export const transactionQueryService = {
         throw new Error('User not authenticated');
       }
       
-      // Adicionar logs para debug
-      console.log('Fetching transactions for user:', user.id);
+      // Log para debugging
+      console.log('Fetching transactions for user:', user.id, 'timestamp:', Date.now());
       
-      const { data, error } = await supabase
+      // Criar a consulta base
+      let query = supabase
         .from('transactions')
         .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false });
+        .eq('user_id', user.id);
+      
+      // Aplicar paginação se fornecida
+      if (limit && page) {
+        const offset = (page - 1) * limit;
+        query = query.range(offset, offset + limit - 1);
+        console.log(`Aplicando paginação: limite ${limit}, página ${page}, offset ${offset}`);
+      }
+      
+      // Executar a consulta ordenada por data
+      const { data, error } = await query.order('date', { ascending: false });
       
       if (error) {
         console.error('Supabase error:', error.message);
         throw error;
       }
       
-      // Adicionar logs para debug
-      console.log('Transactions fetched:', data?.length || 0);
+      // Log para debugging
+      console.log('Transactions fetched:', data?.length || 0, 'timestamp:', Date.now());
       
       if (!data) {
         return [];
@@ -153,6 +163,31 @@ export const transactionQueryService = {
     } catch (error) {
       console.error('Error fetching transactions by date range:', error);
       // Garantir que o erro é propagado para ser tratado
+      throw error;
+    }
+  },
+  
+  // Nova função para contar total de transações (útil para paginação)
+  async countTransactions(): Promise<number> {
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        throw new Error('User not authenticated');
+      }
+      
+      const { count, error } = await supabase
+        .from('transactions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      return count || 0;
+    } catch (error) {
+      console.error('Error counting transactions:', error);
       throw error;
     }
   }

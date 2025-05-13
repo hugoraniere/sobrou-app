@@ -14,9 +14,10 @@ import ImportBankStatementButton from '@/components/transactions/ImportBankState
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/spinner';
 
-const MAX_RETRY_COUNT = 2;
+// Aumentando o tempo de timeout para 30 segundos
+const MAX_RETRY_COUNT = 3;
 const RETRY_DELAY = 3000; // 3 segundos
-const MAX_LOADING_TIME = 15000; // 15 segundos
+const MAX_LOADING_TIME = 30000; // 30 segundos (aumentado de 15s para 30s)
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -53,7 +54,7 @@ const Transactions = () => {
     setFetchAborted(false);
     
     try {
-      console.log(`Tentativa de buscar transações: ${retry ? 'retry' : 'initial'}`);
+      console.log(`Tentativa de buscar transações: ${retry ? 'retry' : 'initial'}, timestamp: ${Date.now()}`);
       const data = await Promise.race([
         TransactionService.getTransactions(),
         new Promise<never>((_, reject) => {
@@ -64,7 +65,7 @@ const Transactions = () => {
         })
       ]) as Transaction[];
       
-      console.log(`Buscando transações: ${data.length} encontradas`);
+      console.log(`Buscando transações: ${data.length} encontradas, timestamp: ${Date.now()}`);
       setTransactions(data);
       setIsLoading(false);
       setRetryCount(0); // Resetar contador de tentativas após sucesso
@@ -84,7 +85,7 @@ const Transactions = () => {
         return;
       }
       
-      // Lógica de retry
+      // Lógica de retry com mais tentativas
       if (retryCount < MAX_RETRY_COUNT) {
         console.log(`Tentativa ${retryCount + 1} de ${MAX_RETRY_COUNT}. Tentando novamente em ${RETRY_DELAY}ms`);
         setRetryCount(prevCount => prevCount + 1);
@@ -105,6 +106,9 @@ const Transactions = () => {
     setRetryCount(0);
     fetchTransactions();
     
+    // Log para debugging do ciclo de vida
+    console.log(`Iniciando busca de transações com timestamp: ${lastUpdate}`);
+    
     // Adiciona um timeout para garantir que o estado de loading não fica preso
     const timeout = setTimeout(() => {
       if (isLoading) {
@@ -118,11 +122,14 @@ const Transactions = () => {
     }, MAX_LOADING_TIME + 1000); // Um pouco mais que o timeout da requisição
 
     return () => clearTimeout(timeout);
-  }, [lastUpdate]);
+  }, [lastUpdate, fetchTransactions]);
 
   const handleTransactionUpdated = useCallback((closeForm = false) => {
     console.log("Atualizando transações...");
-    setLastUpdate(Date.now()); // Força uma nova busca das transações
+    // Forçar nova busca completa com timestamp atual para evitar caching
+    const newTimestamp = Date.now();
+    console.log(`Nova busca forçada com timestamp: ${newTimestamp}`);
+    setLastUpdate(newTimestamp);
     
     // Só fecha o formulário se explicitamente solicitado
     if (closeForm) {

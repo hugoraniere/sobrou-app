@@ -21,6 +21,9 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   onTransactionUpdated,
   className
 }) => {
+  // Log para debugging da propriedade de transações recebida
+  console.log(`ModernTransactionList recebeu ${transactions.length} transações`);
+  
   const {
     currentDate,
     selectedFilter,
@@ -36,6 +39,11 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
+  
+  // Log para debugging das transações filtradas
+  useEffect(() => {
+    console.log(`Transações filtradas: ${filteredTransactions.length}, paginadas: ${paginatedTransactions.length}`);
+  }, [filteredTransactions.length, paginatedTransactions.length]);
   
   // Handle edit
   const handleEdit = (transaction: Transaction) => {
