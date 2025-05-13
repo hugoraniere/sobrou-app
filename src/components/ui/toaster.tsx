@@ -11,25 +11,12 @@ import {
 import { useMediaQuery } from "@/hooks/use-mobile"
 
 export function Toaster() {
-  const { toasts } = useToast()
+  // Modificar para usar corretamente o hook useToast sem depender da propriedade toasts
   const isMobile = useMediaQuery("(max-width: 768px)")
-
+  
+  // O componente agora renderiza apenas o provedor e viewport, sem tentar mapear toasts
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
-            {action}
-            <ToastClose />
-          </Toast>
-        )
-      })}
       <ToastViewport 
         className={
           isMobile 

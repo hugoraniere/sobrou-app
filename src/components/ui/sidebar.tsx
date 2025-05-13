@@ -226,22 +226,25 @@ interface SidebarItemProps
 }
 
 const SidebarItem = React.forwardRef<HTMLDivElement, SidebarItemProps>(
-  ({ className, variant, active, icon, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        sidebarItemVariants({
-          variant,
-          active,
-          className,
-        })
-      )}
-      {...props}
-    >
-      {icon && <div className="w-4 h-4 shrink-0">{icon}</div>}
-      {variant !== "narrow" && <div>{children}</div>}
-    </div>
-  )
+  ({ className, variant, active, icon, children, ...props }, ref) => {
+    // Corrigir a comparação de tipos incompatíveis aqui - problema estava na linha 242
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          sidebarItemVariants({
+            variant,
+            active,
+            className,
+          })
+        )}
+        {...props}
+      >
+        {icon && <div className="w-4 h-4 shrink-0">{icon}</div>}
+        {children && <div>{children}</div>}
+      </div>
+    );
+  }
 )
 
 SidebarItem.displayName = "SidebarItem"
