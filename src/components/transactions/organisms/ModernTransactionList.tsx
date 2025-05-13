@@ -37,6 +37,11 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
   
+  // Monitorar mudanças nas transações
+  useEffect(() => {
+    console.log(`ModernTransactionList recebeu ${transactions.length} transações`);
+  }, [transactions]);
+  
   // Handle edit
   const handleEdit = (transaction: Transaction) => {
     setTransactionToEdit(transaction);

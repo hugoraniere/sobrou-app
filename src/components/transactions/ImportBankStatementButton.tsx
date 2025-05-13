@@ -247,9 +247,8 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         setExtractedTransactions([]);
         
         // Importante: Garantir que a lista de transações seja atualizada
-        setTimeout(() => {
-          onTransactionsAdded();
-        }, 300);
+        // imediatamente após a importação bem-sucedida
+        onTransactionsAdded();
       } else {
         toast.error(result.message || "Erro ao importar transações", { id: importToastId });
       }

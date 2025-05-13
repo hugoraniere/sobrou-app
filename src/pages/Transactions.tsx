@@ -16,7 +16,7 @@ import { LoadingSpinner } from '@/components/ui/spinner';
 
 const MAX_RETRY_COUNT = 2;
 const RETRY_DELAY = 3000; // 3 segundos
-const MAX_LOADING_TIME = 15000; // 15 segundos
+const MAX_LOADING_TIME = 30000; // 30 segundos (aumentado para dar mais tempo)
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -120,14 +120,10 @@ const Transactions = () => {
     return () => clearTimeout(timeout);
   }, [lastUpdate]);
 
-  const handleTransactionUpdated = useCallback((closeForm = false) => {
+  const handleTransactionUpdated = useCallback(() => {
     console.log("Atualizando transações...");
-    setLastUpdate(Date.now()); // Força uma nova busca das transações
-    
-    // Só fecha o formulário se explicitamente solicitado
-    if (closeForm) {
-      setShowNewTransactionForm(false);
-    }
+    // Forçar uma nova busca completa das transações
+    setLastUpdate(Date.now());
   }, []);
 
   const toggleNewTransactionForm = () => {
@@ -159,8 +155,8 @@ const Transactions = () => {
         {showNewTransactionForm && (
           <Card className="p-6 mb-6">
             <AIPromptInput 
-              onTransactionAdded={() => handleTransactionUpdated(false)} // Não fechar o formulário após adição
-              onSavingAdded={() => handleTransactionUpdated(false)} // Não fechar o formulário após adição
+              onTransactionAdded={handleTransactionUpdated} // Atualizar após adicionar
+              onSavingAdded={handleTransactionUpdated} // Atualizar após adicionar saving
               className="bg-white"
             />
           </Card>
@@ -169,7 +165,7 @@ const Transactions = () => {
         {isLoading ? (
           <LoadingSpinner 
             message="Carregando transações..." 
-            timeout={5000}
+            timeout={10000}
           />
         ) : hasError ? (
           <Card className="p-6 flex flex-col items-center justify-center text-center">

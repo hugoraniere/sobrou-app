@@ -14,6 +14,13 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
   
   // Apply filters based on the selected quick filter or date
   useEffect(() => {
+    if (!transactions || transactions.length === 0) {
+      setFilteredTransactions([]);
+      return;
+    }
+
+    console.log(`Filtering ${transactions.length} transactions with filter: ${selectedFilter}`);
+    
     let filtered = [...transactions];
     const today = startOfToday();
     
@@ -65,6 +72,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
     
+    console.log(`After filtering: ${filtered.length} transactions`);
     setFilteredTransactions(filtered);
     setCurrentPage(1); // Reset to first page when filter changes
   }, [transactions, selectedFilter, currentDate]);

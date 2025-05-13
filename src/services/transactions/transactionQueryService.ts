@@ -90,6 +90,9 @@ export const transactionQueryService = {
         }
       }
       
+      // Log adicional para confirmar o número de transações processadas com sucesso
+      console.log('Transactions successfully processed:', transactions.length);
+      
       return transactions;
     } catch (error) {
       console.error('Error fetching transactions:', error);
