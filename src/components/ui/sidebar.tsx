@@ -11,7 +11,6 @@ const sidebarVariants = cva(
       variant: {
         default: "w-64",
         narrow: "w-16",
-        sidebar: "w-64",
       },
       position: {
         left: "left-0",
@@ -168,97 +167,6 @@ const SidebarSectionTitle = React.forwardRef<
 
 SidebarSectionTitle.displayName = "SidebarSectionTitle"
 
-// Adicionar componentes que estavam faltando
-const SidebarMenu = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("space-y-1", className)}
-    {...props}
-  />
-))
-
-SidebarMenu.displayName = "SidebarMenu"
-
-const SidebarMenuItem = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("", className)}
-    {...props}
-  />
-))
-
-SidebarMenuItem.displayName = "SidebarMenuItem"
-
-const SidebarMenuButton = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    asChild?: boolean;
-    isActive?: boolean;
-    tooltip?: string;
-  }
->(({ className, asChild, isActive, tooltip, ...props }, ref) => {
-  const Comp = asChild ? React.Fragment : "button"
-  return (
-    <Comp
-      ref={ref}
-      className={cn(
-        "flex items-center w-full px-3 py-2 rounded-md text-sm transition-colors",
-        isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground",
-        className
-      )}
-      title={tooltip}
-      {...props}
-    />
-  )
-})
-
-SidebarMenuButton.displayName = "SidebarMenuButton"
-
-// Adicionar contexto do Sidebar com Provider
-type SidebarState = "expanded" | "collapsed";
-
-interface SidebarContextType {
-  state: SidebarState;
-  toggleSidebar: () => void;
-}
-
-const SidebarContext = React.createContext<SidebarContextType | undefined>(undefined);
-
-interface SidebarProviderProps {
-  defaultOpen?: boolean;
-  children: React.ReactNode;
-}
-
-const SidebarProvider = ({ defaultOpen = true, children }: SidebarProviderProps) => {
-  const [state, setState] = React.useState<SidebarState>(
-    defaultOpen ? "expanded" : "collapsed"
-  );
-
-  const toggleSidebar = React.useCallback(() => {
-    setState((prev) => (prev === "expanded" ? "collapsed" : "expanded"));
-  }, []);
-
-  return (
-    <SidebarContext.Provider value={{ state, toggleSidebar }}>
-      {children}
-    </SidebarContext.Provider>
-  );
-};
-
-const useSidebar = () => {
-  const context = React.useContext(SidebarContext);
-  if (context === undefined) {
-    throw new Error("useSidebar must be used within a SidebarProvider");
-  }
-  return context;
-};
-
 export {
   Sidebar,
   SidebarHeader,
@@ -266,10 +174,5 @@ export {
   SidebarFooter,
   SidebarItem,
   SidebarSection,
-  SidebarSectionTitle,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider,
-  useSidebar
+  SidebarSectionTitle
 }

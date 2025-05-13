@@ -246,12 +246,10 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         setShowConfirmDialog(false);
         setExtractedTransactions([]);
         
-        // Importante: Chamar diretamente o callback para atualizar a lista de transações
-        // Remover o setTimeout que estava causando problemas
-        onTransactionsAdded();
-        
-        // Log adicional para debugging
-        console.log("Importação concluída com sucesso, atualizando lista de transações");
+        // Importante: Garantir que a lista de transações seja atualizada
+        setTimeout(() => {
+          onTransactionsAdded();
+        }, 300);
       } else {
         toast.error(result.message || "Erro ao importar transações", { id: importToastId });
       }

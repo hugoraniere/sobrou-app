@@ -1,106 +1,110 @@
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import { format, startOfToday, startOfMonth, subDays, startOfYear } from 'date-fns';
 import { Transaction } from '@/services/transactions';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, isEqual, parse, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
-type TransactionFilter = 'all' | 'income' | 'expense' | 'transfer';
+type QuickFilterType = 'today' | '7days' | 'thisMonth' | 'thisYear';
 
 export const useModernTransactionList = (transactions: Transaction[]) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedFilter, setSelectedFilter] = useState<TransactionFilter>('all');
+  const [selectedFilter, setSelectedFilter] = useState<QuickFilterType>('thisMonth');
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  // Reset page number on filter/date change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [currentDate, selectedFilter]);
-
-  // Formatar a data para exibição
-  const formattedMonth = useMemo(() => {
-    return format(currentDate, 'MMMM yyyy', { locale: ptBR });
-  }, [currentDate]);
-
-  // Verificar se há transações no próximo mês
-  const hasTransactionsInNextMonth = useMemo(() => {
-    const nextMonth = addMonths(currentDate, 1);
-    const startOfNextMonth = startOfMonth(nextMonth);
-    const endOfNextMonth = endOfMonth(nextMonth);
-    
-    return transactions.some(transaction => {
-      const transactionDate = parseISO(transaction.date);
-      return transactionDate >= startOfNextMonth && transactionDate <= endOfNextMonth;
-    });
-  }, [currentDate, transactions]);
-
-  // Filtrar transações com base no mês atual e no filtro selecionado
-  const filteredTransactions = useMemo(() => {
-    console.log(`Filtrando ${transactions.length} transações, mês: ${formattedMonth}, filtro: ${selectedFilter}`);
-    
-    const startOfSelectedMonth = startOfMonth(currentDate);
-    const endOfSelectedMonth = endOfMonth(currentDate);
-    
-    return transactions.filter(transaction => {
-      try {
-        // Filtrar por mês e ano
-        const transactionDate = parseISO(transaction.date);
-        const isInSelectedMonth = 
-          transactionDate >= startOfSelectedMonth && 
-          transactionDate <= endOfSelectedMonth;
-          
-        if (!isInSelectedMonth) return false;
-        
-        // Filtrar por tipo de transação 
-        if (selectedFilter !== 'all' && transaction.type !== selectedFilter) {
-          return false;
-        }
-        
-        return true;
-      } catch (error) {
-        console.error('Erro ao processar data da transação:', transaction.date, error);
-        return false;
-      }
-    }).sort((a, b) => {
-      // Ordenar por data (mais recentes primeiro)
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
-  }, [transactions, currentDate, selectedFilter]);
-
-  // Implementar paginação
-  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / itemsPerPage));
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
-  // Pegar apenas as transações da página atual
-  const paginatedTransactions = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    console.log(`Paginação: página ${currentPage}, inicio ${startIndex}, total ${filteredTransactions.length}`);
-    return filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredTransactions, currentPage]);
-
-  // Manipuladores de eventos
-  const handleDateChange = (direction: 'next' | 'previous') => {
-    setCurrentDate(currentDate => {
-      return direction === 'next' 
-        ? addMonths(currentDate, 1)
-        : subMonths(currentDate, 1);
-    });
+  // Apply filters based on the selected quick filter or date
+  useEffect(() => {
+    let filtered = [...transactions];
+    const today = startOfToday();
+    
+    // Apply quick filter
+    switch (selectedFilter) {
+      case 'today':
+        filtered = filtered.filter(tx => 
+          format(new Date(tx.date), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+        );
+        break;
+      case '7days':
+        const sevenDaysAgo = subDays(today, 7);
+        filtered = filtered.filter(tx => 
+          new Date(tx.date) >= sevenDaysAgo
+        );
+        break;
+      case 'thisMonth':
+        const firstDayOfMonth = startOfMonth(currentDate);
+        const lastDayOfMonth = new Date(
+          currentDate.getFullYear(), 
+          currentDate.getMonth() + 1, 
+          0
+        );
+        
+        filtered = filtered.filter(tx => {
+          const txDate = new Date(tx.date);
+          return txDate >= firstDayOfMonth && txDate <= lastDayOfMonth;
+        });
+        break;
+      case 'thisYear':
+        const firstDayOfYear = startOfYear(currentDate);
+        const lastDayOfYear = new Date(
+          currentDate.getFullYear(), 
+          11, 
+          31
+        );
+        
+        filtered = filtered.filter(tx => {
+          const txDate = new Date(tx.date);
+          return txDate >= firstDayOfYear && txDate <= lastDayOfYear;
+        });
+        break;
+      default:
+        break;
+    }
+    
+    // Sort by date, newest first
+    filtered.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    setFilteredTransactions(filtered);
+    setCurrentPage(1); // Reset to first page when filter changes
+  }, [transactions, selectedFilter, currentDate]);
+  
+  // Check if there are transactions in the next month
+  const hasTransactionsInNextMonth = transactions.some(tx => {
+    const txDate = new Date(tx.date);
+    return txDate.getMonth() === (currentDate.getMonth() + 1) % 12;
+  });
+  
+  // Handle filter change
+  const handleFilterChange = (filterId: string) => {
+    setSelectedFilter(filterId as QuickFilterType);
   };
-
-  const handleFilterChange = (filter: TransactionFilter) => {
-    setSelectedFilter(filter);
+  
+  // Handle date change
+  const handleDateChange = (date: Date) => {
+    setCurrentDate(date);
   };
-
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedTransactions = filteredTransactions.slice(
+    startIndex, 
+    startIndex + itemsPerPage
+  );
+  
   return {
     currentDate,
-    formattedMonth,
     selectedFilter,
     filteredTransactions,
     paginatedTransactions,
-    totalPages,
     currentPage,
+    itemsPerPage,
+    totalPages,
     hasTransactionsInNextMonth,
     handleFilterChange,
     handleDateChange,
-    setCurrentPage
+    setCurrentPage,
+    setItemsPerPage
   };
 };
