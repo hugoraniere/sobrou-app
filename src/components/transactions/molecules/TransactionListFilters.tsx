@@ -29,11 +29,11 @@ const TransactionListFilters: React.FC<TransactionListFiltersProps> = ({
         />
       </div>
       
-      {/* Pesquisa de transações - à direita */}
+      {/* Pesquisa de transações - à direita com largura aumentada */}
       <SearchBar 
         searchTerm={searchTerm}
         onSearchChange={onSearchChange}
-        className="w-full md:w-1/2"
+        className="w-full md:w-[60%]"
         placeholder="Buscar por descrição, valor ou categoria..."
       />
     </div>

@@ -11,6 +11,7 @@ export const DASHBOARD_TEXT = {
   },
   charts: {
     categoryBreakdown: "Distribuição por categoria",
+    expensesByCategory: "Gastos por Categoria",
     incomeByType: "Fontes de receita",
     dailyEvolution: "Movimentações diárias",
     balanceByAccount: "Saldo por conta/cartão",
@@ -39,5 +40,6 @@ export const DASHBOARD_TEXT = {
   },
   emptyState: {
     message: "Comece a registrar para ver seus dados"
-  }
+  },
+  recentTransactions: "Últimas Transações"
 };

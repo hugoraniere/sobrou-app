@@ -4,7 +4,7 @@ import DailyBarChart from '../charts/DailyBarChart';
 import ExpensesByCategoryChart from '../charts/ExpensesByCategoryChart';
 import MonthlyComparisonChart from '../charts/MonthlyComparisonChart';
 import { Transaction } from '@/services/transactions';
-import { TEXT } from '@/constants/text';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface DashboardChartsProps {
@@ -12,12 +12,14 @@ interface DashboardChartsProps {
 }
 
 const DashboardCharts: React.FC<DashboardChartsProps> = ({ transactions }) => {
+  const { t } = useTranslation();
+  
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-white border border-gray-100 min-h-[300px]">
           <CardHeader className="pb-2">
-            <CardTitle>{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
+            <CardTitle>{t('dashboard.charts.dailyEvolution', 'Movimentações diárias')}</CardTitle>
           </CardHeader>
           <CardContent className="bg-white">
             <DailyBarChart transactions={transactions} />
@@ -25,7 +27,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ transactions }) => {
         </Card>
         <Card className="bg-white border border-gray-100 min-h-[300px]">
           <CardHeader className="pb-2">
-            <CardTitle>{TEXT.dashboard.charts.categoryBreakdown}</CardTitle>
+            <CardTitle>{t('dashboard.charts.expensesByCategory', 'Gastos por Categoria')}</CardTitle>
           </CardHeader>
           <CardContent className="bg-white">
             <ExpensesByCategoryChart expenses={transactions} chartConfig={{}} />
@@ -35,7 +37,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ transactions }) => {
 
       <Card className="bg-white border border-gray-100 min-h-[300px] mt-6">
         <CardHeader className="pb-2">
-          <CardTitle>{TEXT.dashboard.charts.balanceEvolution}</CardTitle>
+          <CardTitle>{t('dashboard.charts.balanceEvolution', 'Evolução do Saldo')}</CardTitle>
         </CardHeader>
         <CardContent className="bg-white">
           <MonthlyComparisonChart expenses={transactions} chartConfig={{}} />

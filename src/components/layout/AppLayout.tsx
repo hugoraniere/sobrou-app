@@ -1,11 +1,9 @@
 
 import React from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import SidebarNav from './SidebarNav';
-import MobileHeader from './MobileHeader';
+import { useState } from 'react';
+import MainNavbar from '../navigation/MainNavbar';
 import FloatingChatButton from '../chat/FloatingChatButton';
 import ChatWindow from '../chat/ChatWindow';
-import { useState } from 'react';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -15,34 +13,27 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full bg-background-surface">
-        {/* Desktop Sidebar - Fixed and full height */}
-        <div className="hidden md:block">
-          <SidebarNav />
+    <div className="min-h-screen w-full bg-background-surface flex flex-col">
+      {/* Barra de navegação superior */}
+      <MainNavbar />
+      
+      {/* Conteúdo principal */}
+      <main className="flex-1 w-full overflow-x-hidden">
+        <div className="px-4 sm:px-6 md:px-8 py-4 overflow-x-hidden w-full max-w-full">
+          {children}
         </div>
-        
-        {/* Main Content - Adjusted to have proper margin */}
-        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden md:ml-64">
-          {/* Mobile Header */}
-          <MobileHeader />
-          
-          <div className="flex-1 px-4 sm:px-6 md:px-8 py-4 overflow-x-hidden w-full max-w-full">
-            {children}
-          </div>
 
-          {/* Chat Components */}
-          <FloatingChatButton 
-            isOpen={isChatOpen}
-            onClick={() => setIsChatOpen(!isChatOpen)}
-          />
-          <ChatWindow
-            isOpen={isChatOpen}
-            onClose={() => setIsChatOpen(false)}
-          />
-        </main>
-      </div>
-    </SidebarProvider>
+        {/* Chat Components */}
+        <FloatingChatButton 
+          isOpen={isChatOpen}
+          onClick={() => setIsChatOpen(!isChatOpen)}
+        />
+        <ChatWindow
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+        />
+      </main>
+    </div>
   );
 };
 
