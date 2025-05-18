@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { toast } from 'sonner';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Nome do prato é obrigatório'),
@@ -16,6 +15,7 @@ const formSchema = z.object({
   operational_cost_percentage: z.coerce.number().min(0, 'Percentual não pode ser negativo'),
   tax_percentage: z.coerce.number().min(0, 'Percentual não pode ser negativo').optional(),
   desired_margin_percentage: z.coerce.number().min(0, 'Margem não pode ser negativa').max(99.9, 'Margem deve ser menor que 100%'),
+  selling_price: z.coerce.number().positive('Preço deve ser maior que zero').optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -41,6 +41,7 @@ const DishForm: React.FC<DishFormProps> = ({
       operational_cost_percentage: dish?.operational_cost_percentage || 30,
       tax_percentage: dish?.tax_percentage || 0,
       desired_margin_percentage: dish?.desired_margin_percentage || 65,
+      selling_price: dish?.selling_price || undefined,
     },
   });
 
@@ -83,7 +84,7 @@ const DishForm: React.FC<DishFormProps> = ({
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="operational_cost_percentage"
@@ -117,7 +118,9 @@ const DishForm: React.FC<DishFormProps> = ({
               </FormItem>
             )}
           />
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="desired_margin_percentage"
@@ -128,6 +131,31 @@ const DishForm: React.FC<DishFormProps> = ({
                   <div className="relative">
                     <Input type="number" step="0.1" min="0" max="99.9" {...field} />
                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2">%</span>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="selling_price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Preço de Venda Desejado (opcional)</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2">R$</span>
+                    <Input 
+                      type="number" 
+                      step="0.01" 
+                      min="0" 
+                      className="pl-8"
+                      {...field} 
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value === '' ? undefined : parseFloat(e.target.value))}
+                    />
                   </div>
                 </FormControl>
                 <FormMessage />

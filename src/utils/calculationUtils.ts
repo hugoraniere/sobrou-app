@@ -1,92 +1,61 @@
 
-import { CostCalculation, Dish, DishIngredient, IngredientCost } from '@/types/restaurant-calculator';
+import { CostCalculation, Dish, DishIngredient, Ingredient } from "@/types/restaurant-calculator";
 
-/**
- * Calcula o peso líquido considerando a porcentagem de merma
- */
-export function calculateNetWeight(grossWeight: number, wastePercentage: number): number {
-  return grossWeight * (1 - wastePercentage / 100);
-}
+export const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('pt-BR', { 
+    style: 'currency', 
+    currency: 'BRL' 
+  }).format(value);
+};
 
-/**
- * Calcula o custo do ingrediente com base no peso e preço
- */
-export function calculateIngredientCost(
-  quantity: number, 
-  price: number, 
-  wastePercentage: number, 
-  unit: string
-): number {
-  // Converter para unidade base se necessário
-  let baseQuantity = quantity;
-  if (unit === 'kg') baseQuantity = quantity * 1000; // Converte kg para g
-  if (unit === 'L') baseQuantity = quantity * 1000;  // Converte L para ml
-  
-  // Calcular peso líquido considerando merma
-  const netWeight = calculateNetWeight(baseQuantity, wastePercentage);
-  
-  // Calcular custo para unidade equivalente
-  let unitPrice = price;
-  if (unit === 'kg') unitPrice = price / 1000; // Converte preço por kg para preço por g
-  if (unit === 'L') unitPrice = price / 1000;  // Converte preço por L para preço por ml
-  
-  return netWeight * unitPrice;
-}
+export const formatPercentage = (value: number): string => {
+  return new Intl.NumberFormat('pt-BR', { 
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 2
+  }).format(value / 100);
+};
 
-/**
- * Calcula os custos de um prato com base nos ingredientes
- */
-export function calculateDishCost(
-  dish: Dish,
-  dishIngredients: DishIngredient[]
-): CostCalculation {
-  // Calcular custo de cada ingrediente
-  const ingredientCosts: IngredientCost[] = dishIngredients.map(di => {
-    if (!di.ingredient) {
-      return {
-        ingredient: {
-          id: '',
-          name: 'Erro: Ingrediente não encontrado',
-          unit: 'g',
-          price: 0,
-          waste_percentage: 0
-        },
-        gross_weight: 0,
-        net_weight: 0,
-        cost: 0
-      };
-    }
-    
-    const { quantity } = di;
-    const { price, waste_percentage, unit } = di.ingredient;
-    const netWeight = calculateNetWeight(quantity, waste_percentage);
-    const cost = calculateIngredientCost(quantity, price, waste_percentage, unit);
+export const calculateDishCost = (
+  dish: Dish, 
+  dishIngredients: (DishIngredient & { ingredient: Ingredient })[]
+): CostCalculation => {
+  const ingredientCosts = dishIngredients.map(item => {
+    const { ingredient, quantity } = item;
+    const grossWeight = quantity;
+    const netWeight = quantity * (1 - ingredient.waste_percentage / 100);
+    const cost = (netWeight / (1 - ingredient.waste_percentage / 100)) * ingredient.price;
     
     return {
-      ingredient: di.ingredient,
-      gross_weight: quantity,
+      ingredient,
+      gross_weight: grossWeight,
       net_weight: netWeight,
       cost
     };
   });
   
-  // Calcular custo total dos ingredientes
   const totalIngredientsCost = ingredientCosts.reduce((sum, item) => sum + item.cost, 0);
   
-  // Calcular custo operacional
   const operationalCost = totalIngredientsCost * (dish.operational_cost_percentage / 100);
   
-  // Calcular custo de impostos
-  const taxCost = totalIngredientsCost * ((dish.tax_percentage || 0) / 100);
+  const taxPercentage = dish.tax_percentage || 0;
+  const taxCost = totalIngredientsCost * (taxPercentage / 100);
   
-  // Calcular custo total
   const totalCost = totalIngredientsCost + operationalCost + taxCost;
   
-  // Calcular preço sugerido com margem
-  const suggestedPrice = totalCost / (1 - dish.desired_margin_percentage / 100);
+  // Calcular preço sugerido com base na margem desejada
+  // Fórmula: preço = custo / (1 - margem)
+  const marginDecimal = dish.desired_margin_percentage / 100;
+  const suggestedPrice = totalCost / (1 - marginDecimal);
   
-  // Calcular margem efetiva
-  const margin = ((suggestedPrice - totalCost) / suggestedPrice) * 100;
+  // Calcular margem em valor
+  const margin = suggestedPrice - totalCost;
+  
+  // Se tiver um preço de venda definido, calcular o percentual de margem
+  let marginPercentage;
+  if (dish.selling_price) {
+    marginPercentage = ((dish.selling_price - totalCost) / dish.selling_price) * 100;
+  }
   
   return {
     ingredients: ingredientCosts,
@@ -95,34 +64,8 @@ export function calculateDishCost(
     tax_cost: taxCost,
     total_cost: totalCost,
     suggested_price: suggestedPrice,
-    margin
+    desired_selling_price: dish.selling_price,
+    margin,
+    margin_percentage: marginPercentage
   };
-}
-
-/**
- * Formata valor monetário para BRL
- */
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(value);
-}
-
-/**
- * Formata percentual
- */
-export function formatPercentage(value: number): string {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'percent',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1
-  }).format(value / 100);
-}
-
-/**
- * Formata peso com unidade
- */
-export function formatWeight(value: number, unit: string): string {
-  return `${value.toFixed(2)} ${unit}`;
-}
+};

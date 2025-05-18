@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dish, DishIngredient } from '@/types/restaurant-calculator';
+import { Dish, DishIngredient, Ingredient } from '@/types/restaurant-calculator';
 import { getDishes, getDishIngredients } from '@/services/restaurant-calculator/dishService';
+import { getIngredients } from '@/services/restaurant-calculator/ingredientService';
 import DishCard from './DishCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, AlertCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface DishListProps {
   onEditDish: (dish: Dish) => void;
@@ -14,6 +16,7 @@ interface DishListProps {
   onDuplicateDish: (dish: Dish) => void;
   onCalculateDish: (dish: Dish) => void;
   onCreateDish: () => void;
+  onCreateIngredient?: () => void;
 }
 
 const DishesList: React.FC<DishListProps> = ({
@@ -21,33 +24,45 @@ const DishesList: React.FC<DishListProps> = ({
   onDeleteDish,
   onDuplicateDish,
   onCalculateDish,
-  onCreateDish
+  onCreateDish,
+  onCreateIngredient
 }) => {
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [dishIngredientsMap, setDishIngredientsMap] = useState<Record<string, DishIngredient[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [hasIngredients, setHasIngredients] = useState(false);
 
-  const fetchDishes = async () => {
+  const fetchIngredientsAndDishes = async () => {
     setIsLoading(true);
     try {
-      const dishesData = await getDishes();
-      setDishes(dishesData);
+      // Verificar se há ingredientes cadastrados
+      const ingredients = await getIngredients();
+      setHasIngredients(ingredients.length > 0);
       
-      // Carregar ingredientes para cada prato
-      const ingredientsMap: Record<string, DishIngredient[]> = {};
-      for (const dish of dishesData) {
-        const ingredients = await getDishIngredients(dish.id);
-        ingredientsMap[dish.id] = ingredients;
+      // Carregar pratos se houver ingredientes
+      if (ingredients.length > 0) {
+        const dishesData = await getDishes();
+        setDishes(dishesData);
+        
+        // Carregar ingredientes para cada prato
+        const ingredientsMap: Record<string, DishIngredient[]> = {};
+        for (const dish of dishesData) {
+          const dishIngredients = await getDishIngredients(dish.id);
+          ingredientsMap[dish.id] = dishIngredients;
+        }
+        setDishIngredientsMap(ingredientsMap);
+      } else {
+        setDishes([]);
+        setDishIngredientsMap({});
       }
-      setDishIngredientsMap(ingredientsMap);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDishes();
+    fetchIngredientsAndDishes();
   }, []);
 
   const filteredDishes = dishes.filter(
@@ -60,23 +75,42 @@ const DishesList: React.FC<DishListProps> = ({
         <h2 className="text-xl font-semibold">Pratos Cadastrados</h2>
         
         <div className="mt-4 md:mt-0 flex items-center gap-4 w-full md:w-auto">
-          <div className="relative flex items-center w-full md:w-64">
-            <Search className="absolute left-2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Buscar pratos..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <Button onClick={onCreateDish}>
-            <Plus size={16} className="mr-1" /> Novo Prato
-          </Button>
+          {hasIngredients && (
+            <>
+              <div className="relative flex items-center w-full md:w-64">
+                <Search className="absolute left-2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Buscar pratos..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              <Button onClick={onCreateDish}>
+                <Plus size={16} className="mr-1" /> Novo Prato
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
-      {isLoading ? (
+      {!hasIngredients ? (
+        <Alert className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Cadastre ingredientes primeiro</AlertTitle>
+          <AlertDescription>
+            Você precisa cadastrar ao menos um ingrediente antes de criar pratos.
+          </AlertDescription>
+          <Button 
+            className="mt-4" 
+            onClick={onCreateIngredient}
+            variant="outline"
+          >
+            <Plus size={16} className="mr-1" /> Cadastrar Ingredientes
+          </Button>
+        </Alert>
+      ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
             <Card key={i} />

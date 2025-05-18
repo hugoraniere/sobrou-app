@@ -1,7 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Ingredient } from '@/types/restaurant-calculator';
+import { Ingredient, Unit } from '@/types/restaurant-calculator';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export async function getIngredients(): Promise<Ingredient[]> {
   try {
@@ -11,7 +12,14 @@ export async function getIngredients(): Promise<Ingredient[]> {
       .order('name');
     
     if (error) throw error;
-    return data || [];
+    
+    // Converter o tipo unit para o tipo Unit
+    const typedData = data?.map(item => ({
+      ...item,
+      unit: item.unit as Unit
+    })) || [];
+    
+    return typedData;
   } catch (error) {
     console.error('Error fetching ingredients:', error);
     toast.error('Erro ao carregar ingredientes');
@@ -28,7 +36,14 @@ export async function getIngredientById(id: string): Promise<Ingredient | null> 
       .single();
     
     if (error) throw error;
-    return data;
+    
+    if (data) {
+      return {
+        ...data,
+        unit: data.unit as Unit
+      };
+    }
+    return null;
   } catch (error) {
     console.error('Error fetching ingredient:', error);
     toast.error('Erro ao carregar o ingrediente');
@@ -36,8 +51,20 @@ export async function getIngredientById(id: string): Promise<Ingredient | null> 
   }
 }
 
-export async function createIngredient(ingredient: Omit<Ingredient, 'id'>): Promise<Ingredient | null> {
+export async function createIngredient(ingredientData: Omit<Ingredient, 'id'>): Promise<Ingredient | null> {
   try {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      toast.error('Usuário não autenticado');
+      return null;
+    }
+    
+    // Incluir o user_id no objeto
+    const ingredient = {
+      ...ingredientData,
+      user_id: userData.user.id
+    };
+    
     const { data, error } = await supabase
       .from('ingredients')
       .insert(ingredient)
@@ -45,8 +72,9 @@ export async function createIngredient(ingredient: Omit<Ingredient, 'id'>): Prom
       .single();
     
     if (error) throw error;
+    
     toast.success('Ingrediente adicionado com sucesso');
-    return data;
+    return data ? {...data, unit: data.unit as Unit} : null;
   } catch (error) {
     console.error('Error creating ingredient:', error);
     toast.error('Erro ao criar ingrediente');
@@ -54,18 +82,19 @@ export async function createIngredient(ingredient: Omit<Ingredient, 'id'>): Prom
   }
 }
 
-export async function updateIngredient(id: string, ingredient: Partial<Ingredient>): Promise<Ingredient | null> {
+export async function updateIngredient(id: string, ingredientData: Partial<Ingredient>): Promise<Ingredient | null> {
   try {
     const { data, error } = await supabase
       .from('ingredients')
-      .update(ingredient)
+      .update(ingredientData)
       .eq('id', id)
       .select()
       .single();
     
     if (error) throw error;
+    
     toast.success('Ingrediente atualizado com sucesso');
-    return data;
+    return data ? {...data, unit: data.unit as Unit} : null;
   } catch (error) {
     console.error('Error updating ingredient:', error);
     toast.error('Erro ao atualizar ingrediente');
@@ -81,6 +110,7 @@ export async function deleteIngredient(id: string): Promise<boolean> {
       .eq('id', id);
     
     if (error) throw error;
+    
     toast.success('Ingrediente removido com sucesso');
     return true;
   } catch (error) {
