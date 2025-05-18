@@ -22,8 +22,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <SidebarNav />
         </div>
         
-        {/* Main Content */}
-        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
+        {/* Main Content - Adjusted to have proper margin */}
+        <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden md:ml-64">
           {/* Mobile Header */}
           <MobileHeader />
           

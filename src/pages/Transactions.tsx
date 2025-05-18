@@ -9,14 +9,14 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Upload, AlertCircle, RefreshCcw } from 'lucide-react';
+import { Plus, AlertCircle, RefreshCcw } from 'lucide-react';
 import ImportBankStatementButton from '@/components/transactions/ImportBankStatementButton';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/spinner';
 
-const MAX_RETRY_COUNT = 2;
-const RETRY_DELAY = 3000; // 3 segundos
-const MAX_LOADING_TIME = 30000; // 30 segundos (aumentado para dar mais tempo)
+const MAX_RETRY_COUNT = 3; // Aumentado o número de tentativas
+const RETRY_DELAY = 5000; // Aumentado para 5 segundos
+const MAX_LOADING_TIME = 45000; // Aumentado para 45 segundos
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -84,7 +84,7 @@ const Transactions = () => {
         return;
       }
       
-      // Lógica de retry
+      // Lógica de retry aprimorada
       if (retryCount < MAX_RETRY_COUNT) {
         console.log(`Tentativa ${retryCount + 1} de ${MAX_RETRY_COUNT}. Tentando novamente em ${RETRY_DELAY}ms`);
         setRetryCount(prevCount => prevCount + 1);
@@ -115,7 +115,7 @@ const Transactions = () => {
           setErrorMessage("Tempo limite excedido ao carregar transações. Algumas funcionalidades podem não estar disponíveis.");
         }
       }
-    }, MAX_LOADING_TIME + 1000); // Um pouco mais que o timeout da requisição
+    }, MAX_LOADING_TIME + 2000); // Um pouco mais que o timeout da requisição
 
     return () => clearTimeout(timeout);
   }, [lastUpdate]);
@@ -133,12 +133,11 @@ const Transactions = () => {
   return (
     <TooltipProvider>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{t('transactions.title', 'Transações')}</h1>
-            <p className="text-gray-600">
-              {t('transactions.subtitle', 'Visualize e gerencie todas as suas transações financeiras')}
-            </p>
+            <h1 className="text-3xl font-bold">
+              {t('transactions.title', 'Transações')}
+            </h1>
           </div>
           <div className="flex items-center space-x-2">
             <ImportBankStatementButton onTransactionsAdded={handleTransactionUpdated} />
@@ -165,7 +164,7 @@ const Transactions = () => {
         {isLoading ? (
           <LoadingSpinner 
             message="Carregando transações..." 
-            timeout={10000}
+            timeout={15000} // Aumento do tempo de loading
           />
         ) : hasError ? (
           <Card className="p-6 flex flex-col items-center justify-center text-center">
@@ -174,7 +173,10 @@ const Transactions = () => {
             <p className="text-gray-600 mb-4">
               {errorMessage || "Não foi possível carregar suas transações. Verifique sua conexão e tente novamente."}
             </p>
-            <Button onClick={() => fetchTransactions()} className="flex items-center gap-2">
+            <Button onClick={() => {
+              setRetryCount(0);
+              fetchTransactions();
+            }} className="flex items-center gap-2">
               <RefreshCcw className="h-4 w-4" />
               Tentar novamente
             </Button>
@@ -182,7 +184,7 @@ const Transactions = () => {
         ) : transactions.length === 0 ? (
           <Card className="p-6 flex flex-col items-center justify-center text-center">
             <h3 className="text-xl font-semibold mb-2">Nenhuma transação encontrada</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-500 mb-4">
               Você ainda não possui transações registradas. Adicione sua primeira transação agora!
             </p>
             {!showNewTransactionForm && (
@@ -196,8 +198,8 @@ const Transactions = () => {
           <ModernTransactionList
             transactions={transactions}
             onTransactionUpdated={handleTransactionUpdated}
-            className="mt-6 space-y-4" // Adicionando espaçamento entre os cards (16px)
-            key={`transactions-list-${lastUpdate}`} // Forçar rerender quando as transações são atualizadas
+            className="mt-6 space-y-4"
+            key={`transactions-list-${lastUpdate}`}
           />
         )}
       </div>

@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Transaction } from '@/services/transactions';
-import TransactionsHeader from '../molecules/TransactionsHeader';
 import TransactionItem from '../molecules/TransactionItem';
 import EditTransactionDialog from '../../transactions/EditTransactionDialog';
 import DeleteTransactionDialog from '../../transactions/DeleteTransactionDialog';
@@ -9,7 +8,6 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -23,29 +21,19 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   className
 }) => {
   const {
-    currentDate,
-    selectedFilter,
     filteredTransactions,
     paginatedTransactions,
     totalPages,
     currentPage,
-    hasTransactionsInNextMonth,
-    handleFilterChange,
-    handleDateChange,
     setCurrentPage
   } = useModernTransactionList(transactions);
   
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
   
-  // Monitorar mudanças nas transações
   useEffect(() => {
     console.log(`ModernTransactionList recebeu ${transactions.length} transações`);
-    if (transactions.length > 0 && filteredTransactions.length === 0) {
-      // Se temos transações mas nenhuma está sendo mostrada, exibir toast informativo
-      toast.info("Altere o filtro para ver mais transações");
-    }
-  }, [transactions, filteredTransactions]);
+  }, [transactions]);
   
   // Handle edit
   const handleEdit = (transaction: Transaction) => {
@@ -59,19 +47,10 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   
   return (
     <div className={cn("flex flex-col space-y-4", className)}>
-      <TransactionsHeader
-        currentDate={currentDate}
-        onDateChange={handleDateChange}
-        selectedFilter={selectedFilter}
-        onFilterChange={handleFilterChange}
-        hasTransactionsInNextMonth={hasTransactionsInNextMonth}
-        className="w-full"
-      />
-      
       {filteredTransactions.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-12 text-center p-6">
           <p className="text-xl font-medium text-gray-900 mb-2">Nenhuma transação encontrada</p>
-          <p className="text-gray-500">Não há transações para o período selecionado. Tente mudar o filtro acima.</p>
+          <p className="text-gray-500">Não há transações para o período selecionado.</p>
         </Card>
       ) : (
         <>
