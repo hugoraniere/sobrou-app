@@ -8,3 +8,4 @@ export const transactionCategories: CategoryType[] = Array.isArray(expenseCatego
 // Re-export important types and utilities
 export type { CategoryType };
 export * from '../utils/categoryUtils';
+export { getCategoryIcon, categoryIcons } from '../utils/categoryIcons';
