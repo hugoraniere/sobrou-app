@@ -20,7 +20,7 @@ const TransactionListFilters: React.FC<TransactionListFiltersProps> = ({
   className
 }) => {
   return (
-    <div className={cn("flex flex-col md:flex-row gap-3 justify-between", className)}>
+    <div className={cn("flex flex-col md:flex-row gap-3 justify-between items-center", className)}>
       {/* Filtro de mês - à esquerda */}
       <div className="flex items-center">
         <MonthNavigator 
@@ -34,6 +34,7 @@ const TransactionListFilters: React.FC<TransactionListFiltersProps> = ({
         searchTerm={searchTerm}
         onSearchChange={onSearchChange}
         className="w-full md:w-1/2"
+        placeholder="Buscar por descrição, valor ou categoria..."
       />
     </div>
   );

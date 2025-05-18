@@ -70,11 +70,13 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
       />
       
       {/* Paginação */}
-      <TransactionPaginationControls 
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      {filteredTransactions.length > 0 && (
+        <TransactionPaginationControls 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
       
       {/* Dialogs */}
       {transactionToEdit && (

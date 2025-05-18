@@ -3,13 +3,13 @@ import React from 'react';
 import { Transaction } from '@/services/transactions';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import CategoryChip from '../ui/CategoryChip';
-import { transactionCategories } from '@/data/categories';
+import { ArrowDown, ArrowUp, CircleDot } from 'lucide-react';
 import { MoreHorizontal } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/utils/currencyUtils';
-import { getCategoryIcon } from '@/utils/categoryIcons';
+import { transactionCategories, getCategoryIcon } from '@/data/categories';
+import CategoryChip from '../atoms/CategoryChip';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -40,26 +40,35 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   const category = transactionCategories.find(c => c.id === transaction.category) || {
     id: 'other',
     name: 'Outros',
-    color: 'gray'
+    color: 'text-gray-500',
+    type: 'expense' as const,
+    value: 'other',
+    label: 'Outros',
+    icon: CircleDot
   };
   
-  const IconComponent = getCategoryIcon(category.id);
+  const IconComponent = category.icon || CircleDot;
   
   return (
     <div className={cn(
       "flex justify-between items-center px-3 py-1.5 hover:bg-gray-50 border-t first:border-t-0 transition-colors",
-      transaction.type === 'income' ? "border-l-4 border-l-green-500" : "border-l-4 border-l-gray-200"
+      transaction.type === 'income' ? "border-l-4 border-l-green-500" : "border-l-4 border-l-red-400"
     )}>
       <div className="flex items-center gap-2">
-        <div className="hidden sm:flex h-6 w-6 rounded-full bg-gray-100 items-center justify-center text-gray-500">
-          <IconComponent className="h-3 w-3" />
+        <div className={cn(
+          "flex h-6 w-6 rounded-full items-center justify-center",
+          transaction.type === 'income' ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+        )}>
+          {transaction.type === 'income' 
+            ? <ArrowUp className="h-3 w-3" /> 
+            : <ArrowDown className="h-3 w-3" />}
         </div>
         <div>
           <h4 className="text-xs font-medium text-gray-900 line-clamp-1">{transaction.description}</h4>
           <div className="flex items-center gap-1 mt-0.5">
             <span className="text-xs text-gray-500">{formattedDate}</span>
             <span className="text-gray-300 text-xs">•</span>
-            <CategoryChip category={transaction.category} className="px-1 py-0.5 text-xs" />
+            <CategoryChip categoryId={transaction.category} className="px-1 py-0.5 text-xs" />
           </div>
         </div>
       </div>
@@ -67,9 +76,9 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
       <div className="flex items-center gap-1">
         <span className={cn(
           "font-medium text-xs",
-          transaction.type === 'income' ? 'text-green-600' : 'text-gray-700'
+          transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
         )}>
-          {transaction.type === 'income' ? '+ ' : ''}
+          {transaction.type === 'income' ? '+' : '-'}
           {formatCurrency(transaction.amount)}
         </span>
         

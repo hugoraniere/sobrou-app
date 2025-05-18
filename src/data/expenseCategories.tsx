@@ -11,7 +11,8 @@ import {
   ShoppingBag,
   LineChart,
   Users,
-  Gift
+  Gift,
+  HelpCircle
 } from 'lucide-react';
 
 export const expenseCategories: CategoryType[] = [
@@ -113,5 +114,23 @@ export const expenseCategories: CategoryType[] = [
     label: 'Doações',
     color: 'text-rose-800',
     icon: Gift
+  },
+  { 
+    id: 'other',
+    name: 'Outros', 
+    value: 'other',
+    type: 'expense',
+    label: 'Outros',
+    color: 'text-gray-800',
+    icon: HelpCircle
+  },
+  { 
+    id: 'outros',
+    name: 'Outros', 
+    value: 'outros',
+    type: 'expense',
+    label: 'Outros',
+    color: 'text-gray-800',
+    icon: HelpCircle
   }
 ];

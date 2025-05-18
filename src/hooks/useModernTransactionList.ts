@@ -1,7 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Transaction } from '@/services/transactions';
-import { isSameMonth, isSameYear, isWithinInterval, isFuture, parseISO, isValid } from 'date-fns';
+import { isSameMonth, isSameYear, isWithinInterval, isFuture, parseISO, isValid, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export type PeriodFilter = {
   startDate: Date | null;
@@ -9,14 +10,23 @@ export type PeriodFilter = {
 };
 
 export const useModernTransactionList = (transactions: Transaction[]) => {
+  // Estados para gerenciar filtros e paginação
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>({ startDate: null, endDate: null });
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAllTransactions, setShowAllTransactions] = useState(false);
   
+  // Verificar se filtro por período está ativo
+  const isPeriodFilterActive = !!periodFilter.startDate && !!periodFilter.endDate;
+  
+  // Formatar data para exibição
+  const formatDateDisplay = (date: Date | string): string => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return format(dateObj, 'dd MMM yyyy', { locale: ptBR });
+  };
+
   // Filtrar transações pelos filtros aplicados
   useEffect(() => {
     if (!transactions || transactions.length === 0) {
@@ -26,12 +36,6 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
 
     console.log(`Processando ${transactions.length} transações`);
     console.log(`Filtros ativos: ${isPeriodFilterActive ? 'Período personalizado' : 'Mês atual'}`);
-    
-    // Log das primeiras transações para debug
-    console.log("Primeiras 3 transações para debug:");
-    transactions.slice(0, 3).forEach((t, i) => {
-      console.log(`Trans ${i}: id=${t.id}, data=${t.date}, tipo=${typeof t.date}`);
-    });
     
     let filtered = [...transactions];
     
@@ -45,22 +49,13 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
           transaction.amount.toString().includes(searchTerm)
         );
       });
-      console.log(`Após filtro de texto "${searchTerm}": ${filtered.length} transações`);
     }
     
     // Aplicar filtro de período se estiver ativo
     if (isPeriodFilterActive) {
-      console.log(`Filtrando por período: ${periodFilter.startDate?.toISOString()} até ${periodFilter.endDate?.toISOString()}`);
       filtered = filtered.filter(transaction => {
-        // Garantir que a data da transação é uma data válida
-        const transDate = typeof transaction.date === 'string' 
-          ? parseISO(transaction.date) 
-          : new Date(transaction.date);
-          
-        if (!isValid(transDate)) {
-          console.error(`Data inválida para transação ${transaction.id}: ${transaction.date}`);
-          return false;
-        }
+        const transDate = parseValidDate(transaction.date);
+        if (!transDate) return false;
         
         try {
           return isWithinInterval(transDate, {
@@ -73,36 +68,38 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
         }
       });
     } 
-    // Por padrão, filtrar pelo mês atual (não mais usando showAllTransactions)
+    // Por padrão, filtrar pelo mês atual
     else {
-      console.log(`Filtrando pelo mês: ${currentMonth.toISOString()}`);
       filtered = filtered.filter(transaction => {
-        // Garantir que a data da transação é uma data válida
-        const transDate = typeof transaction.date === 'string' 
-          ? parseISO(transaction.date) 
-          : new Date(transaction.date);
-          
-        if (!isValid(transDate)) {
-          console.error(`Data inválida para transação ${transaction.id}: ${transaction.date}`);
-          return false;
-        }
+        const transDate = parseValidDate(transaction.date);
+        if (!transDate) return false;
         
         return isSameMonth(transDate, currentMonth) && 
                isSameYear(transDate, currentMonth);
       });
     }
     
-    // Sort by date, newest first
+    // Ordenar por data, mais recentes primeiro
     filtered.sort((a, b) => {
-      const dateA = typeof a.date === 'string' ? parseISO(a.date) : new Date(a.date);
-      const dateB = typeof b.date === 'string' ? parseISO(b.date) : new Date(b.date);
+      const dateA = parseValidDate(a.date) || new Date(0);
+      const dateB = parseValidDate(b.date) || new Date(0);
       return dateB.getTime() - dateA.getTime();
     });
     
-    console.log(`Após processamento final: ${filtered.length} transações para exibir`);
     setFilteredTransactions(filtered);
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1); // Reset para primeira página quando os filtros mudam
   }, [transactions, currentMonth, periodFilter, searchTerm]);
+  
+  // Função auxiliar para converter string para Date com validação
+  const parseValidDate = (date: string | Date): Date | null => {
+    try {
+      const dateObj = typeof date === 'string' ? parseISO(date) : date;
+      return isValid(dateObj) ? dateObj : null;
+    } catch (e) {
+      console.error("Erro ao converter data:", e);
+      return null;
+    }
+  };
   
   // Aplicar filtro por período com validação de data futura
   const applyPeriodFilter = (startDate: Date, endDate: Date) => {
@@ -116,8 +113,6 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
       startDate, 
       endDate: validEndDate 
     });
-    
-    setShowAllTransactions(false);
   };
   
   // Limpar filtro por período
@@ -130,10 +125,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     setSearchTerm(term);
   };
   
-  // Verificar se filtro por período está ativo
-  const isPeriodFilterActive = !!periodFilter.startDate && !!periodFilter.endDate;
-  
-  // Calculate pagination
+  // Calcular paginação
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedTransactions = filteredTransactions.slice(
@@ -156,6 +148,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     clearPeriodFilter,
     isPeriodFilterActive,
     searchTerm,
-    updateSearchTerm
+    updateSearchTerm,
+    formatDateDisplay
   };
 };

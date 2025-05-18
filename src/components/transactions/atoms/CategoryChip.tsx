@@ -3,6 +3,7 @@ import React from 'react';
 import { CircleDot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { transactionCategories } from '@/data/categories';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 interface CategoryChipProps {
   categoryId: string;
@@ -10,32 +11,24 @@ interface CategoryChipProps {
 }
 
 const CategoryChip: React.FC<CategoryChipProps> = ({ categoryId, className }) => {
+  // Encontrar a categoria pelo ID ou usar uma categoria padrão
   const category = transactionCategories.find(cat => cat.id === categoryId) || {
-    id: 'compras',
-    name: 'Compras',
+    id: 'other',
+    name: 'Outros',
     icon: CircleDot,
     color: 'text-gray-500'
   };
   
-  const IconComponent = category.icon || CircleDot;
+  // Obter o ícone da categoria utilizando a função auxiliar
+  const IconComponent = getCategoryIcon(categoryId);
   
-  // Extrair a cor do background do category.color
-  const bgColorClass = category.color?.replace('text-', 'bg-') || 'bg-gray-200';
-  
-  // Determinar a cor do texto baseado no background (preto para cores claras, branco para cores escuras)
-  const isDarkBg = bgColorClass.includes('bg-blue-600') || 
-                   bgColorClass.includes('bg-purple') || 
-                   bgColorClass.includes('bg-indigo') || 
-                   bgColorClass.includes('bg-green-600') ||
-                   bgColorClass.includes('bg-red-600') || 
-                   bgColorClass.includes('bg-pink-600') || 
-                   bgColorClass.includes('bg-gray-800');
-  
-  const textColorClass = isDarkBg ? 'text-white' : 'text-gray-900';
+  // Estilização consistente: fundo cinza para todos os chips
+  const bgColorClass = 'bg-gray-200';
+  const textColorClass = 'text-gray-700';
 
   return (
     <div className={cn(
-      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium w-fit max-w-full", 
+      "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium w-fit max-w-full", 
       bgColorClass,
       textColorClass,
       className

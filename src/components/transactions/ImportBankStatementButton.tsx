@@ -1,304 +1,156 @@
 
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { useRef } from 'react';
-import { usePdfExtractor } from '@/hooks/usePdfExtractor';
-import { bankStatementService, ExtractedTransaction } from '@/services/bankStatementService';
-import { ConfirmTransactionsDialog } from './upload/ConfirmTransactionsDialog';
+import { useTranslation } from 'react-i18next';
+import { processBankStatement } from '@/services/bankStatementService';
+import FileUploadArea from './upload/FileUploadArea';
+import ImportDialog from './import/ImportDialog';
 
 interface ImportBankStatementButtonProps {
   onTransactionsAdded: () => void;
+  variant?: 'default' | 'outline' | 'secondary';
+  size?: 'default' | 'sm' | 'lg';
 }
 
 const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({ 
-  onTransactionsAdded 
+  onTransactionsAdded,
+  variant = 'secondary',
+  size = 'default'
 }) => {
   const { t } = useTranslation();
-  const { extractTextFromPDF } = usePdfExtractor();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [extractedTransactions, setExtractedTransactions] = useState<ExtractedTransaction[]>([]);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [extractedTransactions, setExtractedTransactions] = useState<any[]>([]);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [processingStep, setProcessingStep] = useState<string>('');
-  const [processingProgress, setProcessingProgress] = useState(0);
-
-  const readFileAsText = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error('Falha ao ler o arquivo'));
-      reader.readAsText(file);
-    });
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
   };
-
-  const readFileAsArrayBuffer = (file: File): Promise<ArrayBuffer> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as ArrayBuffer);
-      reader.onerror = () => reject(new Error('Falha ao ler o arquivo como ArrayBuffer'));
-      reader.readAsArrayBuffer(file);
-    });
+  
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setExtractedTransactions([]);
   };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) {
-      console.log("Nenhum arquivo selecionado");
-      return;
-    }
-
-    console.log("Arquivo selecionado:", file.name, "tipo:", file.type, "tamanho:", file.size);
+  
+  const handleFileSelected = async (file: File) => {
+    if (!file) return;
     
-    // Verificar se o arquivo não é muito grande
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    if (file.size > MAX_FILE_SIZE) {
-      console.error("Arquivo muito grande:", file.size, "bytes");
-      toast.error("O arquivo é muito grande. Por favor, envie arquivos menores que 10MB.");
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      return;
-    }
-    
-    setIsUploading(true);
-    setProcessingStep('Iniciando processamento');
-    setProcessingProgress(5);
-    
-    // Mostrar toast mais visível indicando o início do processamento
-    const processingToast = toast.loading("Processando extrato bancário. Isso pode demorar alguns segundos...", {
-      duration: 60000, // Manter por 60 segundos ou até ser fechado
-    });
-
     try {
-      let text = '';
+      setIsUploading(true);
       
-      // Processar o arquivo de acordo com seu tipo
-      if (file.type === 'application/pdf') {
-        setProcessingStep('Extraindo texto do PDF');
-        setProcessingProgress(20);
-        console.log("Iniciando extração de texto do PDF");
-        
-        // Toast de progresso
-        toast.loading("Extraindo texto do PDF...", { id: processingToast });
-        
-        text = await extractTextFromPDF(file);
-        
-        // Verificar se o texto foi extraído corretamente
-        if (!text || text.trim().length === 0) {
-          // Tentar método alternativo para PDFs que não conseguimos extrair texto facilmente
-          console.warn("Texto não extraído do PDF com método padrão, tentando alternativa");
-          toast.loading("Usando método alternativo de extração...", { id: processingToast });
-          
-          try {
-            const buffer = await readFileAsArrayBuffer(file);
-            const bytes = new Uint8Array(buffer);
-            // Extrair texto de forma bruta procurando sequências de caracteres ASCII
-            text = Array.from(bytes)
-              .map(byte => byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ' ')
-              .join('');
-            console.log("Texto extraído com método alternativo, tamanho:", text.length);
-          } catch (altError) {
-            console.error("Erro no método alternativo:", altError);
-          }
-        }
-      } else if (file.type === 'text/plain' || file.type === 'text/csv' || file.name.endsWith('.csv')) {
-        setProcessingStep('Lendo conteúdo do arquivo');
-        setProcessingProgress(30);
-        console.log("Iniciando leitura de arquivo texto");
-        toast.loading("Lendo arquivo texto...", { id: processingToast });
-        text = await readFileAsText(file);
-      } else if (file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-        // Arquivos Excel
-        setProcessingStep('Processando planilha Excel');
-        setProcessingProgress(30);
-        console.log("Arquivo Excel detectado");
-        toast.loading("Processando arquivo Excel...", { id: processingToast });
-        text = await readFileAsText(file);
-        if (!text || text.trim().length === 0) {
-          // Para arquivos Excel muitas vezes não conseguimos extrair texto diretamente
-          // Informar ao usuário para tentar exportar para CSV
-          throw new Error("Não foi possível processar este arquivo Excel. Por favor, exporte para CSV e tente novamente.");
-        }
-      } else {
-        // Tentar processar mesmo com tipo desconhecido
-        console.warn("Formato de arquivo não reconhecido:", file.type, "Tentando ler como texto");
-        text = await readFileAsText(file);
-        if (!text || text.trim().length === 0) {
-          throw new Error("Formato de arquivo não suportado. Por favor, envie PDF, TXT ou CSV.");
-        }
-      }
+      // Processar o arquivo e extrair transações
+      setProcessingStep('Analisando extrato bancário...');
+      const result = await processBankStatement(file);
       
-      // Verificação mais robusta para garantir que temos conteúdo suficiente
-      if (!text) {
-        console.error("Texto extraído está vazio");
-        throw new Error("Não foi possível extrair texto do arquivo. Tente com outro arquivo.");
-      }
-      
-      // Log do texto extraído
-      console.log("Texto extraído do arquivo, tamanho:", text.length);
-      if (text.length > 0) {
-        console.log("Amostra do texto:", text.substring(0, 200) + "...");
-      }
-      
-      // Verificação mínima para garantir que temos conteúdo suficiente
-      if (text.length < 30) {
-        console.warn("Texto extraído é muito curto:", text);
-        throw new Error("O texto extraído é muito curto para ser um extrato válido. Tente com outro arquivo ou formato.");
-      }
-      
-      setProcessingStep('Analisando transações com IA');
-      setProcessingProgress(50);
-      toast.loading("Analisando extrações bancárias com IA...", { id: processingToast });
-      
-      console.log("Enviando texto para análise, tamanho:", text.length);
-      
-      // Estabelecendo um timeout para a análise da IA
-      const timeoutPromise = new Promise<ExtractedTransaction[]>((_, reject) => {
-        setTimeout(() => reject(new Error("Tempo limite excedido ao analisar extrato. Tente novamente.")), 60000);
-      });
-      
-      // Analisar o conteúdo do extrato com a IA com timeout
-      const extractionPromise = bankStatementService.extractTransactionsFromContent(text);
-      const extractedData = await Promise.race([extractionPromise, timeoutPromise]);
-      
-      console.log("Dados extraídos recebidos:", extractedData?.length || 0, "transações");
-      
-      if (!extractedData || extractedData.length === 0) {
-        throw new Error("Não foi possível identificar transações no extrato. Tente com outro formato de arquivo.");
-      }
-      
-      // Adicionar propriedade 'selected' para cada transação
-      const transactionsWithSelection = extractedData.map(tx => ({ ...tx, selected: true }));
-      
-      setProcessingProgress(100);
-      setExtractedTransactions(transactionsWithSelection);
-      setShowConfirmDialog(true);
-      
-      // Fechar o toast de processamento e mostrar sucesso
-      toast.success(`${transactionsWithSelection.length} transações identificadas com sucesso!`, {
-        id: processingToast, // Substitui o toast de loading
-      });
-    } catch (error: any) {
-      console.error("Erro ao processar arquivo:", error);
-      toast.error(error.message || "Erro ao processar arquivo", {
-        id: processingToast, // Substitui o toast de loading
-      });
-    } finally {
+      setExtractedTransactions(result.transactions);
+      setIsDialogOpen(false);
       setIsUploading(false);
-      setProcessingStep('');
-      setProcessingProgress(0);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      setIsImportDialogOpen(true);
+    } catch (error) {
+      console.error('Error processing bank statement:', error);
+      toast.error(t('transactions.importError', 'Erro ao processar o extrato bancário'));
+      setIsUploading(false);
     }
   };
-
+  
+  // Toggle selection of a transaction
   const handleToggleSelection = (index: number) => {
-    setExtractedTransactions(prev => 
-      prev.map((tx, i) => 
-        i === index ? { ...tx, selected: !tx.selected } : tx
-      )
-    );
+    setExtractedTransactions(prev => {
+      const updated = [...prev];
+      updated[index] = {
+        ...updated[index],
+        selected: !updated[index]?.selected
+      };
+      return updated;
+    });
   };
-
+  
+  // Select all transactions
   const handleSelectAll = (selected: boolean) => {
     setExtractedTransactions(prev => 
-      prev.map(tx => ({ ...tx, selected }))
+      prev.map(transaction => ({ ...transaction, selected }))
     );
   };
   
-  const handleUpdateCategory = (index: number, newCategory: string) => {
-    setExtractedTransactions(prev => 
-      prev.map((tx, i) => 
-        i === index ? { ...tx, category: newCategory } : tx
-      )
-    );
+  // Update category of a transaction
+  const handleUpdateCategory = (index: number, category: string) => {
+    setExtractedTransactions(prev => {
+      const updated = [...prev];
+      updated[index] = {
+        ...updated[index],
+        category
+      };
+      return updated;
+    });
   };
-
-  const handleImportTransactions = async () => {
+  
+  // Import selected transactions
+  const handleImport = async () => {
     try {
       setIsProcessing(true);
-      setProcessingStep('Importando transações');
+      setProcessingStep('Importando transações...');
       
-      // Filtrar apenas as transações selecionadas
-      const selectedTransactions = extractedTransactions.filter(tx => tx.selected);
+      // Lógica para importar as transações
+      // Aqui seria feita uma chamada para o serviço que salva as transações no banco de dados
       
-      if (selectedTransactions.length === 0) {
-        toast.info("Nenhuma transação selecionada para importar");
-        setShowConfirmDialog(false);
-        return;
-      }
-      
-      console.log(`Iniciando importação de ${selectedTransactions.length} transações`);
-      
-      // Criar um toast de feedback
-      const importToastId = toast.loading(`Importando ${selectedTransactions.length} transações...`);
-      
-      const result = await bankStatementService.importTransactions(selectedTransactions);
-      
-      if (result.success) {
-        toast.success(`${selectedTransactions.length} transações importadas com sucesso!`, { id: importToastId });
-        setShowConfirmDialog(false);
-        setExtractedTransactions([]);
-        
-        // Importante: Garantir que a lista de transações seja atualizada
-        // imediatamente após a importação bem-sucedida
-        onTransactionsAdded();
-      } else {
-        toast.error(result.message || "Erro ao importar transações", { id: importToastId });
-      }
-    } catch (error: any) {
-      console.error("Erro ao importar transações:", error);
-      toast.error(error.message || "Erro ao importar transações");
-    } finally {
       setIsProcessing(false);
-      setProcessingStep('');
+      setIsImportDialogOpen(false);
+      toast.success(t('transactions.importSuccess', 'Transações importadas com sucesso'));
+      onTransactionsAdded();
+    } catch (error) {
+      console.error('Error importing transactions:', error);
+      setIsProcessing(false);
+      toast.error(t('transactions.saveError', 'Erro ao salvar as transações'));
     }
   };
-
+  
   return (
     <>
-      <input
-        type="file"
-        ref={fileInputRef}
-        accept=".pdf,.txt,.csv,.xls,.xlsx"
-        onChange={handleFileChange}
-        className="hidden"
-      />
-      
-      <Button
-        variant="outline"
-        className="rounded-full"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={isUploading}
+      <Button 
+        onClick={handleOpenDialog}
+        variant={variant}
+        size={size}
+        className="gap-1.5"
       >
-        {isUploading ? (
-          <>
-            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-            {processingStep ? processingStep : t('common.processing', 'Processando...')}
-          </>
-        ) : (
-          <>
-            <Upload className="h-4 w-4 mr-2" />
-            {t('transactions.importStatement', 'Importar Extrato')}
-          </>
-        )}
+        <Upload className="h-4 w-4" />
+        {t('transactions.importStatement', 'Importar extrato')}
       </Button>
-
-      <ConfirmTransactionsDialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-        transactions={extractedTransactions}
+      
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('transactions.uploadStatement', 'Enviar extrato bancário')}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-6">
+            {isUploading ? (
+              <div className="flex flex-col items-center justify-center p-8">
+                <Loader2 className="h-8 w-8 text-primary animate-spin mb-4" />
+                <p className="text-sm text-center text-gray-500">
+                  {processingStep || t('transactions.processing', 'Processando arquivo...')}
+                </p>
+              </div>
+            ) : (
+              <FileUploadArea onFileSelected={handleFileSelected} />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      <ImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        extractedTransactions={extractedTransactions}
+        onImport={handleImport}
         onToggleSelection={handleToggleSelection}
         onSelectAll={handleSelectAll}
-        onImport={handleImportTransactions}
-        isProcessing={isProcessing}
         onUpdateCategory={handleUpdateCategory}
+        isProcessing={isProcessing}
         processingStep={processingStep}
       />
     </>

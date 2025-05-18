@@ -3,17 +3,13 @@ import React from 'react';
 import { TableCell } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import type { Transaction } from '@/types/component-types';
+import { formatCurrency } from '@/utils/currencyUtils';
 
 interface TransactionAmountCellProps {
   transaction: Transaction;
 }
 
 const TransactionAmountCell: React.FC<TransactionAmountCellProps> = ({ transaction }) => {
-  const formatCurrency = (value: number) => {
-    // Sempre formatar com 2 casas decimais, independente de ter decimais ou não
-    return `R$${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
-
   return (
     <TableCell className={cn(
       "text-left font-medium whitespace-nowrap w-[160px]",
