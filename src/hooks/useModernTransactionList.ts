@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Transaction } from '@/services/transactions';
-import { isSameMonth, isSameYear, isWithinInterval, isFuture } from 'date-fns';
+import { isSameMonth, isSameYear, isWithinInterval, isFuture, parseISO, isValid } from 'date-fns';
 
 export type PeriodFilter = {
   startDate: Date | null;
@@ -32,25 +32,22 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     
     let filtered = [...transactions];
     
-    // Garantir que todas as datas são objetos Date
-    filtered = filtered.map(transaction => {
-      let transDate = transaction.date;
-      if (typeof transDate === 'string') {
-        transDate = new Date(transDate);
-      }
-      return { 
-        ...transaction, 
-        date: transDate instanceof Date ? transDate : new Date(transDate)
-      };
-    });
-    
     // Aplicar filtro de período se estiver ativo
     if (periodFilter.startDate && periodFilter.endDate) {
       console.log(`Filtrando por período: ${periodFilter.startDate.toISOString()} até ${periodFilter.endDate.toISOString()}`);
       filtered = filtered.filter(transaction => {
-        const transactionDate = new Date(transaction.date);
+        // Garantir que a data da transação é uma data válida
+        const transDate = typeof transaction.date === 'string' 
+          ? parseISO(transaction.date) 
+          : new Date(transaction.date);
+          
+        if (!isValid(transDate)) {
+          console.error(`Data inválida para transação ${transaction.id}: ${transaction.date}`);
+          return false;
+        }
+        
         try {
-          return isWithinInterval(transactionDate, {
+          return isWithinInterval(transDate, {
             start: periodFilter.startDate as Date,
             end: periodFilter.endDate as Date
           });
@@ -64,16 +61,27 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     else {
       console.log(`Filtrando pelo mês: ${currentMonth.toISOString()}`);
       filtered = filtered.filter(transaction => {
-        const transactionDate = new Date(transaction.date);
-        return isSameMonth(transactionDate, currentMonth) && 
-               isSameYear(transactionDate, currentMonth);
+        // Garantir que a data da transação é uma data válida
+        const transDate = typeof transaction.date === 'string' 
+          ? parseISO(transaction.date) 
+          : new Date(transaction.date);
+          
+        if (!isValid(transDate)) {
+          console.error(`Data inválida para transação ${transaction.id}: ${transaction.date}`);
+          return false;
+        }
+        
+        return isSameMonth(transDate, currentMonth) && 
+               isSameYear(transDate, currentMonth);
       });
     }
     
     // Sort by date, newest first
-    filtered.sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    filtered.sort((a, b) => {
+      const dateA = typeof a.date === 'string' ? parseISO(a.date) : new Date(a.date);
+      const dateB = typeof b.date === 'string' ? parseISO(b.date) : new Date(b.date);
+      return dateB.getTime() - dateA.getTime();
+    });
     
     console.log(`Após processamento: ${filtered.length} transações`);
     setFilteredTransactions(filtered);

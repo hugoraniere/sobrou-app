@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { format, subMonths, addMonths, isSameMonth, isAfter, isBefore, setMonth, setYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,9 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface MonthNavigatorProps {
   currentDate: Date;
@@ -28,6 +30,8 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const today = new Date();
+  const currentYear = currentDate.getFullYear();
+  const yearsToShow = 4; // Quantos anos mostrar no seletor
   
   const goToPreviousMonth = () => {
     onDateChange(subMonths(currentDate, 1));
@@ -48,36 +52,66 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
   const monthName = format(currentDate, 'MMMM yyyy', { locale: ptBR });
   const capitalizedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   
-  // Gerar meses para dropdown (12 meses anteriores e mês atual)
-  const generateMonthOptions = () => {
-    const options = [];
-    const currentYear = today.getFullYear();
-    const startYear = currentYear - 3; // 3 anos para trás
+  // Controles de navegação do ano
+  const goToPreviousYear = () => {
+    const newDate = new Date(currentDate);
+    newDate.setFullYear(currentDate.getFullYear() - 1);
+    onDateChange(newDate);
+  };
+
+  const goToNextYear = () => {
+    const newDate = new Date(currentDate);
+    const nextYear = currentDate.getFullYear() + 1;
     
-    for (let year = startYear; year <= currentYear; year++) {
-      const monthsInYear = year === currentYear ? today.getMonth() + 1 : 12;
-      
-      for (let month = 0; month < monthsInYear; month++) {
-        const date = new Date(year, month, 1);
-        options.push({
-          year,
-          month,
-          label: format(date, 'MMMM', { locale: ptBR }).charAt(0).toUpperCase() + 
-                 format(date, 'MMMM', { locale: ptBR }).slice(1) + 
-                 ' ' + year
-        });
-      }
+    // Não permitir anos futuros
+    if (nextYear <= today.getFullYear()) {
+      newDate.setFullYear(nextYear);
+      onDateChange(newDate);
+    }
+  };
+
+  // Verificar se pode navegar para o próximo ano
+  const canGoToNextYear = currentYear < today.getFullYear();
+  
+  // Gerar lista de anos para seleção
+  const generateYears = () => {
+    const years = [];
+    const startYear = Math.max(today.getFullYear() - yearsToShow + 1, 2020);
+    
+    for (let year = startYear; year <= today.getFullYear(); year++) {
+      years.push(year);
     }
     
-    // Ordenar os meses mais recentes primeiro
-    return options.reverse();
+    return years;
   };
   
-  const monthOptions = generateMonthOptions();
+  // Lista de meses
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const date = new Date(currentYear, i, 1);
+    // Não permitir meses futuros no ano atual
+    const isFutureMonth = currentYear === today.getFullYear() && i > today.getMonth();
+    
+    return {
+      value: i,
+      label: format(date, 'MMMM', { locale: ptBR }),
+      disabled: isFutureMonth
+    };
+  });
   
-  const handleMonthSelect = (year: number, month: number) => {
+  const handleYearChange = (year: number) => {
     const newDate = new Date(currentDate);
     newDate.setFullYear(year);
+    
+    // Se o mês selecionado é futuro para o ano selecionado, ajustar para o mês atual
+    if (year === today.getFullYear() && newDate.getMonth() > today.getMonth()) {
+      newDate.setMonth(today.getMonth());
+    }
+    
+    onDateChange(newDate);
+  };
+  
+  const handleMonthSelect = (month: number) => {
+    const newDate = new Date(currentDate);
     newDate.setMonth(month);
     onDateChange(newDate);
     setDropdownOpen(false);
@@ -99,24 +133,63 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
         <DropdownMenuTrigger asChild>
           <Button 
             variant="ghost" 
-            className="flex items-center gap-1 mx-1 px-2 py-1 h-auto text-base font-semibold"
+            className="flex items-center mx-1 px-3 py-1 h-auto text-base font-semibold hover:bg-gray-100 transition-colors rounded-md"
           >
             {capitalizedMonthName}
-            <ChevronDown className="ml-1 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 max-h-64 overflow-y-auto bg-white" align="center">
+        <DropdownMenuContent className="w-56 max-h-80 overflow-y-auto bg-white" align="center">
+          {/* Navegação de ano no topo */}
+          <div className="flex items-center justify-between p-2 border-b">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={goToPreviousYear}
+              className="h-8 w-8 rounded-full"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <Select 
+              value={currentYear.toString()} 
+              onValueChange={(value) => handleYearChange(parseInt(value, 10))}
+            >
+              <SelectTrigger className="w-[100px] h-8 border-0 font-semibold focus:ring-0">
+                <SelectValue>{currentYear}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {generateYears().map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={goToNextYear}
+              disabled={!canGoToNextYear}
+              className="h-8 w-8 rounded-full"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          
           <DropdownMenuGroup>
-            {monthOptions.map((option) => (
+            {months.map((month) => (
               <DropdownMenuItem 
-                key={`${option.year}-${option.month}`}
+                key={month.value}
                 className={cn(
                   "cursor-pointer",
-                  isSameMonth(new Date(option.year, option.month), currentDate) && "bg-muted font-semibold"
+                  isSameMonth(new Date(currentYear, month.value), currentDate) && "bg-muted font-semibold",
+                  month.disabled && "opacity-50 pointer-events-none"
                 )}
-                onClick={() => handleMonthSelect(option.year, option.month)}
+                onClick={() => handleMonthSelect(month.value)}
+                disabled={month.disabled}
               >
-                {option.label}
+                {month.label.charAt(0).toUpperCase() + month.label.slice(1)}
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
