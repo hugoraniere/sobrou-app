@@ -20,8 +20,49 @@ interface ImportResult {
   transactions?: any[];
 }
 
+// Função para extrair o ano do texto do extrato bancário
+const extractYearFromStatementText = (text: string): number | null => {
+  // Buscar por padrões comuns de ano em extratos bancários
+  
+  // Padrão: "vencimento: DD/MM/YYYY" ou "vence em: DD/MM/YYYY"
+  const dueDatePattern = /venc[a-zíê]*:?\s+\d{1,2}\/\d{1,2}\/(\d{4})/i;
+  const dueDateMatch = text.match(dueDatePattern);
+  if (dueDateMatch && dueDateMatch[1]) {
+    const year = parseInt(dueDateMatch[1], 10);
+    if (!isNaN(year) && year > 2000 && year <= new Date().getFullYear() + 1) {
+      console.log(`Ano detectado no texto de vencimento: ${year}`);
+      return year;
+    }
+  }
+  
+  // Padrão: "fatura de MM/YYYY" ou "extrato de MM/YYYY"
+  const statementDatePattern = /(?:fatura|extrato)\s+(?:de|do|da)?\s+(?:\w+\s+)?(?:\d{1,2}\/)?(\d{4})/i;
+  const statementDateMatch = text.match(statementDatePattern);
+  if (statementDateMatch && statementDateMatch[1]) {
+    const year = parseInt(statementDateMatch[1], 10);
+    if (!isNaN(year) && year > 2000 && year <= new Date().getFullYear() + 1) {
+      console.log(`Ano detectado na data da fatura/extrato: ${year}`);
+      return year;
+    }
+  }
+  
+  // Buscar qualquer data no formato DD/MM/YYYY no início do documento
+  const anyFullDatePattern = /\d{1,2}\/\d{1,2}\/(\d{4})/;
+  const anyFullDateMatch = text.substring(0, 500).match(anyFullDatePattern);
+  if (anyFullDateMatch && anyFullDateMatch[1]) {
+    const year = parseInt(anyFullDateMatch[1], 10);
+    if (!isNaN(year) && year > 2000 && year <= new Date().getFullYear() + 1) {
+      console.log(`Ano detectado em data completa no início do documento: ${year}`);
+      return year;
+    }
+  }
+
+  // Se não conseguirmos detectar o ano, retornamos null
+  return null;
+};
+
 // Função para validar data antes da inserção
-const validateDate = (dateStr: string): string => {
+const validateDate = (dateStr: string, documentContext?: string): string => {
   try {
     // Verificar se a data está no formato ISO (YYYY-MM-DD)
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -34,6 +75,22 @@ const validateDate = (dateStr: string): string => {
       }
     }
     
+    // Variável para armazenar o ano a ser usado quando não especificado
+    let yearToUse: number;
+    
+    // Se temos o contexto do documento, tentar extrair o ano dele
+    if (documentContext) {
+      const extractedYear = extractYearFromStatementText(documentContext);
+      if (extractedYear) {
+        yearToUse = extractedYear;
+        console.log(`Usando ano extraído do documento: ${yearToUse}`);
+      } else {
+        yearToUse = new Date().getFullYear();
+      }
+    } else {
+      yearToUse = new Date().getFullYear();
+    }
+    
     // Verificar se a data está no formato DD/MM sem ano
     const shortDatePattern = /^(\d{1,2})\/(\d{1,2})$/;
     const shortDateMatch = dateStr.match(shortDatePattern);
@@ -41,9 +98,8 @@ const validateDate = (dateStr: string): string => {
     if (shortDateMatch) {
       const day = parseInt(shortDateMatch[1], 10);
       const month = parseInt(shortDateMatch[2], 10) - 1; // Mês em JS começa do zero
-      const year = new Date().getFullYear(); // Usar o ano atual
       
-      const date = new Date(year, month, day);
+      const date = new Date(yearToUse, month, day);
       
       // Verificar se a data resultante é válida
       if (!isNaN(date.getTime())) {
@@ -245,7 +301,8 @@ export const bankStatementService = {
       }
       
       // Aplicar um mapeamento melhorado das categorias para cada transação
-      const enhancedTransactions = this.enhanceTransactions(extractedTransactions);
+      // Passar o conteúdo original para ajudar na detecção de ano
+      const enhancedTransactions = this.enhanceTransactions(extractedTransactions, content);
       console.log("Transações aprimoradas:", enhancedTransactions.length);
       
       return enhancedTransactions || [];
@@ -255,11 +312,11 @@ export const bankStatementService = {
     }
   },
   
-  enhanceTransactions(transactions: ExtractedTransaction[]): ExtractedTransaction[] {
+  enhanceTransactions(transactions: ExtractedTransaction[], documentContext?: string): ExtractedTransaction[] {
     return transactions.map((tx: ExtractedTransaction) => {
       try {
         // Validar dados
-        const validDate = validateDate(tx.date);
+        const validDate = validateDate(tx.date, documentContext);
         const validDescription = validateDescription(tx.description);
         const validAmount = typeof tx.amount === 'number' ? tx.amount : parseFloat(String(tx.amount));
         const validType = tx.type === 'income' || tx.type === 'expense' ? tx.type : 'expense';

@@ -161,6 +161,34 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
       ? textContent.substring(0, maxLength) + "..." 
       : textContent;
     
+    // Detectar informações importantes no texto como o ano do documento
+    let extractedYear: number | null = null;
+    
+    // Buscar o ano no texto usando padrões comuns
+    const dueDatePattern = /venc[a-zíê]*:?\s+\d{1,2}\/\d{1,2}\/(\d{4})/i;
+    const dueDateMatch = textContent.match(dueDatePattern);
+    if (dueDateMatch && dueDateMatch[1]) {
+      extractedYear = parseInt(dueDateMatch[1], 10);
+      console.log(`Ano extraído de data de vencimento: ${extractedYear}`);
+    }
+    
+    if (!extractedYear) {
+      // Tentar encontrar o ano no começo do documento
+      const anyFullDatePattern = /\d{1,2}\/\d{1,2}\/(\d{4})/;
+      const anyFullDateMatch = textContent.substring(0, 500).match(anyFullDatePattern);
+      if (anyFullDateMatch && anyFullDateMatch[1]) {
+        extractedYear = parseInt(anyFullDateMatch[1], 10);
+        console.log(`Ano extraído de data completa no início: ${extractedYear}`);
+      }
+    }
+    
+    // Verificar se o ano é válido (entre 2000 e próximo ano)
+    const currentYear = new Date().getFullYear();
+    if (extractedYear && (extractedYear < 2000 || extractedYear > currentYear + 1)) {
+      console.log(`Ano extraído ${extractedYear} fora do intervalo válido, ignorando`);
+      extractedYear = null;
+    }
+    
     // Modelo instrucional otimizado para faturas de cartão de crédito e extratos bancários
     const systemPrompt = `
     Você é um especialista financeiro focado em extrair transações de extratos bancários e faturas de cartão de crédito.
@@ -174,7 +202,9 @@ async function extractTransactionsWithAI(textContent: string): Promise<Extracted
     6. Pagamentos de faturas geralmente são "expense" tipo "cartao"
     7. Normalize as datas para o formato ISO (YYYY-MM-DD)
     
-    IMPORTANTE: Este é um fatura de cartão de crédito, portanto a maioria dos itens são compras (expenses).
+    IMPORTANTE:
+    ${extractedYear ? `* O ano do documento é ${extractedYear}. Use este ano para todas as datas que não especificam o ano.` : '* Se uma data não especificar o ano (formato DD/MM), use o ano atual.'}
+    * Este é provavelmente uma fatura de cartão de crédito, portanto a maioria dos itens são compras (expenses).
     
     Retorne APENAS um JSON válido com um array de transações. Formato:
     [

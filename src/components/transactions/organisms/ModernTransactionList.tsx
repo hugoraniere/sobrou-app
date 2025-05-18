@@ -9,10 +9,8 @@ import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import MonthNavigator from '../molecules/MonthNavigator';
-import FilterBadge from '../molecules/FilterBadge';
 import { Input } from '@/components/ui/input';
 import { Search, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -33,14 +31,8 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
     currentMonth,
     setCurrentPage,
     setCurrentMonth,
-    applyPeriodFilter,
-    clearPeriodFilter,
-    isPeriodFilterActive,
-    periodFilter,
     searchTerm,
-    updateSearchTerm,
-    showAllTransactions,
-    toggleShowAllTransactions
+    updateSearchTerm
   } = useModernTransactionList(transactions);
   
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
@@ -71,10 +63,18 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   };
   
   return (
-    <div className={cn("flex flex-col space-y-4", className)}>
-      {/* Filtros e pesquisa - reorganizados: busca à esquerda, filtro de mês à direita */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between">
-        {/* Pesquisa de transações - agora à esquerda */}
+    <div className={cn("flex flex-col space-y-2", className)}>
+      {/* Filtros e pesquisa - reorganizados: mês à esquerda, busca à direita */}
+      <div className="flex flex-col md:flex-row gap-3 justify-between">
+        {/* Filtro de mês - agora à esquerda */}
+        <div className="flex items-center">
+          <MonthNavigator 
+            currentDate={currentMonth} 
+            onDateChange={setCurrentMonth}
+          />
+        </div>
+        
+        {/* Pesquisa de transações - agora à direita */}
         <div className="w-full md:w-1/2 relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -94,27 +94,17 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
             )}
           </div>
         </div>
-        
-        {/* Filtro de mês - agora à direita */}
-        <div className="flex items-center justify-end">
-          <MonthNavigator 
-            currentDate={currentMonth} 
-            onDateChange={setCurrentMonth}
-          />
-        </div>
       </div>
-      
-      {/* Removi o filtro personalizado por enquanto */}
       
       {/* Lista de transações */}
       {filteredTransactions.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center py-12 text-center p-6">
-          <p className="text-xl font-medium text-gray-900 mb-2">Nenhuma transação encontrada</p>
-          <p className="text-gray-500">Não há transações para o período selecionado.</p>
+        <Card className="flex flex-col items-center justify-center py-8 text-center p-4">
+          <p className="text-lg font-medium text-gray-900 mb-1">Nenhuma transação encontrada</p>
+          <p className="text-sm text-gray-500">Não há transações para o período selecionado.</p>
         </Card>
       ) : (
         <>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {paginatedTransactions.map((transaction) => (
               <Card key={transaction.id} className="overflow-hidden">
                 <TransactionItem
@@ -127,7 +117,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
           </div>
           
           {totalPages > 1 && (
-            <Pagination className="mt-4">
+            <Pagination className="mt-2">
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
@@ -159,7 +149,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
                       <PaginationLink
                         isActive={currentPage === pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className="cursor-pointer rounded-full"
+                        className="cursor-pointer rounded-full h-8 w-8 text-sm p-0 flex items-center justify-center"
                       >
                         {pageNum}
                       </PaginationLink>

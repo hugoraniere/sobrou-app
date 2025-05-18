@@ -15,7 +15,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>({ startDate: null, endDate: null });
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAllTransactions, setShowAllTransactions] = useState(false); // Inicialmente filtrar por mês atual
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
   
   // Filtrar transações pelos filtros aplicados
   useEffect(() => {
@@ -25,7 +25,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     }
 
     console.log(`Processando ${transactions.length} transações`);
-    console.log(`Filtros ativos: ${isPeriodFilterActive ? 'Período personalizado' : (showAllTransactions ? 'Todas as transações' : 'Mês atual')}`);
+    console.log(`Filtros ativos: ${isPeriodFilterActive ? 'Período personalizado' : 'Mês atual'}`);
     
     // Log das primeiras transações para debug
     console.log("Primeiras 3 transações para debug:");
@@ -73,8 +73,8 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
         }
       });
     } 
-    // Aplicar filtro de mês atual se não estiver mostrando todas as transações
-    else if (!showAllTransactions) {
+    // Por padrão, filtrar pelo mês atual (não mais usando showAllTransactions)
+    else {
       console.log(`Filtrando pelo mês: ${currentMonth.toISOString()}`);
       filtered = filtered.filter(transaction => {
         // Garantir que a data da transação é uma data válida
@@ -91,7 +91,6 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
                isSameYear(transDate, currentMonth);
       });
     }
-    // Caso contrário, mantém todas as transações (showAllTransactions = true)
     
     // Sort by date, newest first
     filtered.sort((a, b) => {
@@ -103,17 +102,8 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     console.log(`Após processamento final: ${filtered.length} transações para exibir`);
     setFilteredTransactions(filtered);
     setCurrentPage(1); // Reset to first page when filter changes
-  }, [transactions, currentMonth, periodFilter, searchTerm, showAllTransactions]);
+  }, [transactions, currentMonth, periodFilter, searchTerm]);
   
-  // Alternar entre mostrar todas as transações ou apenas do mês atual
-  const toggleShowAllTransactions = (show: boolean) => {
-    setShowAllTransactions(show);
-    if (show) {
-      // Se estiver mostrando todas, limpa o filtro de período também
-      clearPeriodFilter();
-    }
-  };
-
   // Aplicar filtro por período com validação de data futura
   const applyPeriodFilter = (startDate: Date, endDate: Date) => {
     // Não permitir datas futuras
@@ -127,7 +117,6 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
       endDate: validEndDate 
     });
     
-    // Ao aplicar filtro de período, desativa o modo de exibir todas as transações
     setShowAllTransactions(false);
   };
   
@@ -167,8 +156,6 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
     clearPeriodFilter,
     isPeriodFilterActive,
     searchTerm,
-    updateSearchTerm,
-    showAllTransactions,
-    toggleShowAllTransactions
+    updateSearchTerm
   };
 };
