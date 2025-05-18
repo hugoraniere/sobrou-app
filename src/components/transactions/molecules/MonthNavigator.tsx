@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, subMonths, addMonths, isSameMonth, isAfter, isBefore, setMonth, setYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
@@ -136,6 +136,7 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
             className="flex items-center mx-1 px-3 py-1 h-auto text-base font-semibold hover:bg-gray-100 transition-colors rounded-md"
           >
             {capitalizedMonthName}
+            {/* Removida a seta de dropdown */}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 max-h-80 overflow-y-auto bg-white" align="center">

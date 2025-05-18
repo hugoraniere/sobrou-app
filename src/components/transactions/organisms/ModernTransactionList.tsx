@@ -11,6 +11,9 @@ import { cn } from '@/lib/utils';
 import MonthNavigator from '../molecules/MonthNavigator';
 import PeriodFilterButton from '../molecules/PeriodFilterButton';
 import FilterBadge from '../molecules/FilterBadge';
+import { Input } from '@/components/ui/input';
+import { Search, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -35,6 +38,10 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
     clearPeriodFilter,
     isPeriodFilterActive,
     periodFilter,
+    searchTerm,
+    updateSearchTerm,
+    showAllTransactions,
+    toggleShowAllTransactions
   } = useModernTransactionList(transactions);
   
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
@@ -53,24 +60,71 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   const handleDelete = (id: string) => {
     setTransactionToDelete(id);
   };
+
+  // Handle search input
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateSearchTerm(e.target.value);
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    updateSearchTerm('');
+  };
   
   return (
     <div className={cn("flex flex-col space-y-4", className)}>
-      <div className="flex justify-between items-center">
-        {!isPeriodFilterActive ? (
-          <MonthNavigator 
-            currentDate={currentMonth} 
-            onDateChange={setCurrentMonth}
-          />
-        ) : null}
+      {/* Filtros e pesquisa */}
+      <div className="flex flex-col md:flex-row gap-4">
+        {/* Pesquisa de transações */}
+        <div className="w-full md:flex-1 relative">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar transações..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-10 pr-10"
+            />
+            {searchTerm && (
+              <button 
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </div>
         
-        <div className="ml-auto">
-          <PeriodFilterButton
-            onApplyFilter={(startDate, endDate) => applyPeriodFilter(startDate, endDate)}
-          />
+        {/* Filtros por período */}
+        <div className="flex items-center space-x-2">
+          {!isPeriodFilterActive && (
+            <Button
+              variant={showAllTransactions ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleShowAllTransactions(true)}
+              className={`text-sm ${showAllTransactions ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              Todas
+            </Button>
+          )}
+          
+          {!isPeriodFilterActive && (
+            <MonthNavigator 
+              currentDate={currentMonth} 
+              onDateChange={setCurrentMonth}
+            />
+          )}
+          
+          <div className="">
+            <PeriodFilterButton
+              onApplyFilter={(startDate, endDate) => applyPeriodFilter(startDate, endDate)}
+            />
+          </div>
         </div>
       </div>
       
+      {/* Badge de filtro ativo */}
       {isPeriodFilterActive && periodFilter.startDate && periodFilter.endDate && (
         <FilterBadge
           startDate={periodFilter.startDate}
@@ -79,6 +133,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
         />
       )}
       
+      {/* Lista de transações */}
       {filteredTransactions.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-12 text-center p-6">
           <p className="text-xl font-medium text-gray-900 mb-2">Nenhuma transação encontrada</p>
