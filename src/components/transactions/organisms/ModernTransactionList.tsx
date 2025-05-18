@@ -9,7 +9,6 @@ import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import MonthNavigator from '../molecules/MonthNavigator';
-import PeriodFilterButton from '../molecules/PeriodFilterButton';
 import FilterBadge from '../molecules/FilterBadge';
 import { Input } from '@/components/ui/input';
 import { Search, XCircle } from 'lucide-react';
@@ -73,10 +72,10 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   
   return (
     <div className={cn("flex flex-col space-y-4", className)}>
-      {/* Filtros e pesquisa */}
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Pesquisa de transações */}
-        <div className="w-full md:flex-1 relative">
+      {/* Filtros e pesquisa - reorganizados: busca à esquerda, filtro de mês à direita */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between">
+        {/* Pesquisa de transações - agora à esquerda */}
+        <div className="w-full md:w-1/2 relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -96,42 +95,16 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
           </div>
         </div>
         
-        {/* Filtros por período */}
-        <div className="flex items-center space-x-2">
-          {!isPeriodFilterActive && (
-            <Button
-              variant={showAllTransactions ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleShowAllTransactions(true)}
-              className={`text-sm ${showAllTransactions ? 'bg-primary text-primary-foreground' : ''}`}
-            >
-              Todas
-            </Button>
-          )}
-          
-          {!isPeriodFilterActive && (
-            <MonthNavigator 
-              currentDate={currentMonth} 
-              onDateChange={setCurrentMonth}
-            />
-          )}
-          
-          <div className="">
-            <PeriodFilterButton
-              onApplyFilter={(startDate, endDate) => applyPeriodFilter(startDate, endDate)}
-            />
-          </div>
+        {/* Filtro de mês - agora à direita */}
+        <div className="flex items-center justify-end">
+          <MonthNavigator 
+            currentDate={currentMonth} 
+            onDateChange={setCurrentMonth}
+          />
         </div>
       </div>
       
-      {/* Badge de filtro ativo */}
-      {isPeriodFilterActive && periodFilter.startDate && periodFilter.endDate && (
-        <FilterBadge
-          startDate={periodFilter.startDate}
-          endDate={periodFilter.endDate}
-          onClear={clearPeriodFilter}
-        />
-      )}
+      {/* Removi o filtro personalizado por enquanto */}
       
       {/* Lista de transações */}
       {filteredTransactions.length === 0 ? (

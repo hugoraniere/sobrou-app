@@ -15,7 +15,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>({ startDate: null, endDate: null });
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAllTransactions, setShowAllTransactions] = useState(true); // Mostrar todas por padrão
+  const [showAllTransactions, setShowAllTransactions] = useState(false); // Inicialmente filtrar por mês atual
   
   // Filtrar transações pelos filtros aplicados
   useEffect(() => {
@@ -73,7 +73,7 @@ export const useModernTransactionList = (transactions: Transaction[]) => {
         }
       });
     } 
-    // Ou aplicar filtro de mês atual se não estiver mostrando todas as transações
+    // Aplicar filtro de mês atual se não estiver mostrando todas as transações
     else if (!showAllTransactions) {
       console.log(`Filtrando pelo mês: ${currentMonth.toISOString()}`);
       filtered = filtered.filter(transaction => {

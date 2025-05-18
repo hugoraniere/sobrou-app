@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { transactionCategories } from '@/data/categories';
 import { toast } from 'sonner';
@@ -26,19 +25,52 @@ const validateDate = (dateStr: string): string => {
   try {
     // Verificar se a data está no formato ISO (YYYY-MM-DD)
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-    if (!datePattern.test(dateStr)) {
-      console.warn(`Data inválida: ${dateStr}, usando data atual`);
-      return new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    
+    // Se já estiver no formato ISO, verificar se é válida
+    if (datePattern.test(dateStr)) {
+      const date = new Date(dateStr);
+      if (!isNaN(date.getTime())) {
+        return dateStr;
+      }
     }
     
-    // Verificar se a data é válida
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) {
-      console.warn(`Data inválida: ${dateStr}, usando data atual`);
-      return new Date().toISOString().split('T')[0];
+    // Verificar se a data está no formato DD/MM sem ano
+    const shortDatePattern = /^(\d{1,2})\/(\d{1,2})$/;
+    const shortDateMatch = dateStr.match(shortDatePattern);
+    
+    if (shortDateMatch) {
+      const day = parseInt(shortDateMatch[1], 10);
+      const month = parseInt(shortDateMatch[2], 10) - 1; // Mês em JS começa do zero
+      const year = new Date().getFullYear(); // Usar o ano atual
+      
+      const date = new Date(year, month, day);
+      
+      // Verificar se a data resultante é válida
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0]; // Retornar no formato YYYY-MM-DD
+      }
     }
     
-    return dateStr;
+    // Verificar se a data está no formato DD/MM/YYYY
+    const fullDatePattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+    const fullDateMatch = dateStr.match(fullDatePattern);
+    
+    if (fullDateMatch) {
+      const day = parseInt(fullDateMatch[1], 10);
+      const month = parseInt(fullDateMatch[2], 10) - 1; // Mês em JS começa do zero
+      const year = parseInt(fullDateMatch[3], 10);
+      
+      const date = new Date(year, month, day);
+      
+      // Verificar se a data resultante é válida
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0]; // Retornar no formato YYYY-MM-DD
+      }
+    }
+    
+    // Se chegou aqui, a data não está em nenhum formato reconhecido
+    console.warn(`Data inválida: ${dateStr}, usando data atual`);
+    return new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
   } catch (error) {
     console.error("Erro ao validar data:", error);
     return new Date().toISOString().split('T')[0];
