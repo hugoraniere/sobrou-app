@@ -3,6 +3,30 @@ import { supabase } from '@/integrations/supabase/client';
 import { Dish, DishIngredient, Unit } from '@/types/restaurant-calculator';
 import { toast } from 'sonner';
 
+// Funções utilitárias para melhorar o reuso de código
+const handleError = (error: unknown, errorMessage: string): null => {
+  console.error(`${errorMessage}:`, error);
+  toast.error(errorMessage);
+  return null;
+};
+
+const getCurrentUser = async () => {
+  const { data: userData, error } = await supabase.auth.getUser();
+  if (error || !userData.user) {
+    toast.error('Usuário não autenticado');
+    return null;
+  }
+  return userData.user;
+};
+
+const convertUnitType = <T extends { unit?: string }>(item: T): T & { unit: Unit } => {
+  return {
+    ...item,
+    unit: item.unit as Unit
+  };
+};
+
+// Seção 1: Funções relacionadas a pratos
 export async function getDishes(): Promise<Dish[]> {
   try {
     const { data, error } = await supabase
@@ -13,9 +37,7 @@ export async function getDishes(): Promise<Dish[]> {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching dishes:', error);
-    toast.error('Erro ao carregar pratos');
-    return [];
+    return handleError(error, 'Erro ao carregar pratos') as Dish[];
   }
 }
 
@@ -30,24 +52,18 @@ export async function getDishById(id: string): Promise<Dish | null> {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error fetching dish:', error);
-    toast.error('Erro ao carregar o prato');
-    return null;
+    return handleError(error, 'Erro ao carregar o prato');
   }
 }
 
 export async function createDish(dishData: Omit<Dish, 'id'>): Promise<Dish | null> {
   try {
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) {
-      toast.error('Usuário não autenticado');
-      return null;
-    }
+    const user = await getCurrentUser();
+    if (!user) return null;
     
-    // Incluir o user_id no objeto
     const dish = {
       ...dishData,
-      user_id: userData.user.id
+      user_id: user.id
     };
     
     const { data, error } = await supabase
@@ -61,9 +77,7 @@ export async function createDish(dishData: Omit<Dish, 'id'>): Promise<Dish | nul
     toast.success('Prato criado com sucesso');
     return data;
   } catch (error) {
-    console.error('Error creating dish:', error);
-    toast.error('Erro ao criar prato');
-    return null;
+    return handleError(error, 'Erro ao criar prato');
   }
 }
 
@@ -81,14 +95,19 @@ export async function updateDish(id: string, dish: Partial<Dish>): Promise<Dish 
     toast.success('Prato atualizado com sucesso');
     return data;
   } catch (error) {
-    console.error('Error updating dish:', error);
-    toast.error('Erro ao atualizar prato');
-    return null;
+    return handleError(error, 'Erro ao atualizar prato');
   }
 }
 
 export async function deleteDish(id: string): Promise<boolean> {
   try {
+    // Primeiro remove todos os ingredientes relacionados ao prato
+    const deleteIngredientsResult = await removeDishIngredients(id);
+    if (!deleteIngredientsResult) {
+      throw new Error('Falha ao remover ingredientes do prato');
+    }
+    
+    // Depois remove o prato
     const { error } = await supabase
       .from('dishes')
       .delete()
@@ -99,12 +118,11 @@ export async function deleteDish(id: string): Promise<boolean> {
     toast.success('Prato removido com sucesso');
     return true;
   } catch (error) {
-    console.error('Error deleting dish:', error);
-    toast.error('Erro ao remover prato');
-    return false;
+    return handleError(error, 'Erro ao remover prato') as boolean;
   }
 }
 
+// Seção 2: Funções relacionadas aos ingredientes de pratos
 export async function getDishIngredients(dishId: string): Promise<DishIngredient[]> {
   try {
     const { data, error } = await supabase
@@ -120,17 +138,12 @@ export async function getDishIngredients(dishId: string): Promise<DishIngredient
     // Converter o tipo unit para o tipo Unit em cada ingrediente
     const typedData = data?.map(item => ({
       ...item,
-      ingredient: item.ingredient ? {
-        ...item.ingredient,
-        unit: item.ingredient.unit as Unit
-      } : undefined
+      ingredient: item.ingredient ? convertUnitType(item.ingredient) : undefined
     })) || [];
     
     return typedData;
   } catch (error) {
-    console.error('Error fetching dish ingredients:', error);
-    toast.error('Erro ao carregar ingredientes do prato');
-    return [];
+    return handleError(error, 'Erro ao carregar ingredientes do prato') as DishIngredient[];
   }
 }
 
@@ -145,9 +158,7 @@ export async function addDishIngredient(dishIngredient: Omit<DishIngredient, 'id
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error adding dish ingredient:', error);
-    toast.error('Erro ao adicionar ingrediente ao prato');
-    return null;
+    return handleError(error, 'Erro ao adicionar ingrediente ao prato');
   }
 }
 
@@ -167,9 +178,7 @@ export async function updateDishIngredient(id: string, quantity: number, use_per
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error updating dish ingredient:', error);
-    toast.error('Erro ao atualizar ingrediente do prato');
-    return null;
+    return handleError(error, 'Erro ao atualizar ingrediente do prato');
   }
 }
 
@@ -183,9 +192,7 @@ export async function removeDishIngredient(id: string): Promise<boolean> {
     if (error) throw error;
     return true;
   } catch (error) {
-    console.error('Error removing dish ingredient:', error);
-    toast.error('Erro ao remover ingrediente do prato');
-    return false;
+    return handleError(error, 'Erro ao remover ingrediente do prato') as boolean;
   }
 }
 
@@ -199,8 +206,6 @@ export async function removeDishIngredients(dishId: string): Promise<boolean> {
     if (error) throw error;
     return true;
   } catch (error) {
-    console.error('Error removing dish ingredients:', error);
-    toast.error('Erro ao remover ingredientes do prato');
-    return false;
+    return handleError(error, 'Erro ao remover ingredientes do prato') as boolean;
   }
 }

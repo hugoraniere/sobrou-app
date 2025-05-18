@@ -90,6 +90,8 @@ export type Database = {
           id: string
           name: string
           price: number
+          quantity_purchased: number | null
+          total_price: number | null
           unit: string
           updated_at: string | null
           user_id: string
@@ -100,6 +102,8 @@ export type Database = {
           id?: string
           name: string
           price: number
+          quantity_purchased?: number | null
+          total_price?: number | null
           unit: string
           updated_at?: string | null
           user_id: string
@@ -110,6 +114,8 @@ export type Database = {
           id?: string
           name?: string
           price?: number
+          quantity_purchased?: number | null
+          total_price?: number | null
           unit?: string
           updated_at?: string | null
           user_id?: string
