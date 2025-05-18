@@ -5,8 +5,8 @@ import { Upload, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { processBankStatement } from '@/services/bankStatementService';
-import FileUploadArea from './upload/FileUploadArea';
+import { bankStatementService } from '@/services/bankStatementService';
+import { FileUploadArea } from './upload/FileUploadArea';
 import ImportDialog from './import/ImportDialog';
 
 interface ImportBankStatementButtonProps {
@@ -27,6 +27,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [processingStep, setProcessingStep] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -35,19 +36,23 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setExtractedTransactions([]);
+    setSelectedFile(null);
   };
   
   const handleFileSelected = async (file: File) => {
     if (!file) return;
+    setSelectedFile(file);
     
     try {
       setIsUploading(true);
       
       // Processar o arquivo e extrair transações
       setProcessingStep('Analisando extrato bancário...');
-      const result = await processBankStatement(file);
       
-      setExtractedTransactions(result.transactions);
+      const content = await readFileContent(file);
+      const result = await bankStatementService.extractTransactionsFromContent(content);
+      
+      setExtractedTransactions(result);
       setIsDialogOpen(false);
       setIsUploading(false);
       setIsImportDialogOpen(true);
@@ -56,6 +61,22 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       toast.error(t('transactions.importError', 'Erro ao processar o extrato bancário'));
       setIsUploading(false);
     }
+  };
+  
+  // Função auxiliar para ler o conteúdo do arquivo
+  const readFileContent = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          resolve(e.target.result.toString());
+        } else {
+          reject(new Error('Falha ao ler o arquivo'));
+        }
+      };
+      reader.onerror = (e) => reject(e);
+      reader.readAsText(file);
+    });
   };
   
   // Toggle selection of a transaction
@@ -95,17 +116,29 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       setIsProcessing(true);
       setProcessingStep('Importando transações...');
       
-      // Lógica para importar as transações
-      // Aqui seria feita uma chamada para o serviço que salva as transações no banco de dados
+      // Filtrar apenas transações selecionadas
+      const selectedTransactions = extractedTransactions.filter(tx => tx.selected);
       
-      setIsProcessing(false);
-      setIsImportDialogOpen(false);
-      toast.success(t('transactions.importSuccess', 'Transações importadas com sucesso'));
-      onTransactionsAdded();
+      if (selectedTransactions.length === 0) {
+        toast.error(t('transactions.noSelectedTransactions', 'Selecione pelo menos uma transação para importar'));
+        setIsProcessing(false);
+        return;
+      }
+      
+      const result = await bankStatementService.importTransactions(selectedTransactions);
+      
+      if (result.success) {
+        setIsProcessing(false);
+        setIsImportDialogOpen(false);
+        toast.success(t('transactions.importSuccess', 'Transações importadas com sucesso'));
+        onTransactionsAdded();
+      } else {
+        throw new Error(result.message || 'Erro desconhecido');
+      }
     } catch (error) {
       console.error('Error importing transactions:', error);
-      setIsProcessing(false);
       toast.error(t('transactions.saveError', 'Erro ao salvar as transações'));
+      setIsProcessing(false);
     }
   };
   
@@ -136,7 +169,17 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
                 </p>
               </div>
             ) : (
-              <FileUploadArea onFileSelected={handleFileSelected} />
+              <FileUploadArea 
+                fileName={selectedFile?.name || null}
+                isUploading={isUploading}
+                onFileSelect={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleFileSelected(file);
+                  }
+                }}
+                onCancel={handleCloseDialog}
+              />
             )}
           </div>
         </DialogContent>
