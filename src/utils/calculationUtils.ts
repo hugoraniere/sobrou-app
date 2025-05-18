@@ -1,5 +1,5 @@
 
-import { CostCalculation, Dish, DishIngredient, Ingredient } from "@/types/restaurant-calculator";
+import { CostCalculation, Dish, DishIngredient, Ingredient, Unit } from "@/types/restaurant-calculator";
 
 export const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('pt-BR', { 
@@ -14,6 +14,30 @@ export const formatPercentage = (value: number): string => {
     minimumFractionDigits: 1,
     maximumFractionDigits: 2
   }).format(value / 100);
+};
+
+// Adicionando a função formatWeight que estava faltando
+export const formatWeight = (weight: number, unit: Unit): string => {
+  if (unit === 'g') {
+    return `${weight.toFixed(1)}g`;
+  } else if (unit === 'kg') {
+    if (weight < 1) {
+      // Converter para gramas se for menos de 1kg
+      return `${(weight * 1000).toFixed(0)}g`;
+    }
+    return `${weight.toFixed(2)}kg`;
+  } else if (unit === 'ml') {
+    return `${weight.toFixed(0)}ml`;
+  } else if (unit === 'L') {
+    if (weight < 1) {
+      // Converter para mililitros se for menos de 1L
+      return `${(weight * 1000).toFixed(0)}ml`;
+    }
+    return `${weight.toFixed(2)}L`;
+  } else {
+    // Para unidades (un)
+    return `${weight.toFixed(0)} ${unit}`;
+  }
 };
 
 export const calculateDishCost = (
