@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
+import { format, isFuture } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,10 +18,14 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   
   const today = new Date();
+  today.setHours(23, 59, 59, 999); // Final do dia atual
   
   const handleApplyFilter = () => {
     if (startDate && endDate) {
-      onApplyFilter(startDate, endDate);
+      // Garantir que endDate não está no futuro
+      const safeEndDate = isFuture(endDate) ? today : endDate;
+      
+      onApplyFilter(startDate, safeEndDate);
       setIsPopoverOpen(false);
     }
   };
@@ -33,6 +37,9 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
     switch (preset) {
       case 'today':
         // Start and end are today
+        start = new Date(end);
+        start.setHours(0, 0, 0, 0); // Início do dia
+        end.setHours(23, 59, 59, 999); // Final do dia
         break;
       case '7days':
         start.setDate(end.getDate() - 7);
@@ -65,7 +72,7 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
           Filtrar por período
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-4" align="end">
+      <PopoverContent className="w-auto p-4 bg-white" align="end">
         <div className="space-y-4">
           <div className="font-medium">Filtros rápidos</div>
           <div className="grid grid-cols-2 gap-2">
@@ -144,6 +151,7 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
                   setStartDate(range?.from);
                   setEndDate(range?.to);
                 }}
+                disabled={(date) => isFuture(date)}
                 locale={ptBR}
                 className={cn("p-3 pointer-events-auto border rounded-md")}
               />

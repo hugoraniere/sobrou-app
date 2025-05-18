@@ -25,7 +25,7 @@ const FilterBadge: React.FC<FilterBadgeProps> = ({
       <div className="flex items-center gap-2 text-sm">
         <span className="text-blue-600">🔎</span>
         <span>
-          Exibindo transações de {formatDate(startDate)} a {formatDate(endDate)}
+          Exibindo transações de <strong>{formatDate(startDate)}</strong> a <strong>{formatDate(endDate)}</strong>
         </span>
       </div>
       <Button 
@@ -34,6 +34,7 @@ const FilterBadge: React.FC<FilterBadgeProps> = ({
         onClick={onClear}
         className="text-sm px-2 h-8 hover:bg-blue-100"
       >
+        <X className="h-3 w-3 mr-1" />
         Limpar filtro
       </Button>
     </div>
