@@ -4,7 +4,6 @@ import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
 import DashboardOverview from './tabs/DashboardOverview';
 import DashboardInsights from './tabs/DashboardInsights';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface DashboardContentProps {
   transactions: Transaction[];
@@ -37,23 +36,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6">
       {/* Visão Geral */}
-      <Card className="mb-6 bg-white">
-        <CardHeader>
-          <CardTitle>Visão Geral</CardTitle>
-        </CardHeader>
+      <div className="space-y-6">
         <DashboardOverview 
           transactions={transactions} 
           savingGoals={savingGoals} 
         />
-      </Card>
+      </div>
       
       {/* Insights */}
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle>Insights</CardTitle>
-        </CardHeader>
+      <div className="bg-white rounded-lg border p-6">
+        <h2 className="text-2xl font-semibold mb-6">Insights</h2>
         <DashboardInsights transactions={transactions} />
-      </Card>
+      </div>
     </div>
   );
 };

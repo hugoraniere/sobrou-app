@@ -8,6 +8,9 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { useModernTransactionList } from '@/hooks/useModernTransactionList';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import MonthNavigator from '../molecules/MonthNavigator';
+import PeriodFilterButton from '../molecules/PeriodFilterButton';
+import FilterBadge from '../molecules/FilterBadge';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -25,7 +28,13 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
     paginatedTransactions,
     totalPages,
     currentPage,
-    setCurrentPage
+    currentMonth,
+    setCurrentPage,
+    setCurrentMonth,
+    applyPeriodFilter,
+    clearPeriodFilter,
+    isPeriodFilterActive,
+    periodFilter,
   } = useModernTransactionList(transactions);
   
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
@@ -47,6 +56,29 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   
   return (
     <div className={cn("flex flex-col space-y-4", className)}>
+      <div className="flex justify-between items-center">
+        {!isPeriodFilterActive ? (
+          <MonthNavigator 
+            currentDate={currentMonth} 
+            onDateChange={setCurrentMonth}
+          />
+        ) : null}
+        
+        <div className="ml-auto">
+          <PeriodFilterButton
+            onApplyFilter={(startDate, endDate) => applyPeriodFilter(startDate, endDate)}
+          />
+        </div>
+      </div>
+      
+      {isPeriodFilterActive && periodFilter.startDate && periodFilter.endDate && (
+        <FilterBadge
+          startDate={periodFilter.startDate}
+          endDate={periodFilter.endDate}
+          onClear={clearPeriodFilter}
+        />
+      )}
+      
       {filteredTransactions.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-12 text-center p-6">
           <p className="text-xl font-medium text-gray-900 mb-2">Nenhuma transação encontrada</p>
@@ -54,7 +86,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
         </Card>
       ) : (
         <>
-          <div className="space-y-4"> {/* Garantindo espaço de 16px entre cada card */}
+          <div className="space-y-4">
             {paginatedTransactions.map((transaction) => (
               <Card key={transaction.id} className="overflow-hidden">
                 <TransactionItem

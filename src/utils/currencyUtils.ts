@@ -4,6 +4,12 @@ export const formatCurrencyInput = (value: string): string => {
   // Remove any non-digit characters except comma and dot
   let cleanValue = value.replace(/[^\d.,]/g, '');
   
+  // Tratar ponto como separador de milhar e vírgula como separador decimal
+  if (cleanValue.includes('.')) {
+    // Remove todos os pontos e preserve a vírgula como separador decimal
+    cleanValue = cleanValue.replace(/\./g, '');
+  }
+  
   // Handle decimal part
   const parts = cleanValue.split(',');
   if (parts.length > 1) {
@@ -12,10 +18,10 @@ export const formatCurrencyInput = (value: string): string => {
   }
   
   // Convert to number for formatting
-  const numberValue = Number(cleanValue.replace('.', '').replace(',', '.'));
+  const numberValue = Number(cleanValue.replace(',', '.'));
   if (isNaN(numberValue)) return '';
   
-  // Format as Brazilian currency
+  // Format as Brazilian currency with dot as thousand separator
   return numberValue.toLocaleString('pt-BR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
@@ -23,7 +29,7 @@ export const formatCurrencyInput = (value: string): string => {
 };
 
 export const parseCurrencyToNumber = (value: string): number => {
-  // Remove all dots and replace comma with dot for proper number conversion
+  // Remove all dots (thousand separators) and replace comma with dot for proper number conversion
   const cleanValue = value.replace(/\./g, '').replace(',', '.');
   const number = parseFloat(cleanValue);
   return isNaN(number) ? 0 : number;
