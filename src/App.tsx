@@ -23,6 +23,7 @@ import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
 import FinancialPlanning from "./pages/FinancialPlanning";
+import RestaurantCalculator from "./pages/RestaurantCalculator";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -107,6 +108,17 @@ const App = () => {
                           <ProtectedRoute>
                             <AppLayout>
                               <FinancialPlanning />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+
+                      <Route
+                        path="/restaurant-calculator"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <RestaurantCalculator />
                             </AppLayout>
                           </ProtectedRoute>
                         }

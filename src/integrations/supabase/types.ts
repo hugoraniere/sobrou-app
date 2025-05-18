@@ -9,6 +9,114 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      dish_ingredients: {
+        Row: {
+          created_at: string | null
+          dish_id: string
+          id: string
+          ingredient_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string | null
+          dish_id: string
+          id?: string
+          ingredient_id: string
+          quantity: number
+        }
+        Update: {
+          created_at?: string | null
+          dish_id?: string
+          id?: string
+          ingredient_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dish_ingredients_dish_id_fkey"
+            columns: ["dish_id"]
+            isOneToOne: false
+            referencedRelation: "dishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dish_ingredients_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dishes: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          desired_margin_percentage: number
+          id: string
+          name: string
+          operational_cost_percentage: number
+          tax_percentage: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          desired_margin_percentage?: number
+          id?: string
+          name: string
+          operational_cost_percentage?: number
+          tax_percentage?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          desired_margin_percentage?: number
+          id?: string
+          name?: string
+          operational_cost_percentage?: number
+          tax_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ingredients: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          price: number
+          unit: string
+          updated_at: string | null
+          user_id: string
+          waste_percentage: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          price: number
+          unit: string
+          updated_at?: string | null
+          user_id: string
+          waste_percentage?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          price?: number
+          unit?: string
+          updated_at?: string | null
+          user_id?: string
+          waste_percentage?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

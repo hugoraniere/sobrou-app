@@ -96,6 +96,16 @@ const MainNavbar: React.FC = () => {
               >
                 {t('financialPlanning.title', 'Planejamento')}
               </Link>
+
+              <Link 
+                to="/restaurant-calculator" 
+                className={cn(
+                  "font-medium transition-colors hover:text-primary",
+                  isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
+                )}
+              >
+                {'Calculadora de Custos'}
+              </Link>
             </nav>
           )}
         </div>
@@ -103,7 +113,7 @@ const MainNavbar: React.FC = () => {
         <div className="flex items-center">
           {!user && (
             <Link to="/auth">
-              <Button variant="primary" size="sm">
+              <Button variant="default" size="sm">
                 {t('auth.login', 'Entrar')}
               </Button>
             </Link>
