@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LogOut, Plus, Settings } from 'lucide-react';
+import { LogOut, Plus, Settings, LayoutDashboard, FileText, Target, TrendingUp, Calculator } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -115,52 +115,57 @@ const MainNavbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Nav centralizada com tamanho reduzido */}
+      {/* Nav centralizada com tamanho aumentado e ícones */}
       {user && (
         <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center space-x-6">
           <Link 
             to="/dashboard" 
             className={cn(
-              "text-xs font-medium transition-colors hover:text-primary",
+              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
               isActivePath('/dashboard') ? "text-primary" : "text-gray-700"
             )}
           >
+            <LayoutDashboard className="h-4 w-4" />
             {t('common.dashboard', 'Painel')}
           </Link>
           <Link 
             to="/transactions" 
             className={cn(
-              "text-xs font-medium transition-colors hover:text-primary",
+              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
               isActivePath('/transactions') ? "text-primary" : "text-gray-700"
             )}
           >
+            <FileText className="h-4 w-4" />
             {t('common.transactions', 'Transações')}
           </Link>
           <Link 
             to="/goals" 
             className={cn(
-              "text-xs font-medium transition-colors hover:text-primary",
+              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
               isActivePath('/goals') ? "text-primary" : "text-gray-700"
             )}
           >
+            <Target className="h-4 w-4" />
             {t('common.goals', 'Metas')}
           </Link>
           <Link 
             to="/financial-planning" 
             className={cn(
-              "text-xs font-medium transition-colors hover:text-primary",
+              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
               isActivePath('/financial-planning') ? "text-primary" : "text-gray-700"
             )}
           >
+            <TrendingUp className="h-4 w-4" />
             {t('financialPlanning.title', 'Planejamento')}
           </Link>
           <Link 
             to="/restaurant-calculator" 
             className={cn(
-              "text-xs font-medium transition-colors hover:text-primary",
+              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
               isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
             )}
           >
+            <Calculator className="h-4 w-4" />
             {'Calculadora de Custos'}
           </Link>
         </nav>

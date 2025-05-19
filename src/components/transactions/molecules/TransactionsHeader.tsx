@@ -5,10 +5,11 @@ import QuickFilters from './QuickFilters';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface TransactionsHeaderProps {
-  currentDate: Date;
-  onDateChange: (date: Date) => void;
+  currentMonth: string;
+  onMonthChange: (month: string) => void;
   selectedFilter: string;
   onFilterChange: (filterId: string) => void;
   hasTransactionsInNextMonth?: boolean;
@@ -16,8 +17,8 @@ interface TransactionsHeaderProps {
 }
 
 const TransactionsHeader: React.FC<TransactionsHeaderProps> = ({
-  currentDate,
-  onDateChange,
+  currentMonth,
+  onMonthChange,
   selectedFilter,
   onFilterChange,
   hasTransactionsInNextMonth,
@@ -28,9 +29,8 @@ const TransactionsHeader: React.FC<TransactionsHeaderProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center w-full sm:w-auto">
           <MonthNavigator 
-            currentDate={currentDate} 
-            onDateChange={onDateChange}
-            hasTransactionsInNextMonth={hasTransactionsInNextMonth}
+            currentMonth={currentMonth} 
+            onMonthChange={onMonthChange}
           />
           {/* Removido o chip duplicado do mês */}
         </div>

@@ -18,7 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Buscar..."
 }) => {
   return (
-    <div className={cn("relative w-full md:w-[60%] lg:w-[60%]", className)}>
+    <div className={cn("relative w-full", className)}>
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
         type="text"
