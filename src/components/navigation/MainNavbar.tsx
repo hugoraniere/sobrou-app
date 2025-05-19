@@ -1,10 +1,11 @@
+
 <header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-2 py-2">
   <div className="container mx-auto flex justify-between items-center">
     
-    {/* Logo aumentada */}
+    {/* Logo com tamanho reduzido */}
     <div className="flex items-center">
       <Link to="/" className="flex items-center">
-        <Logo className="h-10" /> {/* ou ajuste para h-10 se quiser ainda maior */}
+        <Logo className="h-7" size="sm" />
       </Link>
     </div>
 
@@ -21,11 +22,12 @@
       {user && (
         <div className="flex items-center">
           <Button 
-            variant="primary"
+            variant="default"
             size="sm"
             className="mr-4 hidden md:flex rounded-full bg-primary text-white hover:bg-primary-hover"
             onClick={() => setIsAddTransactionOpen(true)}
           >
+            <Plus className="h-4 w-4 mr-1" />
             {t('transactions.new', 'Nova Transação')}
           </Button>
           
@@ -62,13 +64,13 @@
     </div>
   </div>
 
-  {/* Nav centralizada permanece igual */}
+  {/* Nav centralizada com tamanho reduzido */}
   {user && (
     <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center space-x-6">
       <Link 
         to="/dashboard" 
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
+          "text-xs font-medium transition-colors hover:text-primary",
           isActivePath('/dashboard') ? "text-primary" : "text-gray-700"
         )}
       >
@@ -77,7 +79,7 @@
       <Link 
         to="/transactions" 
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
+          "text-xs font-medium transition-colors hover:text-primary",
           isActivePath('/transactions') ? "text-primary" : "text-gray-700"
         )}
       >
@@ -86,7 +88,7 @@
       <Link 
         to="/goals" 
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
+          "text-xs font-medium transition-colors hover:text-primary",
           isActivePath('/goals') ? "text-primary" : "text-gray-700"
         )}
       >
@@ -95,7 +97,7 @@
       <Link 
         to="/financial-planning" 
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
+          "text-xs font-medium transition-colors hover:text-primary",
           isActivePath('/financial-planning') ? "text-primary" : "text-gray-700"
         )}
       >
@@ -104,7 +106,7 @@
       <Link 
         to="/restaurant-calculator" 
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
+          "text-xs font-medium transition-colors hover:text-primary",
           isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
         )}
       >
