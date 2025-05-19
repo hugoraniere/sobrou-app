@@ -4,7 +4,7 @@
     {/* Logo aumentada */}
     <div className="flex items-center">
       <Link to="/" className="flex items-center">
-        <Logo className="h-8" /> {/* ou ajuste para h-10 se quiser ainda maior */}
+        <Logo className="h-10" /> {/* ou ajuste para h-10 se quiser ainda maior */}
       </Link>
     </div>
 
