@@ -49,7 +49,7 @@ const MainNavbar: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-background-base border-b border-border-subtle shadow-sm py-6">
+    <header className="w-full bg-background-base border-b border-border-subtle shadow-sm py-4">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center">
