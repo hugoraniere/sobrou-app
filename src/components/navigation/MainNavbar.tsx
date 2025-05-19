@@ -1,4 +1,4 @@
-<header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-4 py-4">
+<header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-2 py-2">
   <div className="container mx-auto flex justify-between items-center">
     
     {/* Logo aumentada */}
