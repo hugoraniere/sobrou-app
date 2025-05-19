@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 import { Card } from '@/components/ui/card';
-import ImportBankStatementButton from '@/components/transactions/ImportBankStatementButton';
 import { useTransactionData } from '@/hooks/useTransactionData';
 import { TransactionsLoadingState } from '@/components/transactions/states/TransactionsLoadingState';
 import { TransactionsErrorState } from '@/components/transactions/states/TransactionsErrorState';
@@ -35,9 +34,7 @@ const Transactions = () => {
               {t('transactions.title', 'Transações')}
             </h1>
           </div>
-          <div className="flex items-center space-x-2">
-            <ImportBankStatementButton onTransactionsAdded={handleTransactionUpdated} />
-          </div>
+          {/* Removido o botão de nova transação */}
         </div>
 
         {/* AIPromptInput sempre visível */}

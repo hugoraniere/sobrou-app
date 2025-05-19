@@ -1,6 +1,5 @@
 
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import MainNavbar from '../navigation/MainNavbar';
 import FloatingChatButton from '../chat/FloatingChatButton';
 import ChatWindow from '../chat/ChatWindow';

@@ -5,9 +5,9 @@ import MonthNavigator from './MonthNavigator';
 import SearchBar from './SearchBar';
 
 interface TransactionListFiltersProps {
-  currentMonth: Date;
+  currentMonth: string;
   searchTerm: string;
-  onMonthChange: (date: Date) => void;
+  onMonthChange: (month: string) => void;
   onSearchChange: (term: string) => void;
   className?: string;
 }
@@ -24,8 +24,8 @@ const TransactionListFilters: React.FC<TransactionListFiltersProps> = ({
       {/* Filtro de mês - à esquerda */}
       <div className="flex items-center">
         <MonthNavigator 
-          currentDate={currentMonth} 
-          onDateChange={onMonthChange}
+          currentMonth={currentMonth} 
+          onMonthChange={onMonthChange}
         />
       </div>
       

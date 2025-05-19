@@ -1,7 +1,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Transaction } from '@/services/transactions';
-import { getMonthsFromTransactions } from '@/utils/dateUtils';
+import { format, parseISO, isValid, getMonth, getYear } from 'date-fns';
 
 export function useModernTransactionList(transactions: Transaction[]) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,7 +28,19 @@ export function useModernTransactionList(transactions: Transaction[]) {
   
   // Lista de meses disponíveis nas transações
   const availableMonths = useMemo(() => {
-    return getMonthsFromTransactions(sortedTransactions);
+    const months: { [key: string]: boolean } = {};
+    
+    sortedTransactions.forEach(transaction => {
+      const date = new Date(transaction.date);
+      if (isValid(date)) {
+        const year = getYear(date);
+        const month = getMonth(date) + 1; // 0-indexed to 1-indexed
+        const key = `${year}-${month.toString().padStart(2, '0')}`;
+        months[key] = true;
+      }
+    });
+    
+    return Object.keys(months).sort((a, b) => b.localeCompare(a)); // Mais recente primeiro
   }, [sortedTransactions]);
   
   // Filtrando transações com base no mês atual e termo de pesquisa
@@ -51,8 +63,8 @@ export function useModernTransactionList(transactions: Transaction[]) {
           const prevMonthYear = currentMonthNum === 0 ? currentYear - 1 : currentYear;
           return date.getMonth() === prevMonth && date.getFullYear() === prevMonthYear;
         } else {
-          // Formato: 'MM-YYYY'
-          const [month, year] = currentMonth.split('-').map(Number);
+          // Formato: 'YYYY-MM'
+          const [year, month] = currentMonth.split('-').map(Number);
           return date.getMonth() === month - 1 && date.getFullYear() === year;
         }
       });

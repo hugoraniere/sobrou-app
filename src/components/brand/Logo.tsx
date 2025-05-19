@@ -4,11 +4,12 @@ import { cn } from '@/lib/utils';
 
 interface LogoProps {
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
 const Logo = React.forwardRef<HTMLImageElement, LogoProps>(({ className, size = 'md' }, ref) => {
   const sizeClasses = {
+    xs: 'h-5',
     sm: 'h-7',
     md: 'h-10',
     lg: 'h-20'
