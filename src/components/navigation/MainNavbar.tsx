@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -49,68 +48,17 @@ const MainNavbar: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-background-base border-b border-border-subtle shadow-sm px-4 py-4">
-     <div className="container mx-auto px-6 py-6 grid grid-cols-3 items-center">
-        <div className="flex items-center space-x-6">
+    <header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-6 py-6">
+      <div className="container mx-auto flex justify-between items-center">
+        
+        {/* Logo à esquerda */}
+        <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <Logo size="sm" />
           </Link>
-          
-          {user && (
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link 
-                to="/dashboard" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isActivePath('/dashboard') ? "text-primary" : "text-gray-700"
-                )}
-              >
-                {t('common.dashboard', 'Painel')}
-              </Link>
-              
-              <Link 
-                to="/transactions" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isActivePath('/transactions') ? "text-primary" : "text-gray-700"
-                )}
-              >
-                {t('common.transactions', 'Transações')}
-              </Link>
-              
-              <Link 
-                to="/goals" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isActivePath('/goals') ? "text-primary" : "text-gray-700"
-                )}
-              >
-                {t('common.goals', 'Metas')}
-              </Link>
-              
-              <Link 
-                to="/financial-planning" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isActivePath('/financial-planning') ? "text-primary" : "text-gray-700"
-                )}
-              >
-                {t('financialPlanning.title', 'Planejamento')}
-              </Link>
-
-              <Link 
-                to="/restaurant-calculator" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
-                )}
-              >
-                {'Calculadora de Custos'}
-              </Link>
-            </nav>
-          )}
         </div>
-        
+
+        {/* Ações à direita */}
         <div className="flex items-center">
           {!user && (
             <Link to="/auth">
@@ -163,7 +111,62 @@ const MainNavbar: React.FC = () => {
           )}
         </div>
       </div>
-      
+
+      {/* Navegação centralizada */}
+      {user && (
+        <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center space-x-6">
+          <Link 
+            to="/dashboard" 
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              isActivePath('/dashboard') ? "text-primary" : "text-gray-700"
+            )}
+          >
+            {t('common.dashboard', 'Painel')}
+          </Link>
+          
+          <Link 
+            to="/transactions" 
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              isActivePath('/transactions') ? "text-primary" : "text-gray-700"
+            )}
+          >
+            {t('common.transactions', 'Transações')}
+          </Link>
+          
+          <Link 
+            to="/goals" 
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              isActivePath('/goals') ? "text-primary" : "text-gray-700"
+            )}
+          >
+            {t('common.goals', 'Metas')}
+          </Link>
+          
+          <Link 
+            to="/financial-planning" 
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              isActivePath('/financial-planning') ? "text-primary" : "text-gray-700"
+            )}
+          >
+            {t('financialPlanning.title', 'Planejamento')}
+          </Link>
+
+          <Link 
+            to="/restaurant-calculator" 
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
+            )}
+          >
+            {'Calculadora de Custos'}
+          </Link>
+        </nav>
+      )}
+
       {/* Dialog para nova transação */}
       {user && (
         <AddTransactionDialog
