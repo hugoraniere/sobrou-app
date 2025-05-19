@@ -1,7 +1,12 @@
 
 export const INCOME_KEYWORDS = [
   "recebi", "ganhei", "salário", "salario", "pagamento", 
-  "me pagou", "freelancer", "bônus", "bonus", "pix"
+  "me pagou", "freelancer", "bônus", "bonus", "pix",
+  "caiu na conta", "entrou", "faturei", "venda", "vendido",
+  "fiz um freela", "lucro", "rendimento", "ganho", "comissão",
+  "entrada", "receita", "transferência", "transferencia", "depósito",
+  "deposito", "cashback", "restituição", "restituicao", "premio",
+  "prêmio", "dividendos", "aluguel", "recebido"
 ];
 
 export const SAVING_KEYWORDS = [

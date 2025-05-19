@@ -16,11 +16,14 @@ export const transactionMutationService = {
         throw new Error('Campos obrigatórios ausentes');
       }
 
+      // Preservar o texto original da descrição
+      const originalDescription = transactionData.description;
+
       const newTransaction = {
         user_id: user.id,
         amount: transactionData.amount,
         category: transactionData.category,
-        description: transactionData.description,
+        description: originalDescription, // Garantindo que o texto original é salvo
         type: transactionData.type,
         date: transactionData.date || new Date().toISOString().split('T')[0],
         is_recurring: transactionData.is_recurring || false,

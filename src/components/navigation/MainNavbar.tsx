@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import Logo from '../brand/Logo';
 import AddTransactionDialog from '../transactions/AddTransactionDialog';
+import { Settings, LogOut } from 'lucide-react';
 
 const MainNavbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -48,11 +49,11 @@ const MainNavbar: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-background-base border-b border-border-subtle shadow-sm py-3">
+    <header className="w-full bg-background-base border-b border-border-subtle shadow-sm py-2">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center">
-            <Logo size="md" />
+            <Logo size="sm" />
           </Link>
           
           {user && (
@@ -60,7 +61,7 @@ const MainNavbar: React.FC = () => {
               <Link 
                 to="/dashboard" 
                 className={cn(
-                  "font-medium transition-colors hover:text-primary",
+                  "text-sm font-medium transition-colors hover:text-primary",
                   isActivePath('/dashboard') ? "text-primary" : "text-gray-700"
                 )}
               >
@@ -70,7 +71,7 @@ const MainNavbar: React.FC = () => {
               <Link 
                 to="/transactions" 
                 className={cn(
-                  "font-medium transition-colors hover:text-primary",
+                  "text-sm font-medium transition-colors hover:text-primary",
                   isActivePath('/transactions') ? "text-primary" : "text-gray-700"
                 )}
               >
@@ -80,7 +81,7 @@ const MainNavbar: React.FC = () => {
               <Link 
                 to="/goals" 
                 className={cn(
-                  "font-medium transition-colors hover:text-primary",
+                  "text-sm font-medium transition-colors hover:text-primary",
                   isActivePath('/goals') ? "text-primary" : "text-gray-700"
                 )}
               >
@@ -90,7 +91,7 @@ const MainNavbar: React.FC = () => {
               <Link 
                 to="/financial-planning" 
                 className={cn(
-                  "font-medium transition-colors hover:text-primary",
+                  "text-sm font-medium transition-colors hover:text-primary",
                   isActivePath('/financial-planning') ? "text-primary" : "text-gray-700"
                 )}
               >
@@ -100,7 +101,7 @@ const MainNavbar: React.FC = () => {
               <Link 
                 to="/restaurant-calculator" 
                 className={cn(
-                  "font-medium transition-colors hover:text-primary",
+                  "text-sm font-medium transition-colors hover:text-primary",
                   isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
                 )}
               >
@@ -122,9 +123,9 @@ const MainNavbar: React.FC = () => {
           {user && (
             <div className="flex items-center">
               <Button 
-                variant="ghost"
+                variant="primary"
                 size="sm"
-                className="mr-4 hidden md:flex"
+                className="mr-4 hidden md:flex rounded-full bg-primary text-white hover:bg-primary-hover"
                 onClick={() => setIsAddTransactionOpen(true)}
               >
                 {t('transactions.new', 'Nova Transação')}
@@ -133,7 +134,7 @@ const MainNavbar: React.FC = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="focus:outline-none">
-                    <Avatar className="h-9 w-9 border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                    <Avatar className="h-8 w-8 border-2 border-primary/20 hover:border-primary/40 transition-colors">
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {getUserInitials()}
                       </AvatarFallback>
@@ -146,12 +147,14 @@ const MainNavbar: React.FC = () => {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/settings">
+                    <Link to="/settings" className="flex items-center">
+                      <Settings className="mr-2 h-4 w-4" />
                       {t('common.settings', 'Configurações')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 flex items-center">
+                    <LogOut className="mr-2 h-4 w-4" />
                     {t('auth.logout', 'Sair')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>

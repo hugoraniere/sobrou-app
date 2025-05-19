@@ -22,7 +22,7 @@ export async function aiParseTransaction(text: string) {
               - amount (número, obrigatório)
               - type ("expense" para despesas ou "income" para receitas)
               - category (deve ser uma destas categorias exatas: alimentacao, moradia, transporte, internet, cartao, saude, lazer, compras, investimentos, familia, doacoes)
-              - description (texto breve)
+              - description (deve ser EXATAMENTE igual ao texto original do usuário, sem alterações)
               - isSaving (boolean, indica se é uma economia/poupança)
               - savingGoal (string ou null)
               
@@ -39,13 +39,17 @@ export async function aiParseTransaction(text: string) {
               - familia: escola, mensalidades, despesas com filhos, creche, material escolar
               - doacoes: doações, contribuições para causas, caridade, dízimo
 
-              Regras importantes:
-              - Analise o contexto completo da transação para determinar a categoria correta
+              Regras importantes para TYPE:
+              - Classifique como "income" (receita) se detectar palavras como: "recebi", "ganhei", "salário", "pagamento", "caiu na conta", "entrou", "faturei", "venda"
+              - Exemplos claros de RECEITAS: "Recebi R$2000 de salário", "Ganhei 50 reais com bets", "Caiu 1500 na minha conta", "Me pagaram o freela", "Vendi um celular por 800"
+              - Classifique como "expense" (despesa) apenas quando houver clara indicação de gasto ou pagamento, como: "gastei", "paguei", "comprei"
+              
+              Outras regras importantes:
               - Se o valor contiver "k" (ex: "2k"), multiplique por 1000
               - Para moeda brasileira (R$), extraia apenas o número
               - Detecte intenções de poupança ("poupar", "guardar", "economizar")
-              - O padrão é "expense", a menos que haja claros indicadores de renda
-              - Examine palavras-chave como: pagamento, compra, depósito, recebimento, salário
+              - MANTENHA O TEXT ORIGINAL EXATAMENTE IGUAL NO CAMPO DESCRIPTION. Não faça reformulações, correções ou melhorias no texto.
+              - Não mude nenhuma palavra do texto original do usuário no campo "description".
               
               Retorne APENAS um objeto JSON com esses campos exatos.`
           },
@@ -65,6 +69,9 @@ export async function aiParseTransaction(text: string) {
     const parsedResult = data.choices[0].message.content;
     const parsed = JSON.parse(parsedResult);
     
+    // Garantir que a descrição seja exatamente igual ao texto original
+    parsed.description = text;
+    
     // Garantir que sempre temos uma categoria válida
     if (!parsed.category) {
       parsed.category = 'compras';
@@ -78,7 +85,7 @@ export async function aiParseTransaction(text: string) {
       amount: 0,
       type: 'expense',
       category: 'compras',
-      description: text,
+      description: text, // Sempre preservar o texto original
       isSaving: false,
       savingGoal: null
     };
