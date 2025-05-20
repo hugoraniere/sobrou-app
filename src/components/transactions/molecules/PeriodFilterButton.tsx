@@ -5,7 +5,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format, isFuture } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, Filter } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PeriodFilterButtonProps {
@@ -47,10 +47,18 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
       case '15days':
         start.setDate(end.getDate() - 15);
         break;
-      case '3months':
-        start.setMonth(end.getMonth() - 3);
+      case '30days':
+        start.setDate(end.getDate() - 30);
         break;
-      case 'year':
+      case 'thisWeek':
+        // First day of the week (Sunday or Monday depending on locale)
+        const day = end.getDay();
+        const diff = end.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+        start = new Date(end);
+        start.setDate(diff);
+        start.setHours(0, 0, 0, 0);
+        break;
+      case 'thisYear':
         start = new Date(end.getFullYear(), 0, 1); // Jan 1st of current year
         break;
     }
@@ -68,7 +76,7 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
           variant="outline" 
           className="flex items-center gap-2"
         >
-          <Filter className="h-4 w-4" />
+          <CalendarIcon className="h-4 w-4" />
           Filtrar por período
         </Button>
       </PopoverTrigger>
@@ -100,21 +108,28 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
             <Button 
               variant="outline" 
               className="w-full justify-start text-left"
-              onClick={() => applyPresetFilter('3months')}
+              onClick={() => applyPresetFilter('30days')}
             >
-              Últimos 3 meses
+              Últimos 30 dias
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start text-left col-span-2"
-              onClick={() => applyPresetFilter('year')}
+              className="w-full justify-start text-left"
+              onClick={() => applyPresetFilter('thisWeek')}
             >
-              Ano atual
+              Esta semana
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start text-left"
+              onClick={() => applyPresetFilter('thisYear')}
+            >
+              Este ano
             </Button>
           </div>
           
           <div className="border-t pt-4">
-            <div className="font-medium mb-2">Intervalo personalizado</div>
+            <div className="font-medium mb-2">Período personalizado</div>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <div className="text-sm text-gray-500 mb-1">De:</div>
@@ -153,7 +168,7 @@ const PeriodFilterButton: React.FC<PeriodFilterButtonProps> = ({ onApplyFilter }
                 }}
                 disabled={(date) => isFuture(date)}
                 locale={ptBR}
-                className={cn("p-3 pointer-events-auto border rounded-md")}
+                className={cn("p-3 border rounded-md")}
               />
             </div>
           </div>

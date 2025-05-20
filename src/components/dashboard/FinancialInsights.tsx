@@ -28,7 +28,7 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       const topCategory = sortedCategories[0];
       const percentage = Math.round((topCategory.value / totalExpenses) * 100);
       
-      insights.push(`${percentage}% of your spending is on ${topCategory.name}`);
+      insights.push(`${percentage}% dos seus gastos são em ${topCategory.name}`);
     }
     
     // Month over month trend
@@ -40,16 +40,16 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       const percentChange = Math.round((diff / previousMonth.amount) * 100);
       
       if (diff > 0) {
-        insights.push(`Spending increased by ${percentChange}% compared to last month`);
+        insights.push(`Gastos aumentaram em ${percentChange}% comparado ao mês anterior`);
       } else if (diff < 0) {
-        insights.push(`Spending decreased by ${Math.abs(percentChange)}% compared to last month`);
+        insights.push(`Gastos diminuíram em ${Math.abs(percentChange)}% comparado ao mês anterior`);
       }
     }
     
     // Average daily expense
     if (transactions.length > 0) {
       const avgDaily = totalExpenses / transactions.length;
-      insights.push(`Average daily expense is $${avgDaily.toFixed(2)}`);
+      insights.push(`Despesa média diária é R$ ${avgDaily.toFixed(2)}`);
     }
     
     return insights;
@@ -70,6 +70,7 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
       </Card>
       <Card className="bg-white">
         <CardContent className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Insights</h3>
           <InsightList insights={insights} />
         </CardContent>
       </Card>

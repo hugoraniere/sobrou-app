@@ -27,14 +27,13 @@ const Transactions = () => {
 
   return (
     <TooltipProvider>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-screen-xl px-4 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold">
               {t('transactions.title', 'Transações')}
             </h1>
           </div>
-          {/* Removido o botão de nova transação */}
         </div>
 
         {/* AIPromptInput sempre visível */}

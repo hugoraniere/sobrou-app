@@ -18,7 +18,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       
       {/* Conteúdo principal */}
       <main className="flex-1 w-full overflow-x-hidden">
-        <div className="px-4 sm:px-6 md:px-8 py-4 overflow-x-hidden w-full max-w-full">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-4 overflow-x-hidden w-full max-w-full">
           {children}
         </div>
 
