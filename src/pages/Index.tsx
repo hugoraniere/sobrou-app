@@ -39,8 +39,8 @@ const Index = () => {
   const isLoading = authLoading || dataLoading;
   
   return (
-    <div className="container mx-auto max-w-screen-xl space-y-6 w-full overflow-hidden">
-      <div className="mt-6 mb-6 px-4 md:px-0">
+    <div className="container mx-auto max-w-screen-xl w-full overflow-hidden">
+      <div className="mt-6 mb-6 px-4 md:px-6">
         <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
         <p className="text-gray-600">Acompanhe suas finanças e analise seus hábitos de gastos</p>
       </div>

@@ -1,16 +1,21 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import HeaderLogo from './header/HeaderLogo';
 import { useTranslation } from 'react-i18next';
 import AddTransactionDialog from './transactions/AddTransactionDialog';
 import HeaderDesktopNav from './header/HeaderDesktopNav';
+import { useMobile } from '@/hooks/useMobile';
+import { Menu } from 'lucide-react';
+import { Button } from './ui/button';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [isAddTransactionOpen, setIsAddTransactionOpen] = React.useState(false);
+  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const { isMobile } = useMobile();
 
   return (
     <>
@@ -28,9 +33,54 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
             )}
             
             {user && !isPublic && (
-              <div className="hidden md:flex">
-                <HeaderDesktopNav onNewTransaction={() => setIsAddTransactionOpen(true)} />
-              </div>
+              <>
+                {isMobile ? (
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Menu className="h-5 w-5" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-[80%] sm:max-w-sm">
+                      <div className="mt-8 space-y-4">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start" 
+                          onClick={() => {
+                            setIsAddTransactionOpen(true);
+                          }}
+                        >
+                          Nova Transação
+                        </Button>
+                        <nav className="space-y-2">
+                          <Link to="/dashboard" className="block px-4 py-2 hover:bg-gray-100 rounded-md">
+                            Dashboard
+                          </Link>
+                          <Link to="/transactions" className="block px-4 py-2 hover:bg-gray-100 rounded-md">
+                            Transações
+                          </Link>
+                          <Link to="/goals" className="block px-4 py-2 hover:bg-gray-100 rounded-md">
+                            Metas
+                          </Link>
+                          <Link to="/financial-planning" className="block px-4 py-2 hover:bg-gray-100 rounded-md">
+                            Planejamento
+                          </Link>
+                          <Link to="/settings" className="block px-4 py-2 hover:bg-gray-100 rounded-md">
+                            Configurações
+                          </Link>
+                          <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100 rounded-md">
+                            Perfil
+                          </Link>
+                        </nav>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                ) : (
+                  <div className="hidden md:flex">
+                    <HeaderDesktopNav onNewTransaction={() => setIsAddTransactionOpen(true)} />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

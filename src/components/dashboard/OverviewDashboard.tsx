@@ -15,6 +15,8 @@ import EmptyStateMessage from './EmptyStateMessage';
 import RecentTransactions from './RecentTransactions';
 import { CATEGORY_COLORS } from '@/constants/categoryColors';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -26,6 +28,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   savingGoals
 }) => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   
   // Inicializa filteredTransactions com todas as transações
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
@@ -89,103 +92,104 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     }
   });
 
+  const handleViewAllTransactions = () => {
+    navigate('/transactions');
+  };
+
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden px-4 md:px-0">
+    <div className="space-y-6 w-full max-w-full overflow-hidden px-4 md:px-6">
       {/* Card de Visão Geral com Big Numbers */}
       <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 
-      {/* Grid de cards responsivo - Ajuste para mobile e largura mínima */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Recent Transactions */}
-        <Card className="w-full min-w-[280px]">
-          <CardHeader>
-            <CardTitle className="text-xl">Transações recentes</CardTitle>
-          </CardHeader>
-          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
-            {hasTransactions ? (
-              <RecentTransactions transactions={filteredTransactions} />
-            ) : (
-              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-            )}
-          </CardContent>
-        </Card>
+      {/* Transações Recentes */}
+      <div className="w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Últimas transações</h2>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleViewAllTransactions}
+          >
+            Ver todas
+          </Button>
+        </div>
         
-        {/* Expenses by Category (Pie Chart) */}
-        <Card className="w-full min-w-[280px]">
-          <CardHeader>
-            <CardTitle className="text-xl">Gastos por categoria</CardTitle>
-          </CardHeader>
-          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
-            {hasTransactions ? (
-              <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
-            ) : (
-              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-            )}
-          </CardContent>
-        </Card>
+        {hasTransactions ? (
+          <RecentTransactions transactions={filteredTransactions} />
+        ) : (
+          <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+        )}
       </div>
 
-      {/* Row 2 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Income vs Expenses (Bar Chart) */}
-        <Card className="w-full min-w-[280px]">
-          <CardHeader>
-            <CardTitle className="text-xl">{TEXT.dashboard.charts.revenueVsExpense}</CardTitle>
-          </CardHeader>
-          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
-            {hasTransactions ? (
-              <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
-            ) : (
-              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* Daily Balance (Line Chart) */}
-        <Card className="w-full min-w-[280px]">
-          <CardHeader>
-            <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
-          </CardHeader>
-          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
-            {hasTransactions ? (
-              <DailyBarChart transactions={filteredTransactions} />
-            ) : (
-              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      {/* Gastos por Categoria */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">Gastos por categoria</CardTitle>
+        </CardHeader>
+        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+          {hasTransactions ? (
+            <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+          )}
+        </CardContent>
+      </Card>
 
-      {/* Row 3 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Financial Goals Progress */}
-        <Card className="w-full min-w-[280px]">
-          <CardHeader>
-            <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
-          </CardHeader>
-          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
-            {hasSavingGoals ? (
-              <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
-            ) : (
-              <EmptyStateMessage message={TEXT.dashboard.charts.noGoals} />
-            )}
-          </CardContent>
-        </Card>
+      {/* Receitas vs Despesas */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">{TEXT.dashboard.charts.revenueVsExpense}</CardTitle>
+        </CardHeader>
+        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+          {hasTransactions ? (
+            <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+          )}
+        </CardContent>
+      </Card>
         
-        {/* Income by Type Chart */}
-        <Card className="w-full min-w-[280px]">
-          <CardHeader>
-            <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
-          </CardHeader>
-          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
-            {hasTransactions ? (
-              <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
-            ) : (
-              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      {/* Movimentações Diárias */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
+        </CardHeader>
+        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+          {hasTransactions ? (
+            <DailyBarChart transactions={filteredTransactions} />
+          ) : (
+            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Metas Financeiras */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
+        </CardHeader>
+        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+          {hasSavingGoals ? (
+            <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={TEXT.dashboard.charts.noGoals} />
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Fontes de Receita */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
+        </CardHeader>
+        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+          {hasTransactions ? (
+            <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
+          ) : (
+            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
