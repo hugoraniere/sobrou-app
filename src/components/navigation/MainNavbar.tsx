@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/brand/Logo';
+import MobileSidebar from '../layout/MobileSidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,14 +15,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
+import { useAvatar } from '@/contexts/AvatarContext';
 
 const MainNavbar: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const location = useLocation();
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const { avatarUrl } = useAvatar();
 
   const handleLogout = async () => {
     try {
@@ -50,7 +53,7 @@ const MainNavbar: React.FC = () => {
   };
 
   return (
-    <header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-2 py-2">
+    <header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-4 md:px-6 py-2">
       <div className="container mx-auto flex justify-between items-center">
         
         {/* Logo com tamanho reduzido */}
@@ -59,6 +62,67 @@ const MainNavbar: React.FC = () => {
             <Logo className="h-7" size="sm" />
           </Link>
         </div>
+
+        {/* Menu Mobile (aparece somente em telas pequenas) */}
+        <div className="md:hidden">
+          <MobileSidebar />
+        </div>
+
+        {/* Nav centralizada com tamanho aumentado e ícones */}
+        {user && (
+          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center space-x-6">
+            <Link 
+              to="/dashboard" 
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
+                isActivePath('/dashboard') ? "text-primary" : "text-gray-700"
+              )}
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              {t('common.dashboard', 'Dashboard')}
+            </Link>
+            <Link 
+              to="/transactions" 
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
+                isActivePath('/transactions') ? "text-primary" : "text-gray-700"
+              )}
+            >
+              <FileText className="h-4 w-4" />
+              {t('common.transactions', 'Transações')}
+            </Link>
+            <Link 
+              to="/goals" 
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
+                isActivePath('/goals') ? "text-primary" : "text-gray-700"
+              )}
+            >
+              <Target className="h-4 w-4" />
+              {t('common.goals', 'Metas')}
+            </Link>
+            <Link 
+              to="/financial-planning" 
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
+                isActivePath('/financial-planning') ? "text-primary" : "text-gray-700"
+              )}
+            >
+              <TrendingUp className="h-4 w-4" />
+              {t('financialPlanning.title', 'Planejamento')}
+            </Link>
+            <Link 
+              to="/restaurant-calculator" 
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
+                isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
+              )}
+            >
+              <Calculator className="h-4 w-4" />
+              {'Calculadora de Custos'}
+            </Link>
+          </nav>
+        )}
 
         {/* Ações à direita com avatar maior */}
         <div className="flex items-center">
@@ -82,94 +146,44 @@ const MainNavbar: React.FC = () => {
                 {t('transactions.new', 'Nova Transação')}
               </Button>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="focus:outline-none">
-                    <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
-                      <AvatarFallback className="bg-gray-100 text-black">
-                        {getUserInitials()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="p-2 text-sm font-medium">
-                    {(user as any)?.user_metadata?.full_name || t('common.user', 'Usuário')}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings" className="flex items-center">
-                      <Settings className="mr-2 h-4 w-4" />
-                      {t('common.settings', 'Configurações')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 flex items-center">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {t('auth.logout', 'Sair')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="hidden md:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="focus:outline-none">
+                      <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                        {avatarUrl ? (
+                          <AvatarImage src={avatarUrl} alt="User" />
+                        ) : (
+                          <AvatarFallback className="bg-gray-100 text-black">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="p-2 text-sm font-medium">
+                      {(user as any)?.user_metadata?.full_name || t('common.user', 'Usuário')}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings" className="flex items-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        {t('common.settings', 'Configurações')}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 flex items-center">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {t('auth.logout', 'Sair')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           )}
         </div>
       </div>
-
-      {/* Nav centralizada com tamanho aumentado e ícones */}
-      {user && (
-        <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center space-x-6">
-          <Link 
-            to="/dashboard" 
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
-              isActivePath('/dashboard') ? "text-primary" : "text-gray-700"
-            )}
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            {t('common.dashboard', 'Painel')}
-          </Link>
-          <Link 
-            to="/transactions" 
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
-              isActivePath('/transactions') ? "text-primary" : "text-gray-700"
-            )}
-          >
-            <FileText className="h-4 w-4" />
-            {t('common.transactions', 'Transações')}
-          </Link>
-          <Link 
-            to="/goals" 
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
-              isActivePath('/goals') ? "text-primary" : "text-gray-700"
-            )}
-          >
-            <Target className="h-4 w-4" />
-            {t('common.goals', 'Metas')}
-          </Link>
-          <Link 
-            to="/financial-planning" 
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
-              isActivePath('/financial-planning') ? "text-primary" : "text-gray-700"
-            )}
-          >
-            <TrendingUp className="h-4 w-4" />
-            {t('financialPlanning.title', 'Planejamento')}
-          </Link>
-          <Link 
-            to="/restaurant-calculator" 
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
-              isActivePath('/restaurant-calculator') ? "text-primary" : "text-gray-700"
-            )}
-          >
-            <Calculator className="h-4 w-4" />
-            {'Calculadora de Custos'}
-          </Link>
-        </nav>
-      )}
 
       {/* Dialog para nova transação */}
       {user && (

@@ -44,3 +44,13 @@ export const formatCurrency = (value: number): string => {
     maximumFractionDigits: 2
   });
 };
+
+// Função ausente que estava causando erro
+export const formatCurrencyNoDecimals = (value: number): string => {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
+};

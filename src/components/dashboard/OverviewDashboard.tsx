@@ -14,6 +14,7 @@ import { TEXT } from '@/constants/text';
 import EmptyStateMessage from './EmptyStateMessage';
 import RecentTransactions from './RecentTransactions';
 import { CATEGORY_COLORS } from '@/constants/categoryColors';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -24,6 +25,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   transactions,
   savingGoals
 }) => {
+  const isMobile = useIsMobile();
+  
   // Inicializa filteredTransactions com todas as transações
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
   
@@ -87,21 +90,32 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   });
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-6 w-full max-w-full overflow-hidden px-4 md:px-0">
       {/* Card de Visão Geral com Big Numbers */}
       <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 
-      {/* Row 1 - Recent Transactions & Expenses by Category */}
+      {/* Grid de cards responsivo - Ajuste para mobile e largura mínima */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Recent Transactions */}
-        <RecentTransactions transactions={filteredTransactions} />
+        <Card className="w-full min-w-[280px]">
+          <CardHeader>
+            <CardTitle className="text-xl">Transações recentes</CardTitle>
+          </CardHeader>
+          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+            {hasTransactions ? (
+              <RecentTransactions transactions={filteredTransactions} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+            )}
+          </CardContent>
+        </Card>
         
         {/* Expenses by Category (Pie Chart) */}
-        <Card className="w-full">
+        <Card className="w-full min-w-[280px]">
           <CardHeader>
             <CardTitle className="text-xl">Gastos por categoria</CardTitle>
           </CardHeader>
-          <CardContent className="h-[350px] md:h-[320px]">
+          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
             {hasTransactions ? (
               <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -114,11 +128,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Income vs Expenses (Bar Chart) */}
-        <Card className="w-full">
+        <Card className="w-full min-w-[280px]">
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.revenueVsExpense}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[350px] md:h-[320px]">
+          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
             {hasTransactions ? (
               <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -128,11 +142,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
         
         {/* Daily Balance (Line Chart) */}
-        <Card className="w-full">
+        <Card className="w-full min-w-[280px]">
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[350px] md:h-[320px]">
+          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
             {hasTransactions ? (
               <DailyBarChart transactions={filteredTransactions} />
             ) : (
@@ -145,11 +159,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Row 3 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Financial Goals Progress */}
-        <Card className="w-full">
+        <Card className="w-full min-w-[280px]">
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[350px] md:h-[320px]">
+          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
             {hasSavingGoals ? (
               <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
             ) : (
@@ -159,11 +173,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
         
         {/* Income by Type Chart */}
-        <Card className="w-full">
+        <Card className="w-full min-w-[280px]">
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[350px] md:h-[320px]">
+          <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
             {hasTransactions ? (
               <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
             ) : (

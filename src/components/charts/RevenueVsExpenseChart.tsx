@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LegendProps, LegendType } from 'recharts';
 import { Transaction } from '@/services/transactions';
@@ -82,7 +81,7 @@ const processChartData = (transactions: Transaction[], period: string) => {
   );
   
   // Group by month
-  const monthlyData = new Map<string, { income: number; expense: number }>();
+  const monthlyData = new Map<string, { month: string; income: number; expense: number; monthKey: string }>();
 
   // Determine how many months to display based on the period
   let monthsToDisplay = 1;
@@ -131,9 +130,7 @@ const CustomLegend = (props: LegendProps) => {
 
   return (
     <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-2 mt-2">
-      {payload.map((entry, index) => {
-        // O erro ocorre porque .value é usado em vez de .value (pode ter sido digitado errado)
-        // Vamos extrair a informação correta
+      {payload.map((entry: any, index: number) => {
         if (!entry || !entry.payload) return null;
         
         const value = entry.value;
@@ -148,10 +145,9 @@ const CustomLegend = (props: LegendProps) => {
             <span className="text-sm font-medium">
               {value === 'income' ? 'Receita:' : 'Despesa:'}
               {' '}
-              {entry.payload.formatValue ? 
-                entry.payload.formatValue(entry.payload[value]) : 
-                formatCurrencyNoDecimals(entry.payload[value] || 0)
-              }
+              {entry.payload && typeof entry.payload[value] === 'number' ? 
+                formatCurrencyNoDecimals(entry.payload[value] || 0) : 
+                '0'}
             </span>
           </div>
         );
@@ -170,21 +166,19 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   
   // Process data for the chart based on selected period
   const chartData = useMemo(() => {
-    return processChartData(transactions, period);
+    const data = processChartData(transactions, period);
+    
+    // Add formatValue function to each data point for the legend
+    return data.map(item => ({
+      ...item,
+      // Add formatter function to each data item
+      formatValue: (val: number) => formatCurrencyNoDecimals(val)
+    }));
   }, [transactions, period]);
   
   if (chartData.length === 0) {
     return <div className="text-center text-gray-500">Sem dados para exibir.</div>;
   }
-  
-  // Format values for display
-  const formatValue = (value: number) => formatCurrencyNoDecimals(value || 0);
-  
-  // Add formatValue to each data point for the legend
-  const enhancedData = chartData.map(item => ({
-    ...item,
-    formatValue
-  }));
 
   return (
     <div className="h-full w-full flex flex-col">
@@ -232,7 +226,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={enhancedData}
+              data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 30 }}
               barGap={5}
             >
@@ -247,7 +241,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
-                tickFormatter={formatValue}
+                tickFormatter={(value) => formatCurrencyNoDecimals(value)}
               />
               <Tooltip 
                 content={
