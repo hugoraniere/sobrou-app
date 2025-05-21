@@ -29,7 +29,7 @@ const SidebarNav = () => {
 
   const navigationItems = [
     {
-      name: t('common.dashboard', 'Dashboard'),
+      name: 'Dashboard',
       path: '/dashboard',
       icon: <LayoutDashboard className="w-5 h-5" />,
     },

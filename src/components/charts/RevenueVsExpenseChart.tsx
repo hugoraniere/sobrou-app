@@ -39,7 +39,7 @@ const filterOptions = [
   { value: '7days', label: 'Últimos 7 dias' },
   { value: '15days', label: 'Últimos 15 dias' },
   { value: '30days', label: 'Últimos 30 dias' },
-  { value: 'thisMonth', label: 'Mês atual' },
+  { value: 'thisMonth', label: 'Este mês' },
   { value: '3months', label: 'Últimos 3 meses' },
   { value: '6months', label: 'Últimos 6 meses' }
 ];
@@ -49,7 +49,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   chartConfig
 }) => {
   const { t, i18n } = useTranslation();
-  const [filter, setFilter] = useState('thisMonth');
+  const [filter, setFilter] = useState('thisMonth'); // Default para "Este mês"
   const [viewMode, setViewMode] = useState('monthly'); // 'monthly' ou 'daily'
   
   // Function to get data based on filter and viewMode
@@ -97,20 +97,18 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   
   // Function to get monthly data
   const getMonthlyData = (filteredTransactions: Transaction[], startDate: Date, endDate: Date) => {
-    const monthMap = new Map<string, { income: number; expense: number; balance: number; date: Date }>();
+    const monthMap = new Map<string, { income: number; expense: number; date: Date }>();
     
     let currentDate = new Date(startDate);
     
     // Criar entradas para cada mês no intervalo
     while (currentDate <= endDate) {
       const monthKey = format(currentDate, 'yyyy-MM');
-      const monthLabel = format(currentDate, 'MMM', { locale: i18n.language === 'pt-BR' ? ptBR : undefined });
       
       if (!monthMap.has(monthKey)) {
         monthMap.set(monthKey, { 
           income: 0, 
           expense: 0, 
-          balance: 0,
           date: new Date(currentDate)
         });
       }
@@ -131,7 +129,6 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         } else if (tx.type === 'expense') {
           monthData.expense += tx.amount;
         }
-        monthData.balance = monthData.income - monthData.expense;
       }
     });
     
@@ -141,7 +138,6 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         month: format(data.date, 'MMM', { locale: i18n.language === 'pt-BR' ? ptBR : undefined }),
         income: data.income,
         expense: data.expense,
-        balance: data.balance,
         fullDate: data.date
       }))
       .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
@@ -149,7 +145,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   
   // Function to get daily data
   const getDailyData = (filteredTransactions: Transaction[], startDate: Date, endDate: Date) => {
-    const dayMap = new Map<string, { income: number; expense: number; balance: number; date: Date }>();
+    const dayMap = new Map<string, { income: number; expense: number; date: Date }>();
     
     let currentDate = new Date(startDate);
     
@@ -161,7 +157,6 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         dayMap.set(dayKey, { 
           income: 0, 
           expense: 0, 
-          balance: 0,
           date: new Date(currentDate)
         });
       }
@@ -182,7 +177,6 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         } else if (tx.type === 'expense') {
           dayData.expense += tx.amount;
         }
-        dayData.balance = dayData.income - dayData.expense;
       }
     });
     
@@ -192,7 +186,6 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         day: format(data.date, 'dd/MM', { locale: i18n.language === 'pt-BR' ? ptBR : undefined }),
         income: data.income,
         expense: data.expense,
-        balance: data.balance,
         fullDate: data.date
       }))
       .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
@@ -217,7 +210,6 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   const getInsightMessage = () => {
     if (chartData.length === 0) return "";
     
-    let balance = 0;
     let totalIncome = 0;
     let totalExpense = 0;
     
@@ -226,7 +218,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
       totalExpense += item.expense || 0;
     });
     
-    balance = totalIncome - totalExpense;
+    const balance = totalIncome - totalExpense;
     
     if (balance > 0) {
       return `Neste período, você economizou ${formatCurrency(balance)}.`;
@@ -303,6 +295,12 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                 <Legend 
                   verticalAlign="bottom"
                   height={36}
+                  formatter={(value, entry) => {
+                    // Encontrar o valor total para exibir na legenda
+                    const type = entry.dataKey as "income" | "expense";
+                    const total = chartData.reduce((sum, item) => sum + (item[type] || 0), 0);
+                    return `${value}: ${formatCurrency(total)}`;
+                  }}
                 />
                 <Bar 
                   dataKey="income" 
@@ -316,14 +314,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                   fill="#ef4444" 
                   radius={[4, 4, 0, 0]}
                 />
-                {viewMode === 'monthly' && (
-                  <Bar 
-                    dataKey="balance" 
-                    name={t('common.balance', 'Saldo')} 
-                    fill="#3b82f6" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                )}
+                {/* Barra de Saldo removida conforme solicitado */}
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>

@@ -16,8 +16,8 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({ transactions }) =
   return (
     <CardContent className="p-6 bg-white">
       <div className="w-full space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="lg:col-span-1">
             <InsightsList 
               insights={insights} 
               isLoading={isLoading} 
@@ -25,7 +25,7 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({ transactions }) =
             />
           </div>
           <div className="lg:col-span-1">
-            {/* Traditional insights with charts and metrics */}
+            {/* Traditional insights with metrics */}
             <FinancialInsights transactions={transactions} />
           </div>
         </div>
