@@ -97,7 +97,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   };
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden px-4 md:px-6">
+    <div className="space-y-6 w-full max-w-full">
       {/* Card de Visão Geral com Big Numbers */}
       <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 
@@ -115,7 +115,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </div>
         
         {hasTransactions ? (
-          <RecentTransactions transactions={filteredTransactions} />
+          <div className="bg-white rounded-lg border p-4">
+            <RecentTransactions transactions={filteredTransactions} />
+          </div>
         ) : (
           <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
         )}
@@ -126,7 +128,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <CardHeader>
           <CardTitle className="text-xl">Gastos por categoria</CardTitle>
         </CardHeader>
-        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+        <CardContent className="h-[320px] md:h-[420px]">
           {hasTransactions ? (
             <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
           ) : (
@@ -140,7 +142,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <CardHeader>
           <CardTitle className="text-xl">{TEXT.dashboard.charts.revenueVsExpense}</CardTitle>
         </CardHeader>
-        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+        <CardContent className="h-[320px] md:h-[420px]">
           {hasTransactions ? (
             <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
           ) : (
@@ -154,7 +156,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <CardHeader>
           <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
         </CardHeader>
-        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+        <CardContent className="h-[320px] md:h-[420px]">
           {hasTransactions ? (
             <DailyBarChart transactions={filteredTransactions} />
           ) : (
@@ -168,7 +170,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <CardHeader>
           <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
         </CardHeader>
-        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+        <CardContent className="h-[320px] md:h-[420px]">
           {hasSavingGoals ? (
             <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
           ) : (
@@ -182,7 +184,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <CardHeader>
           <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
         </CardHeader>
-        <CardContent className={`${isMobile ? 'h-[420px]' : 'h-[320px]'} overflow-auto`}>
+        <CardContent className="h-[320px] md:h-[420px]">
           {hasTransactions ? (
             <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
           ) : (

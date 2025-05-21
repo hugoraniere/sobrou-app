@@ -4,7 +4,6 @@ import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
 import DashboardOverview from './tabs/DashboardOverview';
 import DashboardInsights from './tabs/DashboardInsights';
-import { Grid } from 'lucide-react';
 
 interface DashboardContentProps {
   transactions: Transaction[];
@@ -35,7 +34,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   onTransactionUpdated,
 }) => {
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
+    <div className="w-full max-w-full overflow-x-hidden px-4 md:px-6">
       {/* Visão Geral */}
       <div>
         <DashboardOverview 
@@ -45,7 +44,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       </div>
       
       {/* Insights */}
-      <div className="bg-white rounded-lg border p-6 mt-6 mx-4 md:mx-6">
+      <div className="bg-white rounded-lg border p-6 mt-6">
         <h2 className="text-2xl font-semibold mb-6">Insights</h2>
         <DashboardInsights transactions={transactions} />
       </div>
@@ -54,8 +53,3 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
 };
 
 export default DashboardContent;
-
-// Removidos os componentes não utilizados
-// import RecentTransactions from './RecentTransactions';
-// import DashboardCharts from './DashboardCharts';
-// import ExpensesByCategoryChart from '../charts/ExpensesByCategoryChart';

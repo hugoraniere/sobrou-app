@@ -6,7 +6,7 @@ import HeaderLogo from './header/HeaderLogo';
 import { useTranslation } from 'react-i18next';
 import AddTransactionDialog from './transactions/AddTransactionDialog';
 import HeaderDesktopNav from './header/HeaderDesktopNav';
-import { useMobile } from '@/hooks/useMobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
@@ -15,7 +15,7 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
 
   return (
     <>

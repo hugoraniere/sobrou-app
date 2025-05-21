@@ -15,7 +15,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions })
   const recentTransactions = transactions.slice(0, 5); // Últimas 5 transações
   
   return (
-    <div className="space-y-4 bg-white rounded-lg border p-4">
+    <div className="space-y-4">
       {recentTransactions.length === 0 ? (
         <div className="text-center py-6 text-gray-500">
           Nenhuma transação encontrada
