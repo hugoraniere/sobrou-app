@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Transaction } from '@/services/transactions';
 import DashboardBigNumbers from './DashboardBigNumbers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,11 @@ const DashboardOverviewCard: React.FC<DashboardOverviewCardProps> = ({
 }) => {
   const [activePeriod, setActivePeriod] = useState<PeriodFilter>('this-month');
   const [filteredTransactions, setFilteredTransactions] = useState(transactions);
+  
+  // Efeito para filtrar transações quando transactions muda ou quando o período muda
+  useEffect(() => {
+    filterTransactionsByPeriod(activePeriod);
+  }, [transactions, activePeriod]);
   
   // Filtrar transações com base no período selecionado
   const filterTransactionsByPeriod = (period: PeriodFilter) => {
@@ -52,7 +57,6 @@ const DashboardOverviewCard: React.FC<DashboardOverviewCardProps> = ({
     });
     
     setFilteredTransactions(filtered);
-    setActivePeriod(period);
   };
   
   // Configurar os labels dos filtros
@@ -79,7 +83,7 @@ const DashboardOverviewCard: React.FC<DashboardOverviewCardProps> = ({
                 key={filter.id}
                 variant={activePeriod === filter.id ? "default" : "outline"}
                 size="sm"
-                onClick={() => filterTransactionsByPeriod(filter.id)}
+                onClick={() => setActivePeriod(filter.id)}
               >
                 {filter.label}
               </Button>

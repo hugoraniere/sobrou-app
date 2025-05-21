@@ -13,7 +13,6 @@ import { transactionCategories } from '@/data/categories';
 import { TEXT } from '@/constants/text';
 import EmptyStateMessage from './EmptyStateMessage';
 import RecentTransactions from './RecentTransactions';
-import PeriodFilterButton from '../transactions/molecules/PeriodFilterButton';
 import { CATEGORY_COLORS } from '@/constants/categoryColors';
 
 interface OverviewDashboardProps {
@@ -25,42 +24,13 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   transactions,
   savingGoals
 }) => {
+  // Inicializa filteredTransactions com todas as transações
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
-  const [periodLabel, setPeriodLabel] = useState<string>("Mês atual");
   
-  // Inicializa com o primeiro dia do mês atual até hoje
+  // Atualiza quando transactions mudar
   useEffect(() => {
-    const today = new Date();
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    filterTransactionsByPeriod(startOfMonth, today);
+    setFilteredTransactions(transactions);
   }, [transactions]);
-  
-  const filterTransactionsByPeriod = (startDate: Date, endDate: Date) => {
-    const filtered = transactions.filter(transaction => {
-      const transactionDate = new Date(transaction.date);
-      return transactionDate >= startDate && transactionDate <= endDate;
-    });
-    
-    setFilteredTransactions(filtered);
-    
-    // Atualiza o rótulo do período
-    const today = new Date();
-    if (
-      startDate.getDate() === 1 && 
-      startDate.getMonth() === today.getMonth() && 
-      startDate.getFullYear() === today.getFullYear() &&
-      endDate.getTime() === today.setHours(23, 59, 59, 999)
-    ) {
-      setPeriodLabel("Mês atual");
-    } else if (
-      startDate.getTime() === new Date().setHours(0, 0, 0, 0) &&
-      endDate.getTime() === today.setHours(23, 59, 59, 999)
-    ) {
-      setPeriodLabel("Hoje");
-    } else {
-      setPeriodLabel(`${startDate.toLocaleDateString()} a ${endDate.toLocaleDateString()}`);
-    }
-  };
   
   const hasTransactions = filteredTransactions.length > 0;
   const hasSavingGoals = savingGoals.length > 0;
@@ -118,12 +88,6 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
-      {/* Filtro de período */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Dados para: {periodLabel}</h2>
-        <PeriodFilterButton onApplyFilter={filterTransactionsByPeriod} />
-      </div>
-      
       {/* Card de Visão Geral com Big Numbers */}
       <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 

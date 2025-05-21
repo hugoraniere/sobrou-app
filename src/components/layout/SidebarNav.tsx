@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,7 +29,7 @@ const SidebarNav = () => {
 
   const navigationItems = [
     {
-      name: t('common.dashboard', 'Visão Geral'),
+      name: t('common.dashboard', 'Dashboard'),
       path: '/dashboard',
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
