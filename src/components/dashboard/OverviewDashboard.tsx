@@ -149,7 +149,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Income vs Expenses (Line Chart) */}
+        {/* Income vs Expenses (Bar Chart) */}
         <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.revenueVsExpense}</CardTitle>

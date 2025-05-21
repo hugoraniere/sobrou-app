@@ -10,13 +10,13 @@ export const DASHBOARD_TEXT = {
     analytics: "Análises"
   },
   charts: {
-    categoryBreakdown: "Distribuição por categoria",
+    categoryBreakdown: "Gastos por categoria",
     expensesByCategory: "Gastos por Categoria",
     incomeByType: "Fontes de receita",
     dailyEvolution: "Movimentações diárias",
     balanceByAccount: "Saldo por conta/cartão",
     monthlyComparison: "Comparação mensal",
-    revenueVsExpense: "Receita vs Despesa (últimos 6 meses)",
+    revenueVsExpense: "Receita vs Despesa",
     financialGoals: "Metas financeiras",
     balanceEvolution: "Evolução do saldo",
     noData: "Sem dados para exibir",
