@@ -7,13 +7,14 @@ import IncomeByTypeChart from '../charts/IncomeByTypeChart';
 import DailyBarChart from '../charts/DailyBarChart';
 import RevenueVsExpenseChart from '../charts/RevenueVsExpenseChart';
 import FinancialGoalsProgress from '../charts/FinancialGoalsProgress';
-import DashboardBigNumbers from './DashboardBigNumbers';
+import DashboardOverviewCard from './DashboardOverviewCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { transactionCategories } from '@/data/categories';
 import { TEXT } from '@/constants/text';
 import EmptyStateMessage from './EmptyStateMessage';
 import RecentTransactions from './RecentTransactions';
 import PeriodFilterButton from '../transactions/molecules/PeriodFilterButton';
+import { CATEGORY_COLORS } from '@/constants/categoryColors';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -99,20 +100,19 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     }
   };
 
-  // Add category colors
+  // Add category colors from our new color tokens
   transactions.forEach(transaction => {
     const categoryId = transaction.category;
     if (!chartConfig[categoryId]) {
-      const categoryInfo = transactionCategories.find(cat => cat.id === categoryId);
-      if (categoryInfo) {
-        chartConfig[categoryId] = {
-          label: categoryInfo.name,
-          theme: {
-            light: categoryInfo.color,
-            dark: categoryInfo.color
-          }
-        };
-      }
+      // Use our new color tokens
+      const categoryColor = CATEGORY_COLORS[categoryId as keyof typeof CATEGORY_COLORS] || "#CFCFCF";
+      chartConfig[categoryId] = {
+        label: transactionCategories.find(cat => cat.id === categoryId)?.name || categoryId,
+        theme: {
+          light: categoryColor,
+          dark: categoryColor
+        }
+      };
     }
   });
 
@@ -124,8 +124,8 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <PeriodFilterButton onApplyFilter={filterTransactionsByPeriod} />
       </div>
       
-      {/* Big Numbers */}
-      <DashboardBigNumbers transactions={filteredTransactions} totalSavings={totalSavings} />
+      {/* Card de Visão Geral com Big Numbers */}
+      <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 
       {/* Row 1 - Recent Transactions & Expenses by Category */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

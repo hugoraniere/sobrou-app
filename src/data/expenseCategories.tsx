@@ -14,6 +14,7 @@ import {
   Gift,
   HelpCircle
 } from 'lucide-react';
+import { CATEGORY_COLORS } from '@/constants/categoryColors';
 
 export const expenseCategories: CategoryType[] = [
   { 
@@ -22,7 +23,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'alimentacao',
     type: 'expense',
     label: 'Alimentação',
-    color: 'text-red-800',
+    color: 'bg-[#E15759]',
     icon: Utensils
   },
   { 
@@ -31,7 +32,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'moradia',
     type: 'expense',
     label: 'Moradia',
-    color: 'text-blue-800',
+    color: 'bg-[#4E79A7]',
     icon: Home
   },
   { 
@@ -40,7 +41,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'transporte',
     type: 'expense',
     label: 'Transporte',
-    color: 'text-yellow-800',
+    color: 'bg-[#F28E2B]',
     icon: Car
   },
   { 
@@ -49,7 +50,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'internet',
     type: 'expense',
     label: 'Internet',
-    color: 'text-purple-800',
+    color: 'bg-[#A173D1]',
     icon: Wifi
   },
   { 
@@ -58,7 +59,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'cartao',
     type: 'expense',
     label: 'Cartão',
-    color: 'text-indigo-800',
+    color: 'bg-[#7F7F7F]',
     icon: CreditCard
   },
   { 
@@ -67,7 +68,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'saude',
     type: 'expense',
     label: 'Saúde',
-    color: 'text-green-800',
+    color: 'bg-[#59A14F]',
     icon: Heart
   },
   { 
@@ -76,7 +77,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'lazer',
     type: 'expense',
     label: 'Lazer',
-    color: 'text-pink-800',
+    color: 'bg-[#B07AA1]',
     icon: Gamepad
   },
   { 
@@ -85,7 +86,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'compras',
     type: 'expense',
     label: 'Compras',
-    color: 'text-gray-800',
+    color: 'bg-[#E377C2]',
     icon: ShoppingBag
   },
   { 
@@ -94,7 +95,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'investimentos',
     type: 'expense',
     label: 'Investimentos',
-    color: 'text-emerald-800',
+    color: 'bg-[#1F7C38]',
     icon: LineChart
   },
   { 
@@ -103,7 +104,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'familia',
     type: 'expense',
     label: 'Família',
-    color: 'text-cyan-800',
+    color: 'bg-[#76B7B2]',
     icon: Users
   },
   { 
@@ -112,7 +113,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'doacoes',
     type: 'expense',
     label: 'Doações',
-    color: 'text-rose-800',
+    color: 'bg-[#FFC107]',
     icon: Gift
   },
   { 
@@ -121,7 +122,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'other',
     type: 'expense',
     label: 'Outros',
-    color: 'text-gray-800',
+    color: 'bg-[#CFCFCF]',
     icon: HelpCircle
   },
   { 
@@ -130,7 +131,7 @@ export const expenseCategories: CategoryType[] = [
     value: 'outros',
     type: 'expense',
     label: 'Outros',
-    color: 'text-gray-800',
+    color: 'bg-[#CFCFCF]',
     icon: HelpCircle
   }
 ];

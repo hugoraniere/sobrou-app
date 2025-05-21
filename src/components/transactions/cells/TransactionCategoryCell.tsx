@@ -5,6 +5,7 @@ import { transactionCategories } from '@/data/categories';
 import { cn } from '@/lib/utils';
 import { CircleDot } from 'lucide-react';
 import { getCategoryIcon } from '@/utils/categoryIcons';
+import { getCategoryColor } from '@/constants/categoryColors';
 
 interface TransactionCategoryCellProps {
   category: string;
@@ -22,12 +23,16 @@ const TransactionCategoryCell: React.FC<TransactionCategoryCellProps> = ({ categ
   };
 
   const IconComponent = getCategoryIcon(category);
+  const bgColor = getCategoryColor(category);
   
   return (
     <TableCell className={cn("min-w-[140px] whitespace-nowrap", className)}>
       <div className="flex items-center gap-2">
-        <span className="flex-shrink-0 bg-gray-200 p-1 rounded-full">
-          <IconComponent className="h-4 w-4 text-gray-700" />
+        <span 
+          className="flex-shrink-0 p-1 rounded-full"
+          style={{ backgroundColor: bgColor }}
+        >
+          <IconComponent className="h-4 w-4 text-white" />
         </span>
         <span className="text-sm font-medium">
           {categoryData.label || categoryData.name}

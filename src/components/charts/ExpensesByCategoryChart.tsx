@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import { transactionCategories } from '@/data/categories';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
+import { getCategoryColor } from '@/constants/categoryColors';
 
 interface ExpensesByCategoryChartProps {
   expenses: Transaction[];
@@ -33,7 +34,7 @@ const processChartData = (expenses: Transaction[]) => {
       name: categoryInfo?.name || category,
       value,
       id: category,
-      color: categoryInfo?.color || '#8884d8',
+      color: getCategoryColor(category), // Usar nossa nova função de cores
       percentage: 0 // Será calculado em seguida
     };
   }).sort((a, b) => b.value - a.value); // Ordenar por valor, decrescente
@@ -78,13 +79,15 @@ const calculatePercentages = (data: any[]) => {
       largeCategories[existingOthersIndex].value += othersTotal;
       largeCategories[existingOthersIndex].percentage += othersPercentage;
       largeCategories[existingOthersIndex].name = 'Outros';
+      largeCategories[existingOthersIndex].id = 'outros';
+      largeCategories[existingOthersIndex].color = getCategoryColor('outros');
     } else {
       // Cria uma nova categoria "Outros"
       largeCategories.push({
         name: 'Outros',
         value: othersTotal,
         id: 'outros',
-        color: '#CCCCCC', // Cor para "Outros"
+        color: getCategoryColor('outros'),
         percentage: othersPercentage
       });
     }
@@ -130,9 +133,6 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   // Get top category for insight
   const topCategory = data.length > 0 ? data[0] : null;
   
-  // Generate colors for pie chart segments
-  const COLORS = data.map(item => item.color || '#8884d8');
-  
   if (data.length === 0) {
     return null;
   }
@@ -172,7 +172,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
                   {data.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill={entry.color || COLORS[index % COLORS.length]} 
+                      fill={entry.color}
                     />
                   ))}
                 </Pie>
