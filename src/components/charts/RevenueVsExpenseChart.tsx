@@ -1,329 +1,284 @@
 
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart";
-import {
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
-  BarChart,
-  Bar,
-  Tooltip,
-  ReferenceLine
-} from "recharts";
+import React, { useState, useEffect, useMemo } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LegendProps, LegendType } from 'recharts';
 import { Transaction } from '@/services/transactions';
-import { subDays, subMonths, format, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { useTranslation } from 'react-i18next';
+import { formatCurrencyNoDecimals } from '@/utils/currencyUtils';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { addMonths, format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface RevenueVsExpenseChartProps {
   transactions: Transaction[];
   chartConfig: any;
 }
 
-// Opções de filtro
-const filterOptions = [
-  { value: '7days', label: 'Últimos 7 dias' },
-  { value: '15days', label: 'Últimos 15 dias' },
-  { value: '30days', label: 'Últimos 30 dias' },
-  { value: 'thisMonth', label: 'Este mês' },
-  { value: '3months', label: 'Últimos 3 meses' },
-  { value: '6months', label: 'Últimos 6 meses' }
-];
+// Helper to get date range for periods
+const getDateRangeForPeriod = (period: string) => {
+  const now = new Date();
+  
+  switch (period) {
+    case 'this-month':
+      return {
+        startDate: startOfMonth(now),
+        endDate: endOfMonth(now),
+        label: 'Este mês'
+      };
+    case 'last-month':
+      const lastMonth = subMonths(now, 1);
+      return {
+        startDate: startOfMonth(lastMonth),
+        endDate: endOfMonth(lastMonth),
+        label: 'Mês passado'
+      };
+    case 'last-3-months':
+      return {
+        startDate: startOfMonth(subMonths(now, 2)),
+        endDate: endOfMonth(now),
+        label: 'Últimos 3 meses'
+      };
+    case 'last-6-months':
+      return {
+        startDate: startOfMonth(subMonths(now, 5)),
+        endDate: endOfMonth(now),
+        label: 'Últimos 6 meses'
+      };
+    case 'this-year':
+      return {
+        startDate: new Date(now.getFullYear(), 0, 1),
+        endDate: new Date(now.getFullYear(), 11, 31),
+        label: 'Este ano'
+      };
+    default:
+      return {
+        startDate: startOfMonth(now),
+        endDate: endOfMonth(now),
+        label: 'Este mês'
+      };
+  }
+};
+
+// Helper to filter transactions by date range
+const filterTransactionsByDateRange = (
+  transactions: Transaction[],
+  startDate: Date,
+  endDate: Date
+): Transaction[] => {
+  return transactions.filter((transaction) => {
+    const transactionDate = new Date(transaction.date);
+    return transactionDate >= startDate && transactionDate <= endDate;
+  });
+};
+
+// Helper to process data for chart
+const processChartData = (transactions: Transaction[], period: string) => {
+  const { startDate, endDate } = getDateRangeForPeriod(period);
+  const filteredTransactions = filterTransactionsByDateRange(
+    transactions,
+    startDate,
+    endDate
+  );
+  
+  // Group by month
+  const monthlyData = new Map<string, { income: number; expense: number }>();
+
+  // Determine how many months to display based on the period
+  let monthsToDisplay = 1;
+  if (period === 'last-3-months') monthsToDisplay = 3;
+  if (period === 'last-6-months') monthsToDisplay = 6;
+  if (period === 'this-year') monthsToDisplay = 12;
+
+  // Initialize months
+  for (let i = 0; i < monthsToDisplay; i++) {
+    const date = subMonths(endDate, monthsToDisplay - i - 1);
+    const monthKey = format(date, 'yyyy-MM');
+    const monthLabel = format(date, 'MMM', { locale: ptBR });
+    
+    monthlyData.set(monthKey, { 
+      month: monthLabel, 
+      income: 0, 
+      expense: 0,
+      monthKey
+    });
+  }
+
+  // Populate with actual data
+  filteredTransactions.forEach((transaction) => {
+    const transactionDate = new Date(transaction.date);
+    const monthKey = format(transactionDate, 'yyyy-MM');
+    
+    if (monthlyData.has(monthKey)) {
+      const monthData = monthlyData.get(monthKey)!;
+      
+      if (transaction.type === 'income') {
+        monthData.income += transaction.amount;
+      } else if (transaction.type === 'expense') {
+        monthData.expense += transaction.amount;
+      }
+    }
+  });
+
+  return Array.from(monthlyData.values());
+};
+
+// Custom legend component to show formatted values
+const CustomLegend = (props: LegendProps) => {
+  const { payload } = props;
+  
+  if (!payload || !payload.length) return null;
+
+  return (
+    <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-2 mt-2">
+      {payload.map((entry, index) => {
+        // O erro ocorre porque .value é usado em vez de .value (pode ter sido digitado errado)
+        // Vamos extrair a informação correta
+        if (!entry || !entry.payload) return null;
+        
+        const value = entry.value;
+        const color = entry.color;
+        
+        return (
+          <div key={`legend-${index}`} className="flex items-center gap-2">
+            <div
+              className="h-3 w-3 rounded-sm"
+              style={{ backgroundColor: color }}
+            />
+            <span className="text-sm font-medium">
+              {value === 'income' ? 'Receita:' : 'Despesa:'}
+              {' '}
+              {entry.payload.formatValue ? 
+                entry.payload.formatValue(entry.payload[value]) : 
+                formatCurrencyNoDecimals(entry.payload[value] || 0)
+              }
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({ 
   transactions,
   chartConfig
 }) => {
-  const { t, i18n } = useTranslation();
-  const [filter, setFilter] = useState('thisMonth'); // Default para "Este mês"
-  const [viewMode, setViewMode] = useState('monthly'); // 'monthly' ou 'daily'
+  const { t } = useTranslation();
+  const [period, setPeriod] = useState('this-month');
+  const [viewMode, setViewMode] = useState('monthly');
   
-  // Function to get data based on filter and viewMode
-  const getChartData = () => {
-    const today = new Date();
-    let startDate: Date;
-    let endDate = today;
-    
-    // Determinar a data de início com base no filtro
-    switch (filter) {
-      case '7days':
-        startDate = subDays(today, 7);
-        break;
-      case '15days':
-        startDate = subDays(today, 15);
-        break;
-      case '30days':
-        startDate = subDays(today, 30);
-        break;
-      case 'thisMonth':
-        startDate = startOfMonth(today);
-        break;
-      case '3months':
-        startDate = subMonths(today, 3);
-        break;
-      case '6months':
-        startDate = subMonths(today, 6);
-        break;
-      default:
-        startDate = startOfMonth(today);
-    }
-    
-    // Filtrar transações no intervalo de datas
-    const filteredTransactions = transactions.filter(transaction => {
-      const txDate = new Date(transaction.date);
-      return isWithinInterval(txDate, { start: startDate, end: endDate });
-    });
-    
-    if (viewMode === 'monthly') {
-      return getMonthlyData(filteredTransactions, startDate, endDate);
-    } else {
-      return getDailyData(filteredTransactions, startDate, endDate);
-    }
-  };
+  // Process data for the chart based on selected period
+  const chartData = useMemo(() => {
+    return processChartData(transactions, period);
+  }, [transactions, period]);
   
-  // Function to get monthly data
-  const getMonthlyData = (filteredTransactions: Transaction[], startDate: Date, endDate: Date) => {
-    const monthMap = new Map<string, { income: number; expense: number; date: Date }>();
-    
-    let currentDate = new Date(startDate);
-    
-    // Criar entradas para cada mês no intervalo
-    while (currentDate <= endDate) {
-      const monthKey = format(currentDate, 'yyyy-MM');
-      
-      if (!monthMap.has(monthKey)) {
-        monthMap.set(monthKey, { 
-          income: 0, 
-          expense: 0, 
-          date: new Date(currentDate)
-        });
-      }
-      
-      // Avança para o próximo mês
-      currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-    }
-    
-    // Somar transações por mês
-    filteredTransactions.forEach(tx => {
-      const txDate = new Date(tx.date);
-      const monthKey = format(txDate, 'yyyy-MM');
-      
-      if (monthMap.has(monthKey)) {
-        const monthData = monthMap.get(monthKey)!;
-        if (tx.type === 'income') {
-          monthData.income += tx.amount;
-        } else if (tx.type === 'expense') {
-          monthData.expense += tx.amount;
-        }
-      }
-    });
-    
-    // Converter para array e ordenar por data
-    return Array.from(monthMap.entries())
-      .map(([key, data]) => ({
-        month: format(data.date, 'MMM', { locale: i18n.language === 'pt-BR' ? ptBR : undefined }),
-        income: data.income,
-        expense: data.expense,
-        fullDate: data.date
-      }))
-      .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
-  };
+  if (chartData.length === 0) {
+    return <div className="text-center text-gray-500">Sem dados para exibir.</div>;
+  }
   
-  // Function to get daily data
-  const getDailyData = (filteredTransactions: Transaction[], startDate: Date, endDate: Date) => {
-    const dayMap = new Map<string, { income: number; expense: number; date: Date }>();
-    
-    let currentDate = new Date(startDate);
-    
-    // Criar entradas para cada dia no intervalo
-    while (currentDate <= endDate) {
-      const dayKey = format(currentDate, 'yyyy-MM-dd');
-      
-      if (!dayMap.has(dayKey)) {
-        dayMap.set(dayKey, { 
-          income: 0, 
-          expense: 0, 
-          date: new Date(currentDate)
-        });
-      }
-      
-      // Avança para o próximo dia
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    
-    // Somar transações por dia
-    filteredTransactions.forEach(tx => {
-      const txDate = new Date(tx.date);
-      const dayKey = format(txDate, 'yyyy-MM-dd');
-      
-      if (dayMap.has(dayKey)) {
-        const dayData = dayMap.get(dayKey)!;
-        if (tx.type === 'income') {
-          dayData.income += tx.amount;
-        } else if (tx.type === 'expense') {
-          dayData.expense += tx.amount;
-        }
-      }
-    });
-    
-    // Converter para array e ordenar por data
-    return Array.from(dayMap.entries())
-      .map(([key, data]) => ({
-        day: format(data.date, 'dd/MM', { locale: i18n.language === 'pt-BR' ? ptBR : undefined }),
-        income: data.income,
-        expense: data.expense,
-        fullDate: data.date
-      }))
-      .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
-  };
+  // Format values for display
+  const formatValue = (value: number) => formatCurrencyNoDecimals(value || 0);
   
-  const formatCurrency = (value: number) => {
-    const locale = i18n.language === 'pt-BR' ? 'pt-BR' : 'en-US';
-    const currency = locale === 'pt-BR' ? 'BRL' : 'USD';
-    
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-  
-  // Get data based on current filter
-  const chartData = getChartData();
-  
-  // Create insight message
-  const getInsightMessage = () => {
-    if (chartData.length === 0) return "";
-    
-    let totalIncome = 0;
-    let totalExpense = 0;
-    
-    chartData.forEach(item => {
-      totalIncome += item.income || 0;
-      totalExpense += item.expense || 0;
-    });
-    
-    const balance = totalIncome - totalExpense;
-    
-    if (balance > 0) {
-      return `Neste período, você economizou ${formatCurrency(balance)}.`;
-    } else if (balance < 0) {
-      return `Você gastou ${formatCurrency(Math.abs(balance))} a mais do que recebeu neste período.`;
-    } else {
-      return "Suas receitas e despesas estão equilibradas neste período.";
-    }
-  };
-  
+  // Add formatValue to each data point for the legend
+  const enhancedData = chartData.map(item => ({
+    ...item,
+    formatValue
+  }));
+
   return (
-    <div className="h-[320px] w-full">
-      {/* Controles de filtro e visualização */}
-      <div className="flex flex-col sm:flex-row justify-between gap-2 mb-3">
-        <div className="flex items-center space-x-2">
-          <Button 
-            size="sm" 
-            variant={viewMode === 'monthly' ? "default" : "outline"}
+    <div className="h-full w-full flex flex-col">
+      {/* Controle de período */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Select
+          defaultValue={period}
+          value={period}
+          onValueChange={setPeriod}
+        >
+          <SelectTrigger className="w-[180px] h-8 text-sm">
+            <SelectValue placeholder="Selecione o período" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="this-month">Este mês</SelectItem>
+            <SelectItem value="last-month">Mês passado</SelectItem>
+            <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
+            <SelectItem value="last-6-months">Últimos 6 meses</SelectItem>
+            <SelectItem value="this-year">Este ano</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <div className="flex ml-auto">
+          <Button
+            variant={viewMode === 'monthly' ? 'default' : 'outline'}
+            size="sm"
+            className="text-xs h-8"
             onClick={() => setViewMode('monthly')}
           >
             Mensal
           </Button>
-          <Button 
-            size="sm" 
-            variant={viewMode === 'daily' ? "default" : "outline"}
+          <Button
+            variant={viewMode === 'daily' ? 'default' : 'outline'}
+            size="sm"
+            className="text-xs h-8"
             onClick={() => setViewMode('daily')}
           >
             Diário
           </Button>
         </div>
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Selecione o período" />
-          </SelectTrigger>
-          <SelectContent>
-            {filterOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
       
-      {/* Insight */}
-      {chartData.length > 0 && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
-          <p>{getInsightMessage()}</p>
-        </div>
-      )}
-      
-      {chartData.length > 0 ? (
-        <div className="h-[200px]">
-          <ChartContainer className="h-full" config={chartConfig}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartData}
-                margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey={viewMode === 'monthly' ? "month" : "day"} 
-                  height={40}
-                  tick={{ fontSize: 11 }}
-                />
-                <YAxis 
-                  tickFormatter={formatCurrency}
-                  width={60}
-                  tick={{ fontSize: 11 }}
-                />
-                <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
-                <Tooltip
-                  formatter={(value: number) => formatCurrency(value)}
-                  labelFormatter={(label) => viewMode === 'monthly' ? `Mês: ${label}` : `Dia: ${label}`}
-                />
-                <Legend 
-                  verticalAlign="bottom"
-                  height={36}
-                  formatter={(value, entry) => {
-                    // Encontrar o valor total para exibir na legenda
-                    const type = entry.dataKey as "income" | "expense";
-                    const total = chartData.reduce((sum, item) => sum + (item[type] || 0), 0);
-                    return `${value}: ${formatCurrency(total)}`;
-                  }}
-                />
-                <Bar 
-                  dataKey="income" 
-                  name={t('common.income', 'Receita')} 
-                  fill="#22c55e" 
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar 
-                  dataKey="expense" 
-                  name={t('common.expense', 'Despesa')} 
-                  fill="#ef4444" 
-                  radius={[4, 4, 0, 0]}
-                />
-                {/* Barra de Saldo removida conforme solicitado */}
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
-      ) : (
-        <div className="h-[200px] flex items-center justify-center text-gray-400">
-          {t('dashboard.charts.noData', 'Sem dados para exibir')}
-        </div>
-      )}
+      {/* Gráfico */}
+      <div className="flex-1 min-h-0">
+        <ChartContainer config={chartConfig}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={enhancedData}
+              margin={{ top: 10, right: 10, left: 0, bottom: 30 }}
+              barGap={5}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+              <XAxis 
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12 }}
+                tickFormatter={formatValue}
+              />
+              <Tooltip 
+                content={
+                  <ChartTooltipContent 
+                    formatter={(value: number) => [
+                      formatCurrencyNoDecimals(value),
+                      ''
+                    ]}
+                  />
+                }
+              />
+              <Legend 
+                content={<CustomLegend />} 
+                verticalAlign="bottom"
+              />
+              <Bar 
+                dataKey="income" 
+                name="income" 
+                fill={chartConfig.income.theme.light} 
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar 
+                dataKey="expense" 
+                name="expense" 
+                fill={chartConfig.expense.theme.light} 
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
     </div>
   );
 };

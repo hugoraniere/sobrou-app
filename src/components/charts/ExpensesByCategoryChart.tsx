@@ -6,6 +6,7 @@ import { transactionCategories } from '@/data/categories';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { useTranslation } from 'react-i18next';
 import { getCategoryColor } from '@/constants/categoryColors';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 interface ExpensesByCategoryChartProps {
   expenses: Transaction[];
@@ -98,25 +99,32 @@ const calculatePercentages = (data: any[]) => {
   return processedData;
 };
 
-// Componente para renderizar legendas personalizadas
+// Componente para renderizar legendas personalizadas com ícones
 const CustomLegend = ({ data }: { data: any[] }) => {
   return (
     <div className="space-y-2 mt-2 max-h-[240px] overflow-y-auto pr-2">
-      {data.map((entry, index) => (
-        <div key={`legend-${index}`} className="flex items-center justify-between gap-2 py-1">
-          <div className="flex items-center gap-2">
-            <div 
-              className="h-3 w-3 rounded-sm flex-shrink-0"
-              style={{ backgroundColor: entry.color }}
-            />
-            <div className="text-sm truncate max-w-[150px]">{entry.name}</div>
+      {data.map((entry, index) => {
+        // Obter o ícone para a categoria
+        const IconComponent = getCategoryIcon(entry.id);
+        
+        return (
+          <div key={`legend-${index}`} className="flex items-center justify-between gap-2 py-1">
+            <div className="flex items-center gap-2">
+              <div 
+                className="h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: entry.color }}
+              >
+                <IconComponent className="h-3.5 w-3.5 text-white" />
+              </div>
+              <div className="text-sm truncate max-w-[150px]">{entry.name}</div>
+            </div>
+            <div className="text-sm font-medium text-right">
+              <span className="block">R$ {Math.round(entry.value)}</span>
+              <span className="block text-gray-500 text-xs">{entry.percentage.toFixed(1)}%</span>
+            </div>
           </div>
-          <div className="text-sm font-medium text-right">
-            <span className="block">R$ {Math.round(entry.value)}</span>
-            <span className="block text-gray-500 text-xs">{entry.percentage.toFixed(1)}%</span>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
@@ -152,7 +160,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
       
       {/* Novo layout com gráfico à esquerda e legenda à direita */}
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-1/2 h-[180px]">
+        <div className="w-full md:w-1/2 h-[180px] md:h-[210px]">
           <ChartContainer 
             className="h-full w-full"
             config={chartConfig}
@@ -198,7 +206,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
           </ChartContainer>
         </div>
         
-        {/* Legenda personalizada à direita */}
+        {/* Legenda personalizada à direita com ícones */}
         <div className="w-full md:w-1/2">
           <CustomLegend data={data} />
         </div>

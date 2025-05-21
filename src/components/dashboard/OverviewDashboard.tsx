@@ -99,9 +99,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         {/* Expenses by Category (Pie Chart) */}
         <Card className="w-full">
           <CardHeader>
-            <CardTitle className="text-xl">{TEXT.dashboard.charts.categoryBreakdown}</CardTitle>
+            <CardTitle className="text-xl">Gastos por categoria</CardTitle>
           </CardHeader>
-          <CardContent className="h-[320px]">
+          <CardContent className="h-[350px] md:h-[320px]">
             {hasTransactions ? (
               <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -118,7 +118,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.revenueVsExpense}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[320px]">
+          <CardContent className="h-[350px] md:h-[320px]">
             {hasTransactions ? (
               <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -132,7 +132,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[320px]">
+          <CardContent className="h-[350px] md:h-[320px]">
             {hasTransactions ? (
               <DailyBarChart transactions={filteredTransactions} />
             ) : (
@@ -149,7 +149,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[320px]">
+          <CardContent className="h-[350px] md:h-[320px]">
             {hasSavingGoals ? (
               <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
             ) : (
@@ -163,7 +163,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[320px]">
+          <CardContent className="h-[350px] md:h-[320px]">
             {hasTransactions ? (
               <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
             ) : (
