@@ -1,4 +1,3 @@
-
 // Helper function to format currency input for Brazilian Real (R$)
 export const formatCurrencyInput = (value: string): string => {
   // Remove any non-digit characters except comma and dot
@@ -45,7 +44,7 @@ export const formatCurrency = (value: number): string => {
   });
 };
 
-// Função ausente que estava causando erro
+// Função para formatação de moeda sem decimais
 export const formatCurrencyNoDecimals = (value: number): string => {
   return value.toLocaleString('pt-BR', {
     style: 'currency',
