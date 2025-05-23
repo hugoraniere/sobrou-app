@@ -1,13 +1,14 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LegendProps, LegendType } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { useTranslation } from 'react-i18next';
 import { formatCurrencyNoDecimals } from '@/utils/currencyUtils';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addMonths, format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
+import { addMonths, format, startOfMonth, endOfMonth, subMonths, eachDayOfInterval, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { DASHBOARD_TEXT } from '@/constants/text/dashboard';
 
 interface RevenueVsExpenseChartProps {
   transactions: Transaction[];
@@ -71,8 +72,8 @@ const filterTransactionsByDateRange = (
   });
 };
 
-// Helper to process data for chart
-const processChartData = (transactions: Transaction[], period: string) => {
+// Process monthly data for chart
+const processMonthlyData = (transactions: Transaction[], period: string) => {
   const { startDate, endDate } = getDateRangeForPeriod(period);
   const filteredTransactions = filterTransactionsByDateRange(
     transactions,
@@ -122,19 +123,68 @@ const processChartData = (transactions: Transaction[], period: string) => {
   return Array.from(monthlyData.values());
 };
 
-// Custom legend component to show formatted values
-const CustomLegend = (props: LegendProps) => {
-  const { payload } = props;
+// Process daily data for chart
+const processDailyData = (transactions: Transaction[], period: string) => {
+  const { startDate, endDate } = getDateRangeForPeriod(period);
+  const filteredTransactions = filterTransactionsByDateRange(
+    transactions,
+    startDate,
+    endDate
+  );
   
-  if (!payload || !payload.length) return null;
+  // Create array of all days in the interval
+  const daysInInterval = eachDayOfInterval({ start: startDate, end: endDate });
+  
+  // Initialize daily data with zero values
+  const dailyData = daysInInterval.map(date => {
+    const dayKey = format(date, 'yyyy-MM-dd');
+    const dayLabel = format(date, 'dd/MM');
+    
+    return {
+      day: dayLabel,
+      dayKey,
+      income: 0,
+      expense: 0
+    };
+  });
+  
+  // Populate with actual transaction data
+  filteredTransactions.forEach(transaction => {
+    const transactionDate = new Date(transaction.date);
+    const dayKey = format(transactionDate, 'yyyy-MM-dd');
+    
+    // Find the corresponding day in our data array
+    const dayIndex = dailyData.findIndex(item => item.dayKey === dayKey);
+    
+    if (dayIndex !== -1) {
+      if (transaction.type === 'income') {
+        dailyData[dayIndex].income += transaction.amount;
+      } else if (transaction.type === 'expense') {
+        dailyData[dayIndex].expense += transaction.amount;
+      }
+    }
+  });
+  
+  return dailyData;
+};
 
+// Custom legend component to show formatted values
+const CustomLegend = ({ payload, viewMode }: { payload: any[], viewMode: string }) => {
+  if (!payload || !payload.length) return null;
+  
+  // Get the latest data point - this ensures we always have values to display
+  const lastDataPoint = payload[0]?.payload;
+
+  if (!lastDataPoint) return null;
+  
   return (
     <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-2 mt-2">
       {payload.map((entry: any, index: number) => {
-        if (!entry || !entry.payload) return null;
+        if (!entry) return null;
         
-        const value = entry.value;
+        const dataKey = entry.dataKey;
         const color = entry.color;
+        const value = lastDataPoint[dataKey];
         
         return (
           <div key={`legend-${index}`} className="flex items-center gap-2">
@@ -143,11 +193,9 @@ const CustomLegend = (props: LegendProps) => {
               style={{ backgroundColor: color }}
             />
             <span className="text-sm font-medium">
-              {value === 'income' ? 'Receita:' : 'Despesa:'}
+              {dataKey === 'income' ? 'Receita:' : 'Despesa:'}
               {' '}
-              {entry.payload && typeof entry.payload[value] === 'number' ? 
-                formatCurrencyNoDecimals(entry.payload[value] || 0) : 
-                '0'}
+              {typeof value === 'number' ? formatCurrencyNoDecimals(value) : 'R$ 0'}
             </span>
           </div>
         );
@@ -156,25 +204,41 @@ const CustomLegend = (props: LegendProps) => {
   );
 };
 
+// Custom tooltip that only shows the value being hovered
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null;
+  
+  // Get only the data for the bar being hovered
+  const hoverData = payload[0];
+  const value = hoverData.value;
+  const type = hoverData.dataKey;
+  
+  return (
+    <div className="bg-white p-2 border rounded shadow text-sm">
+      <p className="label">{label}</p>
+      <p className={`value ${type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
+        {type === 'income' ? 'Receita: ' : 'Despesa: '}
+        {formatCurrencyNoDecimals(value)}
+      </p>
+    </div>
+  );
+};
+
 const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({ 
   transactions,
   chartConfig
 }) => {
-  const { t } = useTranslation();
   const [period, setPeriod] = useState('this-month');
   const [viewMode, setViewMode] = useState('monthly');
   
-  // Process data for the chart based on selected period
+  // Process data for the chart based on selected period and view mode
   const chartData = useMemo(() => {
-    const data = processChartData(transactions, period);
-    
-    // Add formatValue function to each data point for the legend
-    return data.map(item => ({
-      ...item,
-      // Add formatter function to each data item
-      formatValue: (val: number) => formatCurrencyNoDecimals(val)
-    }));
-  }, [transactions, period]);
+    if (viewMode === 'monthly') {
+      return processMonthlyData(transactions, period);
+    } else {
+      return processDailyData(transactions, period);
+    }
+  }, [transactions, period, viewMode]);
   
   if (chartData.length === 0) {
     return <div className="text-center text-gray-500">Sem dados para exibir.</div>;
@@ -227,34 +291,30 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
-              margin={{ top: 10, right: 10, left: 0, bottom: 30 }}
+              margin={{ top: 10, right: 10, left: 0, bottom: viewMode === 'daily' ? 60 : 30 }}
               barGap={5}
+              maxBarSize={viewMode === 'daily' ? 15 : 60}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
               <XAxis 
-                dataKey="month"
+                dataKey={viewMode === 'monthly' ? "month" : "day"}
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
+                angle={viewMode === 'daily' ? -45 : 0}
+                textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
+                height={viewMode === 'daily' ? 50 : 30}
               />
               <YAxis 
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
                 tickFormatter={(value) => formatCurrencyNoDecimals(value)}
+                width={70}
               />
-              <Tooltip 
-                content={
-                  <ChartTooltipContent 
-                    formatter={(value: number) => [
-                      formatCurrencyNoDecimals(value),
-                      ''
-                    ]}
-                  />
-                }
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Legend 
-                content={<CustomLegend />} 
+                content={<CustomLegend payload={chartData} viewMode={viewMode} />}
                 verticalAlign="bottom"
               />
               <Bar 
@@ -262,12 +322,14 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                 name="income" 
                 fill={chartConfig.income.theme.light} 
                 radius={[4, 4, 0, 0]}
+                animationDuration={500}
               />
               <Bar 
                 dataKey="expense" 
                 name="expense" 
                 fill={chartConfig.expense.theme.light} 
                 radius={[4, 4, 0, 0]}
+                animationDuration={500}
               />
             </BarChart>
           </ResponsiveContainer>

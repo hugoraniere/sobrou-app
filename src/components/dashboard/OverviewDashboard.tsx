@@ -140,7 +140,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Receitas vs Despesas */}
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-xl">{TEXT.dashboard.charts.revenueVsExpense}</CardTitle>
+          <CardTitle className="text-xl">Receita vs Despesa</CardTitle>
         </CardHeader>
         <CardContent className="h-[320px] md:h-[420px]">
           {hasTransactions ? (
