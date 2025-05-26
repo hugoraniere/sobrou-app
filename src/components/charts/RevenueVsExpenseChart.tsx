@@ -255,14 +255,14 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   // Calculate dynamic bar size based on data length and view mode
   const calculateBarSize = () => {
     if (viewMode === 'daily') {
-      return Math.min(20, Math.max(8, 300 / chartData.length));
+      return Math.min(16, Math.max(8, 250 / chartData.length));
     }
-    return Math.min(60, Math.max(20, 400 / chartData.length));
+    return Math.min(40, Math.max(20, 300 / chartData.length));
   };
 
   // Calculate if we need horizontal scroll for daily view
   const needsHorizontalScroll = viewMode === 'daily' && chartData.length > 15;
-  const chartWidth = needsHorizontalScroll ? Math.max(800, chartData.length * 25) : '100%';
+  const chartWidth = needsHorizontalScroll ? Math.max(600, chartData.length * 20) : '100%';
 
   return (
     <div className="h-full w-full flex flex-col">
@@ -310,18 +310,18 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
       
       {/* Gráfico */}
       <div className="flex-1 min-h-0">
-        <div className={`w-full h-full ${needsHorizontalScroll ? 'overflow-x-auto' : ''}`}>
+        <div className={`w-full h-full ${needsHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : ''}`}>
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width={chartWidth} height="100%">
               <BarChart
                 data={chartData}
                 margin={{ 
                   top: 10, 
-                  right: 15, 
+                  right: 10, 
                   left: 10, 
-                  bottom: viewMode === 'daily' ? 40 : 20 
+                  bottom: viewMode === 'daily' ? 35 : 20 
                 }}
-                barGap={2}
+                barGap={1}
                 maxBarSize={calculateBarSize()}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
@@ -329,32 +329,32 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                   dataKey={viewMode === 'monthly' ? "month" : "day"}
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 10 }}
                   angle={viewMode === 'daily' ? -45 : 0}
                   textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
-                  height={viewMode === 'daily' ? 40 : 30}
-                  interval={viewMode === 'daily' && chartData.length > 15 ? 'preserveStartEnd' : 0}
+                  height={viewMode === 'daily' ? 35 : 25}
+                  interval={0}
                 />
                 <YAxis 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 10 }}
                   tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-                  width={60}
+                  width={50}
                 />
                 <Tooltip content={<EnhancedTooltip viewMode={viewMode} />} />
                 <Bar 
                   dataKey="income" 
                   name="income" 
                   fill="#22c55e" 
-                  radius={[3, 3, 0, 0]}
+                  radius={[2, 2, 0, 0]}
                   animationDuration={300}
                 />
                 <Bar 
                   dataKey="expense" 
                   name="expense" 
                   fill="#ef4444" 
-                  radius={[3, 3, 0, 0]}
+                  radius={[2, 2, 0, 0]}
                   animationDuration={300}
                 />
               </BarChart>

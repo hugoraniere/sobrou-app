@@ -98,100 +98,102 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
   return (
     <div className="space-y-6 w-full max-w-full">
-      {/* Card de Visão Geral com Big Numbers */}
+      {/* Card de Visão Geral com Big Numbers - ocupa toda a largura */}
       <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 
-      {/* Transações Recentes */}
-      <div className="w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Últimas transações</h2>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleViewAllTransactions}
-          >
-            Ver todas
-          </Button>
-        </div>
+      {/* Grid responsivo para duas colunas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Transações Recentes */}
+        <Card className="w-full">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-xl">Últimas transações</CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleViewAllTransactions}
+            >
+              Ver todas
+            </Button>
+          </CardHeader>
+          <CardContent className="h-[300px] overflow-y-auto">
+            {hasTransactions ? (
+              <RecentTransactions transactions={filteredTransactions} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Gastos por Categoria */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl">Gastos por categoria</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            {hasTransactions ? (
+              <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Receitas vs Despesas */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl">Receita vs Despesa</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            {hasTransactions ? (
+              <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+            )}
+          </CardContent>
+        </Card>
+          
+        {/* Movimentações Diárias */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            {hasTransactions ? (
+              <DailyBarChart transactions={filteredTransactions} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Metas Financeiras */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            {hasSavingGoals ? (
+              <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noGoals} />
+            )}
+          </CardContent>
+        </Card>
         
-        {hasTransactions ? (
-          <div className="bg-white rounded-lg border p-4">
-            <RecentTransactions transactions={filteredTransactions} />
-          </div>
-        ) : (
-          <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-        )}
+        {/* Fontes de Receita */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            {hasTransactions ? (
+              <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+            )}
+          </CardContent>
+        </Card>
       </div>
-
-      {/* Gastos por Categoria */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-xl">Gastos por categoria</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[320px] md:h-[420px]">
-          {hasTransactions ? (
-            <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Receitas vs Despesas */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-xl">Receita vs Despesa</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[320px] md:h-[420px]">
-          {hasTransactions ? (
-            <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-          )}
-        </CardContent>
-      </Card>
-        
-      {/* Movimentações Diárias */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[320px] md:h-[420px]">
-          {hasTransactions ? (
-            <DailyBarChart transactions={filteredTransactions} />
-          ) : (
-            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Metas Financeiras */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[320px] md:h-[420px]">
-          {hasSavingGoals ? (
-            <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={TEXT.dashboard.charts.noGoals} />
-          )}
-        </CardContent>
-      </Card>
-      
-      {/* Fontes de Receita */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[320px] md:h-[420px]">
-          {hasTransactions ? (
-            <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
-          ) : (
-            <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 };
