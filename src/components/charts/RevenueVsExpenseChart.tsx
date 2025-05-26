@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { addMonths, format, startOfMonth, endOfMonth, subMonths, eachDayOfInterval, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { DASHBOARD_TEXT } from '@/constants/text/dashboard';
 
 interface RevenueVsExpenseChartProps {
   transactions: Transaction[];
@@ -177,7 +176,7 @@ const processDailyData = (transactions: Transaction[], period: string) => {
 // Simplified legend component without values
 const SimplifiedLegend = () => {
   return (
-    <div className="flex justify-center gap-6 mb-4">
+    <div className="flex justify-center gap-6 mt-4">
       <div className="flex items-center gap-2">
         <div className="h-3 w-3 rounded-sm bg-green-500" />
         <span className="text-sm font-medium">Receita</span>
@@ -248,6 +247,25 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
     }
   }, [transactions, period, viewMode]);
   
+  // Calculate insights
+  const insights = useMemo(() => {
+    if (chartData.length === 0) return null;
+    
+    const totalIncome = chartData.reduce((sum, item) => sum + item.income, 0);
+    const totalExpense = chartData.reduce((sum, item) => sum + item.expense, 0);
+    const balance = totalIncome - totalExpense;
+    
+    if (viewMode === 'monthly') {
+      const highestExpenseMonth = chartData.reduce((max, item) => 
+        item.expense > max.expense ? item : max
+      );
+      return `Maior gasto em ${highestExpenseMonth.month} com ${formatCurrencyNoDecimals(highestExpenseMonth.expense)}. Saldo do período: ${formatCurrencyNoDecimals(balance)}`;
+    } else {
+      const avgDailyExpense = totalExpense / chartData.filter(item => item.expense > 0).length;
+      return `Gasto médio diário: ${formatCurrencyNoDecimals(avgDailyExpense)}. Saldo do período: ${formatCurrencyNoDecimals(balance)}`;
+    }
+  }, [chartData, viewMode]);
+  
   if (chartData.length === 0) {
     return <div className="text-center text-gray-500">Sem dados para exibir.</div>;
   }
@@ -265,7 +283,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   const chartWidth = needsHorizontalScroll ? Math.max(600, chartData.length * 20) : '100%';
 
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="h-full w-full flex flex-col overflow-hidden">
       {/* Controle de período */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <Select
@@ -305,11 +323,15 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         </div>
       </div>
       
-      {/* Simplified Legend */}
-      <SimplifiedLegend />
+      {/* Insights */}
+      {insights && (
+        <div className="bg-gray-50 rounded-md p-3 mb-4">
+          <p className="text-sm text-gray-700">{insights}</p>
+        </div>
+      )}
       
       {/* Gráfico */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <div className={`w-full h-full ${needsHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : ''}`}>
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width={chartWidth} height="100%">
@@ -362,6 +384,9 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
           </ChartContainer>
         </div>
       </div>
+      
+      {/* Legenda movida para baixo */}
+      <SimplifiedLegend />
     </div>
   );
 };

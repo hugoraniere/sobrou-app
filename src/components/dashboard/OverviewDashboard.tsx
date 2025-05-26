@@ -4,13 +4,14 @@ import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
 import ExpensesByCategoryChart from '../charts/ExpensesByCategoryChart';
 import IncomeByTypeChart from '../charts/IncomeByTypeChart';
-import DailyBarChart from '../charts/DailyBarChart';
+import WeeklySpendingTrendChart from '../charts/WeeklySpendingTrendChart';
 import RevenueVsExpenseChart from '../charts/RevenueVsExpenseChart';
 import FinancialGoalsProgress from '../charts/FinancialGoalsProgress';
 import DashboardOverviewCard from './DashboardOverviewCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { transactionCategories } from '@/data/categories';
 import { TEXT } from '@/constants/text';
+import { DASHBOARD_TEXT } from '@/constants/text/dashboard';
 import EmptyStateMessage from './EmptyStateMessage';
 import RecentTransactions from './RecentTransactions';
 import { CATEGORY_COLORS } from '@/constants/categoryColors';
@@ -152,14 +153,14 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </CardContent>
         </Card>
           
-        {/* Movimentações Diárias */}
+        {/* Tendência de Gastos por Dia da Semana */}
         <Card className="w-full">
           <CardHeader>
-            <CardTitle className="text-xl">{TEXT.dashboard.charts.dailyEvolution}</CardTitle>
+            <CardTitle className="text-xl">{DASHBOARD_TEXT.charts.weeklySpendingTrend}</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
             {hasTransactions ? (
-              <DailyBarChart transactions={filteredTransactions} />
+              <WeeklySpendingTrendChart transactions={filteredTransactions} chartConfig={chartConfig} />
             ) : (
               <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
             )}

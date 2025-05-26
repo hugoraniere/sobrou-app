@@ -14,6 +14,7 @@ export const DASHBOARD_TEXT = {
     expensesByCategory: "Gastos por Categoria",
     incomeByType: "Fontes de receita",
     dailyEvolution: "Movimentações diárias",
+    weeklySpendingTrend: "Tendência de Gastos por Dia da Semana",
     balanceByAccount: "Saldo por conta/cartão",
     monthlyComparison: "Comparação mensal",
     revenueVsExpense: "Receita vs Despesa",
