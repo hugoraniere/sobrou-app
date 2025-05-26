@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import { ChartContainer } from '@/components/ui/chart';
 import { formatCurrencyNoDecimals } from '@/utils/currencyUtils';
 import { useWeeklySpendingData } from '@/hooks/useWeeklySpendingData';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { usePeriodFilter, PERIOD_OPTIONS, PeriodOption } from '@/hooks/usePeriodFilter';
 
 interface WeeklySpendingTrendChartProps {
   transactions: Transaction[];
@@ -31,13 +33,36 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
   transactions,
   chartConfig
 }) => {
-  const { weeklyData, insights } = useWeeklySpendingData(transactions);
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('this-month');
+  const { filteredTransactions } = usePeriodFilter(transactions, selectedPeriod);
+  const { weeklyData, insights } = useWeeklySpendingData(filteredTransactions);
   
   if (weeklyData.length === 0 || !insights) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center text-gray-500">
-          <p>Sem dados de despesas para exibir.</p>
+      <div className="h-full w-full flex flex-col">
+        {/* Period Filter */}
+        <div className="mb-4">
+          <Select
+            value={selectedPeriod}
+            onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}
+          >
+            <SelectTrigger className="w-[180px] h-8 text-sm">
+              <SelectValue placeholder="Selecione o período" />
+            </SelectTrigger>
+            <SelectContent>
+              {PERIOD_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <p>Sem dados de despesas para exibir no período selecionado.</p>
+          </div>
         </div>
       </div>
     );
@@ -48,6 +73,25 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
   
   return (
     <div className="h-full w-full flex flex-col">
+      {/* Period Filter */}
+      <div className="mb-4">
+        <Select
+          value={selectedPeriod}
+          onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}
+        >
+          <SelectTrigger className="w-[180px] h-8 text-sm">
+            <SelectValue placeholder="Selecione o período" />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Insights */}
       <div className="bg-gray-50 rounded-md p-3 mb-4">
         <p className="text-sm text-gray-700">{insightMessage}</p>
@@ -59,7 +103,7 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={weeklyData}
-              margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
+              margin={{ top: 10, right: 15, left: 10, bottom: 25 }}
               barGap={8}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
@@ -69,13 +113,14 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
                 tickLine={false}
                 tick={{ fontSize: 11 }}
                 height={25}
+                interval={0}
               />
               <YAxis 
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 10 }}
                 tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-                width={50}
+                width={60}
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar 
@@ -84,7 +129,7 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
                 fill="#E15759" 
                 radius={[4, 4, 0, 0]}
                 animationDuration={300}
-                maxBarSize={60}
+                maxBarSize={50}
               />
             </BarChart>
           </ResponsiveContainer>

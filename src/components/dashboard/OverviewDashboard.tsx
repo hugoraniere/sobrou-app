@@ -116,7 +116,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               Ver todas
             </Button>
           </CardHeader>
-          <CardContent className="h-[300px] overflow-y-auto">
+          <CardContent className="h-[360px] overflow-y-auto">
             {hasTransactions ? (
               <RecentTransactions transactions={filteredTransactions} />
             ) : (
@@ -130,7 +130,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">Gastos por categoria</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[360px]">
             {hasTransactions ? (
               <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -144,7 +144,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">Receita vs Despesa</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[360px]">
             {hasTransactions ? (
               <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -158,7 +158,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{DASHBOARD_TEXT.charts.weeklySpendingTrend}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[360px]">
             {hasTransactions ? (
               <WeeklySpendingTrendChart transactions={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -172,7 +172,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[360px]">
             {hasSavingGoals ? (
               <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
             ) : (
@@ -186,7 +186,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[360px]">
             {hasTransactions ? (
               <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
             ) : (

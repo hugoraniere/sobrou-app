@@ -42,5 +42,12 @@ export const DASHBOARD_TEXT = {
   emptyState: {
     message: "Comece a registrar para ver seus dados"
   },
-  recentTransactions: "Últimas Transações"
+  recentTransactions: "Últimas Transações",
+  periods: {
+    thisWeek: "Esta semana",
+    thisMonth: "Este mês",
+    sixMonths: "Últimos 6 meses",
+    oneYear: "Último ano",
+    always: "Sempre"
+  }
 };

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import { transactionCategories } from '@/data/categories';
@@ -7,6 +7,8 @@ import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { useTranslation } from 'react-i18next';
 import { getCategoryColor } from '@/constants/categoryColors';
 import { getCategoryIcon } from '@/utils/categoryIcons';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { usePeriodFilter, PERIOD_OPTIONS, PeriodOption } from '@/hooks/usePeriodFilter';
 
 interface ExpensesByCategoryChartProps {
   expenses: Transaction[];
@@ -102,7 +104,7 @@ const calculatePercentages = (data: any[]) => {
 // Componente para renderizar legendas personalizadas com ícones
 const CustomLegend = ({ data }: { data: any[] }) => {
   return (
-    <div className="space-y-2 mt-2 max-h-[240px] overflow-y-auto pr-2">
+    <div className="space-y-2 mt-2 max-h-[260px] overflow-y-auto pr-2">
       {data.map((entry, index) => {
         // Obter o ícone para a categoria
         const IconComponent = getCategoryIcon(entry.id);
@@ -134,20 +136,68 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
   chartConfig 
 }) => {
   const { t } = useTranslation();
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('this-month');
+  const { filteredTransactions } = usePeriodFilter(expenses, selectedPeriod);
   
   // Process and calculate percentages
-  const rawData = processChartData(expenses);
+  const rawData = processChartData(filteredTransactions);
   const data = calculatePercentages(rawData);
   
   // Get top category for insight
   const topCategory = data.length > 0 ? data[0] : null;
   
   if (data.length === 0) {
-    return null;
+    return (
+      <div className="h-full w-full flex flex-col">
+        {/* Period Filter */}
+        <div className="mb-4">
+          <Select
+            value={selectedPeriod}
+            onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}
+          >
+            <SelectTrigger className="w-[180px] h-8 text-sm">
+              <SelectValue placeholder="Selecione o período" />
+            </SelectTrigger>
+            <SelectContent>
+              {PERIOD_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <p>Sem dados para exibir no período selecionado.</p>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full flex flex-col">
+      {/* Period Filter */}
+      <div className="mb-4">
+        <Select
+          value={selectedPeriod}
+          onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}
+        >
+          <SelectTrigger className="w-[180px] h-8 text-sm">
+            <SelectValue placeholder="Selecione o período" />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Insight moved to top for consistency */}
       {topCategory && (
         <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">
@@ -158,9 +208,9 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
         </div>
       )}
       
-      {/* Novo layout com gráfico à esquerda e legenda à direita */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-1/2 h-[180px] md:h-[210px]">
+      {/* Layout with chart on left and legend on right */}
+      <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
+        <div className="w-full md:w-1/2 h-[200px] md:h-full">
           <ChartContainer 
             className="h-full w-full"
             config={chartConfig}
@@ -177,7 +227,7 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
                   fill="#8884d8"
                   dataKey="value"
                   nameKey="name"
-                  minAngle={3} // Garante ângulo mínimo para fatias pequenas
+                  minAngle={3}
                 >
                   {data.map((entry, index) => (
                     <Cell 
@@ -206,8 +256,8 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
           </ChartContainer>
         </div>
         
-        {/* Legenda personalizada à direita com ícones */}
-        <div className="w-full md:w-1/2">
+        {/* Custom legend on right with icons */}
+        <div className="w-full md:w-1/2 flex-1">
           <CustomLegend data={data} />
         </div>
       </div>

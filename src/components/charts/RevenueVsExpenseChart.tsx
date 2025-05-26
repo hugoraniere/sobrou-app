@@ -276,14 +276,14 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   // Calculate dynamic bar size based on data length and view mode
   const calculateBarSize = () => {
     if (viewMode === 'daily') {
-      return Math.min(16, Math.max(8, 250 / chartData.length));
+      return Math.min(14, Math.max(6, 200 / chartData.length));
     }
-    return Math.min(40, Math.max(20, 300 / chartData.length));
+    return Math.min(35, Math.max(15, 250 / chartData.length));
   };
 
   // Calculate if we need horizontal scroll for daily view
-  const needsHorizontalScroll = viewMode === 'daily' && chartData.length > 15;
-  const chartWidth = needsHorizontalScroll ? Math.max(600, chartData.length * 20) : '100%';
+  const needsHorizontalScroll = viewMode === 'daily' && chartData.length > 12;
+  const chartWidth = needsHorizontalScroll ? Math.max(500, chartData.length * 18) : '100%';
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
@@ -342,11 +342,11 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                 data={chartData}
                 margin={{ 
                   top: 10, 
-                  right: 10, 
+                  right: 15, 
                   left: 10, 
-                  bottom: viewMode === 'daily' ? 35 : 20 
+                  bottom: viewMode === 'daily' ? 40 : 25 
                 }}
-                barGap={1}
+                barGap={2}
                 maxBarSize={calculateBarSize()}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
@@ -357,7 +357,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                   tick={{ fontSize: 10 }}
                   angle={viewMode === 'daily' ? -45 : 0}
                   textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
-                  height={viewMode === 'daily' ? 35 : 25}
+                  height={viewMode === 'daily' ? 40 : 25}
                   interval={0}
                 />
                 <YAxis 
@@ -365,7 +365,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
                   tickLine={false}
                   tick={{ fontSize: 10 }}
                   tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-                  width={50}
+                  width={60}
                 />
                 <Tooltip content={<EnhancedTooltip viewMode={viewMode} />} />
                 <Bar 
