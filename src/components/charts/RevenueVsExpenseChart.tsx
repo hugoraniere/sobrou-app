@@ -256,12 +256,15 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
     const balance = totalIncome - totalExpense;
     
     if (viewMode === 'monthly') {
-      const highestExpenseMonth = chartData.reduce((max, item) => 
+      const monthlyData = chartData as Array<{ month: string; income: number; expense: number; monthKey: string }>;
+      const highestExpenseMonth = monthlyData.reduce((max, item) => 
         item.expense > max.expense ? item : max
       );
       return `Maior gasto em ${highestExpenseMonth.month} com ${formatCurrencyNoDecimals(highestExpenseMonth.expense)}. Saldo do período: ${formatCurrencyNoDecimals(balance)}`;
     } else {
-      const avgDailyExpense = totalExpense / chartData.filter(item => item.expense > 0).length;
+      const dailyData = chartData as Array<{ day: string; dayKey: string; income: number; expense: number }>;
+      const daysWithExpenses = dailyData.filter(item => item.expense > 0);
+      const avgDailyExpense = daysWithExpenses.length > 0 ? totalExpense / daysWithExpenses.length : 0;
       return `Gasto médio diário: ${formatCurrencyNoDecimals(avgDailyExpense)}. Saldo do período: ${formatCurrencyNoDecimals(balance)}`;
     }
   }, [chartData, viewMode]);
