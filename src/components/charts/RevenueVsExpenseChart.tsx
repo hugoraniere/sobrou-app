@@ -123,7 +123,7 @@ const processMonthlyData = (transactions: Transaction[], period: string) => {
   return Array.from(monthlyData.values());
 };
 
-// Process daily data for chart
+// Process daily data for chart (limited to 30 days)
 const processDailyData = (transactions: Transaction[], period: string) => {
   const { startDate, endDate } = getDateRangeForPeriod(period);
   const filteredTransactions = filterTransactionsByDateRange(
@@ -132,8 +132,14 @@ const processDailyData = (transactions: Transaction[], period: string) => {
     endDate
   );
   
-  // Create array of all days in the interval
-  const daysInInterval = eachDayOfInterval({ start: startDate, end: endDate });
+  // Limit to last 30 days from end date
+  const limitedStartDate = new Date(endDate);
+  limitedStartDate.setDate(limitedStartDate.getDate() - 29); // 30 days total
+  
+  const actualStartDate = limitedStartDate > startDate ? limitedStartDate : startDate;
+  
+  // Create array of all days in the limited interval
+  const daysInInterval = eachDayOfInterval({ start: actualStartDate, end: endDate });
   
   // Initialize daily data with zero values
   const dailyData = daysInInterval.map(date => {
@@ -168,60 +174,62 @@ const processDailyData = (transactions: Transaction[], period: string) => {
   return dailyData;
 };
 
-// Custom legend component to show formatted values
-const CustomLegend = ({ payload, viewMode }: { payload: any[], viewMode: string }) => {
-  if (!payload || !payload.length) return null;
-  
-  // Get the latest data point - this ensures we always have values to display
-  const lastDataPoint = payload[0]?.payload;
-
-  if (!lastDataPoint) return null;
-  
+// Simplified legend component without values
+const SimplifiedLegend = () => {
   return (
-    <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-2 mt-2">
-      {payload.map((entry: any, index: number) => {
-        if (!entry) return null;
-        
-        const dataKey = entry.dataKey;
-        const color = entry.color;
-        const value = lastDataPoint[dataKey];
-        
-        return (
-          <div key={`legend-${index}`} className="flex items-center gap-2">
-            <div
-              className="h-3 w-3 rounded-sm"
-              style={{ backgroundColor: color }}
-            />
-            <span className="text-sm font-medium">
-              {dataKey === 'income' ? 'Receita:' : 'Despesa:'}
-              {' '}
-              {typeof value === 'number' ? formatCurrencyNoDecimals(value) : 'R$ 0'}
-            </span>
-          </div>
-        );
-      })}
+    <div className="flex justify-center gap-6 mb-4">
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 rounded-sm bg-green-500" />
+        <span className="text-sm font-medium">Receita</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 rounded-sm bg-red-500" />
+        <span className="text-sm font-medium">Despesa</span>
+      </div>
     </div>
   );
 };
 
-// Custom tooltip that only shows the value being hovered
-const CustomTooltip = ({ active, payload, label }: any) => {
+// Enhanced tooltip for daily view
+const EnhancedTooltip = ({ active, payload, label, viewMode }: any) => {
   if (!active || !payload || !payload.length) return null;
   
-  // Get only the data for the bar being hovered
-  const hoverData = payload[0];
-  const value = hoverData.value;
-  const type = hoverData.dataKey;
-  
-  return (
-    <div className="bg-white p-2 border rounded shadow text-sm">
-      <p className="label">{label}</p>
-      <p className={`value ${type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
-        {type === 'income' ? 'Receita: ' : 'Despesa: '}
-        {formatCurrencyNoDecimals(value)}
-      </p>
-    </div>
-  );
+  if (viewMode === 'daily') {
+    // For daily view, show both income and expense
+    const incomeData = payload.find((p: any) => p.dataKey === 'income');
+    const expenseData = payload.find((p: any) => p.dataKey === 'expense');
+    
+    return (
+      <div className="bg-white p-3 border rounded shadow-lg text-sm">
+        <p className="font-medium mb-2">{label}</p>
+        {incomeData && (
+          <p className="text-green-500">
+            Receita: {formatCurrencyNoDecimals(incomeData.value)}
+          </p>
+        )}
+        {expenseData && (
+          <p className="text-red-500">
+            Despesa: {formatCurrencyNoDecimals(expenseData.value)}
+          </p>
+        )}
+      </div>
+    );
+  } else {
+    // For monthly view, show only the hovered value
+    const hoverData = payload[0];
+    const value = hoverData.value;
+    const type = hoverData.dataKey;
+    
+    return (
+      <div className="bg-white p-2 border rounded shadow text-sm">
+        <p className="label">{label}</p>
+        <p className={`value ${type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
+          {type === 'income' ? 'Receita: ' : 'Despesa: '}
+          {formatCurrencyNoDecimals(value)}
+        </p>
+      </div>
+    );
+  }
 };
 
 const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({ 
@@ -243,6 +251,18 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
   if (chartData.length === 0) {
     return <div className="text-center text-gray-500">Sem dados para exibir.</div>;
   }
+
+  // Calculate dynamic bar size based on data length and view mode
+  const calculateBarSize = () => {
+    if (viewMode === 'daily') {
+      return Math.min(20, Math.max(8, 300 / chartData.length));
+    }
+    return Math.min(60, Math.max(20, 400 / chartData.length));
+  };
+
+  // Calculate if we need horizontal scroll for daily view
+  const needsHorizontalScroll = viewMode === 'daily' && chartData.length > 15;
+  const chartWidth = needsHorizontalScroll ? Math.max(800, chartData.length * 25) : '100%';
 
   return (
     <div className="h-full w-full flex flex-col">
@@ -285,55 +305,62 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
         </div>
       </div>
       
+      {/* Simplified Legend */}
+      <SimplifiedLegend />
+      
       {/* Gráfico */}
       <div className="flex-1 min-h-0">
-        <ChartContainer config={chartConfig}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              margin={{ top: 10, right: 10, left: 0, bottom: viewMode === 'daily' ? 60 : 30 }}
-              barGap={5}
-              maxBarSize={viewMode === 'daily' ? 15 : 60}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-              <XAxis 
-                dataKey={viewMode === 'monthly' ? "month" : "day"}
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12 }}
-                angle={viewMode === 'daily' ? -45 : 0}
-                textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
-                height={viewMode === 'daily' ? 50 : 30}
-              />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-                width={70}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend 
-                content={<CustomLegend payload={chartData} viewMode={viewMode} />}
-                verticalAlign="bottom"
-              />
-              <Bar 
-                dataKey="income" 
-                name="income" 
-                fill={chartConfig.income.theme.light} 
-                radius={[4, 4, 0, 0]}
-                animationDuration={500}
-              />
-              <Bar 
-                dataKey="expense" 
-                name="expense" 
-                fill={chartConfig.expense.theme.light} 
-                radius={[4, 4, 0, 0]}
-                animationDuration={500}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+        <div className={`w-full h-full ${needsHorizontalScroll ? 'overflow-x-auto' : ''}`}>
+          <ChartContainer config={chartConfig}>
+            <ResponsiveContainer width={chartWidth} height="100%">
+              <BarChart
+                data={chartData}
+                margin={{ 
+                  top: 10, 
+                  right: 15, 
+                  left: 10, 
+                  bottom: viewMode === 'daily' ? 40 : 20 
+                }}
+                barGap={2}
+                maxBarSize={calculateBarSize()}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+                <XAxis 
+                  dataKey={viewMode === 'monthly' ? "month" : "day"}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11 }}
+                  angle={viewMode === 'daily' ? -45 : 0}
+                  textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
+                  height={viewMode === 'daily' ? 40 : 30}
+                  interval={viewMode === 'daily' && chartData.length > 15 ? 'preserveStartEnd' : 0}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(value) => formatCurrencyNoDecimals(value)}
+                  width={60}
+                />
+                <Tooltip content={<EnhancedTooltip viewMode={viewMode} />} />
+                <Bar 
+                  dataKey="income" 
+                  name="income" 
+                  fill="#22c55e" 
+                  radius={[3, 3, 0, 0]}
+                  animationDuration={300}
+                />
+                <Bar 
+                  dataKey="expense" 
+                  name="expense" 
+                  fill="#ef4444" 
+                  radius={[3, 3, 0, 0]}
+                  animationDuration={300}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
       </div>
     </div>
   );
