@@ -43,7 +43,7 @@ const MainNavbar: React.FC = () => {
   };
 
   return (
-    <header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-4 md:px-6 py-2">
+    <header className="w-full bg-background-base border-b border-border-subtle shadow-sm px-4 md:px-6 py-2">
       <div className="flex justify-between items-center">
         
         {/* Left side: Logo */}

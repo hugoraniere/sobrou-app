@@ -48,12 +48,12 @@ export function AppSidebar() {
   return (
     <div 
       className={cn(
-        "fixed left-4 top-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-lg border border-gray-100 transition-all duration-300 ease-in-out",
+        "fixed left-0 top-0 h-screen z-50 bg-white shadow-lg border-r border-gray-100 transition-all duration-300 ease-in-out flex flex-col",
         isExpanded ? "w-64" : "w-16"
       )}
     >
       {/* Toggle button */}
-      <div className="flex justify-end p-2">
+      <div className="flex justify-end p-2 border-b border-gray-100">
         <button
           onClick={toggleSidebar}
           className={cn(
@@ -66,7 +66,7 @@ export function AppSidebar() {
       </div>
 
       {/* Menu items */}
-      <nav className="px-2 pb-4">
+      <nav className="flex-1 px-2 py-4">
         <div className="space-y-2">
           {menuItems.map((item) => {
             const isActive = isActivePath(item.url);
@@ -100,9 +100,11 @@ export function AppSidebar() {
             );
           })}
         </div>
+      </nav>
 
-        {/* Settings at bottom */}
-        <div className="mt-6 pt-4 border-t border-gray-100">
+      {/* Settings at bottom with increased spacing */}
+      <div className="px-2 pb-4 border-t border-gray-100 mt-auto">
+        <div className="pt-4">
           <Link
             to="/settings"
             className={cn(
@@ -129,7 +131,7 @@ export function AppSidebar() {
             )}
           </Link>
         </div>
-      </nav>
+      </div>
     </div>
   );
 }
