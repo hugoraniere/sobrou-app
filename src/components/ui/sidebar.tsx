@@ -1,6 +1,7 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Menu } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -129,6 +130,62 @@ const SidebarFooter = React.forwardRef<
 ))
 
 SidebarFooter.displayName = "SidebarFooter"
+
+// Add SidebarGroup component
+const SidebarGroup = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("mb-4", className)}
+    {...props}
+  />
+))
+
+SidebarGroup.displayName = "SidebarGroup"
+
+// Add SidebarGroupContent component
+const SidebarGroupContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("space-y-1", className)}
+    {...props}
+  />
+))
+
+SidebarGroupContent.displayName = "SidebarGroupContent"
+
+// Add SidebarTrigger component
+interface SidebarTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string;
+}
+
+const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
+  ({ className, ...props }, ref) => {
+    const { toggleSidebar } = useSidebar();
+    
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          "inline-flex items-center justify-center rounded-md p-2 hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-ring",
+          className
+        )}
+        onClick={toggleSidebar}
+        {...props}
+      >
+        <Menu className="h-4 w-4" />
+        <span className="sr-only">Toggle sidebar</span>
+      </button>
+    );
+  }
+);
+
+SidebarTrigger.displayName = "SidebarTrigger";
 
 // Menu components
 const SidebarMenu = React.forwardRef<
@@ -290,5 +347,8 @@ export {
   SidebarSectionTitle,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarTrigger
 }
