@@ -1,19 +1,9 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Target, TrendingUp, Calculator, Settings } from 'lucide-react';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarHeader,
-} from '@/components/ui/sidebar';
+import { LayoutDashboard, FileText, Target, TrendingUp, Calculator, Settings, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Logo from '@/components/brand/Logo';
+import { useSidebar } from '@/components/ui/sidebar';
 
 const menuItems = [
   {
@@ -41,15 +31,12 @@ const menuItems = [
     url: '/restaurant-calculator',
     icon: Calculator,
   },
-  {
-    title: 'Configurações',
-    url: '/settings',
-    icon: Settings,
-  },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
+  const { state, toggleSidebar } = useSidebar();
+  const isExpanded = state === 'expanded';
 
   const isActivePath = (path: string) => {
     if (path === '/') {
@@ -59,35 +46,90 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
-      <SidebarHeader className="border-b border-border p-4">
-        <Link to="/" className="flex items-center gap-2">
-          <Logo size="sm" />
-        </Link>
-      </SidebarHeader>
-      
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActivePath(item.url)}
-                    tooltip={item.title}
-                  >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <div 
+      className={cn(
+        "fixed left-4 top-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-lg border border-gray-100 transition-all duration-300 ease-in-out",
+        isExpanded ? "w-64" : "w-16"
+      )}
+    >
+      {/* Toggle button */}
+      <div className="flex justify-end p-2">
+        <button
+          onClick={toggleSidebar}
+          className={cn(
+            "p-2 rounded-lg hover:bg-gray-100 transition-colors",
+            isExpanded && "rotate-180"
+          )}
+        >
+          <ChevronRight className="h-4 w-4 text-gray-500" />
+        </button>
+      </div>
+
+      {/* Menu items */}
+      <nav className="px-2 pb-4">
+        <div className="space-y-2">
+          {menuItems.map((item) => {
+            const isActive = isActivePath(item.url);
+            return (
+              <Link
+                key={item.title}
+                to={item.url}
+                className={cn(
+                  "flex items-center rounded-xl transition-all duration-200 group relative",
+                  isExpanded ? "px-3 py-3" : "px-3 py-3 justify-center",
+                  isActive 
+                    ? "bg-primary text-white shadow-sm" 
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                )}
+                title={!isExpanded ? item.title : undefined}
+              >
+                <item.icon className={cn("h-5 w-5 flex-shrink-0", isExpanded && "mr-3")} />
+                {isExpanded && (
+                  <span className="font-medium text-sm whitespace-nowrap">
+                    {item.title}
+                  </span>
+                )}
+                
+                {/* Tooltip for collapsed state */}
+                {!isExpanded && (
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                    {item.title}
+                  </div>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Settings at bottom */}
+        <div className="mt-6 pt-4 border-t border-gray-100">
+          <Link
+            to="/settings"
+            className={cn(
+              "flex items-center rounded-xl transition-all duration-200 group relative",
+              isExpanded ? "px-3 py-3" : "px-3 py-3 justify-center",
+              isActivePath('/settings')
+                ? "bg-primary text-white shadow-sm" 
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            )}
+            title={!isExpanded ? 'Configurações' : undefined}
+          >
+            <Settings className={cn("h-5 w-5 flex-shrink-0", isExpanded && "mr-3")} />
+            {isExpanded && (
+              <span className="font-medium text-sm whitespace-nowrap">
+                Configurações
+              </span>
+            )}
+            
+            {/* Tooltip for collapsed state */}
+            {!isExpanded && (
+              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                Configurações
+              </div>
+            )}
+          </Link>
+        </div>
+      </nav>
+    </div>
   );
 }

@@ -16,7 +16,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 import { useAvatar } from '@/contexts/AvatarContext';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const MainNavbar: React.FC = () => {
   const { t } = useTranslation();
@@ -47,12 +46,8 @@ const MainNavbar: React.FC = () => {
     <header className="relative w-full bg-background-base border-b border-border-subtle shadow-sm px-4 md:px-6 py-2">
       <div className="flex justify-between items-center">
         
-        {/* Left side: Sidebar trigger for desktop + Logo */}
-        <div className="flex items-center gap-4">
-          <div className="hidden md:block">
-            <SidebarTrigger />
-          </div>
-          
+        {/* Left side: Logo */}
+        <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <Logo className="h-7" size="sm" />
           </Link>
