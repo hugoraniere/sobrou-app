@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Transaction } from '@/services/transactions';
 import { Edit, Trash2, MoreVertical, ArrowUp, ArrowDown } from 'lucide-react';
@@ -65,13 +64,14 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     </div>
   );
 
-  // Layout mobile - seguindo exatamente a referência visual
+  // Layout mobile - removendo padding horizontal
   if (isMobile) {
     return (
       <div 
         className="flex flex-col bg-white w-full max-w-[328px] mx-auto"
         style={{ 
-          padding: '12px',
+          paddingTop: '12px',
+          paddingBottom: '12px',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
           borderRadius: '8px'
