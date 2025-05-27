@@ -27,16 +27,18 @@ const TransactionListContent: React.FC<TransactionListContentProps> = ({
   }
   
   return (
-    <div className="space-y-1">
-      {transactions.map((transaction) => (
-        <Card key={transaction.id} className="overflow-hidden">
-          <TransactionItem
-            transaction={transaction}
-            onEdit={() => onTransactionEdit(transaction)}
-            onDelete={() => onTransactionDelete(transaction.id)}
-          />
-        </Card>
-      ))}
+    <div className="w-full" style={{ maxWidth: '1248px', margin: '0 auto' }}>
+      <div className="space-y-3">
+        {transactions.map((transaction) => (
+          <Card key={transaction.id} className="overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <TransactionItem
+              transaction={transaction}
+              onEdit={() => onTransactionEdit(transaction)}
+              onDelete={() => onTransactionDelete(transaction.id)}
+            />
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
