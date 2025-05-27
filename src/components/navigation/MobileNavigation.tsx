@@ -89,7 +89,7 @@ const MobileNavigation: React.FC = () => {
           <span className="sr-only">Abrir menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[280px] max-w-[90vw] p-0">
+      <SheetContent side="right" className="w-[280px] max-w-[90vw] p-0">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">

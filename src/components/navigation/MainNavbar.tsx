@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -48,10 +49,9 @@ const MainNavbar: React.FC = () => {
     <header className="w-full bg-background-base border-b border-border-subtle shadow-sm px-4 md:px-6 py-2">
       <div className="flex justify-between items-center">
         
-        {/* Left side: Mobile menu + Logo */}
+        {/* Left side: Logo */}
         <div className="flex items-center space-x-3">
-          {isMobile && user && <MobileNavigation />}
-          <Link to="/" className="flex items-center">
+          <Link to={user ? "/" : "/"} className="flex items-center">
             <Logo className="h-7" size="sm" />
           </Link>
         </div>
@@ -81,6 +81,9 @@ const MainNavbar: React.FC = () => {
                 <Plus className="h-4 w-4" />
                 {!isMobile && <span className="ml-1 hidden sm:inline">{t('transactions.new', 'Nova')}</span>}
               </Button>
+
+              {/* Mobile menu - positioned on the right */}
+              {isMobile && <MobileNavigation />}
               
               {/* User Menu - Hidden on mobile since it's in the side menu */}
               {!isMobile && (

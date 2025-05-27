@@ -34,7 +34,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   onTransactionUpdated,
 }) => {
   return (
-    <div className="w-full max-w-full overflow-x-hidden px-4 md:px-6">
+    <div className="w-full max-w-full overflow-x-hidden">
       {/* Visão Geral */}
       <div>
         <DashboardOverview 

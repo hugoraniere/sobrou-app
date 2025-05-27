@@ -15,9 +15,10 @@ import { DASHBOARD_TEXT } from '@/constants/text/dashboard';
 import EmptyStateMessage from './EmptyStateMessage';
 import RecentTransactions from './RecentTransactions';
 import { CATEGORY_COLORS } from '@/constants/categoryColors';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -28,7 +29,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   transactions,
   savingGoals
 }) => {
-  const isMobile = useIsMobile();
+  const { isMobile } = useResponsive();
   const navigate = useNavigate();
   
   // Inicializa filteredTransactions com todas as transações
@@ -102,8 +103,11 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Card de Visão Geral com Big Numbers - ocupa toda a largura */}
       <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 
-      {/* Grid responsivo para duas colunas */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Grid responsivo */}
+      <div className={cn(
+        "grid gap-6",
+        isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"
+      )}>
         {/* Transações Recentes */}
         <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -116,7 +120,10 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               Ver todas
             </Button>
           </CardHeader>
-          <CardContent className="h-[400px] overflow-y-auto">
+          <CardContent className={cn(
+            "overflow-y-auto",
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
             {hasTransactions ? (
               <RecentTransactions transactions={filteredTransactions} />
             ) : (
@@ -130,7 +137,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">Gastos por categoria</CardTitle>
           </CardHeader>
-          <CardContent className="h-[400px]">
+          <CardContent className={cn(
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
             {hasTransactions ? (
               <ExpensesByCategoryChart expenses={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -144,7 +153,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">Receita vs Despesa</CardTitle>
           </CardHeader>
-          <CardContent className="h-[400px]">
+          <CardContent className={cn(
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
             {hasTransactions ? (
               <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -158,7 +169,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{DASHBOARD_TEXT.charts.weeklySpendingTrend}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[400px]">
+          <CardContent className={cn(
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
             {hasTransactions ? (
               <WeeklySpendingTrendChart transactions={filteredTransactions} chartConfig={chartConfig} />
             ) : (
@@ -172,7 +185,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[400px]">
+          <CardContent className={cn(
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
             {hasSavingGoals ? (
               <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
             ) : (
@@ -186,7 +201,9 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[400px]">
+          <CardContent className={cn(
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
             {hasTransactions ? (
               <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
             ) : (

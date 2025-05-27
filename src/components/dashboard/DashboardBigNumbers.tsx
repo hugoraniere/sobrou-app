@@ -5,6 +5,8 @@ import { Transaction } from '@/services/transactions';
 import BigNumberCard from './BigNumberCard';
 import { TEXT } from '@/constants/text';
 import { useNavigate } from 'react-router-dom';
+import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 interface DashboardBigNumbersProps {
   transactions: Transaction[];
@@ -16,6 +18,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   totalSavings
 }) => {
   const navigate = useNavigate();
+  const { isMobile } = useResponsive();
   
   // Calculate total income
   const totalIncome = transactions
@@ -41,7 +44,10 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   };
   
   return (
-    <div className="flex flex-wrap gap-6">
+    <div className={cn(
+      "grid gap-4",
+      isMobile ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+    )}>
       <BigNumberCard
         title={TEXT.common.income}
         value={totalIncome}
