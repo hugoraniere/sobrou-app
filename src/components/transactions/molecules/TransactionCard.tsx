@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Transaction } from '@/services/transactions';
 import { Edit, Trash2, MoreVertical, ArrowUp, ArrowDown } from 'lucide-react';
@@ -20,12 +21,14 @@ interface TransactionCardProps {
   transaction: Transaction;
   onEdit: () => void;
   onDelete: () => void;
+  showActions?: boolean; // Nova prop para controlar se mostra as ações
 }
 
 const TransactionCard: React.FC<TransactionCardProps> = ({
   transaction,
   onEdit,
-  onDelete
+  onDelete,
+  showActions = true // Por padrão, mostra as ações
 }) => {
   const { isMobile } = useResponsive();
   const CategoryIcon = getCategoryIcon(transaction.category);
@@ -77,7 +80,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           borderRadius: '8px'
         }}
       >
-        {/* Primeira linha: Ícone + Título + Valor + Menu */}
+        {/* Primeira linha: Ícone + Título + Valor + Menu (se showActions for true) */}
         <div className="flex items-center justify-between w-full mb-2">
           {/* Lado esquerdo: Ícone + Título */}
           <div className="flex items-center gap-3 flex-1 min-w-0 mr-2">
@@ -100,7 +103,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                   <h4 
                     className="text-sm font-semibold text-gray-900 truncate"
                     style={{ 
-                      maxWidth: '120px', // Largura mais restrita para truncamento agressivo
+                      maxWidth: showActions ? '120px' : '200px', // Aumenta largura quando não há menu
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
@@ -117,7 +120,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             </TooltipProvider>
           </div>
           
-          {/* Lado direito: Valor + Menu */}
+          {/* Lado direito: Valor + Menu (se showActions for true) */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Valor */}
             <div className={cn(
@@ -127,24 +130,26 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
             </div>
 
-            {/* Menu de ações */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onEdit}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onDelete} className="text-red-600">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Excluir
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Menu de ações - só mostra se showActions for true */}
+            {showActions && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onEdit}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
 
@@ -229,24 +234,26 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
         </div>
 
-        {/* Menu de ações */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onEdit}>
-              <Edit className="mr-2 h-4 w-4" />
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onDelete} className="text-red-600">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Excluir
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Menu de ações - só mostra se showActions for true */}
+        {showActions && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onEdit}>
+                <Edit className="mr-2 h-4 w-4" />
+                Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Excluir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );

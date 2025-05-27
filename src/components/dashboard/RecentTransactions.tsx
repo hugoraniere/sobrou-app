@@ -17,7 +17,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions })
   const { isMobile } = useResponsive();
   const recentTransactions = transactions.slice(0, 8); // Mostra até 8 transações
   
-  // No mobile, usar o TransactionCard responsivo
+  // No mobile, usar o TransactionCard responsivo sem ações
   if (isMobile) {
     return (
       <div className="space-y-2">
@@ -32,6 +32,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions })
               transaction={transaction}
               onEdit={() => {}} // Sem ação no dashboard
               onDelete={() => {}} // Sem ação no dashboard
+              showActions={false} // Remove as ações na tela de últimas transações
             />
           ))
         )}
