@@ -9,7 +9,7 @@ const HeaderLogo: React.FC = () => {
 
   return (
     <div className="flex items-center">
-      <Link to={user ? "/" : "/"} className="flex items-center">
+      <Link to={user ? "/dashboard" : "/"} className="flex items-center">
         <Logo size="md" />
       </Link>
     </div>

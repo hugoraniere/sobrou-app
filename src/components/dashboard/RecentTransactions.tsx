@@ -6,14 +6,12 @@ import { formatCurrency } from '@/utils/currencyUtils';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useResponsive } from '@/hooks/useResponsive';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
 }
 
 const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions }) => {
-  const { isMobile } = useResponsive();
   const recentTransactions = transactions.slice(0, 8); // Mostra até 8 transações
   
   return (
@@ -27,50 +25,6 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions })
           {recentTransactions.map((transaction) => {
             const Icon = getCategoryIcon(transaction.category);
             
-            if (isMobile) {
-              // Layout mobile: Ícone à esquerda → Título ao lado → Valor abaixo → Data e categoria do lado direito
-              return (
-                <div key={transaction.id} className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-md transition-colors border border-gray-100">
-                  {/* Ícone à esquerda */}
-                  <div className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1",
-                    transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
-                  )}>
-                    <Icon className={cn(
-                      "h-5 w-5",
-                      transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                    )} />
-                  </div>
-                  
-                  {/* Conteúdo principal */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start">
-                      {/* Título e valor */}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium truncate mb-1">{transaction.description}</p>
-                        <p className={cn(
-                          "text-lg font-semibold",
-                          transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                        )}>
-                          {transaction.type === 'income' ? '+' : '-'}
-                          {formatCurrency(transaction.amount)}
-                        </p>
-                      </div>
-                      
-                      {/* Data e categoria à direita */}
-                      <div className="text-right flex-shrink-0 ml-3">
-                        <p className="text-xs text-gray-500 mb-1">{formatDate(transaction.date)}</p>
-                        <Badge variant="outline" className="text-xs bg-gray-50 px-2 py-1">
-                          {transaction.category}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-            
-            // Layout desktop (mantém o original)
             return (
               <div key={transaction.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md transition-colors">
                 <div className={cn(

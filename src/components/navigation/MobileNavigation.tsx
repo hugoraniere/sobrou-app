@@ -47,7 +47,7 @@ const MobileNavigation: React.FC = () => {
   };
 
   const isActivePath = (path: string) => {
-    if (path === '/') {
+    if (path === '/dashboard') {
       return location.pathname === '/' || location.pathname === '/dashboard';
     }
     return location.pathname === path;
@@ -56,7 +56,7 @@ const MobileNavigation: React.FC = () => {
   const menuItems = [
     {
       title: 'Dashboard',
-      url: '/',
+      url: '/dashboard',
       icon: LayoutDashboard,
     },
     {
