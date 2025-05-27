@@ -65,16 +65,22 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     </div>
   );
 
-  // Layout mobile
+  // Layout mobile - seguindo exatamente a referência visual
   if (isMobile) {
     return (
       <div 
-        className="flex flex-col p-3 gap-2 rounded-lg bg-white w-full"
-        style={{ maxWidth: '100%' }}
+        className="flex flex-col bg-white w-full max-w-[328px] mx-auto"
+        style={{ 
+          padding: '12px',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          borderRadius: '8px'
+        }}
       >
-        {/* Linha 1: Ícone + Título + Valor */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Primeira linha: Ícone + Título + Valor + Menu */}
+        <div className="flex items-center justify-between w-full mb-2">
+          {/* Lado esquerdo: Ícone + Título */}
+          <div className="flex items-center gap-3 flex-1 min-w-0 mr-2">
             {/* Ícone circular com seta direcional */}
             <div className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
@@ -87,13 +93,14 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               )}
             </div>
             
-            {/* Título truncado */}
+            {/* Título truncado - mais agressivo */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <h4 
-                    className="text-sm font-semibold text-gray-900 truncate flex-1"
+                    className="text-sm font-semibold text-gray-900 truncate"
                     style={{ 
+                      maxWidth: '120px', // Largura mais restrita para truncamento agressivo
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
@@ -110,51 +117,55 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             </TooltipProvider>
           </div>
           
-          {/* Valor */}
-          <div className={cn(
-            "text-right font-semibold text-sm flex-shrink-0",
-            transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-          )}>
-            {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+          {/* Lado direito: Valor + Menu */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Valor */}
+            <div className={cn(
+              "text-right font-semibold text-sm",
+              transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+            )}>
+              {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+            </div>
+
+            {/* Menu de ações */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onEdit}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        {/* Linha 2: Data */}
-        <div className="flex items-center justify-between">
+        {/* Segunda linha: Data + Chips */}
+        <div className="flex items-center justify-between w-full">
+          {/* Data */}
           <span className="text-xs text-gray-500">
             {formatDate(transaction.date)}
           </span>
           
-          {/* Menu de ações */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onEdit}>
-                <Edit className="mr-2 h-4 w-4" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDelete} className="text-red-600">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Excluir
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Linha 3: Chips */}
-        <div className="flex items-center gap-2">
-          <CategoryChip />
-          <StatusChip />
+          {/* Chips */}
+          <div className="flex items-center gap-2">
+            <CategoryChip />
+            <StatusChip />
+          </div>
         </div>
       </div>
     );
   }
 
-  // Layout desktop
+  // Layout desktop - mantido exatamente igual
   return (
     <div 
       className="flex w-full p-3 justify-between items-center rounded-lg bg-white"
