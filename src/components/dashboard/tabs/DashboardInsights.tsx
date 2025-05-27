@@ -21,8 +21,8 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({
 
   return (
     <CardContent className="bg-white p-0">
-      <div className="w-full space-y-8 p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="w-full space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="lg:col-span-1">
             <InsightsList insights={insights} isLoading={isLoading} onRefresh={refreshInsights} />
           </div>

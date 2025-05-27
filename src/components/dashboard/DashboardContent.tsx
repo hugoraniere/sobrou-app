@@ -44,8 +44,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       </div>
       
       {/* Insights */}
-      <div className="bg-white rounded-lg border p-6 mt-6">
-        <h2 className="text-2xl font-semibold mb-6">Insights</h2>
+      <div className="bg-white rounded-lg border p-4 mt-6">
+        <h2 className="text-2xl font-semibold mb-4">Insights</h2>
         <DashboardInsights transactions={transactions} />
       </div>
     </div>
