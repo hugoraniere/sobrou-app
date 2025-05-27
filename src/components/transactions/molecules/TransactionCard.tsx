@@ -88,7 +88,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         {/* Primeira linha: Ícone + Título + Valor + Menu (se showActions for true) */}
         <div className={cn(
           "flex items-center justify-between w-full mb-2",
-          !showCardPadding && "px-4"
+          showCardPadding ? "px-0" : "px-4"
         )}>
           {/* Lado esquerdo: Ícone + Título */}
           <div className="flex items-center gap-3 flex-1 min-w-0 mr-2">
@@ -164,7 +164,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         {/* Segunda linha: Data + Chips */}
         <div className={cn(
           "flex items-center justify-between w-full",
-          !showCardPadding && "px-4"
+          showCardPadding ? "px-0" : "px-4"
         )}>
           {/* Data */}
           <span className="text-xs text-gray-500">

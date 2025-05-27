@@ -31,13 +31,13 @@ const Transactions = () => {
 
   return (
     <TooltipProvider>
-      <div className={isMobile ? "w-full" : "container mx-auto max-w-screen-xl w-full overflow-hidden"}>
+      <div className={cn(
+        "w-full overflow-hidden",
+        isMobile ? "px-4 sm:px-8" : "container mx-auto max-w-screen-xl"
+      )}>
         <div>
           {/* Header */}
-          <div className={cn(
-            "flex flex-col space-y-2 mt-6",
-            isMobile && "px-4"
-          )}>
+          <div className="flex flex-col space-y-2 mt-6">
             <h1 className={cn(
               "font-bold text-gray-900",
               isMobile ? "text-2xl" : "text-3xl"
@@ -54,7 +54,7 @@ const Transactions = () => {
           {/* AIPromptInput sempre visível */}
           <Card className={cn(
             "shadow-sm mt-4",
-            isMobile ? "p-4 mx-4" : "p-6"
+            isMobile ? "p-4" : "p-6"
           )}>
             <AIPromptInput 
               onTransactionAdded={handleTransactionUpdated}
@@ -66,28 +66,19 @@ const Transactions = () => {
           {/* Content */}
           <div className="mt-4">
             {isLoading ? (
-              <div className={isMobile ? "px-4" : ""}>
-                <TransactionsLoadingState timeout={15000} />
-              </div>
+              <TransactionsLoadingState timeout={15000} />
             ) : hasError ? (
-              <div className={isMobile ? "px-4" : ""}>
-                <TransactionsErrorState 
-                  errorMessage={errorMessage} 
-                  onRetry={retryFetch} 
-                />
-              </div>
+              <TransactionsErrorState 
+                errorMessage={errorMessage} 
+                onRetry={retryFetch} 
+              />
             ) : transactions.length === 0 ? (
-              <div className={isMobile ? "px-4" : ""}>
-                <TransactionsEmptyState onAddTransaction={() => {}} />
-              </div>
+              <TransactionsEmptyState onAddTransaction={() => {}} />
             ) : (
               <ModernTransactionList
                 transactions={transactions}
                 onTransactionUpdated={handleTransactionUpdated}
-                className={cn(
-                  isMobile && "px-4"
-                )}
-                showCardPadding={true}
+                showCardPadding={false}
               />
             )}
           </div>
