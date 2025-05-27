@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Transaction } from '@/services/transactions';
 import { Edit, Trash2, MoreVertical, ArrowUp, ArrowDown } from 'lucide-react';
@@ -82,9 +81,9 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         <div className="flex items-center justify-between w-full mb-2">
           {/* Lado esquerdo: Ícone + Título */}
           <div className="flex items-center gap-3 flex-1 min-w-0 mr-2">
-            {/* Ícone circular com seta direcional */}
+            {/* Ícone circular com seta direcional - 24px no mobile */}
             <div className={cn(
-              "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0",
+              "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0",
               transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
             )}>
               {transaction.type === 'income' ? (
@@ -174,15 +173,15 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     >
       {/* Lado esquerdo: Ícone + Título/Data */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        {/* Ícone circular com seta direcional */}
+        {/* Ícone circular com seta direcional - 40px no desktop */}
         <div className={cn(
-          "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0",
+          "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
           transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
         )}>
           {transaction.type === 'income' ? (
-            <ArrowUp className="h-4 w-4 text-green-600" />
+            <ArrowUp className="h-6 w-6 text-green-600" />
           ) : (
-            <ArrowDown className="h-4 w-4 text-red-600" />
+            <ArrowDown className="h-6 w-6 text-red-600" />
           )}
         </div>
         
