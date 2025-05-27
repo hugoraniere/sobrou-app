@@ -9,13 +9,15 @@ interface TransactionListContentProps {
   onTransactionEdit: (transaction: Transaction) => void;
   onTransactionDelete: (id: string) => void;
   isEmpty?: boolean;
+  showCardPadding?: boolean;
 }
 
 const TransactionListContent: React.FC<TransactionListContentProps> = ({
   transactions,
   onTransactionEdit,
   onTransactionDelete,
-  isEmpty = false
+  isEmpty = false,
+  showCardPadding = false
 }) => {
   if (isEmpty) {
     return (
@@ -35,6 +37,7 @@ const TransactionListContent: React.FC<TransactionListContentProps> = ({
               transaction={transaction}
               onEdit={() => onTransactionEdit(transaction)}
               onDelete={() => onTransactionDelete(transaction.id)}
+              showCardPadding={showCardPadding}
             />
           </Card>
         ))}

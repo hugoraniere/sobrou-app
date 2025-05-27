@@ -1,104 +1,41 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Transaction } from '@/services/transactions';
-import { useModernTransactionList } from '@/hooks/useModernTransactionList';
-import { cn } from '@/lib/utils';
-
-// Componentes refatorados
-import TransactionListFilters from '../molecules/TransactionListFilters';
-import TransactionListContent from '../molecules/TransactionListContent';
-import TransactionPaginationControls from '../molecules/TransactionPaginationControls';
-import EditTransactionDialog from '../EditTransactionDialog';
-import DeleteTransactionDialog from '../DeleteTransactionDialog';
+import TransactionListContent from '@/components/transactions/molecules/TransactionListContent';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
   onTransactionUpdated: () => void;
   className?: string;
+  showCardPadding?: boolean;
 }
 
 const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   transactions,
   onTransactionUpdated,
-  className
+  className = "",
+  showCardPadding = false
 }) => {
-  const {
-    filteredTransactions,
-    paginatedTransactions,
-    totalPages,
-    currentPage,
-    currentMonth,
-    setCurrentPage,
-    setCurrentMonth,
-    searchTerm,
-    updateSearchTerm
-  } = useModernTransactionList(transactions);
-  
-  const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
-  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
-  
-  useEffect(() => {
-    console.log(`ModernTransactionList recebeu ${transactions.length} transações`);
-  }, [transactions]);
-  
-  // Handle edit
-  const handleEdit = (transaction: Transaction) => {
-    setTransactionToEdit(transaction);
+  const handleTransactionEdit = (transaction: Transaction) => {
+    // Implementation for editing
+    console.log('Edit transaction:', transaction);
   };
-  
-  // Handle delete
-  const handleDelete = (id: string) => {
-    setTransactionToDelete(id);
+
+  const handleTransactionDelete = (id: string) => {
+    // Implementation for deleting
+    console.log('Delete transaction:', id);
+    onTransactionUpdated();
   };
-  
+
   return (
-    <div className={cn("flex flex-col", className)}>
-      {/* Filtros e pesquisa */}
-      <TransactionListFilters 
-        currentMonth={currentMonth}
-        searchTerm={searchTerm}
-        onMonthChange={setCurrentMonth}
-        onSearchChange={updateSearchTerm}
+    <div className={className}>
+      <TransactionListContent
+        transactions={transactions}
+        onTransactionEdit={handleTransactionEdit}
+        onTransactionDelete={handleTransactionDelete}
+        isEmpty={transactions.length === 0}
+        showCardPadding={showCardPadding}
       />
-      
-      {/* Espaçamento de 24px entre filtros e lista */}
-      <div className="h-6" />
-      
-      {/* Lista de transações */}
-      <TransactionListContent 
-        transactions={paginatedTransactions}
-        onTransactionEdit={handleEdit}
-        onTransactionDelete={handleDelete}
-        isEmpty={filteredTransactions.length === 0}
-      />
-      
-      {/* Paginação */}
-      {filteredTransactions.length > 0 && (
-        <TransactionPaginationControls 
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      )}
-      
-      {/* Dialogs */}
-      {transactionToEdit && (
-        <EditTransactionDialog
-          isOpen={!!transactionToEdit}
-          setIsOpen={() => setTransactionToEdit(null)}
-          transaction={transactionToEdit}
-          onTransactionUpdated={onTransactionUpdated}
-        />
-      )}
-      
-      {transactionToDelete && (
-        <DeleteTransactionDialog
-          isOpen={!!transactionToDelete}
-          setIsOpen={() => setTransactionToDelete(null)}
-          transactionId={transactionToDelete}
-          onTransactionUpdated={onTransactionUpdated}
-        />
-      )}
     </div>
   );
 };

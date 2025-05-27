@@ -21,14 +21,16 @@ interface TransactionCardProps {
   transaction: Transaction;
   onEdit: () => void;
   onDelete: () => void;
-  showActions?: boolean; // Nova prop para controlar se mostra as ações
+  showActions?: boolean;
+  showCardPadding?: boolean;
 }
 
 const TransactionCard: React.FC<TransactionCardProps> = ({
   transaction,
   onEdit,
   onDelete,
-  showActions = true // Por padrão, mostra as ações
+  showActions = true,
+  showCardPadding = false
 }) => {
   const { isMobile } = useResponsive();
   const CategoryIcon = getCategoryIcon(transaction.category);
@@ -67,11 +69,14 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     </div>
   );
 
-  // Layout mobile - removendo padding horizontal
+  // Layout mobile
   if (isMobile) {
     return (
       <div 
-        className="flex flex-col bg-white w-full max-w-[328px] mx-auto"
+        className={cn(
+          "flex flex-col bg-white w-full max-w-[328px] mx-auto",
+          showCardPadding && "px-4"
+        )}
         style={{ 
           paddingTop: '12px',
           paddingBottom: '12px',
@@ -103,7 +108,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                   <h4 
                     className="text-sm font-semibold text-gray-900 truncate"
                     style={{ 
-                      maxWidth: showActions ? '120px' : '200px', // Aumenta largura quando não há menu
+                      maxWidth: showActions ? '120px' : '200px',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
