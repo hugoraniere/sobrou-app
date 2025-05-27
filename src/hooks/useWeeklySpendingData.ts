@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale';
 
 interface WeeklySpendingData {
   dayName: string;
+  dayNameMobile: string;
   dayIndex: number;
   averageSpending: number;
   totalSpending: number;
@@ -37,9 +38,15 @@ export const useWeeklySpendingData = (transactions: Transaction[]) => {
       'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'
     ];
     
+    // Mobile abbreviated versions
+    const dayNamesMobile = [
+      'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'
+    ];
+    
     // Initialize data structure for each day
     const dayData = dayNames.map((name, index) => ({
       dayName: name,
+      dayNameMobile: dayNamesMobile[index],
       dayIndex: index,
       totalSpending: 0,
       transactionCount: 0,

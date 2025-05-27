@@ -7,6 +7,7 @@ import { formatCurrencyNoDecimals } from '@/utils/currencyUtils';
 import { useWeeklySpendingData } from '@/hooks/useWeeklySpendingData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePeriodFilter, PERIOD_OPTIONS, PeriodOption } from '@/hooks/usePeriodFilter';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface WeeklySpendingTrendChartProps {
   transactions: Transaction[];
@@ -33,9 +34,16 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
   transactions,
   chartConfig
 }) => {
+  const { isMobile } = useResponsive();
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('this-month');
   const { filteredTransactions } = usePeriodFilter(transactions, selectedPeriod);
   const { weeklyData, insights } = useWeeklySpendingData(filteredTransactions);
+  
+  // Create chart data with appropriate day names based on device
+  const chartData = weeklyData.map(day => ({
+    ...day,
+    displayName: isMobile ? day.dayNameMobile : day.dayName
+  }));
   
   if (weeklyData.length === 0 || !insights) {
     return (
@@ -102,16 +110,16 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={weeklyData}
+              data={chartData}
               margin={{ top: 10, right: 15, left: 10, bottom: 25 }}
               barGap={8}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
               <XAxis 
-                dataKey="dayName"
+                dataKey="displayName"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: isMobile ? 10 : 11 }}
                 height={25}
                 interval={0}
               />
