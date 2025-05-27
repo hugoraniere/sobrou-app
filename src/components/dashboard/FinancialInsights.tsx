@@ -4,7 +4,6 @@ import { Transaction } from '@/services/transactions';
 import { calculateInsightMetrics, getCategoryExpenses, getMonthlyComparison } from '@/utils/insightUtils';
 import FinancialMetricsCard from '../insights/FinancialMetricsCard';
 import InsightList from '../insights/InsightList';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface FinancialInsightsProps {
   transactions: Transaction[];
@@ -59,21 +58,17 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white">
-        <CardContent className="p-4">
-          <FinancialMetricsCard
-            totalExpenses={totalExpenses}
-            totalIncome={totalIncome}
-            balance={balance}
-          />
-        </CardContent>
-      </Card>
-      <Card className="bg-white">
-        <CardContent className="p-4">
-          <h3 className="text-lg font-semibold mb-3">Insights</h3>
-          <InsightList insights={insights} />
-        </CardContent>
-      </Card>
+      <div className="bg-white p-4 rounded-lg border">
+        <FinancialMetricsCard
+          totalExpenses={totalExpenses}
+          totalIncome={totalIncome}
+          balance={balance}
+        />
+      </div>
+      <div className="bg-white p-4 rounded-lg border">
+        <h3 className="text-lg font-semibold mb-3">Insights</h3>
+        <InsightList insights={insights} />
+      </div>
     </div>
   );
 };

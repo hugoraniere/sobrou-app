@@ -1,12 +1,15 @@
+
 import React from 'react';
 import { Transaction } from '@/services/transactions';
 import { useFinancialInsights } from '@/hooks/useFinancialInsights';
 import InsightsList from '@/components/insights/InsightsList';
 import { CardContent } from '@/components/ui/card';
 import FinancialInsights from '@/components/dashboard/FinancialInsights';
+
 interface DashboardInsightsProps {
   transactions: Transaction[];
 }
+
 const DashboardInsights: React.FC<DashboardInsightsProps> = ({
   transactions
 }) => {
@@ -15,8 +18,10 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({
     isLoading,
     refreshInsights
   } = useFinancialInsights(transactions);
-  return <CardContent className="bg-white">
-      <div className="w-full space-y-8">
+
+  return (
+    <CardContent className="bg-white p-0">
+      <div className="w-full space-y-8 p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="lg:col-span-1">
             <InsightsList insights={insights} isLoading={isLoading} onRefresh={refreshInsights} />
@@ -27,6 +32,8 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({
           </div>
         </div>
       </div>
-    </CardContent>;
+    </CardContent>
+  );
 };
+
 export default DashboardInsights;

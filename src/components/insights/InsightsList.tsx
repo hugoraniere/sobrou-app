@@ -39,7 +39,7 @@ const InsightsList: React.FC<InsightsListProps> = ({ insights, isLoading, onRefr
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Seus Insights Personalizados</h3>
+        <h3 className="text-base font-medium">Seus Insights Personalizados</h3>
         <Button onClick={onRefresh} variant="outline" size="sm" disabled={isLoading}>
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
           Atualizar
