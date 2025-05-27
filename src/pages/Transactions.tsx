@@ -33,14 +33,14 @@ const Transactions = () => {
     <TooltipProvider>
       <div className={cn(
         "w-full overflow-hidden",
-        isMobile ? "px-4 sm:px-8" : "container mx-auto max-w-screen-xl"
+        isMobile ? "sm:px-8" : "container mx-auto max-w-screen-xl"
       )}>
         <div>
           {/* Header */}
           <div className="flex flex-col space-y-2 mt-6">
             <h1 className={cn(
               "font-bold text-gray-900",
-              isMobile ? "text-2xl" : "text-3xl"
+              isMobile ? "text-2xl px-4" : "text-3xl"
             )}>
               {t('transactions.title', 'Transações')}
             </h1>
@@ -54,7 +54,7 @@ const Transactions = () => {
           {/* AIPromptInput sempre visível */}
           <Card className={cn(
             "shadow-sm mt-4",
-            isMobile ? "p-4" : "p-6"
+            isMobile ? "p-4 mx-4" : "p-6"
           )}>
             <AIPromptInput 
               onTransactionAdded={handleTransactionUpdated}
