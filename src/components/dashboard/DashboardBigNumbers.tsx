@@ -46,7 +46,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   return (
     <div className={cn(
       "grid gap-4",
-      isMobile ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+      isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
     )}>
       <BigNumberCard
         title={TEXT.common.income}

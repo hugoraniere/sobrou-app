@@ -6,14 +6,40 @@ import { formatCurrency } from '@/utils/currencyUtils';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useResponsive } from '@/hooks/useResponsive';
+import TransactionCard from '@/components/transactions/molecules/TransactionCard';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
 }
 
 const RecentTransactions: React.FC<RecentTransactionsProps> = ({ transactions }) => {
+  const { isMobile } = useResponsive();
   const recentTransactions = transactions.slice(0, 8); // Mostra até 8 transações
   
+  // No mobile, usar o TransactionCard responsivo
+  if (isMobile) {
+    return (
+      <div className="space-y-2">
+        {recentTransactions.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Nenhuma transação encontrada
+          </div>
+        ) : (
+          recentTransactions.map((transaction) => (
+            <TransactionCard
+              key={transaction.id}
+              transaction={transaction}
+              onEdit={() => {}} // Sem ação no dashboard
+              onDelete={() => {}} // Sem ação no dashboard
+            />
+          ))
+        )}
+      </div>
+    );
+  }
+  
+  // No desktop, manter o layout original
   return (
     <div className="space-y-3">
       {recentTransactions.length === 0 ? (

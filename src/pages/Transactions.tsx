@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -30,10 +31,10 @@ const Transactions = () => {
 
   return (
     <TooltipProvider>
-      <ResponsiveContainer>
+      <div className={isMobile ? "px-4 w-full" : "container mx-auto max-w-screen-xl w-full overflow-hidden"}>
         <div className="space-y-4 md:space-y-6">
           {/* Header */}
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2 mt-6">
             <h1 className={cn(
               "font-bold text-gray-900",
               isMobile ? "text-2xl" : "text-3xl"
@@ -77,7 +78,7 @@ const Transactions = () => {
             />
           )}
         </div>
-      </ResponsiveContainer>
+      </div>
     </TooltipProvider>
   );
 };
