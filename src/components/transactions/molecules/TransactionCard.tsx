@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Transaction } from '@/services/transactions';
-import { Edit, Trash2, MoreVertical } from 'lucide-react';
+import { Edit, Trash2, MoreVertical, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -29,7 +29,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   onDelete
 }) => {
   const { isMobile } = useResponsive();
-  const Icon = getCategoryIcon(transaction.category);
+  const CategoryIcon = getCategoryIcon(transaction.category);
   const categoryColor = getCategoryColor(transaction.category);
 
   const formatCurrency = (amount: number) => {
@@ -43,23 +43,24 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
   };
 
+  const capitalizeFirstLetter = (text: string) => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
+
   // Componente do chip de categoria
   const CategoryChip = () => (
     <div 
-      className="flex justify-center items-center gap-1 px-1 py-0.5 rounded-[54px] text-white text-xs font-medium"
-      style={{ 
-        backgroundColor: categoryColor,
-        boxShadow: '0px 1px 2px rgba(0,0,0,0.3), 0px 1px 3px 1px rgba(0,0,0,0.15)'
-      }}
+      className="flex justify-center items-center gap-1 px-2 py-1 rounded-[54px] text-white text-xs"
+      style={{ backgroundColor: categoryColor }}
     >
-      <Icon className="h-3 w-3" />
+      <CategoryIcon className="h-3 w-3" />
       <span>{transaction.category}</span>
     </div>
   );
 
   // Componente do chip de status
   const StatusChip = () => (
-    <div className="flex justify-center items-center px-1 py-0.5 rounded-[54px] bg-gray-100 text-gray-700 text-xs font-medium">
+    <div className="flex justify-center items-center px-2 py-1 rounded-[54px] bg-gray-100 text-gray-700 text-xs">
       Pago
     </div>
   );
@@ -74,15 +75,16 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         {/* Linha 1: Ícone + Título + Valor */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            {/* Ícone circular */}
+            {/* Ícone circular com seta direcional */}
             <div className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
               transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
             )}>
-              <Icon className={cn(
-                "h-5 w-5",
-                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-              )} />
+              {transaction.type === 'income' ? (
+                <ArrowUp className="h-5 w-5 text-green-600" />
+              ) : (
+                <ArrowDown className="h-5 w-5 text-red-600" />
+              )}
             </div>
             
             {/* Título truncado */}
@@ -90,7 +92,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <h4 
-                    className="text-sm font-bold text-gray-900 truncate flex-1"
+                    className="text-sm font-semibold text-gray-900 truncate flex-1"
                     style={{ 
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -98,11 +100,11 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                     }}
                     title={transaction.description}
                   >
-                    {transaction.description}
+                    {capitalizeFirstLetter(transaction.description)}
                   </h4>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{transaction.description}</p>
+                  <p>{capitalizeFirstLetter(transaction.description)}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -160,15 +162,16 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     >
       {/* Lado esquerdo: Ícone + Título/Data */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        {/* Ícone circular */}
+        {/* Ícone circular com seta direcional */}
         <div className={cn(
           "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
           transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
         )}>
-          <Icon className={cn(
-            "h-5 w-5",
-            transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-          )} />
+          {transaction.type === 'income' ? (
+            <ArrowUp className="h-5 w-5 text-green-600" />
+          ) : (
+            <ArrowDown className="h-5 w-5 text-red-600" />
+          )}
         </div>
         
         {/* Título e Data */}
@@ -177,7 +180,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <h4 
-                  className="text-sm font-bold text-gray-900 truncate"
+                  className="text-sm font-semibold text-gray-900 truncate"
                   style={{ 
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -185,11 +188,11 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                   }}
                   title={transaction.description}
                 >
-                  {transaction.description}
+                  {capitalizeFirstLetter(transaction.description)}
                 </h4>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{transaction.description}</p>
+                <p>{capitalizeFirstLetter(transaction.description)}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

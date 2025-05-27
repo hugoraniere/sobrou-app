@@ -52,7 +52,7 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   };
   
   return (
-    <div className={cn("flex flex-col space-y-2", className)}>
+    <div className={cn("flex flex-col", className)}>
       {/* Filtros e pesquisa */}
       <TransactionListFilters 
         currentMonth={currentMonth}
@@ -60,6 +60,9 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
         onMonthChange={setCurrentMonth}
         onSearchChange={updateSearchTerm}
       />
+      
+      {/* Espaçamento de 24px entre filtros e lista */}
+      <div className="h-6" />
       
       {/* Lista de transações */}
       <TransactionListContent 

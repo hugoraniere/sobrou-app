@@ -28,7 +28,7 @@ const TransactionListContent: React.FC<TransactionListContentProps> = ({
   
   return (
     <div className="w-full" style={{ maxWidth: '1248px', margin: '0 auto' }}>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {transactions.map((transaction) => (
           <Card key={transaction.id} className="overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             <TransactionItem
