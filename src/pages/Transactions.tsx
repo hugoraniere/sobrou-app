@@ -32,7 +32,7 @@ const Transactions = () => {
   return (
     <TooltipProvider>
       <div className={isMobile ? "w-full" : "container mx-auto max-w-screen-xl w-full overflow-hidden"}>
-        <div className="space-y-4 md:space-y-6">
+        <div>
           {/* Header */}
           <div className={cn(
             "flex flex-col space-y-2 mt-6",
@@ -53,7 +53,7 @@ const Transactions = () => {
 
           {/* AIPromptInput sempre visível */}
           <Card className={cn(
-            "shadow-sm",
+            "shadow-sm mt-4",
             isMobile ? "p-4 mx-4" : "p-6"
           )}>
             <AIPromptInput 
@@ -64,32 +64,33 @@ const Transactions = () => {
           </Card>
 
           {/* Content */}
-          {isLoading ? (
-            <div className={isMobile ? "px-4" : ""}>
-              <TransactionsLoadingState timeout={15000} />
-            </div>
-          ) : hasError ? (
-            <div className={isMobile ? "px-4" : ""}>
-              <TransactionsErrorState 
-                errorMessage={errorMessage} 
-                onRetry={retryFetch} 
+          <div className="mt-4">
+            {isLoading ? (
+              <div className={isMobile ? "px-4" : ""}>
+                <TransactionsLoadingState timeout={15000} />
+              </div>
+            ) : hasError ? (
+              <div className={isMobile ? "px-4" : ""}>
+                <TransactionsErrorState 
+                  errorMessage={errorMessage} 
+                  onRetry={retryFetch} 
+                />
+              </div>
+            ) : transactions.length === 0 ? (
+              <div className={isMobile ? "px-4" : ""}>
+                <TransactionsEmptyState onAddTransaction={() => {}} />
+              </div>
+            ) : (
+              <ModernTransactionList
+                transactions={transactions}
+                onTransactionUpdated={handleTransactionUpdated}
+                className={cn(
+                  isMobile && "px-4"
+                )}
+                showCardPadding={true}
               />
-            </div>
-          ) : transactions.length === 0 ? (
-            <div className={isMobile ? "px-4" : ""}>
-              <TransactionsEmptyState onAddTransaction={() => {}} />
-            </div>
-          ) : (
-            <ModernTransactionList
-              transactions={transactions}
-              onTransactionUpdated={handleTransactionUpdated}
-              className={cn(
-                "space-y-3 md:space-y-4",
-                isMobile && "px-4"
-              )}
-              showCardPadding={true}
-            />
-          )}
+            )}
+          </div>
         </div>
       </div>
     </TooltipProvider>
