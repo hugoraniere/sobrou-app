@@ -1,10 +1,11 @@
-
 import React, { useState } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import MainNavbar from '../navigation/MainNavbar';
 import FloatingChatButton from '../chat/FloatingChatButton';
 import ChatWindow from '../chat/ChatWindow';
+import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 interface AppLayoutContentProps {
   children: React.ReactNode;
@@ -13,26 +14,30 @@ interface AppLayoutContentProps {
 const AppLayoutContent: React.FC<AppLayoutContentProps> = ({ children }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { state } = useSidebar();
+  const { isMobile } = useResponsive();
   const isExpanded = state === 'expanded';
 
   return (
     <div className="min-h-screen w-full bg-background-surface flex">
-      {/* Fixed Sidebar */}
-      <AppSidebar />
+      {/* Fixed Sidebar - Only on desktop */}
+      {!isMobile && <AppSidebar />}
       
       {/* Main content area with responsive margin */}
       <div 
-        className="flex-1 flex flex-col transition-all duration-300 ease-in-out"
-        style={{ 
-          marginLeft: isExpanded ? '256px' : '64px' 
-        }}
+        className={cn(
+          "flex-1 flex flex-col transition-all duration-300 ease-in-out",
+          !isMobile && (isExpanded ? "ml-64" : "ml-16")
+        )}
       >
         {/* Top navbar */}
         <MainNavbar />
         
         {/* Main content */}
         <main className="flex-1 w-full overflow-x-hidden">
-          <div className="container mx-auto px-4 sm:px-6 md:px-8 py-4 overflow-x-hidden w-full max-w-full">
+          <div className={cn(
+            "mx-auto py-4 overflow-x-hidden w-full max-w-full",
+            isMobile ? "px-4" : "container px-4 sm:px-6 md:px-8"
+          )}>
             {children}
           </div>
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -16,12 +15,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 import { useAvatar } from '@/contexts/AvatarContext';
+import MobileNavigation from './MobileNavigation';
+import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 const MainNavbar: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   const { avatarUrl } = useAvatar();
+  const { isMobile } = useResponsive();
 
   const handleLogout = async () => {
     try {
@@ -32,7 +35,6 @@ const MainNavbar: React.FC = () => {
   };
 
   const getUserInitials = () => {
-    // Cast to any to access user_metadata which isn't in the UserProfile type
     const userAny = user as any;
     if (!userAny?.user_metadata?.full_name) return 'U';
     const names = userAny.user_metadata.full_name.split(' ');
@@ -46,15 +48,16 @@ const MainNavbar: React.FC = () => {
     <header className="w-full bg-background-base border-b border-border-subtle shadow-sm px-4 md:px-6 py-2">
       <div className="flex justify-between items-center">
         
-        {/* Left side: Logo */}
-        <div className="flex items-center">
+        {/* Left side: Mobile menu + Logo */}
+        <div className="flex items-center space-x-3">
+          {isMobile && user && <MobileNavigation />}
           <Link to="/" className="flex items-center">
             <Logo className="h-7" size="sm" />
           </Link>
         </div>
 
         {/* Right side: Actions */}
-        <div className="flex items-center">
+        <div className="flex items-center space-x-2">
           {!user && (
             <Link to="/auth">
               <Button variant="default" size="sm" className="rounded-full">
@@ -64,50 +67,57 @@ const MainNavbar: React.FC = () => {
           )}
           
           {user && (
-            <div className="flex items-center">
+            <>
+              {/* Add Transaction - Both mobile and desktop */}
               <Button 
                 variant="default"
-                size="sm"
-                className="mr-4 hidden md:flex rounded-full bg-primary text-white hover:bg-primary-hover"
+                size={isMobile ? "sm" : "sm"}
+                className={cn(
+                  "rounded-full bg-primary text-white hover:bg-primary-hover",
+                  isMobile ? "px-3" : "mr-2"
+                )}
                 onClick={() => setIsAddTransactionOpen(true)}
               >
-                <Plus className="h-4 w-4 mr-1" />
-                {t('transactions.new', 'Nova Transação')}
+                <Plus className="h-4 w-4" />
+                {!isMobile && <span className="ml-1 hidden sm:inline">{t('transactions.new', 'Nova')}</span>}
               </Button>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="focus:outline-none">
-                    <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
-                      {avatarUrl ? (
-                        <AvatarImage src={avatarUrl} alt="User" />
-                      ) : (
-                        <AvatarFallback className="bg-gray-100 text-black">
-                          {getUserInitials()}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="p-2 text-sm font-medium">
-                    {(user as any)?.user_metadata?.full_name || t('common.user', 'Usuário')}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings" className="flex items-center">
-                      <Settings className="mr-2 h-4 w-4" />
-                      {t('common.settings', 'Configurações')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 flex items-center">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {t('auth.logout', 'Sair')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+              {/* User Menu - Hidden on mobile since it's in the side menu */}
+              {!isMobile && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="focus:outline-none">
+                      <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                        {avatarUrl ? (
+                          <AvatarImage src={avatarUrl} alt="User" />
+                        ) : (
+                          <AvatarFallback className="bg-gray-100 text-black">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="p-2 text-sm font-medium">
+                      {(user as any)?.user_metadata?.full_name || t('common.user', 'Usuário')}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings" className="flex items-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        {t('common.settings', 'Configurações')}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 flex items-center">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {t('auth.logout', 'Sair')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </>
           )}
         </div>
       </div>

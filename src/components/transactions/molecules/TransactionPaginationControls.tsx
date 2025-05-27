@@ -1,6 +1,9 @@
 
 import React from 'react';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { useResponsive } from '@/hooks/useResponsive';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface TransactionPaginationControlsProps {
   currentPage: number;
@@ -13,7 +16,41 @@ const TransactionPaginationControls: React.FC<TransactionPaginationControlsProps
   totalPages,
   onPageChange
 }) => {
+  const { isMobile } = useResponsive();
+  
   if (totalPages <= 1) return null;
+  
+  if (isMobile) {
+    return (
+      <div className="flex items-center justify-between py-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+          disabled={currentPage === 1}
+          className="flex items-center"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Anterior
+        </Button>
+        
+        <span className="text-sm text-gray-600">
+          {currentPage} de {totalPages}
+        </span>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+          disabled={currentPage === totalPages}
+          className="flex items-center"
+        >
+          Próximo
+          <ChevronRight className="h-4 w-4 ml-1" />
+        </Button>
+      </div>
+    );
+  }
   
   return (
     <Pagination className="mt-2">
@@ -26,20 +63,15 @@ const TransactionPaginationControls: React.FC<TransactionPaginationControlsProps
         </PaginationItem>
         
         {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
-          // Simplified pagination display
           let pageNum;
           
           if (totalPages <= 5) {
-            // Show all pages if 5 or fewer
             pageNum = i + 1;
           } else if (currentPage <= 3) {
-            // At start, show first 5 pages
             pageNum = i + 1;
           } else if (currentPage >= totalPages - 2) {
-            // At end, show last 5 pages
             pageNum = totalPages - 4 + i;
           } else {
-            // In middle, show current page and 2 pages before/after
             pageNum = currentPage - 2 + i;
           }
           

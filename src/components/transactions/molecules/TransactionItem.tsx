@@ -1,120 +1,108 @@
 
 import React from 'react';
 import { Transaction } from '@/services/transactions';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { ArrowDown, ArrowUp, CircleDot } from 'lucide-react';
-import { MoreHorizontal } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Edit, Trash2, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/utils/currencyUtils';
-import { transactionCategories, getCategoryIcon } from '@/data/categories';
-import CategoryChip from '../atoms/CategoryChip';
+import { cn } from '@/lib/utils';
+import TransactionCategoryCell from '../cells/TransactionCategoryCell';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface TransactionItemProps {
   transaction: Transaction;
-  onEdit?: (transaction: Transaction) => void;
-  onDelete?: (transactionId: string) => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 const TransactionItem: React.FC<TransactionItemProps> = ({
   transaction,
   onEdit,
-  onDelete,
+  onDelete
 }) => {
-  // Format date from ISO string (YYYY-MM-DD) to DD/MM/YYYY
-  const formattedDate = (() => {
-    try {
-      const date = typeof transaction.date === 'string' 
-        ? new Date(transaction.date)
-        : transaction.date;
-      
-      return format(date, 'dd/MM/yyyy');
-    } catch (e) {
-      console.error("Error formatting date:", e);
-      return 'Data inválida';
-    }
-  })();
+  const { isMobile } = useResponsive();
 
-  // Find category details
-  const category = transactionCategories.find(c => c.id === transaction.category) || {
-    id: 'other',
-    name: 'Outros',
-    color: 'text-gray-500',
-    type: 'expense' as const,
-    value: 'other',
-    label: 'Outros',
-    icon: CircleDot
+  const formatCurrency = (amount: number) => {
+    return `R$ ${amount.toLocaleString('pt-BR', { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    })}`;
   };
-  
-  const IconComponent = category.icon || CircleDot;
-  
+
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
+  };
+
   return (
     <div className={cn(
-      "flex justify-between items-center px-3 py-1.5 hover:bg-gray-50 border-t first:border-t-0 transition-colors",
-      transaction.type === 'income' ? "border-l-4 border-l-green-500" : "border-l-4 border-l-red-400"
+      "p-4 hover:bg-gray-50 transition-colors cursor-pointer",
+      isMobile ? "border-b border-gray-100 last:border-b-0" : ""
     )}>
-      <div className="flex items-center gap-2">
-        <div className={cn(
-          "flex h-6 w-6 rounded-full items-center justify-center",
-          transaction.type === 'income' ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
-        )}>
-          {transaction.type === 'income' 
-            ? <ArrowUp className="h-3 w-3" /> 
-            : <ArrowDown className="h-3 w-3" />}
-        </div>
-        <div>
-          <h4 className="text-xs font-medium text-gray-900 line-clamp-1">{transaction.description}</h4>
-          <div className="flex items-center gap-1 mt-0.5">
-            <span className="text-xs text-gray-500">{formattedDate}</span>
-            <span className="text-gray-300 text-xs">•</span>
-            <CategoryChip categoryId={transaction.category} className="px-1 py-0.5 text-xs" />
+      <div className="flex items-center justify-between">
+        {/* Left side: Main info */}
+        <div className="flex-1 min-w-0">
+          {/* First row: Description and amount */}
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex-1 min-w-0 mr-3">
+              <h4 className="text-sm font-medium text-gray-900 truncate">
+                {transaction.description}
+              </h4>
+              <div className="flex items-center mt-1 space-x-2">
+                <span className="text-xs text-gray-500">
+                  {formatDate(transaction.date)}
+                </span>
+                <span className="text-xs text-gray-400">•</span>
+                <span className={cn(
+                  "text-xs font-medium",
+                  transaction.type === 'income' ? 'text-green-600' : 'text-blue-600'
+                )}>
+                  {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <div className={cn(
+                "text-right",
+                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+              )}>
+                <div className="font-semibold text-sm">
+                  {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onEdit}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          {/* Second row: Category */}
+          <div className="flex items-center">
+            <TransactionCategoryCell category={transaction.category} />
           </div>
         </div>
-      </div>
-      
-      <div className="flex items-center gap-1">
-        <span className={cn(
-          "font-medium text-xs",
-          transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-        )}>
-          {transaction.type === 'income' ? '+' : '-'}
-          {formatCurrency(transaction.amount)}
-        </span>
-        
-        {(onEdit || onDelete) && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-40 p-1" align="end" side="left">
-              <div className="flex flex-col gap-1 text-xs">
-                {onEdit && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => onEdit(transaction)}
-                    className="justify-start h-6"
-                  >
-                    Editar
-                  </Button>
-                )}
-                {onDelete && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => onDelete(transaction.id)}
-                    className="justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-6"
-                  >
-                    Excluir
-                  </Button>
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
-        )}
       </div>
     </div>
   );
