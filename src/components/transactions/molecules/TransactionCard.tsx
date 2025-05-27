@@ -87,9 +87,9 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
             )}>
               {transaction.type === 'income' ? (
-                <ArrowUp className="h-5 w-5 text-green-600" />
+                <ArrowUp className="h-4 w-4 text-green-600" />
               ) : (
-                <ArrowDown className="h-5 w-5 text-red-600" />
+                <ArrowDown className="h-4 w-4 text-red-600" />
               )}
             </div>
             
@@ -179,9 +179,9 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'
         )}>
           {transaction.type === 'income' ? (
-            <ArrowUp className="h-5 w-5 text-green-600" />
+            <ArrowUp className="h-4 w-4 text-green-600" />
           ) : (
-            <ArrowDown className="h-5 w-5 text-red-600" />
+            <ArrowDown className="h-4 w-4 text-red-600" />
           )}
         </div>
         
