@@ -11,16 +11,13 @@ const PublicLanding: React.FC = () => {
     <div className="bg-white min-h-screen">
       <TransparentHeader />
 
-      {/* HERO, FEATURES e CTA: todas usando max-w-7xl */}
       <main>
         <HeroSection />
         <FeaturesSection />
         <CtaSection />
       </main>
 
-      {/* RESOURCES: larga, background, centralizar conteúdo interno */}
       <ResourcesSection />
-
       <Footer />
     </div>
   );
