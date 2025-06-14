@@ -9,12 +9,14 @@ import Footer from '../components/landing/Footer';
 
 const PublicLanding: React.FC = () => {
   return (
-    <div className="min-h-screen">
+    <div className="bg-white min-h-screen">
       <TransparentHeader />
-      <HeroSection />
-      <FeaturesSection />
-      <ResourcesSection />
-      <CtaSection />
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <HeroSection />
+        <FeaturesSection />
+        <ResourcesSection />
+        <CtaSection />
+      </main>
       <Footer />
     </div>
   );

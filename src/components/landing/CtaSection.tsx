@@ -6,8 +6,8 @@ import { CheckCircle2 } from 'lucide-react';
 
 const CtaSection: React.FC = () => {
   return (
-    <section className="bg-primary py-24 text-white">
-      <div className="container mx-auto px-4 text-center">
+    <section className="bg-primary py-12 sm:py-16 lg:py-20 text-white rounded-2xl mt-8 mb-8 sm:mb-12 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+      <div className="text-center">
         <h2 className="font-alliance-n2 text-3xl md:text-4xl font-bold mb-6">
           Comece agora mesmo
         </h2>
@@ -15,7 +15,7 @@ const CtaSection: React.FC = () => {
           Controle suas finanças de forma simples e inteligente
         </p>
         <Link to="/auth?tab=signup">
-          <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-alliance-n2">
+          <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-alliance-n2 w-full sm:w-auto">
             Criar conta gratuita
           </Button>
         </Link>
