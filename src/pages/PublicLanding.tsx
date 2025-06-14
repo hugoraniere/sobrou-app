@@ -1,4 +1,3 @@
-
 import React from 'react';
 import TransparentHeader from '../components/header/TransparentHeader';
 import HeroSection from '../components/landing/HeroSection';
@@ -11,12 +10,17 @@ const PublicLanding: React.FC = () => {
   return (
     <div className="bg-white min-h-screen">
       <TransparentHeader />
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      {/* HERO, FEATURES e CTA: todas usando max-w-7xl */}
+      <main>
         <HeroSection />
         <FeaturesSection />
-        <ResourcesSection />
         <CtaSection />
       </main>
+
+      {/* RESOURCES: larga, background, centralizar conteúdo interno */}
+      <ResourcesSection />
+
       <Footer />
     </div>
   );
