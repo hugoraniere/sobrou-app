@@ -16,7 +16,6 @@ interface ComparativeTableSectionProps {
   sectionKey: 'REVENUE' | 'ESSENTIAL' | 'NON_ESSENTIAL' | 'RESERVES';
   realCategories: CategoryData[];
   planningCategories: CategoryData[];
-  selectedMonth: number;
   currentMonth: number;
   months: string[];
 }
@@ -26,7 +25,6 @@ export const ComparativeTableSection: React.FC<ComparativeTableSectionProps> = (
   sectionKey,
   realCategories,
   planningCategories,
-  selectedMonth,
   currentMonth,
   months
 }) => {
@@ -59,7 +57,6 @@ export const ComparativeTableSection: React.FC<ComparativeTableSectionProps> = (
             key={realCategory.id}
             realCategory={realCategory}
             planningCategory={planningCategory}
-            selectedMonth={selectedMonth}
             currentMonth={currentMonth}
             months={months}
           />

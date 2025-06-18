@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
@@ -23,8 +23,6 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
   } = useUnifiedMonthlySummary(year);
   const { isMobile } = useResponsive();
   
-  // Estado para o mês selecionado (inicializado com o mês atual)
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const currentMonth = new Date().getMonth();
 
   // Determinar qual dados de planejamento usar baseado no toggle
@@ -50,10 +48,6 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
       displayName: cat.displayName,
       values: Array(12).fill(cat.monthlyValue)
     }))
-  };
-
-  const handleMonthClick = (monthIndex: number) => {
-    setSelectedMonth(monthIndex);
   };
 
   const sections = [
@@ -85,7 +79,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
 
   const getDescription = () => {
     const viewType = isDetailedView ? 'detalhado' : 'simples';
-    return `Compare seus gastos reais com o planejamento ${viewType} por categoria. Clique nos meses para alterar a comparação.`;
+    return `Compare seus gastos reais com o planejamento ${viewType} por categoria.`;
   };
 
   return (
@@ -101,9 +95,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
           <Table className="min-w-full">
             <ComparativeTableHeader
               months={months}
-              selectedMonth={selectedMonth}
               currentMonth={currentMonth}
-              onMonthClick={handleMonthClick}
             />
             <TableBody>
               {sections.map((section) => (
@@ -113,7 +105,6 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                   sectionKey={section.sectionKey}
                   realCategories={section.realCategories}
                   planningCategories={section.planningCategories}
-                  selectedMonth={selectedMonth}
                   currentMonth={currentMonth}
                   months={months}
                 />

@@ -15,7 +15,6 @@ interface CategoryData {
 interface ComparativeTableRowProps {
   realCategory: CategoryData;
   planningCategory?: CategoryData;
-  selectedMonth: number;
   currentMonth: number;
   months: string[];
 }
@@ -23,7 +22,6 @@ interface ComparativeTableRowProps {
 export const ComparativeTableRow: React.FC<ComparativeTableRowProps> = ({
   realCategory,
   planningCategory,
-  selectedMonth,
   currentMonth,
   months
 }) => {
@@ -45,13 +43,13 @@ export const ComparativeTableRow: React.FC<ComparativeTableRowProps> = ({
         {realCategory.displayName}
       </TableCell>
       
-      {/* Coluna de valor planejado para o mês selecionado */}
+      {/* Coluna de valor planejado para o mês atual */}
       <TableCell className={cn(
         TABLE_CELL_STYLES.DATA_CELL,
         "text-center bg-gray-100 font-medium border-l-4 border-gray-400"
       )}>
         {formatCurrency(
-          planningCategory?.values[selectedMonth] || 0
+          planningCategory?.values[currentMonth] || 0
         )}
       </TableCell>
       
@@ -67,8 +65,7 @@ export const ComparativeTableRow: React.FC<ComparativeTableRowProps> = ({
               TABLE_CELL_STYLES.DATA_CELL,
               "text-center",
               getVarianceColor(realValue, plannedValue),
-              monthIndex === selectedMonth && "border-l-4 border-blue-500",
-              getCurrentMonthColumnStyle(monthIndex === currentMonth && monthIndex !== selectedMonth)
+              getCurrentMonthColumnStyle(monthIndex === currentMonth)
             )}
           >
             <ComparativeTooltip
