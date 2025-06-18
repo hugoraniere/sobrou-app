@@ -49,8 +49,11 @@ export const BillForm: React.FC<BillFormProps> = ({
 
   const onFormSubmit = (data: BillFormData) => {
     onSubmit({
-      ...data,
+      title: data.title,
       amount: parseFloat(data.amount),
+      due_date: data.due_date,
+      description: data.description || undefined,
+      notes: data.notes || undefined,
     });
   };
 
