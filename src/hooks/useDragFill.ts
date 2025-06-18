@@ -35,6 +35,7 @@ export const useDragFill = () => {
       end: position
     });
     
+    // Definir cursor para todo o documento
     document.body.style.cursor = 'crosshair';
     document.body.style.userSelect = 'none';
   }, []);
@@ -58,18 +59,18 @@ export const useDragFill = () => {
     console.log('Drag ended, range:', fillRange, 'with value:', dragStartValue.current);
     setIsDragging(false);
     
+    // Restaurar cursor
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
     
     const range = fillRange;
-    const valueToFill = dragStartValue.current;
     
     // Limpar range após um delay para feedback visual
     setTimeout(() => {
       setFillRange(null);
     }, 300);
     
-    return { range, value: valueToFill };
+    return range;
   }, [fillRange]);
 
   const clearSelection = useCallback(() => {
@@ -88,9 +89,11 @@ export const useDragFill = () => {
     
     console.log('Getting cells in range from:', start, 'to:', end);
     
+    // Determinar direção do preenchimento (horizontal apenas)
     const minMonth = Math.min(start.monthIndex, end.monthIndex);
     const maxMonth = Math.max(start.monthIndex, end.monthIndex);
     
+    // Preenchimento horizontal (mesma categoria, diferentes meses)
     if (start.categoryId === end.categoryId && start.section === end.section) {
       for (let month = minMonth; month <= maxMonth; month++) {
         cells.push({
@@ -122,6 +125,7 @@ export const useDragFill = () => {
     selectedCell,
     fillRange,
     isDragging,
+    // FIX: Retornar corretamente o valor do dragStartValue
     dragStartValue: dragStartValue.current,
     selectCell,
     startDrag,

@@ -81,29 +81,26 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     onDragStart?.(position, value);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
+      // Melhorar detecção de células durante o drag
       const elements = document.elementsFromPoint(moveEvent.clientX, moveEvent.clientY);
       
       for (const element of elements) {
-        const cellElement = element.closest('[data-cell-info]');
+        const cellElement = element.closest('[data-cell-section]');
         if (cellElement) {
-          const cellInfo = cellElement.getAttribute('data-cell-info');
-          if (cellInfo) {
-            try {
-              const [section, categoryId, monthIndex] = cellInfo.split('|');
-              if (section && categoryId && monthIndex !== null) {
-                const targetPosition: CellPosition = {
-                  section,
-                  categoryId,
-                  monthIndex: parseInt(monthIndex)
-                };
-                
-                console.log('Drag move to position:', targetPosition);
-                onDragMove?.(targetPosition);
-                break;
-              }
-            } catch (error) {
-              console.warn('Error parsing cell info:', error);
-            }
+          const section = cellElement.getAttribute('data-cell-section');
+          const categoryId = cellElement.getAttribute('data-cell-category');
+          const monthIndex = cellElement.getAttribute('data-cell-month');
+          
+          if (section && categoryId && monthIndex !== null) {
+            const targetPosition: CellPosition = {
+              section,
+              categoryId,
+              monthIndex: parseInt(monthIndex)
+            };
+            
+            console.log('Drag move to position:', targetPosition);
+            onDragMove?.(targetPosition);
+            break;
           }
         }
       }
@@ -127,14 +124,13 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
   };
 
-  // Usar data-cell-info consistente em todo lugar
-  const cellDataInfo = `${position.section}|${position.categoryId}|${position.monthIndex}`;
-
   if (isEditing) {
     return (
       <div
         ref={cellRef}
-        data-cell-info={cellDataInfo}
+        data-cell-section={position.section}
+        data-cell-category={position.categoryId}
+        data-cell-month={position.monthIndex}
         className={cn("relative", className)}
         onMouseEnter={handleCellMouseEnter}
       >
@@ -154,7 +150,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   return (
     <div
       ref={cellRef}
-      data-cell-info={cellDataInfo}
+      data-cell-section={position.section}
+      data-cell-category={position.categoryId}
+      data-cell-month={position.monthIndex}
       onClick={handleClick}
       onMouseEnter={handleCellMouseEnter}
       className={cn(

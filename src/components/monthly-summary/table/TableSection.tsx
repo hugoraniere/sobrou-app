@@ -7,6 +7,7 @@ import { CategoryRow } from './CategoryRow';
 import { AddCategoryButton } from '../AddCategoryButton';
 import { useCategoryDragDrop } from '@/hooks/useCategoryDragDrop';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
@@ -28,7 +29,6 @@ interface TableSectionProps {
   onDragMove: (position: CellPosition) => void;
   onDragEnd: () => void;
   isInFillRange: (position: CellPosition) => boolean;
-  hideHeader?: boolean;
 }
 
 export const TableSection: React.FC<TableSectionProps> = ({
@@ -49,9 +49,13 @@ export const TableSection: React.FC<TableSectionProps> = ({
   onDragMove,
   onDragEnd,
   isInFillRange,
-  hideHeader = false,
 }) => {
   const categoryDragDrop = useCategoryDragDrop();
+
+  // Calcular totais por mês
+  const totals = Array(12).fill(0).map((_, monthIndex) =>
+    categories.reduce((sum, category) => sum + (category.values[monthIndex] || 0), 0)
+  );
 
   const handleCategoryDragEnd = () => {
     const result = categoryDragDrop.endDrag();
@@ -62,6 +66,29 @@ export const TableSection: React.FC<TableSectionProps> = ({
 
   return (
     <>
+      {/* Header da seção */}
+      <TableRow className={bgColor}>
+        <TableCell className={cn(
+          TABLE_CELL_STYLES.HEADER,
+          `font-bold sticky left-0 border-r ${bgColor} ${textColor}`,
+          TABLE_Z_INDEX.SECTION_HEADER
+        )}>
+          {title}
+        </TableCell>
+        {totals.map((total, index) => (
+          <TableCell 
+            key={index} 
+            className={cn(
+              TABLE_CELL_STYLES.HEADER,
+              `text-center font-semibold ${textColor}`,
+              getCurrentMonthColumnStyle(index === currentMonth)
+            )}
+          >
+            {formatCurrency(total)}
+          </TableCell>
+        ))}
+      </TableRow>
+      
       {/* Linhas das categorias */}
       {categories.map((category, index) => (
         <CategoryRow
@@ -88,7 +115,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
         />
       ))}
       
-      {/* Linha para adicionar categoria */}
+      {/* Linha para adicionar categoria - MOVIDA PARA O FINAL */}
       <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
         <TableCell className={cn(
           TABLE_CELL_STYLES.CATEGORY_CELL,

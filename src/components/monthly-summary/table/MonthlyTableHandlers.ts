@@ -61,14 +61,15 @@ export const createMonthlyTableHandlers = ({
   };
 
   const handleDragEnd = () => {
-    const result = dragFill.endDrag();
-    if (result && result.range && result.value !== undefined) {
-      const cells = dragFill.getCellsInRange(result.range);
-      const valueToFill = result.value;
+    const range = dragFill.endDrag();
+    if (range) {
+      const cells = dragFill.getCellsInRange(range);
+      // FIX: Acessar o valor através da função dragStartValue corretamente
+      const valueToFill = dragFill.dragStartValue;
       
       console.log('Filling cells:', cells, 'with value:', valueToFill);
       
-      // Preencher todas as células do range
+      // Preencher todas as células do range, incluindo a inicial
       cells.forEach((cell: CellPosition) => {
         console.log('Updating cell:', cell, 'with value:', valueToFill);
         updateCategoryValue(
