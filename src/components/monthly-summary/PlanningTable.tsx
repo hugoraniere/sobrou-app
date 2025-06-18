@@ -10,6 +10,7 @@ import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useDragFill } from '@/hooks/useDragFill';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 
 interface PlanningTableProps {
   year: number;
@@ -79,7 +80,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                       key={month} 
                       className={cn(
                         "text-center min-w-[80px] text-xs",
-                        index === currentMonth && "border-r-2 border-blue-500"
+                        getCurrentMonthColumnStyle(index === currentMonth)
                       )}
                     >
                       {month}

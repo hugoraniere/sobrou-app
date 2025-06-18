@@ -3,6 +3,7 @@ import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 
 interface TableSectionHeaderProps {
   title: string;
@@ -33,7 +34,7 @@ export const TableSectionHeader: React.FC<TableSectionHeaderProps> = ({
           key={index} 
           className={cn(
             `text-center font-semibold ${textColor} text-xs px-1 h-6`,
-            index === currentMonth && "bg-blue-50"
+            getCurrentMonthColumnStyle(index === currentMonth)
           )}
         >
           {formatCurrency(total)}

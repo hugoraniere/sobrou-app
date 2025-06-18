@@ -4,6 +4,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
 import { cn } from '@/lib/utils';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { EditableCategoryName } from '../EditableCategoryName';
 import { EditableCell } from '../EditableCell';
 
@@ -62,7 +63,7 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
             key={monthIndex}
             className={cn(
               "text-center text-xs px-1 py-1 relative",
-              monthIndex === currentMonth && "bg-blue-50 border-r-2 border-blue-500",
+              getCurrentMonthColumnStyle(monthIndex === currentMonth),
               isSelected && "ring-2 ring-blue-400",
               isInRange && "bg-blue-100"
             )}

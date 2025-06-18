@@ -2,6 +2,7 @@
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { formatCurrency, cn } from '@/lib/utils';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 
 interface MonthlyTotals {
   revenue: number;
@@ -28,7 +29,7 @@ export const SurplusRow: React.FC<SurplusRowProps> = ({ totals, currentMonth }) 
           className={cn(
             "text-center font-bold text-xs px-1 py-2",
             monthTotal.surplus >= 0 ? "text-green-600" : "text-red-600",
-            index === currentMonth && "bg-blue-100 border-r-2 border-blue-500"
+            getCurrentMonthColumnStyle(index === currentMonth)
           )}
         >
           {formatCurrency(monthTotal.surplus)}

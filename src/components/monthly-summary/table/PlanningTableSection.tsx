@@ -4,6 +4,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { EditableCell } from '../EditableCell';
 import { CellPosition } from '@/hooks/useDragFill';
 import { cn } from '@/lib/utils';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 
 interface PlanningCategoryData {
   id: string;
@@ -49,7 +50,7 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
             key={index} 
             className={cn(
               "text-center font-semibold text-xs px-1 h-6",
-              index === currentMonth && "bg-blue-50"
+              getCurrentMonthColumnStyle(index === currentMonth)
             )}
           >
             R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -75,7 +76,7 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
                 key={monthIndex} 
                 className={cn(
                   "p-0.5 h-6",
-                  monthIndex === currentMonth && "bg-blue-50"
+                  getCurrentMonthColumnStyle(monthIndex === currentMonth)
                 )}
               >
                 <EditableCell

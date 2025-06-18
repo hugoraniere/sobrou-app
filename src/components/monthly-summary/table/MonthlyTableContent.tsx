@@ -4,6 +4,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MONTHS_SHORT } from '@/types/monthly-summary';
 import { cn } from '@/lib/utils';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getSectionConfigs } from './MonthlyTableConfig';
@@ -79,7 +80,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
                   key={index} 
                   className={cn(
                     "text-center min-w-[70px] font-bold text-xs px-1 h-6",
-                    index === currentMonth && "bg-blue-50 border-r-2 border-blue-500"
+                    getCurrentMonthColumnStyle(index === currentMonth)
                   )}
                 >
                   {month}
