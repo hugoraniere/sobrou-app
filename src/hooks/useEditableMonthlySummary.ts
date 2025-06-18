@@ -19,26 +19,41 @@ export interface EditableMonthlySummary {
 const getInitialCategories = () => ({
   revenue: [
     { id: 'salario', name: 'salario', displayName: 'Salário', values: Array(12).fill(0) },
-    { id: 'freelance', name: 'freelance', displayName: 'Freelance', values: Array(12).fill(0) },
-    { id: 'aluguel-recebido', name: 'aluguel-recebido', displayName: 'Aluguel Recebido', values: Array(12).fill(0) },
-    { id: 'investimentos', name: 'investimentos', displayName: 'Rendimentos', values: Array(12).fill(0) },
+    { id: 'aluguel', name: 'aluguel', displayName: 'Aluguel', values: Array(12).fill(0) },
+    { id: 'transferencias', name: 'transferencias', displayName: 'Transferências', values: Array(12).fill(0) },
+    { id: 'outros-receita', name: 'outros-receita', displayName: 'Outros', values: Array(12).fill(0) },
   ],
   essentialExpenses: [
-    { id: 'moradia', name: 'moradia', displayName: 'Moradia', values: Array(12).fill(0) },
-    { id: 'alimentacao', name: 'alimentacao', displayName: 'Alimentação', values: Array(12).fill(0) },
-    { id: 'transporte', name: 'transporte', displayName: 'Transporte', values: Array(12).fill(0) },
-    { id: 'saude', name: 'saude', displayName: 'Saúde', values: Array(12).fill(0) },
+    { id: 'luz', name: 'luz', displayName: 'Luz', values: Array(12).fill(0) },
+    { id: 'agua', name: 'agua', displayName: 'Água', values: Array(12).fill(0) },
     { id: 'internet', name: 'internet', displayName: 'Internet', values: Array(12).fill(0) },
-    { id: 'cartao', name: 'cartao', displayName: 'Cartão', values: Array(12).fill(0) },
+    { id: 'transporte', name: 'transporte', displayName: 'Transporte', values: Array(12).fill(0) },
+    { id: 'alimentacao', name: 'alimentacao', displayName: 'Alimentação', values: Array(12).fill(0) },
+    { id: 'cartao-credito', name: 'cartao-credito', displayName: 'Cartão de Crédito', values: Array(12).fill(0) },
+    { id: 'manutencao-carro', name: 'manutencao-carro', displayName: 'Manutenção Carro', values: Array(12).fill(0) },
+    { id: 'emprestimo', name: 'emprestimo', displayName: 'Empréstimo', values: Array(12).fill(0) },
+    { id: 'manutencao-apto', name: 'manutencao-apto', displayName: 'Manutenção Apto', values: Array(12).fill(0) },
+    { id: 'diarista', name: 'diarista', displayName: 'Diarista', values: Array(12).fill(0) },
+    { id: 'outros-essencial', name: 'outros-essencial', displayName: 'Outros', values: Array(12).fill(0) },
   ],
   nonEssentialExpenses: [
-    { id: 'lazer', name: 'lazer', displayName: 'Lazer', values: Array(12).fill(0) },
-    { id: 'compras', name: 'compras', displayName: 'Compras', values: Array(12).fill(0) },
-    { id: 'outros', name: 'outros', displayName: 'Outros', values: Array(12).fill(0) },
+    { id: 'academia', name: 'academia', displayName: 'Academia', values: Array(12).fill(0) },
+    { id: 'plano-saude', name: 'plano-saude', displayName: 'Plano de Saúde', values: Array(12).fill(0) },
+    { id: 'mei', name: 'mei', displayName: 'MEI', values: Array(12).fill(0) },
+    { id: 'estudos', name: 'estudos', displayName: 'Estudos', values: Array(12).fill(0) },
+    { id: 'alimentacao-extra', name: 'alimentacao-extra', displayName: 'Alimentação (Gastos extras)', values: Array(12).fill(0) },
+    { id: 'celular', name: 'celular', displayName: 'Celular (Mensalidade)', values: Array(12).fill(0) },
+    { id: 'assinaturas', name: 'assinaturas', displayName: 'Assinaturas Mensais', values: Array(12).fill(0) },
+    { id: 'dentista', name: 'dentista', displayName: 'Dentista', values: Array(12).fill(0) },
+    { id: 'outros-nao-essencial', name: 'outros-nao-essencial', displayName: 'Outros', values: Array(12).fill(0) },
   ],
   reserves: [
-    { id: 'investimentos-reserva', name: 'investimentos-reserva', displayName: 'Investimentos', values: Array(12).fill(0) },
-    { id: 'poupanca', name: 'poupanca', displayName: 'Poupança', values: Array(12).fill(0) },
+    { id: 'montante-investido', name: 'montante-investido', displayName: 'Montante Investido no mês', values: Array(12).fill(0) },
+    { id: 'investimentos-medio-longo', name: 'investimentos-medio-longo', displayName: 'Total de Investimentos em Médio e Longo Prazo', values: Array(12).fill(0) },
+    { id: 'investimentos-curto', name: 'investimentos-curto', displayName: 'Total de Investimentos em Curto Prazo', values: Array(12).fill(0) },
+    { id: 'percentual-sobra', name: 'percentual-sobra', displayName: '% de Sobra', values: Array(12).fill(0) },
+    { id: 'fundo-emergencia', name: 'fundo-emergencia', displayName: 'Quanto Falta para o Fundo de Emergência', values: Array(12).fill(0) },
+    { id: 'sobra-mensal', name: 'sobra-mensal', displayName: 'Sobra Mensal (R - D1 - D2)', values: Array(12).fill(0) },
   ],
 });
 
@@ -100,6 +115,23 @@ export const useEditableMonthlySummary = (year: number) => {
     }));
   }, []);
 
+  const updateCategoryName = useCallback((
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
+    categoryId: string,
+    newName: string
+  ) => {
+    const displayName = newName.charAt(0).toUpperCase() + newName.slice(1);
+    
+    setData(prev => ({
+      ...prev,
+      [section]: prev[section].map(cat =>
+        cat.id === categoryId
+          ? { ...cat, displayName }
+          : cat
+      )
+    }));
+  }, []);
+
   const addCategory = useCallback((
     section: keyof Omit<EditableMonthlySummary, 'year'>,
     name: string
@@ -156,6 +188,7 @@ export const useEditableMonthlySummary = (year: number) => {
   return {
     data,
     updateCategoryValue,
+    updateCategoryName,
     addCategory,
     removeCategory,
     totals,

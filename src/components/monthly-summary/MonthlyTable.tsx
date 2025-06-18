@@ -7,6 +7,7 @@ import { MONTHS_SHORT } from '@/types/monthly-summary';
 import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { EditableCell } from './EditableCell';
+import { EditableCategoryName } from './EditableCategoryName';
 import { AddCategoryButton } from './AddCategoryButton';
 import { AddCategoryDialog } from './AddCategoryDialog';
 import { useEditableMonthlySummary } from '@/hooks/useEditableMonthlySummary';
@@ -16,7 +17,7 @@ interface MonthlyTableProps {
 }
 
 export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
-  const { data, updateCategoryValue, addCategory, totals } = useEditableMonthlySummary(year);
+  const { data, updateCategoryValue, updateCategoryName, addCategory, totals } = useEditableMonthlySummary(year);
   const [dialogState, setDialogState] = useState<{
     open: boolean;
     section: keyof Omit<typeof data, 'year'> | null;
@@ -26,6 +27,8 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     section: null,
     sectionTitle: ''
   });
+
+  const currentMonth = new Date().getMonth();
 
   const handleAddCategory = (section: keyof Omit<typeof data, 'year'>, sectionTitle: string) => {
     setDialogState({
@@ -41,6 +44,14 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     }
   };
 
+  const handleCategoryNameChange = (
+    section: keyof Omit<typeof data, 'year'>,
+    categoryId: string,
+    newName: string
+  ) => {
+    updateCategoryName(section, categoryId, newName);
+  };
+
   return (
     <>
       <Card className="w-full">
@@ -53,7 +64,13 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     Categoria
                   </TableHead>
                   {MONTHS_SHORT.map((month, index) => (
-                    <TableHead key={index} className="text-center min-w-[100px] font-bold text-sm">
+                    <TableHead 
+                      key={index} 
+                      className={cn(
+                        "text-center min-w-[100px] font-bold text-sm",
+                        index === currentMonth && "bg-blue-50"
+                      )}
+                    >
                       {month}
                     </TableHead>
                   ))}
@@ -66,7 +83,13 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     RECEITAS (R)
                   </TableCell>
                   {totals.map((total, index) => (
-                    <TableCell key={index} className="text-center font-semibold text-green-700 text-sm">
+                    <TableCell 
+                      key={index} 
+                      className={cn(
+                        "text-center font-semibold text-green-700 text-sm",
+                        index === currentMonth && "bg-blue-50"
+                      )}
+                    >
                       {formatCurrency(total.revenue)}
                     </TableCell>
                   ))}
@@ -75,10 +98,19 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                 {data.revenue.map(category => (
                   <TableRow key={category.id} className="hover:bg-gray-50">
                     <TableCell className="bg-white sticky left-0 z-10 pl-8 text-sm">
-                      {category.displayName}
+                      <EditableCategoryName
+                        value={category.displayName}
+                        onChange={(newName) => handleCategoryNameChange('revenue', category.id, newName)}
+                      />
                     </TableCell>
                     {category.values.map((value, monthIndex) => (
-                      <TableCell key={monthIndex} className="p-1">
+                      <TableCell 
+                        key={monthIndex} 
+                        className={cn(
+                          "p-1",
+                          monthIndex === currentMonth && "bg-blue-50"
+                        )}
+                      >
                         <EditableCell
                           value={value}
                           onChange={(newValue) => updateCategoryValue('revenue', category.id, monthIndex, newValue)}
@@ -93,7 +125,10 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     <AddCategoryButton onClick={() => handleAddCategory('revenue', 'Receitas')} />
                   </TableCell>
                   {Array(12).fill(null).map((_, index) => (
-                    <TableCell key={index}></TableCell>
+                    <TableCell 
+                      key={index}
+                      className={cn(index === currentMonth && "bg-blue-50")}
+                    ></TableCell>
                   ))}
                 </TableRow>
 
@@ -103,7 +138,13 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     DESPESAS ESSENCIAIS (D1)
                   </TableCell>
                   {totals.map((total, index) => (
-                    <TableCell key={index} className="text-center font-semibold text-red-700 text-sm">
+                    <TableCell 
+                      key={index} 
+                      className={cn(
+                        "text-center font-semibold text-red-700 text-sm",
+                        index === currentMonth && "bg-blue-50"
+                      )}
+                    >
                       {formatCurrency(total.essential)}
                     </TableCell>
                   ))}
@@ -112,10 +153,19 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                 {data.essentialExpenses.map(category => (
                   <TableRow key={category.id} className="hover:bg-gray-50">
                     <TableCell className="bg-white sticky left-0 z-10 pl-8 text-sm">
-                      {category.displayName}
+                      <EditableCategoryName
+                        value={category.displayName}
+                        onChange={(newName) => handleCategoryNameChange('essentialExpenses', category.id, newName)}
+                      />
                     </TableCell>
                     {category.values.map((value, monthIndex) => (
-                      <TableCell key={monthIndex} className="p-1">
+                      <TableCell 
+                        key={monthIndex} 
+                        className={cn(
+                          "p-1",
+                          monthIndex === currentMonth && "bg-blue-50"
+                        )}
+                      >
                         <EditableCell
                           value={value}
                           onChange={(newValue) => updateCategoryValue('essentialExpenses', category.id, monthIndex, newValue)}
@@ -130,7 +180,10 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     <AddCategoryButton onClick={() => handleAddCategory('essentialExpenses', 'Despesas Essenciais')} />
                   </TableCell>
                   {Array(12).fill(null).map((_, index) => (
-                    <TableCell key={index}></TableCell>
+                    <TableCell 
+                      key={index}
+                      className={cn(index === currentMonth && "bg-blue-50")}
+                    ></TableCell>
                   ))}
                 </TableRow>
 
@@ -140,7 +193,13 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     DESPESAS NÃO ESSENCIAIS (D2)
                   </TableCell>
                   {totals.map((total, index) => (
-                    <TableCell key={index} className="text-center font-semibold text-orange-700 text-sm">
+                    <TableCell 
+                      key={index} 
+                      className={cn(
+                        "text-center font-semibold text-orange-700 text-sm",
+                        index === currentMonth && "bg-blue-50"
+                      )}
+                    >
                       {formatCurrency(total.nonEssential)}
                     </TableCell>
                   ))}
@@ -149,10 +208,19 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                 {data.nonEssentialExpenses.map(category => (
                   <TableRow key={category.id} className="hover:bg-gray-50">
                     <TableCell className="bg-white sticky left-0 z-10 pl-8 text-sm">
-                      {category.displayName}
+                      <EditableCategoryName
+                        value={category.displayName}
+                        onChange={(newName) => handleCategoryNameChange('nonEssentialExpenses', category.id, newName)}
+                      />
                     </TableCell>
                     {category.values.map((value, monthIndex) => (
-                      <TableCell key={monthIndex} className="p-1">
+                      <TableCell 
+                        key={monthIndex} 
+                        className={cn(
+                          "p-1",
+                          monthIndex === currentMonth && "bg-blue-50"
+                        )}
+                      >
                         <EditableCell
                           value={value}
                           onChange={(newValue) => updateCategoryValue('nonEssentialExpenses', category.id, monthIndex, newValue)}
@@ -167,7 +235,10 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     <AddCategoryButton onClick={() => handleAddCategory('nonEssentialExpenses', 'Despesas Não Essenciais')} />
                   </TableCell>
                   {Array(12).fill(null).map((_, index) => (
-                    <TableCell key={index}></TableCell>
+                    <TableCell 
+                      key={index}
+                      className={cn(index === currentMonth && "bg-blue-50")}
+                    ></TableCell>
                   ))}
                 </TableRow>
 
@@ -177,7 +248,13 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     RESERVAS MENSAIS
                   </TableCell>
                   {totals.map((total, index) => (
-                    <TableCell key={index} className="text-center font-semibold text-blue-700 text-sm">
+                    <TableCell 
+                      key={index} 
+                      className={cn(
+                        "text-center font-semibold text-blue-700 text-sm",
+                        index === currentMonth && "bg-blue-50"
+                      )}
+                    >
                       {formatCurrency(total.reserves)}
                     </TableCell>
                   ))}
@@ -186,10 +263,19 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                 {data.reserves.map(category => (
                   <TableRow key={category.id} className="hover:bg-gray-50">
                     <TableCell className="bg-white sticky left-0 z-10 pl-8 text-sm">
-                      {category.displayName}
+                      <EditableCategoryName
+                        value={category.displayName}
+                        onChange={(newName) => handleCategoryNameChange('reserves', category.id, newName)}
+                      />
                     </TableCell>
                     {category.values.map((value, monthIndex) => (
-                      <TableCell key={monthIndex} className="p-1">
+                      <TableCell 
+                        key={monthIndex} 
+                        className={cn(
+                          "p-1",
+                          monthIndex === currentMonth && "bg-blue-50"
+                        )}
+                      >
                         <EditableCell
                           value={value}
                           onChange={(newValue) => updateCategoryValue('reserves', category.id, monthIndex, newValue)}
@@ -204,7 +290,10 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     <AddCategoryButton onClick={() => handleAddCategory('reserves', 'Reservas Mensais')} />
                   </TableCell>
                   {Array(12).fill(null).map((_, index) => (
-                    <TableCell key={index}></TableCell>
+                    <TableCell 
+                      key={index}
+                      className={cn(index === currentMonth && "bg-blue-50")}
+                    ></TableCell>
                   ))}
                 </TableRow>
 
@@ -218,7 +307,8 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                       key={index} 
                       className={cn(
                         "text-center font-bold text-sm",
-                        total.surplus >= 0 ? "text-green-600" : "text-red-600"
+                        total.surplus >= 0 ? "text-green-600" : "text-red-600",
+                        index === currentMonth && "bg-blue-50"
                       )}
                     >
                       {formatCurrency(total.surplus)}
