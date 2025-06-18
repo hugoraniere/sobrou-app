@@ -17,6 +17,7 @@ interface ComparativeTableSectionProps {
   realCategories: CategoryData[];
   planningCategories: CategoryData[];
   currentMonth: number;
+  selectedMonth: number;
   months: string[];
 }
 
@@ -26,6 +27,7 @@ export const ComparativeTableSection: React.FC<ComparativeTableSectionProps> = (
   realCategories,
   planningCategories,
   currentMonth,
+  selectedMonth,
   months
 }) => {
   const sectionColors = getSectionColor(sectionKey);
@@ -58,6 +60,7 @@ export const ComparativeTableSection: React.FC<ComparativeTableSectionProps> = (
             realCategory={realCategory}
             planningCategory={planningCategory}
             currentMonth={currentMonth}
+            selectedMonth={selectedMonth}
             months={months}
           />
         );

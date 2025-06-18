@@ -16,6 +16,7 @@ interface ComparativeTableRowProps {
   realCategory: CategoryData;
   planningCategory?: CategoryData;
   currentMonth: number;
+  selectedMonth: number;
   months: string[];
 }
 
@@ -23,6 +24,7 @@ export const ComparativeTableRow: React.FC<ComparativeTableRowProps> = ({
   realCategory,
   planningCategory,
   currentMonth,
+  selectedMonth,
   months
 }) => {
   const getVarianceColor = (real: number, planned: number) => {
@@ -43,13 +45,13 @@ export const ComparativeTableRow: React.FC<ComparativeTableRowProps> = ({
         {realCategory.displayName}
       </TableCell>
       
-      {/* Coluna de valor planejado para o mês atual */}
+      {/* Coluna de valor planejado para o mês selecionado */}
       <TableCell className={cn(
         TABLE_CELL_STYLES.DATA_CELL,
         "text-center bg-gray-100 font-medium border-l-4 border-gray-400"
       )}>
         {formatCurrency(
-          planningCategory?.values[currentMonth] || 0
+          planningCategory?.values[selectedMonth] || 0
         )}
       </TableCell>
       

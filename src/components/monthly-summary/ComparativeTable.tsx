@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
@@ -24,6 +24,11 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
   const { isMobile } = useResponsive();
   
   const currentMonth = new Date().getMonth();
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+
+  const handleMonthClick = (monthIndex: number) => {
+    setSelectedMonth(monthIndex);
+  };
 
   // Determinar qual dados de planejamento usar baseado no toggle
   const currentPlanningData = isDetailedView ? planningData : {
@@ -96,6 +101,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
             <ComparativeTableHeader
               months={months}
               currentMonth={currentMonth}
+              selectedMonth={selectedMonth}
+              onMonthClick={handleMonthClick}
             />
             <TableBody>
               {sections.map((section) => (
@@ -106,6 +113,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                   realCategories={section.realCategories}
                   planningCategories={section.planningCategories}
                   currentMonth={currentMonth}
+                  selectedMonth={selectedMonth}
                   months={months}
                 />
               ))}

@@ -6,17 +6,22 @@ import {
   TABLE_COLUMN_WIDTHS, 
   TABLE_CELL_STYLES, 
   TABLE_Z_INDEX,
-  getCurrentMonthHeaderStyle
+  getCurrentMonthHeaderStyle,
+  getSelectedMonthHeaderStyle
 } from '@/constants/tableStyles';
 
 interface ComparativeTableHeaderProps {
   months: string[];
   currentMonth: number;
+  selectedMonth: number;
+  onMonthClick: (monthIndex: number) => void;
 }
 
 export const ComparativeTableHeader: React.FC<ComparativeTableHeaderProps> = ({
   months,
-  currentMonth
+  currentMonth,
+  selectedMonth,
+  onMonthClick
 }) => {
   return (
     <TableHeader>
@@ -34,7 +39,7 @@ export const ComparativeTableHeader: React.FC<ComparativeTableHeaderProps> = ({
           TABLE_CELL_STYLES.HEADER,
           "text-center bg-gray-100 border-l-4 border-gray-400"
         )}>
-          Planejado ({months[currentMonth]})
+          Planejado ({months[selectedMonth]})
         </TableHead>
         {months.map((month, index) => (
           <TableHead 
@@ -42,9 +47,11 @@ export const ComparativeTableHeader: React.FC<ComparativeTableHeaderProps> = ({
             className={cn(
               TABLE_COLUMN_WIDTHS.MONTH,
               TABLE_CELL_STYLES.HEADER,
-              "text-center",
-              getCurrentMonthHeaderStyle(index === currentMonth)
+              "text-center cursor-pointer hover:bg-gray-50",
+              getCurrentMonthHeaderStyle(index === currentMonth),
+              getSelectedMonthHeaderStyle(index === selectedMonth)
             )}
+            onClick={() => onMonthClick(index)}
           >
             {month}
           </TableHead>
