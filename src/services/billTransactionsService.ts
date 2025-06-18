@@ -16,7 +16,8 @@ export const billTransactionsService = {
       throw error;
     }
 
-    return data || [];
+    // Type assertion para garantir que o tipo está correto
+    return (data || []) as BillTransaction[];
   },
 
   async createBillTransaction(transactionData: CreateBillTransactionData): Promise<BillTransaction> {
@@ -41,7 +42,8 @@ export const billTransactionsService = {
       throw error;
     }
 
-    return data;
+    // Type assertion para garantir que o tipo está correto
+    return data as BillTransaction;
   },
 
   async deleteBillTransaction(id: string): Promise<void> {
