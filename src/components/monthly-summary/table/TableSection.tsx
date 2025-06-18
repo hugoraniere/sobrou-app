@@ -48,12 +48,10 @@ export const TableSection: React.FC<TableSectionProps> = ({
     <>
       <TableSectionHeader
         title={title}
-        section={section}
         totals={totals}
         currentMonth={currentMonth}
         bgColor={bgColor}
         textColor={textColor}
-        onAddCategory={onAddCategory}
       />
       
       {categories.map((category) => (

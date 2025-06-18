@@ -38,8 +38,8 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
     <TableRow className="hover:bg-gray-50/50">
       <TableCell className="sticky left-0 z-10 bg-white text-xs px-2 py-1 border-r">
         <EditableCategoryName
-          initialName={category.displayName}
-          onSave={(newName) => onCategoryNameChange(section as keyof any, category.id, newName)}
+          value={category.displayName}
+          onChange={(newName) => onCategoryNameChange(section as keyof any, category.id, newName)}
         />
       </TableCell>
       
@@ -71,6 +71,9 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
             <EditableCell
               value={value}
               onChange={(newValue) => onValueChange(section as keyof any, category.id, monthIndex, newValue)}
+              position={cellPosition}
+              isSelected={isSelected}
+              isInFillRange={isInRange}
               onCellSelect={() => onCellSelect(cellPosition, value)}
               onDragStart={() => onDragStart(cellPosition, value)}
               onDragMove={() => onDragMove(cellPosition)}
