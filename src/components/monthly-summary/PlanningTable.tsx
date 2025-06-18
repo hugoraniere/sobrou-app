@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,16 +45,18 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
   const currentMonth = new Date().getMonth();
 
   const handleDragFillEnd = () => {
-    const range = dragFill.endDrag();
-    if (range) {
-      const cells = dragFill.getCellsInRange(range);
+    const result = dragFill.endDrag();
+    if (result && result.range) {
+      const cells = dragFill.getCellsInRange(result.range);
+      const valueToFill = result.value;
+      
       cells.forEach(cell => {
-        if (cell.categoryId !== range.start.categoryId || cell.monthIndex === range.start.monthIndex) return;
+        if (cell.categoryId !== result.range.start.categoryId || cell.monthIndex === result.range.start.monthIndex) return;
         updateCategoryValue(
           cell.section as keyof Omit<typeof data, 'year'>,
           cell.categoryId,
           cell.monthIndex,
-          dragFill.dragStartValue
+          valueToFill
         );
       });
     }
