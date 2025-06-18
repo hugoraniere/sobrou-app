@@ -11,6 +11,7 @@ import { useDragFill } from '@/hooks/useDragFill';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface PlanningTableProps {
   year: number;
@@ -72,14 +73,21 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
             <Table className="min-w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-white border-r min-w-[140px] text-xs">
+                  <TableHead className={cn(
+                    TABLE_COLUMN_WIDTHS.CATEGORY,
+                    TABLE_CELL_STYLES.HEADER,
+                    "sticky left-0 bg-white border-r",
+                    TABLE_Z_INDEX.STICKY_CATEGORY
+                  )}>
                     Categoria
                   </TableHead>
                   {months.map((month, index) => (
                     <TableHead 
                       key={month} 
                       className={cn(
-                        "text-center min-w-[80px] text-xs",
+                        TABLE_COLUMN_WIDTHS.MONTH,
+                        TABLE_CELL_STYLES.HEADER,
+                        "text-center",
                         getCurrentMonthColumnStyle(index === currentMonth)
                       )}
                     >
@@ -96,7 +104,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-green-50"
+                  className="bg-green-100"
                 />
                 
                 <PlanningTableSection
@@ -106,7 +114,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-red-50"
+                  className="bg-red-100"
                 />
                 
                 <PlanningTableSection
@@ -116,7 +124,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-yellow-50"
+                  className="bg-orange-100"
                 />
                 
                 <PlanningTableSection
@@ -126,7 +134,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-blue-50"
+                  className="bg-blue-100"
                 />
                 
                 <SurplusRow 

@@ -5,6 +5,7 @@ import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 import { EditableCategoryName } from '../EditableCategoryName';
 import { EditableCell } from '../EditableCell';
 
@@ -37,7 +38,11 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
 }) => {
   return (
     <TableRow className="hover:bg-gray-50/50">
-      <TableCell className="sticky left-0 z-10 bg-white text-xs px-2 py-1 border-r">
+      <TableCell className={cn(
+        TABLE_CELL_STYLES.CATEGORY_CELL,
+        "sticky left-0 bg-white border-r",
+        TABLE_Z_INDEX.SECTION_HEADER
+      )}>
         <EditableCategoryName
           value={category.displayName}
           onChange={(newName) => onCategoryNameChange(section as keyof any, category.id, newName)}
@@ -62,7 +67,8 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
           <TableCell
             key={monthIndex}
             className={cn(
-              "text-center text-xs px-1 py-1 relative",
+              TABLE_CELL_STYLES.DATA_CELL,
+              "text-center relative",
               getCurrentMonthColumnStyle(monthIndex === currentMonth),
               isSelected && "ring-2 ring-blue-400",
               isInRange && "bg-blue-100"

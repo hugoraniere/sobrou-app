@@ -6,6 +6,7 @@ import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useResponsive } from '@/hooks/useResponsive';
 import { formatCurrency, cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 import { ComparativeTooltip } from './ComparativeTooltip';
 
 interface ComparativeTableProps {
@@ -110,17 +111,28 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
           <Table className="min-w-full">
             <TableHeader>
               <TableRow>
-                <TableHead className="sticky left-0 z-20 bg-white border-r min-w-[140px] text-xs">
+                <TableHead className={cn(
+                  TABLE_COLUMN_WIDTHS.CATEGORY,
+                  TABLE_CELL_STYLES.HEADER,
+                  "sticky left-0 bg-white border-r",
+                  TABLE_Z_INDEX.STICKY_CATEGORY
+                )}>
                   Categoria
                 </TableHead>
-                <TableHead className="text-center min-w-[100px] text-xs bg-gray-100 border-l-4 border-gray-400">
+                <TableHead className={cn(
+                  TABLE_COLUMN_WIDTHS.PLANNING_SPECIAL,
+                  TABLE_CELL_STYLES.HEADER,
+                  "text-center bg-gray-100 border-l-4 border-gray-400"
+                )}>
                   Planejado ({months[selectedMonth]})
                 </TableHead>
                 {months.map((month, index) => (
                   <TableHead 
                     key={month} 
                     className={cn(
-                      "text-center min-w-[90px] text-xs cursor-pointer hover:bg-gray-50 transition-colors",
+                      TABLE_COLUMN_WIDTHS.MONTH,
+                      TABLE_CELL_STYLES.HEADER,
+                      "text-center cursor-pointer hover:bg-gray-50 transition-colors",
                       index === selectedMonth && "bg-blue-100 text-blue-800 font-semibold border-l-4 border-blue-500",
                       getCurrentMonthColumnStyle(index === currentMonth && index !== selectedMonth)
                     )}
@@ -138,7 +150,11 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                   <TableRow className={section.bgColor}>
                     <TableCell 
                       colSpan={14} 
-                      className="font-bold text-sm py-2 sticky left-0 z-10"
+                      className={cn(
+                        TABLE_CELL_STYLES.HEADER,
+                        "font-bold sticky left-0",
+                        TABLE_Z_INDEX.SECTION_HEADER
+                      )}
                     >
                       {section.title}
                     </TableCell>
@@ -152,14 +168,18 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                     
                     return (
                       <TableRow key={realCategory.id} className="hover:bg-gray-50">
-                        <TableCell className="font-medium sticky left-0 z-10 bg-white text-xs border-r">
+                        <TableCell className={cn(
+                          TABLE_CELL_STYLES.CATEGORY_CELL,
+                          "font-medium sticky left-0 bg-white border-r",
+                          TABLE_Z_INDEX.SECTION_HEADER
+                        )}>
                           {realCategory.displayName}
                         </TableCell>
                         
                         {/* Coluna de valor planejado para o mês selecionado */}
                         <TableCell className={cn(
-                          "text-center text-xs bg-gray-100 font-medium",
-                          "border-l-4 border-gray-400"
+                          TABLE_CELL_STYLES.DATA_CELL,
+                          "text-center bg-gray-100 font-medium border-l-4 border-gray-400"
                         )}>
                           {formatCurrency(
                             planningCategory?.values[selectedMonth] || 0
@@ -175,7 +195,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                             <TableCell 
                               key={monthIndex} 
                               className={cn(
-                                "text-center text-xs px-1",
+                                TABLE_CELL_STYLES.DATA_CELL,
+                                "text-center",
                                 getVarianceColor(realValue, plannedValue),
                                 monthIndex === selectedMonth && "bg-blue-100 text-blue-800 border-l-4 border-blue-500",
                                 getCurrentMonthColumnStyle(monthIndex === currentMonth && monthIndex !== selectedMonth)

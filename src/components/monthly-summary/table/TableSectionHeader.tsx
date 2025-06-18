@@ -4,6 +4,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface TableSectionHeaderProps {
   title: string;
@@ -26,14 +27,19 @@ export const TableSectionHeader: React.FC<TableSectionHeaderProps> = ({
 
   return (
     <TableRow className={safeBgColor}>
-      <TableCell className={`font-bold ${headerBgColor} sticky left-0 z-10 text-xs px-2 h-6`}>
+      <TableCell className={cn(
+        TABLE_CELL_STYLES.HEADER,
+        `font-bold ${headerBgColor} sticky left-0 border-r`,
+        TABLE_Z_INDEX.SECTION_HEADER
+      )}>
         {title}
       </TableCell>
       {totals.map((total, index) => (
         <TableCell 
           key={index} 
           className={cn(
-            `text-center font-semibold ${textColor} text-xs px-1 h-6`,
+            TABLE_CELL_STYLES.HEADER,
+            `text-center font-semibold ${textColor}`,
             getCurrentMonthColumnStyle(index === currentMonth)
           )}
         >

@@ -5,6 +5,8 @@ import { EditableCell } from '../EditableCell';
 import { CellPosition } from '@/hooks/useDragFill';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { formatCurrency } from '@/lib/utils';
+import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface PlanningCategoryData {
   id: string;
@@ -42,18 +44,23 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
     <>
       {/* Header da seção */}
       <TableRow className={className}>
-        <TableCell className={`font-bold sticky left-0 z-10 text-xs px-2 h-6 ${className.replace('50', '100')}`}>
+        <TableCell className={cn(
+          TABLE_CELL_STYLES.HEADER,
+          `font-bold sticky left-0 border-r ${className.replace('50', '100')}`,
+          TABLE_Z_INDEX.SECTION_HEADER
+        )}>
           {title}
         </TableCell>
         {totals.map((total, index) => (
           <TableCell 
             key={index} 
             className={cn(
-              "text-center font-semibold text-xs px-1 h-6",
+              TABLE_CELL_STYLES.HEADER,
+              "text-center font-semibold",
               getCurrentMonthColumnStyle(index === currentMonth)
             )}
           >
-            R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            {formatCurrency(total)}
           </TableCell>
         ))}
       </TableRow>
@@ -61,7 +68,11 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
       {/* Linhas das categorias */}
       {categories.map(category => (
         <TableRow key={category.id} className="hover:bg-gray-50">
-          <TableCell className="bg-white sticky left-0 z-10 pl-4 text-xs px-2 h-6">
+          <TableCell className={cn(
+            TABLE_CELL_STYLES.CATEGORY_CELL,
+            "bg-white sticky left-0 pl-4 border-r",
+            TABLE_Z_INDEX.SECTION_HEADER
+          )}>
             {category.displayName}
           </TableCell>
           {category.values.map((value, monthIndex) => {
@@ -75,7 +86,8 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
               <TableCell 
                 key={monthIndex} 
                 className={cn(
-                  "p-0.5 h-6",
+                  "p-0.5",
+                  TABLE_CELL_STYLES.DATA_CELL.replace('py-2', 'py-1'),
                   getCurrentMonthColumnStyle(monthIndex === currentMonth)
                 )}
               >
