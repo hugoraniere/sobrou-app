@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -134,7 +133,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                       TABLE_CELL_STYLES.HEADER,
                       "text-center cursor-pointer hover:bg-gray-50 transition-colors",
                       index === selectedMonth && "bg-blue-100 text-blue-800 font-semibold border-l-4 border-blue-500",
-                      getCurrentMonthColumnStyle(index === currentMonth && index !== selectedMonth)
+                      index === currentMonth && index !== selectedMonth && "bg-blue-100 text-blue-800"
                     )}
                     onClick={() => handleMonthClick(index)}
                   >
@@ -198,7 +197,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                                 TABLE_CELL_STYLES.DATA_CELL,
                                 "text-center",
                                 getVarianceColor(realValue, plannedValue),
-                                monthIndex === selectedMonth && "bg-blue-100 text-blue-800 border-l-4 border-blue-500",
+                                monthIndex === selectedMonth && "border-l-4 border-blue-500",
                                 getCurrentMonthColumnStyle(monthIndex === currentMonth && monthIndex !== selectedMonth)
                               )}
                             >
