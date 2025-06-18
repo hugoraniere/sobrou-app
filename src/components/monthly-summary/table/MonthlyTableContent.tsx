@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,8 @@ interface MonthlyTableContentProps {
 
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
+type SectionKey = 'revenue' | 'essentialExpenses' | 'nonEssentialExpenses' | 'reserves';
+
 export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   data,
   totals,
@@ -34,30 +37,45 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
 }) => {
   const { isMobile } = useResponsive();
 
+  // Estado para controlar quais seções estão expandidas
+  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
+    revenue: true,
+    essentialExpenses: true,
+    nonEssentialExpenses: true,
+    reserves: true,
+  });
+
+  const toggleSection = (sectionKey: SectionKey) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }));
+  };
+
   const sections = [
     {
-      title: 'RECEITAS',
+      title: 'Receitas',
       section: 'revenue' as const,
       categories: data.revenue,
       bgColor: 'bg-green-50',
       textColor: 'text-green-800',
     },
     {
-      title: 'GASTOS ESSENCIAIS',
+      title: 'Gastos Essenciais',
       section: 'essentialExpenses' as const,
       categories: data.essentialExpenses,
       bgColor: 'bg-red-50',
       textColor: 'text-red-800',
     },
     {
-      title: 'GASTOS NÃO ESSENCIAIS',
+      title: 'Gastos Não Essenciais',
       section: 'nonEssentialExpenses' as const,
       categories: data.nonEssentialExpenses,
       bgColor: 'bg-yellow-50',
       textColor: 'text-yellow-800',
     },
     {
-      title: 'RESERVAS',
+      title: 'Reservas',
       section: 'reserves' as const,
       categories: data.reserves,
       bgColor: 'bg-blue-50',
@@ -104,6 +122,8 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
               textColor={sectionData.textColor}
               currentMonth={currentMonth}
               selectedCell={selectedCell}
+              isExpanded={expandedSections[sectionData.section]}
+              onToggleExpanded={() => toggleSection(sectionData.section)}
               onAddCategory={() => onAddCategory(sectionData.section, sectionData.title)}
               onCategoryNameChange={handlers.handleCategoryNameChange}
               onValueChange={onValueChange}

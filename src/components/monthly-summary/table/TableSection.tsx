@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
 import { CategoryRow } from './CategoryRow';
@@ -19,6 +20,8 @@ interface TableSectionProps {
   textColor: string;
   currentMonth: number;
   selectedCell: CellPosition | null;
+  isExpanded: boolean;
+  onToggleExpanded: () => void;
   onAddCategory: () => void;
   onCategoryNameChange: (section: keyof any, categoryId: string, newName: string) => void;
   onValueChange: (section: keyof any, categoryId: string, monthIndex: number, value: number) => void;
@@ -39,6 +42,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
   textColor,
   currentMonth,
   selectedCell,
+  isExpanded,
+  onToggleExpanded,
   onAddCategory,
   onCategoryNameChange,
   onValueChange,
@@ -64,15 +69,28 @@ export const TableSection: React.FC<TableSectionProps> = ({
     }
   };
 
+  const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
+
   return (
     <>
-      {/* Header da seção */}
-      <TableRow className={bgColor}>
-        <TableCell className={cn(
-          TABLE_CELL_STYLES.HEADER,
-          `font-bold sticky left-0 border-r ${bgColor} ${textColor}`,
-          TABLE_Z_INDEX.SECTION_HEADER
-        )}>
+      {/* Header da seção - agora clicável */}
+      <TableRow className={cn(bgColor, "hover:opacity-80 transition-opacity")}>
+        <TableCell 
+          className={cn(
+            TABLE_CELL_STYLES.HEADER,
+            `font-bold sticky left-0 border-r ${bgColor} ${textColor} cursor-pointer`,
+            TABLE_Z_INDEX.SECTION_HEADER,
+            "flex items-center gap-2"
+          )}
+          onClick={onToggleExpanded}
+        >
+          <ChevronIcon 
+            size={16} 
+            className={cn(
+              "transition-transform duration-200",
+              isExpanded ? "rotate-0" : "rotate-0"
+            )} 
+          />
           {title}
         </TableCell>
         {totals.map((total, index) => (
@@ -80,65 +98,70 @@ export const TableSection: React.FC<TableSectionProps> = ({
             key={index} 
             className={cn(
               TABLE_CELL_STYLES.HEADER,
-              `text-center font-semibold ${textColor}`,
+              `text-center font-semibold ${textColor} cursor-pointer`,
               getCurrentMonthColumnStyle(index === currentMonth)
             )}
+            onClick={onToggleExpanded}
           >
             {formatCurrency(total)}
           </TableCell>
         ))}
       </TableRow>
       
-      {/* Linhas das categorias */}
-      {categories.map((category, index) => (
-        <CategoryRow
-          key={category.id}
-          category={category}
-          section={section}
-          sectionTitle={title}
-          currentMonth={currentMonth}
-          categoryIndex={index}
-          selectedCell={selectedCell}
-          onCategoryNameChange={onCategoryNameChange}
-          onValueChange={onValueChange}
-          onCategoryRemove={onCategoryRemove}
-          onCellSelect={onCellSelect}
-          onDragStart={onDragStart}
-          onDragMove={onDragMove}
-          onDragEnd={onDragEnd}
-          isInFillRange={isInFillRange}
-          onCategoryDragStart={categoryDragDrop.startDrag}
-          onCategoryDragOver={categoryDragDrop.dragOver}
-          onCategoryDragEnd={handleCategoryDragEnd}
-          isDraggedCategory={categoryDragDrop.dragState.draggedIndex === index && categoryDragDrop.dragState.section === section}
-          isDragOverCategory={categoryDragDrop.dragState.dragOverIndex === index && categoryDragDrop.dragState.section === section}
-        />
-      ))}
-      
-      {/* Linha para adicionar categoria - MOVIDA PARA O FINAL */}
-      <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
-        <TableCell className={cn(
-          TABLE_CELL_STYLES.CATEGORY_CELL,
-          "sticky left-0 border-r",
-          bgColor.replace('50', '25'),
-          TABLE_Z_INDEX.SECTION_HEADER
-        )}>
-          <AddCategoryButton 
-            onClick={onAddCategory}
-            className="w-full justify-center text-gray-600 hover:text-gray-800"
-          />
-        </TableCell>
-        {Array(12).fill(0).map((_, index) => (
-          <TableCell 
-            key={index} 
-            className={cn(
-              TABLE_CELL_STYLES.DATA_CELL,
-              getCurrentMonthColumnStyle(index === currentMonth),
-              bgColor.replace('50', '25')
-            )}
-          />
-        ))}
-      </TableRow>
+      {/* Linhas das categorias - mostradas apenas se expandido */}
+      {isExpanded && (
+        <>
+          {categories.map((category, index) => (
+            <CategoryRow
+              key={category.id}
+              category={category}
+              section={section}
+              sectionTitle={title}
+              currentMonth={currentMonth}
+              categoryIndex={index}
+              selectedCell={selectedCell}
+              onCategoryNameChange={onCategoryNameChange}
+              onValueChange={onValueChange}
+              onCategoryRemove={onCategoryRemove}
+              onCellSelect={onCellSelect}
+              onDragStart={onDragStart}
+              onDragMove={onDragMove}
+              onDragEnd={onDragEnd}
+              isInFillRange={isInFillRange}
+              onCategoryDragStart={categoryDragDrop.startDrag}
+              onCategoryDragOver={categoryDragDrop.dragOver}
+              onCategoryDragEnd={handleCategoryDragEnd}
+              isDraggedCategory={categoryDragDrop.dragState.draggedIndex === index && categoryDragDrop.dragState.section === section}
+              isDragOverCategory={categoryDragDrop.dragState.dragOverIndex === index && categoryDragDrop.dragState.section === section}
+            />
+          ))}
+          
+          {/* Linha para adicionar categoria - MOVIDA PARA O FINAL e visível apenas quando expandido */}
+          <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
+            <TableCell className={cn(
+              TABLE_CELL_STYLES.CATEGORY_CELL,
+              "sticky left-0 border-r",
+              bgColor.replace('50', '25'),
+              TABLE_Z_INDEX.SECTION_HEADER
+            )}>
+              <AddCategoryButton 
+                onClick={onAddCategory}
+                className="w-full justify-center text-gray-600 hover:text-gray-800"
+              />
+            </TableCell>
+            {Array(12).fill(0).map((_, index) => (
+              <TableCell 
+                key={index} 
+                className={cn(
+                  TABLE_CELL_STYLES.DATA_CELL,
+                  getCurrentMonthColumnStyle(index === currentMonth),
+                  bgColor.replace('50', '25')
+                )}
+              />
+            ))}
+          </TableRow>
+        </>
+      )}
     </>
   );
 };
