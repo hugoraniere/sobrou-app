@@ -4,12 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MONTHS_SHORT } from '@/types/monthly-summary';
-import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { EditableCell } from './EditableCell';
-import { EditableCategoryName } from './EditableCategoryName';
-import { AddCategoryButton } from './AddCategoryButton';
 import { AddCategoryDialog } from './AddCategoryDialog';
+import { TableSection } from './table/TableSection';
+import { SurplusRow } from './table/SurplusRow';
 import { useEditableMonthlySummary } from '@/hooks/useEditableMonthlySummary';
 import { useDragFill, CellPosition } from '@/hooks/useDragFill';
 
@@ -103,15 +101,41 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     }
   };
 
-  const isCellSelected = (position: CellPosition): boolean => {
-    return selectedCell?.categoryId === position.categoryId && 
-           selectedCell?.monthIndex === position.monthIndex &&
-           selectedCell?.section === position.section;
-  };
-
-  const isCellInFillRange = (position: CellPosition): boolean => {
-    return isInFillRange(position);
-  };
+  // Configurações das seções
+  const sections = [
+    {
+      title: 'RECEITAS (R)',
+      section: 'revenue',
+      categories: data.revenue,
+      totals: totals.map(t => t.revenue),
+      bgColor: 'bg-green-50',
+      textColor: 'text-green-700'
+    },
+    {
+      title: 'DESPESAS ESSENCIAIS (D1)',
+      section: 'essentialExpenses',
+      categories: data.essentialExpenses,
+      totals: totals.map(t => t.essential),
+      bgColor: 'bg-red-50',
+      textColor: 'text-red-700'
+    },
+    {
+      title: 'DESPESAS NÃO ESSENCIAIS (D2)',
+      section: 'nonEssentialExpenses',
+      categories: data.nonEssentialExpenses,
+      totals: totals.map(t => t.nonEssential),
+      bgColor: 'bg-orange-50',
+      textColor: 'text-orange-700'
+    },
+    {
+      title: 'RESERVAS MENSAIS',
+      section: 'reserves',
+      categories: data.reserves,
+      totals: totals.map(t => t.reserves),
+      bgColor: 'bg-blue-50',
+      textColor: 'text-blue-700'
+    }
+  ];
 
   return (
     <>
@@ -138,304 +162,29 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {/* RECEITAS */}
-                <TableRow className="bg-green-50">
-                  <TableCell className="font-bold bg-green-100 sticky left-0 z-10 text-xs px-2 h-6">
-                    RECEITAS (R)
-                  </TableCell>
-                  {totals.map((total, index) => (
-                    <TableCell 
-                      key={index} 
-                      className={cn(
-                        "text-center font-semibold text-green-700 text-xs px-1 h-6",
-                        index === currentMonth && "bg-blue-50"
-                      )}
-                    >
-                      {formatCurrency(total.revenue)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                
-                {data.revenue.map(category => (
-                  <TableRow key={category.id} className="hover:bg-gray-50">
-                    <TableCell className="bg-white sticky left-0 z-10 pl-4 text-xs px-2 h-6">
-                      <EditableCategoryName
-                        value={category.displayName}
-                        onChange={(newName) => handleCategoryNameChange('revenue', category.id, newName)}
-                      />
-                    </TableCell>
-                    {category.values.map((value, monthIndex) => {
-                      const position: CellPosition = {
-                        categoryId: category.id,
-                        monthIndex,
-                        section: 'revenue'
-                      };
-                      
-                      return (
-                        <TableCell 
-                          key={monthIndex} 
-                          className={cn(
-                            "p-0.5 h-6",
-                            monthIndex === currentMonth && "bg-blue-50"
-                          )}
-                        >
-                          <EditableCell
-                            value={value}
-                            onChange={(newValue) => updateCategoryValue('revenue', category.id, monthIndex, newValue)}
-                            position={position}
-                            isSelected={isCellSelected(position)}
-                            isInFillRange={isCellInFillRange(position)}
-                            onCellSelect={handleCellSelect}
-                            onDragStart={handleDragStart}
-                            onDragMove={handleDragMove}
-                            onDragEnd={handleDragEnd}
-                          />
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
+                {sections.map(sectionConfig => (
+                  <TableSection
+                    key={sectionConfig.section}
+                    title={sectionConfig.title}
+                    section={sectionConfig.section}
+                    categories={sectionConfig.categories}
+                    totals={sectionConfig.totals}
+                    currentMonth={currentMonth}
+                    bgColor={sectionConfig.bgColor}
+                    textColor={sectionConfig.textColor}
+                    selectedCell={selectedCell}
+                    onAddCategory={handleAddCategory}
+                    onCategoryNameChange={handleCategoryNameChange}
+                    onValueChange={updateCategoryValue}
+                    onCellSelect={handleCellSelect}
+                    onDragStart={handleDragStart}
+                    onDragMove={handleDragMove}
+                    onDragEnd={handleDragEnd}
+                    isInFillRange={isInFillRange}
+                  />
                 ))}
-                
-                <TableRow>
-                  <TableCell className="bg-white sticky left-0 z-10 pl-4 px-2 h-6">
-                    <AddCategoryButton onClick={() => handleAddCategory('revenue', 'Receitas')} />
-                  </TableCell>
-                  {Array(12).fill(null).map((_, index) => (
-                    <TableCell 
-                      key={index}
-                      className={cn("h-6", index === currentMonth && "bg-blue-50")}
-                    ></TableCell>
-                  ))}
-                </TableRow>
 
-                {/* DESPESAS ESSENCIAIS */}
-                <TableRow className="bg-red-50">
-                  <TableCell className="font-bold bg-red-100 sticky left-0 z-10 text-xs px-2 h-6">
-                    DESPESAS ESSENCIAIS (D1)
-                  </TableCell>
-                  {totals.map((total, index) => (
-                    <TableCell 
-                      key={index} 
-                      className={cn(
-                        "text-center font-semibold text-red-700 text-xs px-1 h-6",
-                        index === currentMonth && "bg-blue-50"
-                      )}
-                    >
-                      {formatCurrency(total.essential)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                
-                {data.essentialExpenses.map(category => (
-                  <TableRow key={category.id} className="hover:bg-gray-50">
-                    <TableCell className="bg-white sticky left-0 z-10 pl-4 text-xs px-2 h-6">
-                      <EditableCategoryName
-                        value={category.displayName}
-                        onChange={(newName) => handleCategoryNameChange('essentialExpenses', category.id, newName)}
-                      />
-                    </TableCell>
-                    {category.values.map((value, monthIndex) => {
-                      const position: CellPosition = {
-                        categoryId: category.id,
-                        monthIndex,
-                        section: 'essentialExpenses'
-                      };
-                      
-                      return (
-                        <TableCell 
-                          key={monthIndex} 
-                          className={cn(
-                            "p-0.5 h-6",
-                            monthIndex === currentMonth && "bg-blue-50"
-                          )}
-                        >
-                          <EditableCell
-                            value={value}
-                            onChange={(newValue) => updateCategoryValue('essentialExpenses', category.id, monthIndex, newValue)}
-                            position={position}
-                            isSelected={isCellSelected(position)}
-                            isInFillRange={isCellInFillRange(position)}
-                            onCellSelect={handleCellSelect}
-                            onDragStart={handleDragStart}
-                            onDragMove={handleDragMove}
-                            onDragEnd={handleDragEnd}
-                          />
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-                
-                <TableRow>
-                  <TableCell className="bg-white sticky left-0 z-10 pl-4 px-2 h-6">
-                    <AddCategoryButton onClick={() => handleAddCategory('essentialExpenses', 'Despesas Essenciais')} />
-                  </TableCell>
-                  {Array(12).fill(null).map((_, index) => (
-                    <TableCell 
-                      key={index}
-                      className={cn("h-6", index === currentMonth && "bg-blue-50")}
-                    ></TableCell>
-                  ))}
-                </TableRow>
-
-                {/* DESPESAS NÃO ESSENCIAIS */}
-                <TableRow className="bg-orange-50">
-                  <TableCell className="font-bold bg-orange-100 sticky left-0 z-10 text-xs px-2 h-6">
-                    DESPESAS NÃO ESSENCIAIS (D2)
-                  </TableCell>
-                  {totals.map((total, index) => (
-                    <TableCell 
-                      key={index} 
-                      className={cn(
-                        "text-center font-semibold text-orange-700 text-xs px-1 h-6",
-                        index === currentMonth && "bg-blue-50"
-                      )}
-                    >
-                      {formatCurrency(total.nonEssential)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                
-                {data.nonEssentialExpenses.map(category => (
-                  <TableRow key={category.id} className="hover:bg-gray-50">
-                    <TableCell className="bg-white sticky left-0 z-10 pl-4 text-xs px-2 h-6">
-                      <EditableCategoryName
-                        value={category.displayName}
-                        onChange={(newName) => handleCategoryNameChange('nonEssentialExpenses', category.id, newName)}
-                      />
-                    </TableCell>
-                    {category.values.map((value, monthIndex) => {
-                      const position: CellPosition = {
-                        categoryId: category.id,
-                        monthIndex,
-                        section: 'nonEssentialExpenses'
-                      };
-                      
-                      return (
-                        <TableCell 
-                          key={monthIndex} 
-                          className={cn(
-                            "p-0.5 h-6",
-                            monthIndex === currentMonth && "bg-blue-50"
-                          )}
-                        >
-                          <EditableCell
-                            value={value}
-                            onChange={(newValue) => updateCategoryValue('nonEssentialExpenses', category.id, monthIndex, newValue)}
-                            position={position}
-                            isSelected={isCellSelected(position)}
-                            isInFillRange={isCellInFillRange(position)}
-                            onCellSelect={handleCellSelect}
-                            onDragStart={handleDragStart}
-                            onDragMove={handleDragMove}
-                            onDragEnd={handleDragEnd}
-                          />
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-                
-                <TableRow>
-                  <TableCell className="bg-white sticky left-0 z-10 pl-4 px-2 h-6">
-                    <AddCategoryButton onClick={() => handleAddCategory('nonEssentialExpenses', 'Despesas Não Essenciais')} />
-                  </TableCell>
-                  {Array(12).fill(null).map((_, index) => (
-                    <TableCell 
-                      key={index}
-                      className={cn("h-6", index === currentMonth && "bg-blue-50")}
-                    ></TableCell>
-                  ))}
-                </TableRow>
-
-                {/* RESERVAS MENSAIS */}
-                <TableRow className="bg-blue-50">
-                  <TableCell className="font-bold bg-blue-100 sticky left-0 z-10 text-xs px-2 h-6">
-                    RESERVAS MENSAIS
-                  </TableCell>
-                  {totals.map((total, index) => (
-                    <TableCell 
-                      key={index} 
-                      className={cn(
-                        "text-center font-semibold text-blue-700 text-xs px-1 h-6",
-                        index === currentMonth && "bg-blue-50"
-                      )}
-                    >
-                      {formatCurrency(total.reserves)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                
-                {data.reserves.map(category => (
-                  <TableRow key={category.id} className="hover:bg-gray-50">
-                    <TableCell className="bg-white sticky left-0 z-10 pl-4 text-xs px-2 h-6">
-                      <EditableCategoryName
-                        value={category.displayName}
-                        onChange={(newName) => handleCategoryNameChange('reserves', category.id, newName)}
-                      />
-                    </TableCell>
-                    {category.values.map((value, monthIndex) => {
-                      const position: CellPosition = {
-                        categoryId: category.id,
-                        monthIndex,
-                        section: 'reserves'
-                      };
-                      
-                      return (
-                        <TableCell 
-                          key={monthIndex} 
-                          className={cn(
-                            "p-0.5 h-6",
-                            monthIndex === currentMonth && "bg-blue-50"
-                          )}
-                        >
-                          <EditableCell
-                            value={value}
-                            onChange={(newValue) => updateCategoryValue('reserves', category.id, monthIndex, newValue)}
-                            position={position}
-                            isSelected={isCellSelected(position)}
-                            isInFillRange={isCellInFillRange(position)}
-                            onCellSelect={handleCellSelect}
-                            onDragStart={handleDragStart}
-                            onDragMove={handleDragMove}
-                            onDragEnd={handleDragEnd}
-                          />
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-                
-                <TableRow>
-                  <TableCell className="bg-white sticky left-0 z-10 pl-4 px-2 h-6">
-                    <AddCategoryButton onClick={() => handleAddCategory('reserves', 'Reservas Mensais')} />
-                  </TableCell>
-                  {Array(12).fill(null).map((_, index) => (
-                    <TableCell 
-                      key={index}
-                      className={cn("h-6", index === currentMonth && "bg-blue-50")}
-                    ></TableCell>
-                  ))}
-                </TableRow>
-
-                {/* SOBRA MENSAL */}
-                <TableRow className="bg-gray-100 border-t-2">
-                  <TableCell className="font-bold text-xs bg-gray-200 sticky left-0 z-10 px-2 h-7">
-                    SOBRA MENSAL
-                  </TableCell>
-                  {totals.map((total, index) => (
-                    <TableCell 
-                      key={index} 
-                      className={cn(
-                        "text-center font-bold text-xs px-1 h-7",
-                        total.surplus >= 0 ? "text-green-600" : "text-red-600",
-                        index === currentMonth && "bg-blue-50"
-                      )}
-                    >
-                      {formatCurrency(total.surplus)}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <SurplusRow totals={totals} currentMonth={currentMonth} />
               </TableBody>
             </Table>
           </div>
