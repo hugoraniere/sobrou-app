@@ -77,7 +77,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Fill handle mouse down');
+    console.log('Fill handle mouse down, starting drag with value:', value);
     onDragStart?.(position, value);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
@@ -159,13 +159,13 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           onMouseEnter={() => setIsDragHandleHover(true)}
           onMouseLeave={() => setIsDragHandleHover(false)}
           className={cn(
-            "absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 border-2 border-white shadow-lg transition-all duration-150 cursor-crosshair",
-            isDragHandleHover ? "bg-blue-700 scale-110" : "hover:bg-blue-700"
+            "absolute -bottom-1 -right-1 w-3 h-3 bg-blue-600 border-2 border-white shadow-lg transition-all duration-150 cursor-crosshair hover:scale-110",
+            isDragHandleHover ? "bg-blue-700" : ""
           )}
           style={{ 
             borderRadius: '50%'
           }}
-          title="Arraste para preencher células"
+          title="Arraste para preencher células adjacentes"
         />
       )}
     </div>

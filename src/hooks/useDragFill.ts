@@ -78,6 +78,7 @@ export const useDragFill = () => {
     setSelectedCell(null);
     setFillRange(null);
     setIsDragging(false);
+    dragStartValue.current = 0;
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
   }, []);

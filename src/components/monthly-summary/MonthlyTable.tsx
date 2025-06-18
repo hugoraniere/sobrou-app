@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { AddCategoryDialog } from './AddCategoryDialog';
 import { TableSection } from './table/TableSection';
 import { SurplusRow } from './table/SurplusRow';
-import { useEditableMonthlySummary } from '@/hooks/useEditableMonthlySummary';
+import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useDragFill, CellPosition } from '@/hooks/useDragFill';
 
 interface MonthlyTableProps {
@@ -16,20 +15,15 @@ interface MonthlyTableProps {
 }
 
 export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
-  const { data, updateCategoryValue, updateCategoryName, addCategory, totals } = useEditableMonthlySummary(year);
-  const {
-    selectedCell,
-    fillRange,
-    isDragging,
-    dragStartValue,
-    selectCell,
-    startDrag,
-    updateDragRange,
-    endDrag,
-    clearSelection,
-    getCellsInRange,
-    isInFillRange
-  } = useDragFill();
+  const { 
+    realData: data, 
+    updateRealValue: updateCategoryValue, 
+    updateRealName: updateCategoryName, 
+    addRealCategory: addCategory, 
+    realTotals: totals 
+  } = useUnifiedMonthlySummary(year);
+  
+  const dragFill = useDragFill();
   
   const [dialogState, setDialogState] = useState<{
     open: boolean;
@@ -66,28 +60,32 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
   };
 
   const handleCellSelect = (position: CellPosition, value: number) => {
-    selectCell(position, value);
+    dragFill.selectCell(position, value);
   };
 
   const handleDragStart = (position: CellPosition, value: number) => {
-    startDrag(position, value);
+    dragFill.startDrag(position, value);
   };
 
   const handleDragMove = (position: CellPosition) => {
-    updateDragRange(position);
+    dragFill.updateDragRange(position);
   };
 
   const handleDragEnd = () => {
-    const range = endDrag();
+    const range = dragFill.endDrag();
     if (range) {
-      const cellsToFill = getCellsInRange(range);
+      const cellsToFill = dragFill.getCellsInRange(range);
+      console.log('Applying drag fill with value:', dragFill.dragStartValue, 'to cells:', cellsToFill);
+      
       // Aplicar o valor arrastado para todas as células no range
       cellsToFill.forEach(cell => {
+        if (cell.categoryId !== range.start.categoryId || cell.monthIndex === range.start.monthIndex) return;
+        
         updateCategoryValue(
           cell.section as keyof Omit<typeof data, 'year'>,
           cell.categoryId,
           cell.monthIndex,
-          dragStartValue
+          dragFill.dragStartValue
         );
       });
     }
@@ -97,7 +95,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     // Se clicou fora de uma célula, limpar seleção
     const target = e.target as HTMLElement;
     if (!target.closest('[data-cell-position]')) {
-      clearSelection();
+      dragFill.clearSelection();
     }
   };
 
@@ -172,7 +170,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     currentMonth={currentMonth}
                     bgColor={sectionConfig.bgColor}
                     textColor={sectionConfig.textColor}
-                    selectedCell={selectedCell}
+                    selectedCell={dragFill.selectedCell}
                     onAddCategory={handleAddCategory}
                     onCategoryNameChange={handleCategoryNameChange}
                     onValueChange={updateCategoryValue}
@@ -180,7 +178,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                     onDragStart={handleDragStart}
                     onDragMove={handleDragMove}
                     onDragEnd={handleDragEnd}
-                    isInFillRange={isInFillRange}
+                    isInFillRange={dragFill.isInFillRange}
                   />
                 ))}
 

@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEditableMonthlySummary } from '@/hooks/useEditableMonthlySummary';
-import { useEditablePlanning } from '@/hooks/useEditablePlanning';
+import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useResponsive } from '@/hooks/useResponsive';
 import { formatCurrency, cn } from '@/lib/utils';
 
@@ -14,19 +12,8 @@ interface ComparativeTableProps {
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
-  const { totals: realTotals, isLoading: realLoading } = useEditableMonthlySummary(year);
-  const { totals: plannedTotals, isLoading: plannedLoading } = useEditablePlanning(year);
+  const { realTotals, planningTotals } = useUnifiedMonthlySummary(year);
   const { isMobile } = useResponsive();
-
-  if (realLoading || plannedLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center">Carregando comparativo...</div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   const getVarianceColor = (real: number, planned: number) => {
     if (planned === 0) return 'text-gray-500';
@@ -81,7 +68,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                 <TableCell className="font-semibold sticky left-0 z-10 bg-green-100 text-xs">
                   Receitas (Planejado)
                 </TableCell>
-                {plannedTotals.map((total, index) => (
+                {planningTotals.map((total, index) => (
                   <TableCell key={index} className="text-center text-xs px-1">
                     {formatCurrency(total.revenue)}
                   </TableCell>
@@ -92,7 +79,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                   Variação
                 </TableCell>
                 {realTotals.map((realTotal, index) => {
-                  const plannedTotal = plannedTotals[index];
+                  const plannedTotal = planningTotals[index];
                   return (
                     <TableCell 
                       key={index} 
@@ -122,7 +109,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                 <TableCell className="font-semibold sticky left-0 z-10 bg-red-100 text-xs">
                   Essenciais (Planejado)
                 </TableCell>
-                {plannedTotals.map((total, index) => (
+                {planningTotals.map((total, index) => (
                   <TableCell key={index} className="text-center text-xs px-1">
                     {formatCurrency(total.essential)}
                   </TableCell>
@@ -133,7 +120,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                   Variação
                 </TableCell>
                 {realTotals.map((realTotal, index) => {
-                  const plannedTotal = plannedTotals[index];
+                  const plannedTotal = planningTotals[index];
                   return (
                     <TableCell 
                       key={index} 
@@ -163,7 +150,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                 <TableCell className="font-semibold sticky left-0 z-10 bg-yellow-100 text-xs">
                   Não Essenciais (Planejado)
                 </TableCell>
-                {plannedTotals.map((total, index) => (
+                {planningTotals.map((total, index) => (
                   <TableCell key={index} className="text-center text-xs px-1">
                     {formatCurrency(total.nonEssential)}
                   </TableCell>
@@ -174,7 +161,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                   Variação
                 </TableCell>
                 {realTotals.map((realTotal, index) => {
-                  const plannedTotal = plannedTotals[index];
+                  const plannedTotal = planningTotals[index];
                   return (
                     <TableCell 
                       key={index} 
@@ -210,7 +197,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                 <TableCell className="font-bold sticky left-0 z-10 bg-gray-300 text-xs">
                   SOBRA (Planejado)
                 </TableCell>
-                {plannedTotals.map((total, index) => (
+                {planningTotals.map((total, index) => (
                   <TableCell 
                     key={index} 
                     className={cn(

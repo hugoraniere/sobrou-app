@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlanningTableSection } from './table/PlanningTableSection';
 import { SurplusRow } from './table/SurplusRow';
-import { useEditablePlanning } from '@/hooks/useEditablePlanning';
+import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useDragFill } from '@/hooks/useDragFill';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ interface PlanningTableProps {
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 export const PlanningTable: React.FC<PlanningTableProps> = ({ year }) => {
-  const { data, updateCategoryValue, totals, isLoading } = useEditablePlanning(year);
+  const { planningData: data, updatePlanningValue: updateCategoryValue, planningTotals: totals } = useUnifiedMonthlySummary(year);
   const dragFill = useDragFill();
   const { isMobile } = useResponsive();
 
@@ -35,16 +35,6 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year }) => {
       });
     }
   };
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center">Carregando planejamento...</div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>
