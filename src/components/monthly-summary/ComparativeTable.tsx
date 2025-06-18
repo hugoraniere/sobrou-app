@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useResponsive } from '@/hooks/useResponsive';
 import { formatCurrency, cn } from '@/lib/utils';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { ComparativeTooltip } from './ComparativeTooltip';
 
 interface ComparativeTableProps {
@@ -120,8 +121,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                     key={month} 
                     className={cn(
                       "text-center min-w-[90px] text-xs cursor-pointer hover:bg-gray-50 transition-colors",
-                      index === selectedMonth && "bg-blue-200 font-semibold text-blue-800 border-l-4 border-blue-500",
-                      index === currentMonth && index !== selectedMonth && "border-r-2 border-blue-500"
+                      index === selectedMonth && "bg-blue-100 text-blue-800 font-semibold border-l-4 border-blue-500",
+                      getCurrentMonthColumnStyle(index === currentMonth && index !== selectedMonth)
                     )}
                     onClick={() => handleMonthClick(index)}
                   >
@@ -176,8 +177,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                               className={cn(
                                 "text-center text-xs px-1",
                                 getVarianceColor(realValue, plannedValue),
-                                monthIndex === selectedMonth && "border-l-4 border-blue-500",
-                                monthIndex === currentMonth && monthIndex !== selectedMonth && "border-r-2 border-blue-500"
+                                monthIndex === selectedMonth && "bg-blue-100 text-blue-800 border-l-4 border-blue-500",
+                                getCurrentMonthColumnStyle(monthIndex === currentMonth && monthIndex !== selectedMonth)
                               )}
                             >
                               <ComparativeTooltip
