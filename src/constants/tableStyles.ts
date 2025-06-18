@@ -51,3 +51,24 @@ export const getTableCellClass = (type: keyof typeof TABLE_CELL_STYLES, addition
 export const getColumnWidthClass = (type: keyof typeof TABLE_COLUMN_WIDTHS, additionalClasses?: string) => {
   return cn(TABLE_COLUMN_WIDTHS[type], additionalClasses);
 };
+
+// Função helper para aplicar cores de seção consistentes
+export const getSectionColor = (section: keyof typeof SECTION_COLORS) => {
+  return SECTION_COLORS[section];
+};
+
+// Função helper para estilo de mês selecionado no cabeçalho
+export const getSelectedMonthHeaderStyle = (isSelected: boolean, additionalClasses?: string) => {
+  return cn(
+    isSelected && "bg-blue-100 text-blue-800 font-semibold border-l-4 border-blue-500",
+    additionalClasses
+  );
+};
+
+// Função helper para estilo de mês atual no cabeçalho
+export const getCurrentMonthHeaderStyle = (isCurrent: boolean, additionalClasses?: string) => {
+  return cn(
+    isCurrent && "bg-blue-100 text-blue-800",
+    additionalClasses
+  );
+};

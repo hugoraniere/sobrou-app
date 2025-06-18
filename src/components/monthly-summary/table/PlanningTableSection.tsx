@@ -6,7 +6,7 @@ import { CellPosition } from '@/hooks/useDragFill';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { formatCurrency } from '@/lib/utils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
+import { TABLE_CELL_STYLES, TABLE_Z_INDEX, getSectionColor } from '@/constants/tableStyles';
 
 interface PlanningCategoryData {
   id: string;
@@ -17,21 +17,21 @@ interface PlanningCategoryData {
 interface PlanningTableSectionProps {
   title: string;
   section: string;
+  sectionKey: 'REVENUE' | 'ESSENTIAL' | 'NON_ESSENTIAL' | 'RESERVES';
   categories: PlanningCategoryData[];
   updateCategoryValue: (section: string, categoryId: string, monthIndex: number, value: number) => void;
   dragFill: any;
   onDragFillEnd: () => void;
-  className?: string;
 }
 
 export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
   title,
   section,
+  sectionKey,
   categories,
   updateCategoryValue,
   dragFill,
-  onDragFillEnd,
-  className = ''
+  onDragFillEnd
 }) => {
   // Calcular totais por mês
   const totals = Array(12).fill(0).map((_, monthIndex) =>
@@ -39,14 +39,15 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
   );
 
   const currentMonth = new Date().getMonth();
+  const sectionColors = getSectionColor(sectionKey);
 
   return (
     <>
       {/* Header da seção */}
-      <TableRow className={className}>
+      <TableRow className={sectionColors.bg}>
         <TableCell className={cn(
           TABLE_CELL_STYLES.HEADER,
-          `font-bold sticky left-0 border-r ${className.replace('50', '100')}`,
+          `font-bold sticky left-0 border-r ${sectionColors.bg} ${sectionColors.text}`,
           TABLE_Z_INDEX.SECTION_HEADER
         )}>
           {title}
@@ -56,7 +57,7 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
             key={index} 
             className={cn(
               TABLE_CELL_STYLES.HEADER,
-              "text-center font-semibold",
+              `text-center font-semibold ${sectionColors.text}`,
               getCurrentMonthColumnStyle(index === currentMonth)
             )}
           >
