@@ -52,6 +52,7 @@ export const createMonthlyTableHandlers = ({
   };
 
   const handleDragStart = (position: CellPosition, value: number) => {
+    console.log('Handler drag start with value:', value);
     dragFill.startDrag(position, value);
   };
 
@@ -63,15 +64,19 @@ export const createMonthlyTableHandlers = ({
     const range = dragFill.endDrag();
     if (range) {
       const cells = dragFill.getCellsInRange(range);
-      console.log('Filling cells:', cells, 'with value:', dragFill.dragStartValue);
+      // FIX: Acessar o valor através da função dragStartValue corretamente
+      const valueToFill = dragFill.dragStartValue;
+      
+      console.log('Filling cells:', cells, 'with value:', valueToFill);
       
       // Preencher todas as células do range, incluindo a inicial
       cells.forEach((cell: CellPosition) => {
+        console.log('Updating cell:', cell, 'with value:', valueToFill);
         updateCategoryValue(
           cell.section as keyof Omit<EditableMonthlySummary, 'year'>,
           cell.categoryId,
           cell.monthIndex,
-          dragFill.dragStartValue
+          valueToFill
         );
       });
     }

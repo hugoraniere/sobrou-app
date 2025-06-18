@@ -77,32 +77,37 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Fill handle mouse down, starting drag with value:', value);
+    console.log('Fill handle mouse down, starting drag with position:', position, 'value:', value);
     onDragStart?.(position, value);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      // Encontrar a célula sob o cursor usando coordenadas
-      const elementUnderCursor = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-      const cellElement = elementUnderCursor?.closest('[data-cell-section]');
+      // Melhorar detecção de células durante o drag
+      const elements = document.elementsFromPoint(moveEvent.clientX, moveEvent.clientY);
       
-      if (cellElement) {
-        const section = cellElement.getAttribute('data-cell-section');
-        const categoryId = cellElement.getAttribute('data-cell-category');
-        const monthIndex = cellElement.getAttribute('data-cell-month');
-        
-        if (section && categoryId && monthIndex !== null) {
-          const targetPosition: CellPosition = {
-            section,
-            categoryId,
-            monthIndex: parseInt(monthIndex)
-          };
-          onDragMove?.(targetPosition);
+      for (const element of elements) {
+        const cellElement = element.closest('[data-cell-section]');
+        if (cellElement) {
+          const section = cellElement.getAttribute('data-cell-section');
+          const categoryId = cellElement.getAttribute('data-cell-category');
+          const monthIndex = cellElement.getAttribute('data-cell-month');
+          
+          if (section && categoryId && monthIndex !== null) {
+            const targetPosition: CellPosition = {
+              section,
+              categoryId,
+              monthIndex: parseInt(monthIndex)
+            };
+            
+            console.log('Drag move to position:', targetPosition);
+            onDragMove?.(targetPosition);
+            break;
+          }
         }
       }
     };
 
     const handleMouseUp = () => {
-      console.log('Fill handle mouse up');
+      console.log('Fill handle mouse up, ending drag');
       onDragEnd?.();
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);

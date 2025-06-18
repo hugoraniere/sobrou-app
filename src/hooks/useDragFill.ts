@@ -19,14 +19,14 @@ export const useDragFill = () => {
   const dragStartValue = useRef<number>(0);
 
   const selectCell = useCallback((position: CellPosition, value: number) => {
-    console.log('Cell selected:', position, value);
+    console.log('Cell selected:', position, 'with value:', value);
     setSelectedCell(position);
     dragStartValue.current = value;
     setFillRange(null);
   }, []);
 
   const startDrag = useCallback((position: CellPosition, value: number) => {
-    console.log('Drag started:', position, value);
+    console.log('Drag started:', position, 'with value:', value);
     setIsDragging(true);
     setSelectedCell(position);
     dragStartValue.current = value;
@@ -47,7 +47,7 @@ export const useDragFill = () => {
     if (endPosition.section !== selectedCell.section || 
         endPosition.categoryId !== selectedCell.categoryId) return;
     
-    console.log('Updating drag range to:', endPosition);
+    console.log('Updating drag range from:', selectedCell, 'to:', endPosition);
     
     setFillRange({
       start: selectedCell,
@@ -56,7 +56,7 @@ export const useDragFill = () => {
   }, [selectedCell, isDragging]);
 
   const endDrag = useCallback(() => {
-    console.log('Drag ended, range:', fillRange);
+    console.log('Drag ended, range:', fillRange, 'with value:', dragStartValue.current);
     setIsDragging(false);
     
     // Restaurar cursor
@@ -87,7 +87,7 @@ export const useDragFill = () => {
     const cells: CellPosition[] = [];
     const { start, end } = range;
     
-    console.log('Getting cells in range:', start, end);
+    console.log('Getting cells in range from:', start, 'to:', end);
     
     // Determinar direção do preenchimento (horizontal apenas)
     const minMonth = Math.min(start.monthIndex, end.monthIndex);
@@ -125,6 +125,7 @@ export const useDragFill = () => {
     selectedCell,
     fillRange,
     isDragging,
+    // FIX: Retornar corretamente o valor do dragStartValue
     dragStartValue: dragStartValue.current,
     selectCell,
     startDrag,
