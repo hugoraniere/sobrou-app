@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useEditableMonthlySummary } from './useEditableMonthlySummary';
 
@@ -96,6 +97,7 @@ export const useUnifiedMonthlySummary = (year: number) => {
     updateCategoryName: updateRealName,
     addCategory: addRealCategory,
     removeCategory: removeRealCategory,
+    reorderCategories: reorderRealCategories,
     totals: realTotals 
   } = useEditableMonthlySummary(year);
 
@@ -308,7 +310,8 @@ export const useUnifiedMonthlySummary = (year: number) => {
     updateRealValue,
     updateRealName,
     addRealCategory,
-    removeRealCategory, // Expor método de remoção
+    removeRealCategory,
+    reorderRealCategories,
     realTotals,
     
     // Dados de planejamento detalhado

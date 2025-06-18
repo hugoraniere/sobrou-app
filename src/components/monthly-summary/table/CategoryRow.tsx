@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash } from 'lucide-react';
+import { Trash, GripVertical } from 'lucide-react';
 import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
 import { DeleteCategoryDialog } from '../DeleteCategoryDialog';
@@ -17,6 +17,7 @@ interface CategoryRowProps {
   section: string;
   sectionTitle: string;
   currentMonth: number;
+  categoryIndex: number;
   selectedCell: CellPosition | null;
   onCategoryNameChange: (section: keyof any, categoryId: string, newName: string) => void;
   onValueChange: (section: keyof any, categoryId: string, monthIndex: number, value: number) => void;
@@ -26,6 +27,11 @@ interface CategoryRowProps {
   onDragMove: (position: CellPosition) => void;
   onDragEnd: () => void;
   isInFillRange: (position: CellPosition) => boolean;
+  onCategoryDragStart: (index: number, section: string) => void;
+  onCategoryDragOver: (index: number) => void;
+  onCategoryDragEnd: () => void;
+  isDraggedCategory: boolean;
+  isDragOverCategory: boolean;
 }
 
 export const CategoryRow: React.FC<CategoryRowProps> = ({
@@ -33,6 +39,7 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
   section,
   sectionTitle,
   currentMonth,
+  categoryIndex,
   selectedCell,
   onCategoryNameChange,
   onValueChange,
@@ -42,6 +49,11 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
   onDragMove,
   onDragEnd,
   isInFillRange,
+  onCategoryDragStart,
+  onCategoryDragOver,
+  onCategoryDragEnd,
+  isDraggedCategory,
+  isDragOverCategory,
 }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -53,19 +65,54 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
     onCategoryRemove(section as keyof any, category.id);
   };
 
+  const handleCategoryDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = 'move';
+    onCategoryDragStart(categoryIndex, section);
+  };
+
+  const handleCategoryDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    onCategoryDragOver(categoryIndex);
+  };
+
+  const handleCategoryDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    onCategoryDragEnd();
+  };
+
   return (
     <>
-      <TableRow className="hover:bg-gray-50/50 group">
+      <TableRow 
+        className={cn(
+          "hover:bg-gray-50/50 group transition-all duration-200",
+          isDraggedCategory && "opacity-50",
+          isDragOverCategory && "border-t-2 border-blue-500"
+        )}
+        draggable={false}
+        onDragOver={handleCategoryDragOver}
+        onDrop={handleCategoryDrop}
+      >
         <TableCell className={cn(
           TABLE_CELL_STYLES.CATEGORY_CELL,
           "sticky left-0 bg-white border-r",
           TABLE_Z_INDEX.SECTION_HEADER
         )}>
           <div className="flex items-center justify-between">
-            <EditableCategoryName
-              value={category.displayName}
-              onChange={(newName) => onCategoryNameChange(section as keyof any, category.id, newName)}
-            />
+            <div className="flex items-center gap-2 flex-1">
+              <div
+                draggable
+                onDragStart={handleCategoryDragStart}
+                className="cursor-grab hover:cursor-grabbing opacity-50 hover:opacity-100 transition-opacity p-1 rounded hover:bg-gray-100"
+                title="Arrastar para reordenar"
+              >
+                <GripVertical className="h-3 w-3 text-gray-400" />
+              </div>
+              <EditableCategoryName
+                value={category.displayName}
+                onChange={(newName) => onCategoryNameChange(section as keyof any, category.id, newName)}
+              />
+            </div>
             <Button
               variant="ghost"
               size="sm"

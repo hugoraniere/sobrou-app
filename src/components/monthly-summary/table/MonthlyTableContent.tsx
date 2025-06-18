@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
@@ -16,6 +17,7 @@ interface MonthlyTableContentProps {
   handlers: any;
   onAddCategory: (section: string, sectionTitle: string) => void;
   onValueChange: (section: string, categoryId: string, monthIndex: number, value: number) => void;
+  onCategoryReorder: (section: string, fromIndex: number, toIndex: number) => void;
   isInFillRange: (position: any) => boolean;
 }
 
@@ -29,6 +31,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   handlers,
   onAddCategory,
   onValueChange,
+  onCategoryReorder,
   isInFillRange,
 }) => {
   const { isMobile } = useResponsive();
@@ -107,6 +110,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
               onCategoryNameChange={handlers.handleCategoryNameChange}
               onValueChange={onValueChange}
               onCategoryRemove={handlers.handleCategoryRemove}
+              onCategoryReorder={onCategoryReorder}
               onCellSelect={handlers.handleCellSelect}
               onDragStart={handlers.handleDragStart}
               onDragMove={handlers.handleDragMove}

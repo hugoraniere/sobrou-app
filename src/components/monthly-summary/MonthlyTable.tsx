@@ -18,6 +18,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     updateRealName: updateCategoryName, 
     addRealCategory: addCategory, 
     removeRealCategory: removeCategory,
+    reorderRealCategories: reorderCategories,
     realTotals: totals 
   } = useUnifiedMonthlySummary(year);
   
@@ -57,13 +58,17 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     }
   };
 
+  const handleCategoryReorder = (section: keyof Omit<typeof data, 'year'>, fromIndex: number, toIndex: number) => {
+    reorderCategories(section, fromIndex, toIndex);
+  };
+
   return (
     <>
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Gastos Mensais {year}</CardTitle>
           <CardDescription>
-            Registre seus gastos reais e receitas ao longo do ano. Use arrastar e soltar para preencher múltiplas células rapidamente.
+            Registre seus gastos reais e receitas ao longo do ano. Use arrastar e soltar para preencher múltiplas células rapidamente. Arraste o ícone de 6 pontinhos para reordenar categorias.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -75,6 +80,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
             handlers={handlers}
             onAddCategory={handleAddCategory}
             onValueChange={updateCategoryValue}
+            onCategoryReorder={handleCategoryReorder}
             isInFillRange={dragFill.isInFillRange}
           />
         </CardContent>

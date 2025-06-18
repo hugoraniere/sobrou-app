@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 
 export interface EditableCategoryData {
@@ -163,6 +162,23 @@ export const useEditableMonthlySummary = (year: number) => {
     }));
   }, []);
 
+  const reorderCategories = useCallback((
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
+    fromIndex: number,
+    toIndex: number
+  ) => {
+    setData(prev => {
+      const sectionCategories = [...prev[section]];
+      const [movedCategory] = sectionCategories.splice(fromIndex, 1);
+      sectionCategories.splice(toIndex, 0, movedCategory);
+      
+      return {
+        ...prev,
+        [section]: sectionCategories
+      };
+    });
+  }, []);
+
   // Calculate totals
   const calculateTotals = useCallback(() => {
     const monthlyTotals = Array(12).fill(0).map((_, monthIndex) => {
@@ -191,6 +207,7 @@ export const useEditableMonthlySummary = (year: number) => {
     updateCategoryName,
     addCategory,
     removeCategory,
+    reorderCategories,
     totals,
     isLoading: false,
     error: null
