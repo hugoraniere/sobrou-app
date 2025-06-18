@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
@@ -16,6 +16,9 @@ const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', '
 export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
   const { realData, planningData } = useUnifiedMonthlySummary(year);
   const { isMobile } = useResponsive();
+  
+  // Estado para o mês selecionado (inicializado com o mês atual)
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
   const getVarianceColor = (real: number, planned: number) => {
     if (planned === 0) return 'text-gray-500';
@@ -23,6 +26,10 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
     if (variance <= 5) return 'bg-green-50 text-green-700';
     if (variance <= 15) return 'bg-yellow-50 text-yellow-700';
     return 'bg-red-50 text-red-700';
+  };
+
+  const handleMonthClick = (monthIndex: number) => {
+    setSelectedMonth(monthIndex);
   };
 
   const sections = [
@@ -57,7 +64,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
       <CardHeader>
         <CardTitle>Comparativo Detalhado: Real vs Planejado {year}</CardTitle>
         <CardDescription>
-          Compare seus gastos reais com o planejamento por categoria. Passe o mouse sobre os valores para ver detalhes.
+          Compare seus gastos reais com o planejamento por categoria. Clique nos meses para alterar a comparação.
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
@@ -69,10 +76,17 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                   Categoria
                 </TableHead>
                 <TableHead className="text-center min-w-[100px] text-xs bg-blue-50">
-                  Planejado
+                  Planejado ({months[selectedMonth]})
                 </TableHead>
                 {months.map((month, index) => (
-                  <TableHead key={month} className="text-center min-w-[90px] text-xs">
+                  <TableHead 
+                    key={month} 
+                    className={cn(
+                      "text-center min-w-[90px] text-xs cursor-pointer hover:bg-gray-50 transition-colors",
+                      index === selectedMonth && "bg-blue-100 font-semibold"
+                    )}
+                    onClick={() => handleMonthClick(index)}
+                  >
                     {month}
                   </TableHead>
                 ))}
@@ -103,10 +117,10 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                           {realCategory.displayName}
                         </TableCell>
                         
-                        {/* Coluna de valores planejados */}
+                        {/* Coluna de valor planejado para o mês selecionado */}
                         <TableCell className="text-center text-xs bg-blue-50 font-medium">
                           {formatCurrency(
-                            planningCategory?.values.reduce((sum, val) => sum + val, 0) || 0
+                            planningCategory?.values[selectedMonth] || 0
                           )}
                         </TableCell>
                         
@@ -120,7 +134,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                               key={monthIndex} 
                               className={cn(
                                 "text-center text-xs px-1",
-                                getVarianceColor(realValue, plannedValue)
+                                getVarianceColor(realValue, plannedValue),
+                                monthIndex === selectedMonth && "ring-2 ring-blue-300 ring-inset"
                               )}
                             >
                               <ComparativeTooltip
