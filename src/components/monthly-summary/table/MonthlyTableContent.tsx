@@ -1,13 +1,11 @@
-
 import React from 'react';
-import { Table, TableBody } from "@/components/ui/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface MonthlyTableContentProps {
   data: any;
