@@ -100,41 +100,41 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                 <PlanningTableSection
                   title="RECEITAS"
                   section="revenue"
+                  sectionKey="REVENUE"
                   categories={data.revenue}
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-green-100"
                 />
                 
                 <PlanningTableSection
                   title="GASTOS ESSENCIAIS"
                   section="essentialExpenses"
+                  sectionKey="ESSENTIAL"
                   categories={data.essentialExpenses}
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-red-100"
                 />
                 
                 <PlanningTableSection
                   title="GASTOS NÃO ESSENCIAIS"
                   section="nonEssentialExpenses"
+                  sectionKey="NON_ESSENTIAL"
                   categories={data.nonEssentialExpenses}
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-orange-100"
                 />
                 
                 <PlanningTableSection
                   title="RESERVAS"
                   section="reserves"
+                  sectionKey="RESERVES"
                   categories={data.reserves}
                   updateCategoryValue={updateCategoryValue}
                   dragFill={dragFill}
                   onDragFillEnd={handleDragFillEnd}
-                  className="bg-blue-100"
                 />
                 
                 <SurplusRow 
