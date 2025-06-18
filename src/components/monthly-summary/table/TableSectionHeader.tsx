@@ -19,9 +19,13 @@ export const TableSectionHeader: React.FC<TableSectionHeaderProps> = ({
   bgColor,
   textColor
 }) => {
+  // Garantir que bgColor é uma string válida antes de usar replace
+  const safeBgColor = bgColor || 'bg-gray-50';
+  const headerBgColor = safeBgColor.includes('50') ? safeBgColor.replace('50', '100') : `${safeBgColor}-100`;
+
   return (
-    <TableRow className={bgColor}>
-      <TableCell className={`font-bold ${bgColor.replace('50', '100')} sticky left-0 z-10 text-xs px-2 h-6`}>
+    <TableRow className={safeBgColor}>
+      <TableCell className={`font-bold ${headerBgColor} sticky left-0 z-10 text-xs px-2 h-6`}>
         {title}
       </TableCell>
       {totals.map((total, index) => (
