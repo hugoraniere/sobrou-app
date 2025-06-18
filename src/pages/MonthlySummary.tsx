@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { YearSelector } from '@/components/monthly-summary/YearSelector';
-import { MonthlyTable } from '@/components/monthly-summary/MonthlyTable';
+import { MonthlySummaryTabs } from '@/components/monthly-summary/MonthlySummaryTabs';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 
@@ -27,7 +27,7 @@ const MonthlySummary = () => {
               </h1>
               {!isMobile && (
                 <p className="text-gray-600 text-sm mt-1">
-                  Planeje e edite seu orçamento financeiro mês a mês
+                  Visualize, planeje e compare seu orçamento financeiro
                 </p>
               )}
             </div>
@@ -43,7 +43,7 @@ const MonthlySummary = () => {
 
         {/* Content */}
         <div className={cn("mt-4", isMobile && "px-4")}>
-          <MonthlyTable year={selectedYear} />
+          <MonthlySummaryTabs year={selectedYear} />
         </div>
       </div>
     </div>
