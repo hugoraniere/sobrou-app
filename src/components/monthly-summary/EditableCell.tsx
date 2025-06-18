@@ -81,19 +81,22 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     onDragStart?.(position, value);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      // Encontrar a célula sob o cursor
+      // Encontrar a célula sob o cursor usando coordenadas
       const elementUnderCursor = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-      const cellElement = elementUnderCursor?.closest('[data-cell-position]');
+      const cellElement = elementUnderCursor?.closest('[data-cell-section]');
       
       if (cellElement) {
-        const positionData = cellElement.getAttribute('data-cell-position');
-        if (positionData) {
-          try {
-            const targetPosition = JSON.parse(positionData);
-            onDragMove?.(targetPosition);
-          } catch (error) {
-            console.error('Error parsing cell position:', error);
-          }
+        const section = cellElement.getAttribute('data-cell-section');
+        const categoryId = cellElement.getAttribute('data-cell-category');
+        const monthIndex = cellElement.getAttribute('data-cell-month');
+        
+        if (section && categoryId && monthIndex !== null) {
+          const targetPosition: CellPosition = {
+            section,
+            categoryId,
+            monthIndex: parseInt(monthIndex)
+          };
+          onDragMove?.(targetPosition);
         }
       }
     };
@@ -120,7 +123,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     return (
       <div
         ref={cellRef}
-        data-cell-position={JSON.stringify(position)}
+        data-cell-section={position.section}
+        data-cell-category={position.categoryId}
+        data-cell-month={position.monthIndex}
         className={cn("relative", className)}
         onMouseEnter={handleCellMouseEnter}
       >
@@ -140,7 +145,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   return (
     <div
       ref={cellRef}
-      data-cell-position={JSON.stringify(position)}
+      data-cell-section={position.section}
+      data-cell-category={position.categoryId}
+      data-cell-month={position.monthIndex}
       onClick={handleClick}
       onMouseEnter={handleCellMouseEnter}
       className={cn(

@@ -66,17 +66,14 @@ export const TableSection: React.FC<TableSectionProps> = ({
 
   return (
     <>
-      {/* Header da seção com botão de adicionar */}
+      {/* Header da seção */}
       <TableRow className={bgColor}>
         <TableCell className={cn(
           TABLE_CELL_STYLES.HEADER,
           `font-bold sticky left-0 border-r ${bgColor} ${textColor}`,
           TABLE_Z_INDEX.SECTION_HEADER
         )}>
-          <div className="flex items-center justify-between">
-            <span>{title}</span>
-            <AddCategoryButton onClick={onAddCategory} />
-          </div>
+          {title}
         </TableCell>
         {totals.map((total, index) => (
           <TableCell 
@@ -89,6 +86,31 @@ export const TableSection: React.FC<TableSectionProps> = ({
           >
             {formatCurrency(total)}
           </TableCell>
+        ))}
+      </TableRow>
+      
+      {/* Linha para adicionar categoria */}
+      <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
+        <TableCell className={cn(
+          TABLE_CELL_STYLES.CATEGORY_CELL,
+          "sticky left-0 border-r",
+          bgColor.replace('50', '25'),
+          TABLE_Z_INDEX.SECTION_HEADER
+        )}>
+          <AddCategoryButton 
+            onClick={onAddCategory}
+            className="w-full justify-center text-gray-600 hover:text-gray-800"
+          />
+        </TableCell>
+        {Array(12).fill(0).map((_, index) => (
+          <TableCell 
+            key={index} 
+            className={cn(
+              TABLE_CELL_STYLES.DATA_CELL,
+              getCurrentMonthColumnStyle(index === currentMonth),
+              bgColor.replace('50', '25')
+            )}
+          />
         ))}
       </TableRow>
       

@@ -63,8 +63,10 @@ export const createMonthlyTableHandlers = ({
     const range = dragFill.endDrag();
     if (range) {
       const cells = dragFill.getCellsInRange(range);
+      console.log('Filling cells:', cells, 'with value:', dragFill.dragStartValue);
+      
+      // Preencher todas as células do range, incluindo a inicial
       cells.forEach((cell: CellPosition) => {
-        if (cell.categoryId === range.start.categoryId && cell.monthIndex === range.start.monthIndex) return;
         updateCategoryValue(
           cell.section as keyof Omit<EditableMonthlySummary, 'year'>,
           cell.categoryId,
