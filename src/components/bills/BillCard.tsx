@@ -2,7 +2,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, Edit2, Trash2, Check, X } from 'lucide-react';
+import { Calendar, Edit2, Trash2, Check, X, Repeat } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,13 @@ interface BillCardProps {
   onDelete: (id: string) => void;
   onTogglePaid: (id: string, isPaid: boolean) => void;
 }
+
+const frequencyLabels = {
+  daily: 'Diária',
+  weekly: 'Semanal',
+  monthly: 'Mensal',
+  yearly: 'Anual',
+};
 
 export const BillCard: React.FC<BillCardProps> = ({
   bill,
@@ -43,6 +50,14 @@ export const BillCard: React.FC<BillCardProps> = ({
               )}>
                 {bill.title}
               </h3>
+              
+              {bill.is_recurring && (
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                  <Repeat className="h-3 w-3" />
+                  {frequencyLabels[bill.recurrence_frequency]}
+                </Badge>
+              )}
+              
               {bill.is_paid && (
                 <Badge variant="secondary" className="bg-green-100 text-green-800">
                   Paga
@@ -90,6 +105,12 @@ export const BillCard: React.FC<BillCardProps> = ({
                 bill.is_paid && "text-gray-400"
               )}>
                 <span className="font-medium">Obs:</span> {bill.notes}
+              </p>
+            )}
+
+            {bill.is_recurring && bill.next_due_date && !bill.is_paid && (
+              <p className="text-xs text-blue-600 mt-1">
+                Próximo vencimento: {format(new Date(bill.next_due_date), 'dd/MM/yyyy', { locale: ptBR })}
               </p>
             )}
           </div>

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreateBillData } from '@/types/bills';
 
 const billSchema = z.object({
@@ -32,6 +34,11 @@ export const BillForm: React.FC<BillFormProps> = ({
   initialData,
   isSubmitting = false,
 }) => {
+  const [isRecurring, setIsRecurring] = useState(initialData?.is_recurring || false);
+  const [recurrenceFrequency, setRecurrenceFrequency] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>(
+    initialData?.recurrence_frequency || 'monthly'
+  );
+
   const {
     register,
     handleSubmit,
@@ -54,6 +61,8 @@ export const BillForm: React.FC<BillFormProps> = ({
       due_date: data.due_date,
       description: data.description || undefined,
       notes: data.notes || undefined,
+      is_recurring: isRecurring,
+      recurrence_frequency: isRecurring ? recurrenceFrequency : undefined,
     });
   };
 
@@ -119,6 +128,38 @@ export const BillForm: React.FC<BillFormProps> = ({
           rows={3}
           {...register('notes')}
         />
+      </div>
+
+      {/* Controles de Recorrência */}
+      <div className="space-y-4 pt-4 border-t">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="is-recurring"
+            checked={isRecurring}
+            onCheckedChange={setIsRecurring}
+          />
+          <Label htmlFor="is-recurring">Conta Recorrente</Label>
+        </div>
+
+        {isRecurring && (
+          <div className="space-y-2">
+            <Label>Frequência de Repetição</Label>
+            <Select value={recurrenceFrequency} onValueChange={(value: 'daily' | 'weekly' | 'monthly' | 'yearly') => setRecurrenceFrequency(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Diária</SelectItem>
+                <SelectItem value="weekly">Semanal</SelectItem>
+                <SelectItem value="monthly">Mensal</SelectItem>
+                <SelectItem value="yearly">Anual</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500">
+              A próxima conta será criada automaticamente após marcar esta como paga.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

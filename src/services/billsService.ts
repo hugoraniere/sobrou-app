@@ -1,6 +1,24 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Bill, CreateBillData, UpdateBillData } from "@/types/bills";
+import { addDays, addWeeks, addMonths, addYears } from 'date-fns';
+
+const calculateNextDueDate = (currentDate: string, frequency: 'daily' | 'weekly' | 'monthly' | 'yearly'): string => {
+  const date = new Date(currentDate);
+  
+  switch (frequency) {
+    case 'daily':
+      return addDays(date, 1).toISOString().split('T')[0];
+    case 'weekly':
+      return addWeeks(date, 1).toISOString().split('T')[0];
+    case 'monthly':
+      return addMonths(date, 1).toISOString().split('T')[0];
+    case 'yearly':
+      return addYears(date, 1).toISOString().split('T')[0];
+    default:
+      return addMonths(date, 1).toISOString().split('T')[0];
+  }
+};
 
 export const billsService = {
   async getBills(): Promise<Bill[]> {
@@ -24,11 +42,18 @@ export const billsService = {
       throw new Error('User not authenticated');
     }
 
+    const nextDueDate = billData.is_recurring && billData.recurrence_frequency
+      ? calculateNextDueDate(billData.due_date, billData.recurrence_frequency)
+      : null;
+
     const { data, error } = await supabase
       .from('bills_to_pay')
       .insert([{
         ...billData,
-        user_id: user.id
+        user_id: user.id,
+        is_recurring: billData.is_recurring || false,
+        recurrence_frequency: billData.recurrence_frequency || 'monthly',
+        next_due_date: nextDueDate
       }])
       .select()
       .single();
@@ -73,10 +98,51 @@ export const billsService = {
   },
 
   async markAsPaid(id: string): Promise<Bill> {
-    return this.updateBill(id, {
-      is_paid: true,
-      paid_date: new Date().toISOString().split('T')[0]
-    });
+    // Buscar a conta atual
+    const { data: bill, error: fetchError } = await supabase
+      .from('bills_to_pay')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching bill:', fetchError);
+      throw fetchError;
+    }
+
+    // Marcar como paga
+    const { data: updatedBill, error: updateError } = await supabase
+      .from('bills_to_pay')
+      .update({
+        is_paid: true,
+        paid_date: new Date().toISOString().split('T')[0],
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Error updating bill:', updateError);
+      throw updateError;
+    }
+
+    // Se for recorrente, criar a próxima conta
+    if (bill.is_recurring && bill.next_due_date) {
+      const nextDueDate = calculateNextDueDate(bill.next_due_date, bill.recurrence_frequency);
+      
+      await this.createBill({
+        title: bill.title,
+        amount: bill.amount,
+        due_date: bill.next_due_date,
+        description: bill.description,
+        notes: bill.notes,
+        is_recurring: true,
+        recurrence_frequency: bill.recurrence_frequency,
+      });
+    }
+
+    return updatedBill;
   },
 
   async markAsUnpaid(id: string): Promise<Bill> {

@@ -17,8 +17,11 @@ export type Database = {
           due_date: string
           id: string
           is_paid: boolean
+          is_recurring: boolean | null
+          next_due_date: string | null
           notes: string | null
           paid_date: string | null
+          recurrence_frequency: string | null
           title: string
           updated_at: string
           user_id: string
@@ -30,8 +33,11 @@ export type Database = {
           due_date: string
           id?: string
           is_paid?: boolean
+          is_recurring?: boolean | null
+          next_due_date?: string | null
           notes?: string | null
           paid_date?: string | null
+          recurrence_frequency?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -43,8 +49,11 @@ export type Database = {
           due_date?: string
           id?: string
           is_paid?: boolean
+          is_recurring?: boolean | null
+          next_due_date?: string | null
           notes?: string | null
           paid_date?: string | null
+          recurrence_frequency?: string | null
           title?: string
           updated_at?: string
           user_id?: string
