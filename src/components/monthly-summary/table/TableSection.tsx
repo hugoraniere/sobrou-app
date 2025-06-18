@@ -29,6 +29,7 @@ interface TableSectionProps {
   onDragMove: (position: CellPosition) => void;
   onDragEnd: () => void;
   isInFillRange: (position: CellPosition) => boolean;
+  hideHeader?: boolean;
 }
 
 export const TableSection: React.FC<TableSectionProps> = ({
@@ -49,6 +50,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
   onDragMove,
   onDragEnd,
   isInFillRange,
+  hideHeader = false,
 }) => {
   const categoryDragDrop = useCategoryDragDrop();
 
@@ -66,28 +68,30 @@ export const TableSection: React.FC<TableSectionProps> = ({
 
   return (
     <>
-      {/* Header da seção */}
-      <TableRow className={bgColor}>
-        <TableCell className={cn(
-          TABLE_CELL_STYLES.HEADER,
-          `font-bold sticky left-0 border-r ${bgColor} ${textColor}`,
-          TABLE_Z_INDEX.SECTION_HEADER
-        )}>
-          {title}
-        </TableCell>
-        {totals.map((total, index) => (
-          <TableCell 
-            key={index} 
-            className={cn(
-              TABLE_CELL_STYLES.HEADER,
-              `text-center font-semibold ${textColor}`,
-              getCurrentMonthColumnStyle(index === currentMonth)
-            )}
-          >
-            {formatCurrency(total)}
+      {/* Header da seção - só mostra se não estiver oculto */}
+      {!hideHeader && (
+        <TableRow className={bgColor}>
+          <TableCell className={cn(
+            TABLE_CELL_STYLES.HEADER,
+            `font-bold sticky left-0 border-r ${bgColor} ${textColor}`,
+            TABLE_Z_INDEX.SECTION_HEADER
+          )}>
+            {title}
           </TableCell>
-        ))}
-      </TableRow>
+          {totals.map((total, index) => (
+            <TableCell 
+              key={index} 
+              className={cn(
+                TABLE_CELL_STYLES.HEADER,
+                `text-center font-semibold ${textColor}`,
+                getCurrentMonthColumnStyle(index === currentMonth)
+              )}
+            >
+              {formatCurrency(total)}
+            </TableCell>
+          ))}
+        </TableRow>
+      )}
       
       {/* Linhas das categorias */}
       {categories.map((category, index) => (
@@ -115,7 +119,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
         />
       ))}
       
-      {/* Linha para adicionar categoria - MOVIDA PARA O FINAL */}
+      {/* Linha para adicionar categoria */}
       <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
         <TableCell className={cn(
           TABLE_CELL_STYLES.CATEGORY_CELL,
