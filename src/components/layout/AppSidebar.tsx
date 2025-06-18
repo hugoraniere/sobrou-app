@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Target, TrendingUp, Calculator, Calendar, Settings, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, FileText, Target, TrendingUp, Calculator, Calendar, CreditCard, Settings, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/components/ui/sidebar';
 
@@ -14,6 +15,11 @@ const menuItems = [
     title: 'Transações',
     url: '/transactions',
     icon: FileText,
+  },
+  {
+    title: 'Contas a Pagar',
+    url: '/bills-to-pay',
+    icon: CreditCard,
   },
   {
     title: 'Metas',
