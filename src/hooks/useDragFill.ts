@@ -28,18 +28,24 @@ export const useDragFill = () => {
   const startDrag = useCallback((position: CellPosition, value: number) => {
     console.log('Drag started:', position, value);
     setIsDragging(true);
+    setSelectedCell(position);
     dragStartValue.current = value;
     setFillRange({
       start: position,
       end: position
     });
+    
+    // Definir cursor para todo o documento
+    document.body.style.cursor = 'crosshair';
+    document.body.style.userSelect = 'none';
   }, []);
 
   const updateDragRange = useCallback((endPosition: CellPosition) => {
     if (!selectedCell || !isDragging) return;
     
-    // Verificar se estamos na mesma seção
-    if (endPosition.section !== selectedCell.section) return;
+    // Verificar se estamos na mesma seção e categoria (para arraste horizontal)
+    if (endPosition.section !== selectedCell.section || 
+        endPosition.categoryId !== selectedCell.categoryId) return;
     
     console.log('Updating drag range to:', endPosition);
     
@@ -52,9 +58,18 @@ export const useDragFill = () => {
   const endDrag = useCallback(() => {
     console.log('Drag ended, range:', fillRange);
     setIsDragging(false);
+    
+    // Restaurar cursor
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    
     const range = fillRange;
-    // Não limpar o fillRange imediatamente para manter o feedback visual
-    setTimeout(() => setFillRange(null), 200);
+    
+    // Limpar range após um delay para feedback visual
+    setTimeout(() => {
+      setFillRange(null);
+    }, 300);
+    
     return range;
   }, [fillRange]);
 
@@ -63,6 +78,8 @@ export const useDragFill = () => {
     setSelectedCell(null);
     setFillRange(null);
     setIsDragging(false);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
   }, []);
 
   const getCellsInRange = useCallback((range: FillRange): CellPosition[] => {
@@ -71,11 +88,11 @@ export const useDragFill = () => {
     
     console.log('Getting cells in range:', start, end);
     
-    // Determinar direção do preenchimento
+    // Determinar direção do preenchimento (horizontal apenas)
     const minMonth = Math.min(start.monthIndex, end.monthIndex);
     const maxMonth = Math.max(start.monthIndex, end.monthIndex);
     
-    // Para preenchimento horizontal (mesmo categoryId, diferentes meses)
+    // Preenchimento horizontal (mesma categoria, diferentes meses)
     if (start.categoryId === end.categoryId && start.section === end.section) {
       for (let month = minMonth; month <= maxMonth; month++) {
         cells.push({
@@ -85,19 +102,13 @@ export const useDragFill = () => {
         });
       }
     }
-    // Para preenchimento vertical (mesma coluna, diferentes categorias)
-    else if (start.monthIndex === end.monthIndex && start.section === end.section) {
-      // Por simplicidade, vamos focar no preenchimento horizontal por enquanto
-      // Futuramente pode ser expandido para preenchimento vertical
-      cells.push(start);
-    }
     
     console.log('Cells in range:', cells);
     return cells;
   }, []);
 
   const isInFillRange = useCallback((position: CellPosition): boolean => {
-    if (!fillRange) return false;
+    if (!fillRange || !isDragging) return false;
     
     const cellsInRange = getCellsInRange(fillRange);
     const inRange = cellsInRange.some(cell => 
@@ -107,7 +118,7 @@ export const useDragFill = () => {
     );
     
     return inRange;
-  }, [fillRange, getCellsInRange]);
+  }, [fillRange, isDragging, getCellsInRange]);
 
   return {
     selectedCell,

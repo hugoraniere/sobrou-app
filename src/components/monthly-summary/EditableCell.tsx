@@ -34,7 +34,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [isDragHandleHover, setIsDragHandleHover] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const fillHandleRef = useRef<HTMLDivElement>(null);
   const cellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,6 +76,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   const handleFillHandleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    console.log('Fill handle mouse down');
     onDragStart?.(position, value);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
@@ -98,18 +99,13 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     };
 
     const handleMouseUp = () => {
+      console.log('Fill handle mouse up');
       onDragEnd?.();
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       setIsDragHandleHover(false);
-      
-      // Reset cursor
-      document.body.style.cursor = '';
     };
 
-    // Set cursor during drag
-    document.body.style.cursor = 'crosshair';
-    
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
@@ -148,9 +144,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       onClick={handleClick}
       onMouseEnter={handleCellMouseEnter}
       className={cn(
-        "relative text-center text-xs cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded transition-colors min-h-[20px] flex items-center justify-center",
+        "relative text-center text-xs cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded transition-colors min-h-[18px] flex items-center justify-center",
         isSelected && "ring-2 ring-blue-500 bg-blue-50",
-        isInFillRange && "bg-blue-100 ring-1 ring-blue-300",
+        isInFillRange && "bg-blue-200 ring-1 ring-blue-400",
         className
       )}
       title="Clique para editar"
@@ -159,17 +155,15 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       
       {isSelected && !isEditing && (
         <div
-          ref={fillHandleRef}
           onMouseDown={handleFillHandleMouseDown}
           onMouseEnter={() => setIsDragHandleHover(true)}
           onMouseLeave={() => setIsDragHandleHover(false)}
           className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-600 border-2 border-white shadow-sm transition-all duration-150",
+            "absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 border-2 border-white shadow-lg transition-all duration-150 cursor-crosshair",
             isDragHandleHover ? "bg-blue-700 scale-110" : "hover:bg-blue-700"
           )}
           style={{ 
-            cursor: 'crosshair',
-            borderRadius: '1px'
+            borderRadius: '50%'
           }}
           title="Arraste para preencher células"
         />
