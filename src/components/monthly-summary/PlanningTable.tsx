@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +26,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
     planningData: data, 
     updatePlanningValue: updateCategoryValue, 
     planningTotals: totals,
-    addReal Category: addCategory
+    addRealCategory: addCategory
   } = useUnifiedMonthlySummary(year);
   const dragFill = useDragFill();
   const { isMobile } = useResponsive();
