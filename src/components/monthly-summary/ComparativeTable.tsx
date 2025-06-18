@@ -19,6 +19,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
   
   // Estado para o mês selecionado (inicializado com o mês atual)
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const currentMonth = new Date().getMonth();
 
   const getVarianceColor = (real: number, planned: number) => {
     if (planned === 0) return 'text-gray-500';
@@ -83,7 +84,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                     key={month} 
                     className={cn(
                       "text-center min-w-[90px] text-xs cursor-pointer hover:bg-gray-50 transition-colors",
-                      index === selectedMonth && "bg-blue-200 font-semibold text-blue-800 border-l-4 border-blue-500"
+                      index === selectedMonth && "bg-blue-200 font-semibold text-blue-800 border-l-4 border-blue-500",
+                      index === currentMonth && index !== selectedMonth && "border-r-2 border-blue-500"
                     )}
                     onClick={() => handleMonthClick(index)}
                   >
@@ -138,7 +140,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                               className={cn(
                                 "text-center text-xs px-1",
                                 getVarianceColor(realValue, plannedValue),
-                                monthIndex === selectedMonth && "border-l-4 border-blue-500"
+                                monthIndex === selectedMonth && "border-l-4 border-blue-500",
+                                monthIndex === currentMonth && monthIndex !== selectedMonth && "border-r-2 border-blue-500"
                               )}
                             >
                               <ComparativeTooltip

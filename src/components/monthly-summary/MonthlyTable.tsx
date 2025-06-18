@@ -151,7 +151,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
                       key={index} 
                       className={cn(
                         "text-center min-w-[70px] font-bold text-xs px-1 h-6",
-                        index === currentMonth && "bg-blue-50"
+                        index === currentMonth && "bg-blue-50 border-r-2 border-blue-500"
                       )}
                     >
                       {month}

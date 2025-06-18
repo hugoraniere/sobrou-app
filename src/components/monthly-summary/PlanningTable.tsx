@@ -28,6 +28,8 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year }) => {
     return stored ? JSON.parse(stored) : false; // Por padrão, visão simples
   });
 
+  const currentMonth = new Date().getMonth();
+
   // Salvar preferência no localStorage
   useEffect(() => {
     localStorage.setItem('planningViewMode', JSON.stringify(isDetailedView));
@@ -82,7 +84,13 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year }) => {
                     Categoria
                   </TableHead>
                   {months.map((month, index) => (
-                    <TableHead key={month} className="text-center min-w-[80px] text-xs">
+                    <TableHead 
+                      key={month} 
+                      className={cn(
+                        "text-center min-w-[80px] text-xs",
+                        index === currentMonth && "border-r-2 border-blue-500"
+                      )}
+                    >
                       {month}
                     </TableHead>
                   ))}
@@ -131,7 +139,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year }) => {
                 
                 <SurplusRow 
                   totals={totals}
-                  currentMonth={new Date().getMonth()}
+                  currentMonth={currentMonth}
                 />
               </TableBody>
             </Table>

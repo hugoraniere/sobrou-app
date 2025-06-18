@@ -1,19 +1,19 @@
 
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
-import { cn } from '@/lib/utils';
-import { EditableCell } from '../EditableCell';
-import { EditableCategoryName } from '../EditableCategoryName';
-import { CellPosition } from '@/hooks/useDragFill';
 import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
+import { CellPosition } from '@/hooks/useDragFill';
+import { cn } from '@/lib/utils';
+import { EditableCategoryName } from '../EditableCategoryName';
+import { EditableCell } from '../EditableCell';
 
 interface CategoryRowProps {
   category: EditableCategoryData;
   section: string;
   currentMonth: number;
-  onCategoryNameChange: (newName: string) => void;
-  onValueChange: (monthIndex: number, value: number) => void;
   selectedCell: CellPosition | null;
+  onCategoryNameChange: (section: keyof any, categoryId: string, newName: string) => void;
+  onValueChange: (section: keyof any, categoryId: string, monthIndex: number, value: number) => void;
   onCellSelect: (position: CellPosition, value: number) => void;
   onDragStart: (position: CellPosition, value: number) => void;
   onDragMove: (position: CellPosition) => void;
@@ -25,53 +25,55 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
   category,
   section,
   currentMonth,
+  selectedCell,
   onCategoryNameChange,
   onValueChange,
-  selectedCell,
   onCellSelect,
   onDragStart,
   onDragMove,
   onDragEnd,
-  isInFillRange
+  isInFillRange,
 }) => {
-  const isCellSelected = (position: CellPosition): boolean => {
-    return selectedCell?.categoryId === position.categoryId && 
-           selectedCell?.monthIndex === position.monthIndex &&
-           selectedCell?.section === position.section;
-  };
-
   return (
-    <TableRow className="hover:bg-gray-50">
-      <TableCell className="bg-white sticky left-0 z-10 pl-4 text-xs px-2 h-6">
+    <TableRow className="hover:bg-gray-50/50">
+      <TableCell className="sticky left-0 z-10 bg-white text-xs px-2 py-1 border-r">
         <EditableCategoryName
-          value={category.displayName}
-          onChange={onCategoryNameChange}
+          initialName={category.displayName}
+          onSave={(newName) => onCategoryNameChange(section as keyof any, category.id, newName)}
         />
       </TableCell>
+      
       {category.values.map((value, monthIndex) => {
-        const position: CellPosition = {
+        const cellPosition: CellPosition = {
+          section,
           categoryId: category.id,
-          monthIndex,
-          section
+          monthIndex
         };
         
+        const isSelected = selectedCell && 
+          selectedCell.section === section && 
+          selectedCell.categoryId === category.id && 
+          selectedCell.monthIndex === monthIndex;
+        
+        const isInRange = isInFillRange(cellPosition);
+        
         return (
-          <TableCell 
-            key={monthIndex} 
+          <TableCell
+            key={monthIndex}
             className={cn(
-              "p-0.5 h-6",
-              monthIndex === currentMonth && "bg-blue-50"
+              "text-center text-xs px-1 py-1 relative",
+              monthIndex === currentMonth && "bg-blue-50 border-r-2 border-blue-500",
+              isSelected && "ring-2 ring-blue-400",
+              isInRange && "bg-blue-100"
             )}
+            data-cell-position={`${section}-${category.id}-${monthIndex}`}
           >
             <EditableCell
               value={value}
-              onChange={(newValue) => onValueChange(monthIndex, newValue)}
-              position={position}
-              isSelected={isCellSelected(position)}
-              isInFillRange={isInFillRange(position)}
-              onCellSelect={onCellSelect}
-              onDragStart={onDragStart}
-              onDragMove={onDragMove}
+              onChange={(newValue) => onValueChange(section as keyof any, category.id, monthIndex, newValue)}
+              onCellSelect={() => onCellSelect(cellPosition, value)}
+              onDragStart={() => onDragStart(cellPosition, value)}
+              onDragMove={() => onDragMove(cellPosition)}
               onDragEnd={onDragEnd}
             />
           </TableCell>

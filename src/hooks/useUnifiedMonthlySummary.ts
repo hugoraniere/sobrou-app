@@ -38,6 +38,58 @@ interface MonthlyTotals {
   surplus: number;
 }
 
+const initializeDetailedPlanningData = (year: number, realData: any): PlanningData => {
+  return {
+    year,
+    revenue: realData.revenue.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(0)
+    })),
+    essentialExpenses: realData.essentialExpenses.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(0)
+    })),
+    nonEssentialExpenses: realData.nonEssentialExpenses.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(0)
+    })),
+    reserves: realData.reserves.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(0)
+    }))
+  };
+};
+
+const initializeSimplePlanningData = (year: number, realData: any): SimplePlanningData => {
+  return {
+    year,
+    revenue: realData.revenue.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      monthlyValue: 0
+    })),
+    essentialExpenses: realData.essentialExpenses.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      monthlyValue: 0
+    })),
+    nonEssentialExpenses: realData.nonEssentialExpenses.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      monthlyValue: 0
+    })),
+    reserves: realData.reserves.map((cat: any) => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      monthlyValue: 0
+    }))
+  };
+};
+
 export const useUnifiedMonthlySummary = (year: number) => {
   const { 
     data: realData, 
@@ -51,67 +103,58 @@ export const useUnifiedMonthlySummary = (year: number) => {
   const [detailedPlanningData, setDetailedPlanningData] = useState<PlanningData>(() => {
     const stored = localStorage.getItem(`detailedPlanningData_${year}`);
     if (stored) {
-      return JSON.parse(stored);
+      const parsedData = JSON.parse(stored);
+      // Ensure year matches
+      if (parsedData.year === year) {
+        return parsedData;
+      }
     }
-    
-    // Inicializar com base nas categorias reais
-    return {
-      year,
-      revenue: realData.revenue.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        values: Array(12).fill(0)
-      })),
-      essentialExpenses: realData.essentialExpenses.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        values: Array(12).fill(0)
-      })),
-      nonEssentialExpenses: realData.nonEssentialExpenses.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        values: Array(12).fill(0)
-      })),
-      reserves: realData.reserves.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        values: Array(12).fill(0)
-      }))
-    };
+    return initializeDetailedPlanningData(year, realData);
   });
 
   // Estado para dados de planejamento simples
   const [simplePlanningData, setSimplePlanningData] = useState<SimplePlanningData>(() => {
     const stored = localStorage.getItem(`simplePlanningData_${year}`);
     if (stored) {
-      return JSON.parse(stored);
+      const parsedData = JSON.parse(stored);
+      // Ensure year matches
+      if (parsedData.year === year) {
+        return parsedData;
+      }
     }
-    
-    // Inicializar com base nas categorias reais
-    return {
-      year,
-      revenue: realData.revenue.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        monthlyValue: 0
-      })),
-      essentialExpenses: realData.essentialExpenses.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        monthlyValue: 0
-      })),
-      nonEssentialExpenses: realData.nonEssentialExpenses.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        monthlyValue: 0
-      })),
-      reserves: realData.reserves.map(cat => ({
-        id: cat.id,
-        displayName: cat.displayName,
-        monthlyValue: 0
-      }))
-    };
+    return initializeSimplePlanningData(year, realData);
   });
+
+  // Reset data when year changes
+  useEffect(() => {
+    console.log('Year changed to:', year);
+    
+    // Load detailed planning data for the new year
+    const storedDetailed = localStorage.getItem(`detailedPlanningData_${year}`);
+    if (storedDetailed) {
+      const parsedDetailed = JSON.parse(storedDetailed);
+      if (parsedDetailed.year === year) {
+        setDetailedPlanningData(parsedDetailed);
+      } else {
+        setDetailedPlanningData(initializeDetailedPlanningData(year, realData));
+      }
+    } else {
+      setDetailedPlanningData(initializeDetailedPlanningData(year, realData));
+    }
+
+    // Load simple planning data for the new year
+    const storedSimple = localStorage.getItem(`simplePlanningData_${year}`);
+    if (storedSimple) {
+      const parsedSimple = JSON.parse(storedSimple);
+      if (parsedSimple.year === year) {
+        setSimplePlanningData(parsedSimple);
+      } else {
+        setSimplePlanningData(initializeSimplePlanningData(year, realData));
+      }
+    } else {
+      setSimplePlanningData(initializeSimplePlanningData(year, realData));
+    }
+  }, [year, realData]);
 
   // Sincronizar categorias do planejamento detalhado com dados reais
   useEffect(() => {
@@ -133,6 +176,7 @@ export const useUnifiedMonthlySummary = (year: number) => {
 
       const updated = {
         ...prev,
+        year,
         revenue: syncSection(realData.revenue, prev.revenue),
         essentialExpenses: syncSection(realData.essentialExpenses, prev.essentialExpenses),
         nonEssentialExpenses: syncSection(realData.nonEssentialExpenses, prev.nonEssentialExpenses),
@@ -141,7 +185,7 @@ export const useUnifiedMonthlySummary = (year: number) => {
 
       return updated;
     });
-  }, [realData]);
+  }, [realData, year]);
 
   // Sincronizar categorias do planejamento simples com dados reais
   useEffect(() => {
@@ -163,6 +207,7 @@ export const useUnifiedMonthlySummary = (year: number) => {
 
       const updated = {
         ...prev,
+        year,
         revenue: syncSection(realData.revenue, prev.revenue),
         essentialExpenses: syncSection(realData.essentialExpenses, prev.essentialExpenses),
         nonEssentialExpenses: syncSection(realData.nonEssentialExpenses, prev.nonEssentialExpenses),
@@ -171,7 +216,7 @@ export const useUnifiedMonthlySummary = (year: number) => {
 
       return updated;
     });
-  }, [realData]);
+  }, [realData, year]);
 
   // Salvar dados de planejamento detalhado no localStorage
   useEffect(() => {
