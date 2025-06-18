@@ -57,7 +57,14 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({ children
       }
 
       if (data?.optional_pages) {
-        setPreferences(data.optional_pages as UserPreferences);
+        // Safely convert the data with proper type checking
+        const optionalPages = data.optional_pages as unknown;
+        if (optionalPages && typeof optionalPages === 'object' && 'restaurant_calculator' in optionalPages) {
+          setPreferences(optionalPages as UserPreferences);
+        } else {
+          // Create default preferences if data structure is invalid
+          await createDefaultPreferences();
+        }
       } else {
         // Criar preferências padrão se não existirem
         await createDefaultPreferences();
