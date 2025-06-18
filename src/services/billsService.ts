@@ -32,7 +32,10 @@ export const billsService = {
       throw error;
     }
 
-    return data || [];
+    return (data || []).map(bill => ({
+      ...bill,
+      recurrence_frequency: bill.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+    }));
   },
 
   async createBill(billData: CreateBillData): Promise<Bill> {
@@ -63,7 +66,10 @@ export const billsService = {
       throw error;
     }
 
-    return data;
+    return {
+      ...data,
+      recurrence_frequency: data.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+    };
   },
 
   async updateBill(id: string, updateData: UpdateBillData): Promise<Bill> {
@@ -82,7 +88,10 @@ export const billsService = {
       throw error;
     }
 
-    return data;
+    return {
+      ...data,
+      recurrence_frequency: data.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+    };
   },
 
   async deleteBill(id: string): Promise<void> {
@@ -129,7 +138,10 @@ export const billsService = {
 
     // Se for recorrente, criar a próxima conta
     if (bill.is_recurring && bill.next_due_date) {
-      const nextDueDate = calculateNextDueDate(bill.next_due_date, bill.recurrence_frequency);
+      const nextDueDate = calculateNextDueDate(
+        bill.next_due_date, 
+        bill.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+      );
       
       await this.createBill({
         title: bill.title,
@@ -138,11 +150,14 @@ export const billsService = {
         description: bill.description,
         notes: bill.notes,
         is_recurring: true,
-        recurrence_frequency: bill.recurrence_frequency,
+        recurrence_frequency: bill.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly',
       });
     }
 
-    return updatedBill;
+    return {
+      ...updatedBill,
+      recurrence_frequency: updatedBill.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+    };
   },
 
   async markAsUnpaid(id: string): Promise<Bill> {
