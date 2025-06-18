@@ -1,4 +1,3 @@
-
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -24,6 +23,7 @@ import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
 import FinancialPlanning from "./pages/FinancialPlanning";
 import RestaurantCalculator from "./pages/RestaurantCalculator";
+import MonthlySummary from "./pages/MonthlySummary";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -112,13 +112,24 @@ const App = () => {
                           </ProtectedRoute>
                         }
                       />
-
+                      
                       <Route
                         path="/restaurant-calculator"
                         element={
                           <ProtectedRoute>
                             <AppLayout>
                               <RestaurantCalculator />
+                            </AppLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      
+                      <Route
+                        path="/monthly-summary"
+                        element={
+                          <ProtectedRoute>
+                            <AppLayout>
+                              <MonthlySummary />
                             </AppLayout>
                           </ProtectedRoute>
                         }
