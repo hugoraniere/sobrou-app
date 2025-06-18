@@ -4,11 +4,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   Menu, 
-  LayoutDashboard, 
-  FileText, 
-  Target, 
-  TrendingUp, 
-  Calculator, 
   Settings, 
   LogOut,
   X
@@ -19,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAvatar } from '@/contexts/AvatarContext';
+import { useNavigationPages } from '@/hooks/useNavigationPages';
 
 const MobileNavigation: React.FC = () => {
   const { t } = useTranslation();
@@ -26,6 +22,7 @@ const MobileNavigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { avatarUrl } = useAvatar();
+  const { visiblePages } = useNavigationPages();
 
   const getUserInitials = () => {
     const userAny = user as any;
@@ -52,34 +49,6 @@ const MobileNavigation: React.FC = () => {
     }
     return location.pathname === path;
   };
-
-  const menuItems = [
-    {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: LayoutDashboard,
-    },
-    {
-      title: 'Transações',
-      url: '/transactions',
-      icon: FileText,
-    },
-    {
-      title: 'Metas',
-      url: '/goals',
-      icon: Target,
-    },
-    {
-      title: 'Planejamento',
-      url: '/financial-planning',
-      icon: TrendingUp,
-    },
-    {
-      title: 'Calculadora de Custos',
-      url: '/restaurant-calculator',
-      icon: Calculator,
-    },
-  ];
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -117,7 +86,7 @@ const MobileNavigation: React.FC = () => {
           {/* Navigation Menu */}
           <nav className="flex-1 px-4 py-6">
             <div className="space-y-2">
-              {menuItems.map((item) => {
+              {visiblePages.map((item) => {
                 const isActive = isActivePath(item.url);
                 return (
                   <Link

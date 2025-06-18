@@ -2,13 +2,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, LayoutDashboard, FileText, Target, Settings, LogOut, TrendingUp, Calculator } from 'lucide-react';
+import { Menu, Settings, LogOut } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAvatar } from '@/contexts/AvatarContext';
+import { useNavigationPages } from '@/hooks/useNavigationPages';
 
 const MobileSidebar = () => {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ const MobileSidebar = () => {
   const [open, setOpen] = React.useState(false);
   const location = useLocation();
   const { avatarUrl } = useAvatar();
+  const { visiblePages } = useNavigationPages();
   
   const getUserInitials = () => {
     const fullName = user && (user as any)?.user_metadata?.full_name || t('common.user', 'Usuário');
@@ -25,34 +27,6 @@ const MobileSidebar = () => {
     }
     return names[0][0].toUpperCase();
   };
-
-  const navigationItems = [
-    {
-      name: t('common.dashboard', 'Dashboard'),
-      path: '/dashboard',
-      icon: <LayoutDashboard className="w-5 h-5" />,
-    },
-    {
-      name: t('common.transactions', 'Transações'),
-      path: '/transactions',
-      icon: <FileText className="w-5 h-5" />,
-    },
-    {
-      name: t('common.goals', 'Metas'),
-      path: '/goals',
-      icon: <Target className="w-5 h-5" />,
-    },
-    {
-      name: t('financialPlanning.title', 'Planejamento'),
-      path: '/financial-planning',
-      icon: <TrendingUp className="w-5 h-5" />,
-    },
-    {
-      name: 'Calculadora de Custos',
-      path: '/restaurant-calculator',
-      icon: <Calculator className="w-5 h-5" />,
-    }
-  ];
 
   const handleLogout = async () => {
     try {
@@ -96,13 +70,13 @@ const MobileSidebar = () => {
           </div>
           
           <nav className="space-y-1">
-            {navigationItems.map((item) => {
-              const isActive = isActiveRoute(item.path);
+            {visiblePages.map((item) => {
+              const isActive = isActiveRoute(item.url);
               
               return (
                 <Link
-                  key={item.path}
-                  to={item.path}
+                  key={item.url}
+                  to={item.url}
                   className={cn(
                     "flex items-center p-2 rounded-md hover:bg-gray-100",
                     isActive ? "bg-primary/10 text-primary font-semibold" : "text-gray-700"
@@ -113,9 +87,9 @@ const MobileSidebar = () => {
                     "flex items-center justify-center",
                     isActive ? "text-primary" : "text-gray-700"
                   )}>
-                    {item.icon}
+                    <item.icon className="w-5 h-5" />
                   </span>
-                  <span className="ml-3">{item.name}</span>
+                  <span className="ml-3">{item.title}</span>
                 </Link>
               );
             })}

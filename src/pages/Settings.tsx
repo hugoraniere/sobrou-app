@@ -3,10 +3,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Settings as SettingsIcon, MessageCircle } from 'lucide-react';
+import { User, Settings as SettingsIcon, MessageCircle, Layout } from 'lucide-react';
 import ProfileTab from '@/components/settings/ProfileTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import WhatsAppTab from '@/components/settings/WhatsAppTab';
+import PagesTab from '@/components/settings/PagesTab';
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -26,6 +27,10 @@ const Settings = () => {
               <SettingsIcon className="h-4 w-4" />
               {t('settings.tabs.preferences', 'Preferências')}
             </TabsTrigger>
+            <TabsTrigger value="pages" className="flex items-center gap-2">
+              <Layout className="h-4 w-4" />
+              {t('settings.tabs.pages', 'Páginas')}
+            </TabsTrigger>
             <TabsTrigger value="whatsapp" className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4" />
               {t('settings.tabs.whatsapp', 'WhatsApp')}
@@ -39,6 +44,10 @@ const Settings = () => {
 
         <TabsContent value="preferences">
           <PreferencesTab />
+        </TabsContent>
+
+        <TabsContent value="pages">
+          <PagesTab />
         </TabsContent>
 
         <TabsContent value="whatsapp">

@@ -1,51 +1,15 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Target, TrendingUp, Calculator, Calendar, CreditCard, Settings, ChevronRight } from 'lucide-react';
+import { Settings, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/components/ui/sidebar';
-
-const menuItems = [
-  {
-    title: 'Dashboard',
-    url: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'Transações',
-    url: '/transactions',
-    icon: FileText,
-  },
-  {
-    title: 'Contas a Pagar',
-    url: '/bills-to-pay',
-    icon: CreditCard,
-  },
-  {
-    title: 'Metas',
-    url: '/goals',
-    icon: Target,
-  },
-  {
-    title: 'Planejamento',
-    url: '/financial-planning',
-    icon: TrendingUp,
-  },
-  {
-    title: 'Resumo Mensal',
-    url: '/monthly-summary',
-    icon: Calendar,
-  },
-  {
-    title: 'Calculadora de Custos',
-    url: '/restaurant-calculator',
-    icon: Calculator,
-  },
-];
+import { useNavigationPages } from '@/hooks/useNavigationPages';
 
 export function AppSidebar() {
   const location = useLocation();
   const { state, toggleSidebar } = useSidebar();
+  const { visiblePages } = useNavigationPages();
   const isExpanded = state === 'expanded';
 
   const isActivePath = (path: string) => {
@@ -78,7 +42,7 @@ export function AppSidebar() {
       {/* Menu items */}
       <nav className="flex-1 px-2 py-4">
         <div className="space-y-2">
-          {menuItems.map((item) => {
+          {visiblePages.map((item) => {
             const isActive = isActivePath(item.url);
             return (
               <Link

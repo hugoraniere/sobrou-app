@@ -1,4 +1,3 @@
-
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -26,6 +25,9 @@ import FinancialPlanning from "./pages/FinancialPlanning";
 import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
+import { NavigationProvider } from '@/contexts/NavigationContext';
+import { SidebarProvider } from '@/contexts/SidebarContext';
+import FloatingChatButton from '@/components/chat/FloatingChatButton';
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -41,117 +43,124 @@ const App = () => {
               <AvatarProvider>
                 <AIChatProvider>
                   <WhatsAppButtonProvider>
-                    <Routes>
-                      {/* Public routes */}
-                      <Route path="/" element={<PublicLanding />} />
-                      <Route path="/auth" element={<Auth />} />
-                      <Route path="/verify" element={<EmailVerification />} />
-                      <Route path="/reset-password" element={<PasswordReset />} />
-                      
-                      {/* Protected routes */}
-                      <Route
-                        path="/dashboard"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <Index />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/transactions"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <Transactions />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/goals"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <Goals />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/bills-to-pay"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <BillsToPay />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/settings"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <Settings />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/whatsapp-integration"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <WhatsAppIntegration />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/financial-planning"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <FinancialPlanning />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/restaurant-calculator"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <RestaurantCalculator />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route
-                        path="/monthly-summary"
-                        element={
-                          <ProtectedRoute>
-                            <AppLayout>
-                              <MonthlySummary />
-                            </AppLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                    
-                    <WhatsAppChatButton />
+                    <NavigationProvider>
+                      <SidebarProvider>
+                        <div className="min-h-screen bg-gray-50">
+                          <Routes>
+                            {/* Public routes */}
+                            <Route path="/" element={<PublicLanding />} />
+                            <Route path="/auth" element={<Auth />} />
+                            <Route path="/verify" element={<EmailVerification />} />
+                            <Route path="/reset-password" element={<PasswordReset />} />
+                            
+                            {/* Protected routes */}
+                            <Route
+                              path="/dashboard"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <Index />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/transactions"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <Transactions />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/goals"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <Goals />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/bills-to-pay"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <BillsToPay />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/settings"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <Settings />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/whatsapp-integration"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <WhatsAppIntegration />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/financial-planning"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <FinancialPlanning />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/restaurant-calculator"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <RestaurantCalculator />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route
+                              path="/monthly-summary"
+                              element={
+                                <ProtectedRoute>
+                                  <AppLayout>
+                                    <MonthlySummary />
+                                  </AppLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            
+                            <Route path="*" element={<NotFound />} />
+                          </Routes>
+                          
+                          <WhatsAppChatButton />
+                          <FloatingChatButton />
+                        </div>
+                      </SidebarProvider>
+                    </NavigationProvider>
                   </WhatsAppButtonProvider>
                 </AIChatProvider>
               </AvatarProvider>
