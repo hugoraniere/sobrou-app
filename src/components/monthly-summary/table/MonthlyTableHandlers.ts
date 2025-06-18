@@ -1,10 +1,27 @@
 
+import { EditableMonthlySummary } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
 
-export interface MonthlyTableHandlersProps {
-  updateCategoryValue: (section: keyof any, categoryId: string, monthIndex: number, value: number) => void;
-  updateCategoryName: (section: keyof any, categoryId: string, newName: string) => void;
-  addCategory: (section: keyof any, name: string) => void;
+interface MonthlyTableHandlersProps {
+  updateCategoryValue: (
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
+    categoryId: string,
+    monthIndex: number,
+    value: number
+  ) => void;
+  updateCategoryName: (
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
+    categoryId: string,
+    newName: string
+  ) => void;
+  addCategory: (
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
+    name: string
+  ) => void;
+  removeCategory: (
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
+    categoryId: string
+  ) => void;
   dragFill: any;
 }
 
@@ -12,14 +29,22 @@ export const createMonthlyTableHandlers = ({
   updateCategoryValue,
   updateCategoryName,
   addCategory,
+  removeCategory,
   dragFill
 }: MonthlyTableHandlersProps) => {
   const handleCategoryNameChange = (
-    section: keyof any,
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
     categoryId: string,
     newName: string
   ) => {
     updateCategoryName(section, categoryId, newName);
+  };
+
+  const handleCategoryRemove = (
+    section: keyof Omit<EditableMonthlySummary, 'year'>,
+    categoryId: string
+  ) => {
+    removeCategory(section, categoryId);
   };
 
   const handleCellSelect = (position: CellPosition, value: number) => {
@@ -37,14 +62,11 @@ export const createMonthlyTableHandlers = ({
   const handleDragEnd = () => {
     const range = dragFill.endDrag();
     if (range) {
-      const cellsToFill = dragFill.getCellsInRange(range);
-      console.log('Applying drag fill with value:', dragFill.dragStartValue, 'to cells:', cellsToFill);
-      
-      cellsToFill.forEach((cell: CellPosition) => {
-        if (cell.categoryId !== range.start.categoryId || cell.monthIndex === range.start.monthIndex) return;
-        
+      const cells = dragFill.getCellsInRange(range);
+      cells.forEach((cell: CellPosition) => {
+        if (cell.categoryId === range.start.categoryId && cell.monthIndex === range.start.monthIndex) return;
         updateCategoryValue(
-          cell.section as keyof any,
+          cell.section as keyof Omit<EditableMonthlySummary, 'year'>,
           cell.categoryId,
           cell.monthIndex,
           dragFill.dragStartValue
@@ -53,19 +75,12 @@ export const createMonthlyTableHandlers = ({
     }
   };
 
-  const handleTableClick = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    if (!target.closest('[data-cell-position]')) {
-      dragFill.clearSelection();
-    }
-  };
-
   return {
     handleCategoryNameChange,
+    handleCategoryRemove,
     handleCellSelect,
     handleDragStart,
     handleDragMove,
-    handleDragEnd,
-    handleTableClick
+    handleDragEnd
   };
 };

@@ -17,6 +17,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     updateRealValue: updateCategoryValue, 
     updateRealName: updateCategoryName, 
     addRealCategory: addCategory, 
+    removeRealCategory: removeCategory,
     realTotals: totals 
   } = useUnifiedMonthlySummary(year);
   
@@ -38,6 +39,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
     updateCategoryValue,
     updateCategoryName,
     addCategory,
+    removeCategory,
     dragFill
   });
 

@@ -6,6 +6,7 @@ import { PlanningTableSection } from './table/PlanningTableSection';
 import { SurplusRow } from './table/SurplusRow';
 import { SimplePlanningTable } from './SimplePlanningTable';
 import { PlanningViewToggle } from './PlanningViewToggle';
+import { AddCategoryDialog } from './AddCategoryDialog';
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useDragFill } from '@/hooks/useDragFill';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -22,9 +23,24 @@ interface PlanningTableProps {
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedView, onToggleView }) => {
-  const { planningData: data, updatePlanningValue: updateCategoryValue, planningTotals: totals } = useUnifiedMonthlySummary(year);
+  const { 
+    planningData: data, 
+    updatePlanningValue: updateCategoryValue, 
+    planningTotals: totals,
+    addReal Category: addCategory
+  } = useUnifiedMonthlySummary(year);
   const dragFill = useDragFill();
   const { isMobile } = useResponsive();
+
+  const [dialogState, setDialogState] = useState<{
+    open: boolean;
+    section: keyof Omit<typeof data, 'year'> | null;
+    sectionTitle: string;
+  }>({
+    open: false,
+    section: null,
+    sectionTitle: ''
+  });
 
   const currentMonth = new Date().getMonth();
 
@@ -44,6 +60,20 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
     }
   };
 
+  const handleAddCategory = (section: keyof Omit<typeof data, 'year'>, sectionTitle: string) => {
+    setDialogState({
+      open: true,
+      section,
+      sectionTitle
+    });
+  };
+
+  const handleCategorySubmit = (name: string) => {
+    if (dialogState.section) {
+      addCategory(dialogState.section, name);
+    }
+  };
+
   const getDescription = () => {
     if (isDetailedView) {
       return "Defina seus valores planejados para cada categoria e mês com controle detalhado";
@@ -51,103 +81,113 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
     return "Defina um valor mensal planejado para cada categoria. Os valores serão distribuídos automaticamente pelos 12 meses";
   };
 
+  const sections = [
+    {
+      title: 'RECEITAS',
+      section: 'revenue' as const,
+      sectionKey: 'REVENUE' as const,
+      categories: data.revenue,
+    },
+    {
+      title: 'GASTOS ESSENCIAIS',
+      section: 'essentialExpenses' as const,
+      sectionKey: 'ESSENTIAL' as const,
+      categories: data.essentialExpenses,
+    },
+    {
+      title: 'GASTOS NÃO ESSENCIAIS',
+      section: 'nonEssentialExpenses' as const,
+      sectionKey: 'NON_ESSENTIAL' as const,
+      categories: data.nonEssentialExpenses,
+    },
+    {
+      title: 'RESERVAS',
+      section: 'reserves' as const,
+      sectionKey: 'RESERVES' as const,
+      categories: data.reserves,
+    }
+  ];
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <CardTitle>Planejamento Financeiro {year}</CardTitle>
-            <CardDescription className="mt-2">
-              {getDescription()}
-            </CardDescription>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle>Planejamento Financeiro {year}</CardTitle>
+              <CardDescription className="mt-2">
+                {getDescription()}
+              </CardDescription>
+            </div>
+            <PlanningViewToggle
+              isDetailedView={isDetailedView}
+              onToggle={onToggleView}
+            />
           </div>
-          <PlanningViewToggle
-            isDetailedView={isDetailedView}
-            onToggle={onToggleView}
-          />
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        {isDetailedView ? (
-          <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
-            <Table className="min-w-full">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className={cn(
-                    TABLE_COLUMN_WIDTHS.CATEGORY,
-                    TABLE_CELL_STYLES.HEADER,
-                    "sticky left-0 bg-white border-r",
-                    TABLE_Z_INDEX.STICKY_CATEGORY
-                  )}>
-                    Categoria
-                  </TableHead>
-                  {months.map((month, index) => (
-                    <TableHead 
-                      key={month} 
-                      className={cn(
-                        TABLE_COLUMN_WIDTHS.MONTH,
-                        TABLE_CELL_STYLES.HEADER,
-                        "text-center",
-                        getCurrentMonthColumnStyle(index === currentMonth)
-                      )}
-                    >
-                      {month}
+        </CardHeader>
+        <CardContent className="p-0">
+          {isDetailedView ? (
+            <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
+              <Table className="min-w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className={cn(
+                      TABLE_COLUMN_WIDTHS.CATEGORY,
+                      TABLE_CELL_STYLES.HEADER,
+                      "sticky left-0 bg-white border-r",
+                      TABLE_Z_INDEX.STICKY_CATEGORY
+                    )}>
+                      Categoria
                     </TableHead>
+                    {months.map((month, index) => (
+                      <TableHead 
+                        key={month} 
+                        className={cn(
+                          TABLE_COLUMN_WIDTHS.MONTH,
+                          TABLE_CELL_STYLES.HEADER,
+                          "text-center",
+                          getCurrentMonthColumnStyle(index === currentMonth)
+                        )}
+                      >
+                        {month}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sections.map((section) => (
+                    <PlanningTableSection
+                      key={section.title}
+                      title={section.title}
+                      section={section.section}
+                      sectionKey={section.sectionKey}
+                      categories={section.categories}
+                      updateCategoryValue={updateCategoryValue}
+                      onAddCategory={() => handleAddCategory(section.section, section.title)}
+                      dragFill={dragFill}
+                      onDragFillEnd={handleDragFillEnd}
+                    />
                   ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <PlanningTableSection
-                  title="RECEITAS"
-                  section="revenue"
-                  sectionKey="REVENUE"
-                  categories={data.revenue}
-                  updateCategoryValue={updateCategoryValue}
-                  dragFill={dragFill}
-                  onDragFillEnd={handleDragFillEnd}
-                />
-                
-                <PlanningTableSection
-                  title="GASTOS ESSENCIAIS"
-                  section="essentialExpenses"
-                  sectionKey="ESSENTIAL"
-                  categories={data.essentialExpenses}
-                  updateCategoryValue={updateCategoryValue}
-                  dragFill={dragFill}
-                  onDragFillEnd={handleDragFillEnd}
-                />
-                
-                <PlanningTableSection
-                  title="GASTOS NÃO ESSENCIAIS"
-                  section="nonEssentialExpenses"
-                  sectionKey="NON_ESSENTIAL"
-                  categories={data.nonEssentialExpenses}
-                  updateCategoryValue={updateCategoryValue}
-                  dragFill={dragFill}
-                  onDragFillEnd={handleDragFillEnd}
-                />
-                
-                <PlanningTableSection
-                  title="RESERVAS"
-                  section="reserves"
-                  sectionKey="RESERVES"
-                  categories={data.reserves}
-                  updateCategoryValue={updateCategoryValue}
-                  dragFill={dragFill}
-                  onDragFillEnd={handleDragFillEnd}
-                />
-                
-                <SurplusRow 
-                  totals={totals}
-                  currentMonth={currentMonth}
-                />
-              </TableBody>
-            </Table>
-          </div>
-        ) : (
-          <SimplePlanningTable year={year} />
-        )}
-      </CardContent>
-    </Card>
+                  
+                  <SurplusRow 
+                    totals={totals}
+                    currentMonth={currentMonth}
+                  />
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <SimplePlanningTable year={year} />
+          )}
+        </CardContent>
+      </Card>
+
+      <AddCategoryDialog
+        open={dialogState.open}
+        onOpenChange={(open) => setDialogState({ ...dialogState, open })}
+        onAddCategory={handleCategorySubmit}
+        sectionTitle={dialogState.sectionTitle}
+      />
+    </>
   );
 };

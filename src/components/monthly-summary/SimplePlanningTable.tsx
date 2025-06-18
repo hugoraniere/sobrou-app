@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
+import { AddCategoryDialog } from './AddCategoryDialog';
+import { AddCategoryButton } from './AddCategoryButton';
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { cn } from '@/lib/utils';
 import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
@@ -15,6 +17,7 @@ interface SimplePlanningTableSectionProps {
   section: 'revenue' | 'essentialExpenses' | 'nonEssentialExpenses' | 'reserves';
   categories: Array<{ id: string; displayName: string; monthlyValue: number }>;
   updateCategoryValue: (section: string, categoryId: string, value: number) => void;
+  onAddCategory: () => void;
   className?: string;
 }
 
@@ -23,6 +26,7 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
   section,
   categories,
   updateCategoryValue,
+  onAddCategory,
   className
 }) => {
   const handleValueChange = (categoryId: string, inputValue: string) => {
@@ -32,10 +36,13 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
 
   return (
     <>
-      {/* Cabeçalho da seção */}
+      {/* Cabeçalho da seção com botão de adicionar */}
       <TableRow className={cn(className, "font-semibold")}>
         <TableCell colSpan={2} className="py-3">
-          {title}
+          <div className="flex items-center justify-between">
+            <span>{title}</span>
+            <AddCategoryButton onClick={onAddCategory} />
+          </div>
         </TableCell>
       </TableRow>
       
@@ -63,7 +70,21 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
 };
 
 export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }) => {
-  const { simplePlanningData, updateSimplePlanningValue } = useUnifiedMonthlySummary(year);
+  const { 
+    simplePlanningData, 
+    updateSimplePlanningValue,
+    addRealCategory: addCategory
+  } = useUnifiedMonthlySummary(year);
+
+  const [dialogState, setDialogState] = useState<{
+    open: boolean;
+    section: keyof Omit<typeof simplePlanningData, 'year'> | null;
+    sectionTitle: string;
+  }>({
+    open: false,
+    section: null,
+    sectionTitle: ''
+  });
 
   const updateSimpleValue = (section: string, categoryId: string, monthlyValue: number) => {
     updateSimplePlanningValue(
@@ -73,53 +94,83 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
     );
   };
 
+  const handleAddCategory = (section: keyof Omit<typeof simplePlanningData, 'year'>, sectionTitle: string) => {
+    setDialogState({
+      open: true,
+      section,
+      sectionTitle
+    });
+  };
+
+  const handleCategorySubmit = (name: string) => {
+    if (dialogState.section) {
+      addCategory(dialogState.section, name);
+    }
+  };
+
+  const sections = [
+    {
+      title: 'RECEITAS',
+      section: 'revenue' as const,
+      categories: simplePlanningData.revenue,
+      className: 'bg-green-50',
+    },
+    {
+      title: 'GASTOS ESSENCIAIS',
+      section: 'essentialExpenses' as const,
+      categories: simplePlanningData.essentialExpenses,
+      className: 'bg-red-50',
+    },
+    {
+      title: 'GASTOS NÃO ESSENCIAIS',
+      section: 'nonEssentialExpenses' as const,
+      categories: simplePlanningData.nonEssentialExpenses,
+      className: 'bg-yellow-50',
+    },
+    {
+      title: 'RESERVAS',
+      section: 'reserves' as const,
+      categories: simplePlanningData.reserves,
+      className: 'bg-blue-50',
+    }
+  ];
+
   return (
-    <div className="overflow-x-auto">
-      <Table className="min-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="min-w-[200px] text-sm">
-              Categoria
-            </TableHead>
-            <TableHead className="text-center min-w-[150px] text-sm">
-              Valor Planejado (Mensal)
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <SimplePlanningTableSection
-            title="RECEITAS"
-            section="revenue"
-            categories={simplePlanningData.revenue}
-            updateCategoryValue={updateSimpleValue}
-            className="bg-green-50"
-          />
-          
-          <SimplePlanningTableSection
-            title="GASTOS ESSENCIAIS"
-            section="essentialExpenses"
-            categories={simplePlanningData.essentialExpenses}
-            updateCategoryValue={updateSimpleValue}
-            className="bg-red-50"
-          />
-          
-          <SimplePlanningTableSection
-            title="GASTOS NÃO ESSENCIAIS"
-            section="nonEssentialExpenses"
-            categories={simplePlanningData.nonEssentialExpenses}
-            updateCategoryValue={updateSimpleValue}
-            className="bg-yellow-50"
-          />
-          
-          <SimplePlanningTableSection
-            title="RESERVAS"
-            section="reserves"
-            categories={simplePlanningData.reserves}
-            updateCategoryValue={updateSimpleValue}
-            className="bg-blue-50"
-          />
-        </TableBody>
-      </Table>
-    </div>
+    <>
+      <div className="overflow-x-auto">
+        <Table className="min-w-full">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="min-w-[200px] text-sm">
+                Categoria
+              </TableHead>
+              <TableHead className="text-center min-w-[150px] text-sm">
+                Valor Planejado (Mensal)
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sections.map((section) => (
+              <SimplePlanningTableSection
+                key={section.title}
+                title={section.title}
+                section={section.section}
+                categories={section.categories}
+                updateCategoryValue={updateSimpleValue}
+                onAddCategory={() => handleAddCategory(section.section, section.title)}
+                className={section.className}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <AddCategoryDialog
+        open={dialogState.open}
+        onOpenChange={(open) => setDialogState({ ...dialogState, open })}
+        onAddCategory={handleCategorySubmit}
+        sectionTitle={dialogState.sectionTitle}
+      />
+    </>
   );
 };

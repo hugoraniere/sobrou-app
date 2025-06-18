@@ -2,6 +2,7 @@
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { EditableCell } from '../EditableCell';
+import { AddCategoryButton } from '../AddCategoryButton';
 import { CellPosition } from '@/hooks/useDragFill';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
@@ -20,6 +21,7 @@ interface PlanningTableSectionProps {
   sectionKey: 'REVENUE' | 'ESSENTIAL' | 'NON_ESSENTIAL' | 'RESERVES';
   categories: PlanningCategoryData[];
   updateCategoryValue: (section: string, categoryId: string, monthIndex: number, value: number) => void;
+  onAddCategory: () => void;
   dragFill: any;
   onDragFillEnd: () => void;
 }
@@ -30,6 +32,7 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
   sectionKey,
   categories,
   updateCategoryValue,
+  onAddCategory,
   dragFill,
   onDragFillEnd
 }) => {
@@ -43,14 +46,17 @@ export const PlanningTableSection: React.FC<PlanningTableSectionProps> = ({
 
   return (
     <>
-      {/* Header da seção */}
+      {/* Header da seção com botão de adicionar */}
       <TableRow className={sectionColors.bg}>
         <TableCell className={cn(
           TABLE_CELL_STYLES.HEADER,
           `font-bold sticky left-0 border-r ${sectionColors.bg} ${sectionColors.text}`,
           TABLE_Z_INDEX.SECTION_HEADER
         )}>
-          {title}
+          <div className="flex items-center justify-between">
+            <span>{title}</span>
+            <AddCategoryButton onClick={onAddCategory} />
+          </div>
         </TableCell>
         {totals.map((total, index) => (
           <TableCell 
