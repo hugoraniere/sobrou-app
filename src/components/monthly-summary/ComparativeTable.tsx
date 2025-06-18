@@ -75,7 +75,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                 <TableHead className="sticky left-0 z-20 bg-white border-r min-w-[140px] text-xs">
                   Categoria
                 </TableHead>
-                <TableHead className="text-center min-w-[100px] text-xs bg-blue-50">
+                <TableHead className="text-center min-w-[100px] text-xs bg-gray-100">
                   Planejado ({months[selectedMonth]})
                 </TableHead>
                 {months.map((month, index) => (
@@ -83,7 +83,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                     key={month} 
                     className={cn(
                       "text-center min-w-[90px] text-xs cursor-pointer hover:bg-gray-50 transition-colors",
-                      index === selectedMonth && "bg-blue-100 font-semibold"
+                      index === selectedMonth && "bg-blue-200 font-semibold text-blue-800"
                     )}
                     onClick={() => handleMonthClick(index)}
                   >
@@ -118,7 +118,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                         </TableCell>
                         
                         {/* Coluna de valor planejado para o mês selecionado */}
-                        <TableCell className="text-center text-xs bg-blue-50 font-medium">
+                        <TableCell className="text-center text-xs bg-gray-100 font-medium">
                           {formatCurrency(
                             planningCategory?.values[selectedMonth] || 0
                           )}
@@ -135,7 +135,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                               className={cn(
                                 "text-center text-xs px-1",
                                 getVarianceColor(realValue, plannedValue),
-                                monthIndex === selectedMonth && "ring-2 ring-blue-300 ring-inset"
+                                monthIndex === selectedMonth && "bg-blue-100"
                               )}
                             >
                               <ComparativeTooltip

@@ -67,10 +67,9 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
 export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }) => {
   const { planningData, updatePlanningValue } = useUnifiedMonthlySummary(year);
 
-  const updateSimpleValue = (section: string, categoryId: string, totalValue: number) => {
-    const monthlyValue = totalValue / 12;
-    
-    // Atualizar todos os 12 meses com o valor distribuído
+  const updateSimpleValue = (section: string, categoryId: string, monthlyValue: number) => {
+    // O valor inserido pelo usuário já é o valor mensal desejado
+    // Distribuir esse valor exato para todos os 12 meses
     for (let month = 0; month < 12; month++) {
       updatePlanningValue(
         section as keyof Omit<typeof planningData, 'year'>,
