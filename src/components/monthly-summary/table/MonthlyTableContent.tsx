@@ -129,19 +129,25 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
           return (
             <AccordionItem key={sectionData.section} value={sectionData.section} className="border rounded-lg">
               <AccordionTrigger className={cn(
-                "hover:no-underline px-4 py-3 font-bold text-left",
+                "hover:no-underline px-0 py-3 font-bold text-left",
                 sectionData.bgColor,
                 sectionData.textColor
               )}>
-                <div className="flex justify-between items-center w-full mr-4">
-                  <span>{sectionData.title}</span>
-                  <div className="flex gap-2 text-sm font-semibold">
-                    {sectionTotals.slice(0, 6).map((total, index) => (
-                      <span key={index} className="hidden lg:inline-block min-w-[60px] text-center">
-                        {formatCurrency(total)}
-                      </span>
-                    ))}
+                <div className="w-full grid" style={{ gridTemplateColumns: `${TABLE_COLUMN_WIDTHS.CATEGORY.replace('min-w-[', '').replace(']', '')} repeat(12, ${TABLE_COLUMN_WIDTHS.MONTH.replace('min-w-[', '').replace(']', '')})` }}>
+                  <div className="px-4 py-1 font-bold">
+                    {sectionData.title}
                   </div>
+                  {sectionTotals.map((total, index) => (
+                    <div 
+                      key={index} 
+                      className={cn(
+                        "text-center text-sm font-semibold px-1",
+                        getCurrentMonthColumnStyle(index === currentMonth)
+                      )}
+                    >
+                      {formatCurrency(total)}
+                    </div>
+                  ))}
                 </div>
               </AccordionTrigger>
               
