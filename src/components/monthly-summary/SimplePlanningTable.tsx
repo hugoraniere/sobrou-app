@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
-import { formatCurrency, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
 
 interface SimplePlanningTableProps {
@@ -13,7 +13,7 @@ interface SimplePlanningTableProps {
 interface SimplePlanningTableSectionProps {
   title: string;
   section: 'revenue' | 'essentialExpenses' | 'nonEssentialExpenses' | 'reserves';
-  categories: Array<{ id: string; displayName: string; values: number[] }>;
+  categories: Array<{ id: string; displayName: string; monthlyValue: number }>;
   updateCategoryValue: (section: string, categoryId: string, value: number) => void;
   className?: string;
 }
@@ -41,8 +41,6 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
       
       {/* Categorias da seção */}
       {categories.map((category) => {
-        const averageValue = category.values.reduce((sum, val) => sum + val, 0) / 12;
-        
         return (
           <TableRow key={category.id} className="hover:bg-gray-50">
             <TableCell className="font-medium">
@@ -52,7 +50,7 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
               <Input
                 type="text"
                 className="text-center max-w-32 mx-auto"
-                value={averageValue === 0 ? '' : formatCurrencyInput(averageValue.toString())}
+                value={category.monthlyValue === 0 ? '' : formatCurrencyInput(category.monthlyValue.toString())}
                 onChange={(e) => handleValueChange(category.id, e.target.value)}
                 placeholder="0,00"
               />
@@ -65,19 +63,14 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
 };
 
 export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }) => {
-  const { planningData, updatePlanningValue } = useUnifiedMonthlySummary(year);
+  const { simplePlanningData, updateSimplePlanningValue } = useUnifiedMonthlySummary(year);
 
   const updateSimpleValue = (section: string, categoryId: string, monthlyValue: number) => {
-    // O valor inserido pelo usuário já é o valor mensal desejado
-    // Distribuir esse valor exato para todos os 12 meses
-    for (let month = 0; month < 12; month++) {
-      updatePlanningValue(
-        section as keyof Omit<typeof planningData, 'year'>,
-        categoryId,
-        month,
-        monthlyValue
-      );
-    }
+    updateSimplePlanningValue(
+      section as keyof Omit<typeof simplePlanningData, 'year'>,
+      categoryId,
+      monthlyValue
+    );
   };
 
   return (
@@ -97,7 +90,7 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
           <SimplePlanningTableSection
             title="RECEITAS"
             section="revenue"
-            categories={planningData.revenue}
+            categories={simplePlanningData.revenue}
             updateCategoryValue={updateSimpleValue}
             className="bg-green-50"
           />
@@ -105,7 +98,7 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
           <SimplePlanningTableSection
             title="GASTOS ESSENCIAIS"
             section="essentialExpenses"
-            categories={planningData.essentialExpenses}
+            categories={simplePlanningData.essentialExpenses}
             updateCategoryValue={updateSimpleValue}
             className="bg-red-50"
           />
@@ -113,7 +106,7 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
           <SimplePlanningTableSection
             title="GASTOS NÃO ESSENCIAIS"
             section="nonEssentialExpenses"
-            categories={planningData.nonEssentialExpenses}
+            categories={simplePlanningData.nonEssentialExpenses}
             updateCategoryValue={updateSimpleValue}
             className="bg-yellow-50"
           />
@@ -121,7 +114,7 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
           <SimplePlanningTableSection
             title="RESERVAS"
             section="reserves"
-            categories={planningData.reserves}
+            categories={simplePlanningData.reserves}
             updateCategoryValue={updateSimpleValue}
             className="bg-blue-50"
           />

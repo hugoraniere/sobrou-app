@@ -75,7 +75,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                 <TableHead className="sticky left-0 z-20 bg-white border-r min-w-[140px] text-xs">
                   Categoria
                 </TableHead>
-                <TableHead className="text-center min-w-[100px] text-xs bg-gray-100">
+                <TableHead className="text-center min-w-[100px] text-xs bg-gray-100 border-l-4 border-gray-400">
                   Planejado ({months[selectedMonth]})
                 </TableHead>
                 {months.map((month, index) => (
@@ -83,7 +83,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                     key={month} 
                     className={cn(
                       "text-center min-w-[90px] text-xs cursor-pointer hover:bg-gray-50 transition-colors",
-                      index === selectedMonth && "bg-blue-200 font-semibold text-blue-800"
+                      index === selectedMonth && "bg-blue-200 font-semibold text-blue-800 border-l-4 border-blue-500"
                     )}
                     onClick={() => handleMonthClick(index)}
                   >
@@ -118,7 +118,10 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                         </TableCell>
                         
                         {/* Coluna de valor planejado para o mês selecionado */}
-                        <TableCell className="text-center text-xs bg-gray-100 font-medium">
+                        <TableCell className={cn(
+                          "text-center text-xs bg-gray-100 font-medium",
+                          "border-l-4 border-gray-400"
+                        )}>
                           {formatCurrency(
                             planningCategory?.values[selectedMonth] || 0
                           )}
@@ -135,7 +138,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
                               className={cn(
                                 "text-center text-xs px-1",
                                 getVarianceColor(realValue, plannedValue),
-                                monthIndex === selectedMonth && "bg-blue-100"
+                                monthIndex === selectedMonth && "border-l-4 border-blue-500"
                               )}
                             >
                               <ComparativeTooltip
