@@ -54,11 +54,6 @@ export const TableSection: React.FC<TableSectionProps> = ({
 }) => {
   const categoryDragDrop = useCategoryDragDrop();
 
-  // Calcular totais por mês
-  const totals = Array(12).fill(0).map((_, monthIndex) =>
-    categories.reduce((sum, category) => sum + (category.values[monthIndex] || 0), 0)
-  );
-
   const handleCategoryDragEnd = () => {
     const result = categoryDragDrop.endDrag();
     if (result && result.section === section) {
@@ -68,31 +63,6 @@ export const TableSection: React.FC<TableSectionProps> = ({
 
   return (
     <>
-      {/* Header da seção - só mostra se não estiver oculto */}
-      {!hideHeader && (
-        <TableRow className={bgColor}>
-          <TableCell className={cn(
-            TABLE_CELL_STYLES.HEADER,
-            `font-bold sticky left-0 border-r ${bgColor} ${textColor}`,
-            TABLE_Z_INDEX.SECTION_HEADER
-          )}>
-            {title}
-          </TableCell>
-          {totals.map((total, index) => (
-            <TableCell 
-              key={index} 
-              className={cn(
-                TABLE_CELL_STYLES.HEADER,
-                `text-center font-semibold ${textColor}`,
-                getCurrentMonthColumnStyle(index === currentMonth)
-              )}
-            >
-              {formatCurrency(total)}
-            </TableCell>
-          ))}
-        </TableRow>
-      )}
-      
       {/* Linhas das categorias */}
       {categories.map((category, index) => (
         <CategoryRow

@@ -1,14 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency } from '@/lib/utils';
 
 interface MonthlyTableContentProps {
@@ -87,74 +86,69 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
     );
   };
 
+  // Header compartilhado para todas as tabelas
+  const TableHeaderComponent = () => (
+    <TableHeader>
+      <TableRow>
+        <TableHead className={cn(
+          TABLE_COLUMN_WIDTHS.CATEGORY,
+          TABLE_CELL_STYLES.HEADER,
+          "sticky left-0 bg-white border-r",
+          TABLE_Z_INDEX.STICKY_CATEGORY
+        )}>
+          Categoria
+        </TableHead>
+        {months.map((month, index) => (
+          <TableHead 
+            key={month} 
+            className={cn(
+              TABLE_COLUMN_WIDTHS.MONTH,
+              TABLE_CELL_STYLES.HEADER,
+              "text-center",
+              getCurrentMonthColumnStyle(index === currentMonth)
+            )}
+          >
+            {month}
+          </TableHead>
+        ))}
+      </TableRow>
+    </TableHeader>
+  );
+
   return (
     <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
-      <Table className="min-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead className={cn(
-              TABLE_COLUMN_WIDTHS.CATEGORY,
-              TABLE_CELL_STYLES.HEADER,
-              "sticky left-0 bg-white border-r",
-              TABLE_Z_INDEX.STICKY_CATEGORY
-            )}>
-              Categoria
-            </TableHead>
-            {months.map((month, index) => (
-              <TableHead 
-                key={month} 
-                className={cn(
-                  TABLE_COLUMN_WIDTHS.MONTH,
-                  TABLE_CELL_STYLES.HEADER,
-                  "text-center",
-                  getCurrentMonthColumnStyle(index === currentMonth)
-                )}
-              >
-                {month}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <Accordion 
-            type="multiple" 
-            value={openSections}
-            onValueChange={setOpenSections}
-            className="w-full"
-          >
-            {sections.map((sectionData) => {
-              const sectionTotals = getSectionTotals(sectionData.categories);
-              
-              return (
-                <AccordionItem key={sectionData.section} value={sectionData.section} className="border-0">
-                  <tr className={sectionData.bgColor}>
-                    <td className={cn(
-                      TABLE_CELL_STYLES.HEADER,
-                      `sticky left-0 border-r ${sectionData.bgColor} ${sectionData.textColor}`,
-                      TABLE_Z_INDEX.SECTION_HEADER
-                    )}>
-                      <AccordionTrigger className={cn(
-                        "hover:no-underline py-2 font-bold w-full justify-between",
-                        sectionData.textColor
-                      )}>
-                        {sectionData.title}
-                      </AccordionTrigger>
-                    </td>
-                    {sectionTotals.map((total, index) => (
-                      <td 
-                        key={index} 
-                        className={cn(
-                          TABLE_CELL_STYLES.HEADER,
-                          `text-center font-semibold ${sectionData.textColor}`,
-                          getCurrentMonthColumnStyle(index === currentMonth)
-                        )}
-                      >
+      <Accordion 
+        type="multiple" 
+        value={openSections}
+        onValueChange={setOpenSections}
+        className="w-full space-y-4"
+      >
+        {sections.map((sectionData) => {
+          const sectionTotals = getSectionTotals(sectionData.categories);
+          
+          return (
+            <AccordionItem key={sectionData.section} value={sectionData.section} className="border rounded-lg">
+              <AccordionTrigger className={cn(
+                "hover:no-underline px-4 py-3 font-bold text-left",
+                sectionData.bgColor,
+                sectionData.textColor
+              )}>
+                <div className="flex justify-between items-center w-full mr-4">
+                  <span>{sectionData.title}</span>
+                  <div className="flex gap-2 text-sm font-semibold">
+                    {sectionTotals.slice(0, 6).map((total, index) => (
+                      <span key={index} className="hidden lg:inline-block min-w-[60px] text-center">
                         {formatCurrency(total)}
-                      </td>
+                      </span>
                     ))}
-                  </tr>
-                  
-                  <AccordionContent className="pb-0">
+                  </div>
+                </div>
+              </AccordionTrigger>
+              
+              <AccordionContent className="p-0">
+                <Table className="min-w-full">
+                  <TableHeaderComponent />
+                  <TableBody>
                     <TableSection
                       title={sectionData.title}
                       section={sectionData.section}
@@ -175,18 +169,26 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
                       isInFillRange={isInFillRange}
                       hideHeader={true}
                     />
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
-          
-          <SurplusRow 
-            totals={totals}
-            currentMonth={currentMonth}
-          />
-        </TableBody>
-      </Table>
+                  </TableBody>
+                </Table>
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
+      
+      {/* Tabela separada para a linha de surplus */}
+      <div className="mt-4">
+        <Table className="min-w-full">
+          <TableHeaderComponent />
+          <TableBody>
+            <SurplusRow 
+              totals={totals}
+              currentMonth={currentMonth}
+            />
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
