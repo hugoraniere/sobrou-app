@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
-import { formatCurrency } from '@/lib/utils';
 
 interface MonthlyTableContentProps {
   data: any;
@@ -38,15 +38,34 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   const { isMobile } = useResponsive();
   
   // Estado para controlar seções abertas/fechadas
-  const [openSections, setOpenSections] = useState<string[]>(() => {
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const stored = localStorage.getItem('monthlyTableOpenSections');
-    return stored ? JSON.parse(stored) : ['revenue', 'essentialExpenses', 'nonEssentialExpenses', 'reserves'];
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        // Fallback para formato antigo
+      }
+    }
+    return {
+      revenue: true,
+      essentialExpenses: true,
+      nonEssentialExpenses: true,
+      reserves: true
+    };
   });
 
   // Persistir estado no localStorage
   useEffect(() => {
     localStorage.setItem('monthlyTableOpenSections', JSON.stringify(openSections));
   }, [openSections]);
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   const sections = [
     {
@@ -86,115 +105,129 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
     );
   };
 
-  // Header compartilhado para todas as tabelas
-  const TableHeaderComponent = () => (
-    <TableHeader>
-      <TableRow>
-        <TableHead className={cn(
-          TABLE_COLUMN_WIDTHS.CATEGORY,
-          TABLE_CELL_STYLES.HEADER,
-          "sticky left-0 bg-white border-r",
-          TABLE_Z_INDEX.STICKY_CATEGORY
-        )}>
-          Categoria
-        </TableHead>
-        {months.map((month, index) => (
-          <TableHead 
-            key={month} 
-            className={cn(
-              TABLE_COLUMN_WIDTHS.MONTH,
-              TABLE_CELL_STYLES.HEADER,
-              "text-center",
-              getCurrentMonthColumnStyle(index === currentMonth)
-            )}
-          >
-            {month}
-          </TableHead>
-        ))}
-      </TableRow>
-    </TableHeader>
-  );
-
   return (
     <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
-      <Accordion 
-        type="multiple" 
-        value={openSections}
-        onValueChange={setOpenSections}
-        className="w-full space-y-4"
-      >
-        {sections.map((sectionData) => {
-          const sectionTotals = getSectionTotals(sectionData.categories);
+      <Table className="min-w-full">
+        {/* Header global dos meses - SEMPRE VISÍVEL */}
+        <TableHeader>
+          <TableRow>
+            <TableHead className={cn(
+              TABLE_COLUMN_WIDTHS.CATEGORY,
+              TABLE_CELL_STYLES.HEADER,
+              "sticky left-0 bg-white border-r",
+              TABLE_Z_INDEX.STICKY_CATEGORY
+            )}>
+              Categoria
+            </TableHead>
+            {months.map((month, index) => (
+              <TableHead 
+                key={month} 
+                className={cn(
+                  TABLE_COLUMN_WIDTHS.MONTH,
+                  TABLE_CELL_STYLES.HEADER,
+                  "text-center",
+                  getCurrentMonthColumnStyle(index === currentMonth)
+                )}
+              >
+                {month}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        
+        <TableBody>
+          {sections.map((sectionData) => {
+            const sectionTotals = getSectionTotals(sectionData.categories);
+            const isOpen = openSections[sectionData.section];
+            
+            return (
+              <React.Fragment key={sectionData.section}>
+                {/* Header da seção com totais - usando Collapsible */}
+                <Collapsible 
+                  open={isOpen}
+                  onOpenChange={() => toggleSection(sectionData.section)}
+                  asChild
+                >
+                  <>
+                    <CollapsibleTrigger asChild>
+                      <TableRow className={cn(
+                        "cursor-pointer hover:bg-opacity-80 transition-colors",
+                        sectionData.bgColor,
+                        "border-b-2"
+                      )}>
+                        <TableCell className={cn(
+                          TABLE_CELL_STYLES.HEADER,
+                          "sticky left-0 border-r font-bold",
+                          sectionData.bgColor,
+                          sectionData.textColor,
+                          TABLE_Z_INDEX.SECTION_HEADER
+                        )}>
+                          <div className="flex items-center gap-2">
+                            {isOpen ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                            {sectionData.title}
+                          </div>
+                        </TableCell>
+                        {sectionTotals.map((total, index) => (
+                          <TableCell 
+                            key={index} 
+                            className={cn(
+                              TABLE_CELL_STYLES.HEADER,
+                              "text-center font-semibold text-sm",
+                              sectionData.textColor,
+                              getCurrentMonthColumnStyle(index === currentMonth)
+                            )}
+                          >
+                            {new Intl.NumberFormat('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL'
+                            }).format(total)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </CollapsibleTrigger>
+                    
+                    {/* Conteúdo da seção */}
+                    <CollapsibleContent asChild>
+                      <>
+                        <TableSection
+                          title={sectionData.title}
+                          section={sectionData.section}
+                          categories={sectionData.categories}
+                          bgColor={sectionData.bgColor}
+                          textColor={sectionData.textColor}
+                          currentMonth={currentMonth}
+                          selectedCell={selectedCell}
+                          onAddCategory={() => onAddCategory(sectionData.section, sectionData.title)}
+                          onCategoryNameChange={handlers.handleCategoryNameChange}
+                          onValueChange={onValueChange}
+                          onCategoryRemove={handlers.handleCategoryRemove}
+                          onCategoryReorder={onCategoryReorder}
+                          onCellSelect={handlers.handleCellSelect}
+                          onDragStart={handlers.handleDragStart}
+                          onDragMove={handlers.handleDragMove}
+                          onDragEnd={handlers.handleDragEnd}
+                          isInFillRange={isInFillRange}
+                          hideHeader={true}
+                        />
+                      </>
+                    </CollapsibleContent>
+                  </>
+                </Collapsible>
+              </React.Fragment>
+            );
+          })}
           
-          return (
-            <AccordionItem key={sectionData.section} value={sectionData.section} className="border rounded-lg">
-              <AccordionTrigger className={cn(
-                "hover:no-underline px-0 py-3 font-bold text-left",
-                sectionData.bgColor,
-                sectionData.textColor
-              )}>
-                <div className="w-full grid" style={{ gridTemplateColumns: `${TABLE_COLUMN_WIDTHS.CATEGORY.replace('min-w-[', '').replace(']', '')} repeat(12, ${TABLE_COLUMN_WIDTHS.MONTH.replace('min-w-[', '').replace(']', '')})` }}>
-                  <div className="px-4 py-1 font-bold">
-                    {sectionData.title}
-                  </div>
-                  {sectionTotals.map((total, index) => (
-                    <div 
-                      key={index} 
-                      className={cn(
-                        "text-center text-sm font-semibold px-1",
-                        getCurrentMonthColumnStyle(index === currentMonth)
-                      )}
-                    >
-                      {formatCurrency(total)}
-                    </div>
-                  ))}
-                </div>
-              </AccordionTrigger>
-              
-              <AccordionContent className="p-0">
-                <Table className="min-w-full">
-                  <TableHeaderComponent />
-                  <TableBody>
-                    <TableSection
-                      title={sectionData.title}
-                      section={sectionData.section}
-                      categories={sectionData.categories}
-                      bgColor={sectionData.bgColor}
-                      textColor={sectionData.textColor}
-                      currentMonth={currentMonth}
-                      selectedCell={selectedCell}
-                      onAddCategory={() => onAddCategory(sectionData.section, sectionData.title)}
-                      onCategoryNameChange={handlers.handleCategoryNameChange}
-                      onValueChange={onValueChange}
-                      onCategoryRemove={handlers.handleCategoryRemove}
-                      onCategoryReorder={onCategoryReorder}
-                      onCellSelect={handlers.handleCellSelect}
-                      onDragStart={handlers.handleDragStart}
-                      onDragMove={handlers.handleDragMove}
-                      onDragEnd={handlers.handleDragEnd}
-                      isInFillRange={isInFillRange}
-                      hideHeader={true}
-                    />
-                  </TableBody>
-                </Table>
-              </AccordionContent>
-            </AccordionItem>
-          );
-        })}
-      </Accordion>
-      
-      {/* Tabela separada para a linha de surplus */}
-      <div className="mt-4">
-        <Table className="min-w-full">
-          <TableHeaderComponent />
-          <TableBody>
-            <SurplusRow 
-              totals={totals}
-              currentMonth={currentMonth}
-            />
-          </TableBody>
-        </Table>
-      </div>
+          {/* Linha de surplus */}
+          <SurplusRow 
+            totals={totals}
+            currentMonth={currentMonth}
+          />
+        </TableBody>
+      </Table>
     </div>
   );
 };

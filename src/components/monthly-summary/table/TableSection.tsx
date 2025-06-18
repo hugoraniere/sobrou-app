@@ -7,7 +7,6 @@ import { CategoryRow } from './CategoryRow';
 import { AddCategoryButton } from '../AddCategoryButton';
 import { useCategoryDragDrop } from '@/hooks/useCategoryDragDrop';
 import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 

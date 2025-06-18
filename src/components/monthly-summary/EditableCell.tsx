@@ -127,6 +127,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
   };
 
+  // Usar data-cell-info consistente em todo lugar
   const cellDataInfo = `${position.section}|${position.categoryId}|${position.monthIndex}`;
 
   if (isEditing) {
