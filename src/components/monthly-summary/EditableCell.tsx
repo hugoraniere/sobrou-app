@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
-import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
+import { formatCurrencyInput, parseCurrencyToNumber, formatCurrencyForDisplay } from '@/utils/currencyUtils';
 import { cn } from '@/lib/utils';
 
 interface EditableCellProps {
@@ -21,7 +21,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
   useEffect(() => {
     if (isEditing) {
-      setInputValue(value === 0 ? '' : formatCurrencyInput(value.toString()));
+      // Mostrar valor sem formatação durante a edição
+      setInputValue(value === 0 ? '' : value.toString().replace('.', ','));
       setTimeout(() => {
         inputRef.current?.focus();
         inputRef.current?.select();
@@ -44,7 +45,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       handleBlur();
     } else if (e.key === 'Escape') {
       setIsEditing(false);
-      setInputValue(value === 0 ? '' : formatCurrencyInput(value.toString()));
+      setInputValue(value === 0 ? '' : value.toString().replace('.', ','));
     }
   };
 
@@ -52,11 +53,6 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     const formatted = formatCurrencyInput(e.target.value);
     setInputValue(formatted);
   };
-
-  const displayValue = value === 0 ? '-' : value.toLocaleString('pt-BR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
 
   if (isEditing) {
     return (
@@ -66,7 +62,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         onChange={handleInputChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className={cn("text-center text-sm h-8", className)}
+        className={cn("text-center text-xs h-6 px-1", className)}
         placeholder="0,00"
       />
     );
@@ -76,12 +72,12 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     <div
       onClick={handleClick}
       className={cn(
-        "text-center text-sm cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-colors min-h-[32px] flex items-center justify-center",
+        "text-center text-xs cursor-pointer hover:bg-gray-50 px-1 py-1 rounded transition-colors min-h-[24px] flex items-center justify-center",
         className
       )}
       title="Clique para editar"
     >
-      {displayValue}
+      {formatCurrencyForDisplay(value)}
     </div>
   );
 };

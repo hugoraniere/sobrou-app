@@ -64,7 +64,7 @@ export const EditableCategoryName: React.FC<EditableCategoryNameProps> = ({
         onChange={handleInputChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className={cn("text-sm h-8 min-w-[120px]", className)}
+        className={cn("text-xs h-6 min-w-[100px] px-1", className)}
         placeholder="Nome da categoria"
       />
     );
@@ -74,13 +74,13 @@ export const EditableCategoryName: React.FC<EditableCategoryNameProps> = ({
     <div
       onClick={handleClick}
       className={cn(
-        "flex items-center gap-1 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-colors group",
+        "flex items-center gap-1 cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded transition-colors group",
         className
       )}
       title="Clique para editar"
     >
-      <span className="text-sm">{value}</span>
-      <Edit2 className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <span className="text-xs">{value}</span>
+      <Edit2 className="h-2.5 w-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
     </div>
   );
 };

@@ -1,8 +1,16 @@
-
 // Helper function to format currency input for Brazilian Real (R$)
 export const formatCurrencyInput = (value: string): string => {
+  // Durante a digitação, não formatar - apenas limpar caracteres inválidos
   // Remove any non-digit characters except comma and dot
   let cleanValue = value.replace(/[^\d.,]/g, '');
+  
+  // Se o valor está vazio, retornar vazio
+  if (!cleanValue) return '';
+  
+  // Se contém apenas dígitos, deixar como está para digitação natural
+  if (/^\d+$/.test(cleanValue)) {
+    return cleanValue;
+  }
   
   // Tratar ponto como separador de milhar e vírgula como separador decimal
   if (cleanValue.includes('.')) {
@@ -17,18 +25,15 @@ export const formatCurrencyInput = (value: string): string => {
     cleanValue = `${parts[0]},${parts[1].slice(0, 2)}`;
   }
   
-  // Convert to number for formatting
-  const numberValue = Number(cleanValue.replace(',', '.'));
-  if (isNaN(numberValue)) return '';
-  
-  // Format as Brazilian currency with dot as thousand separator
-  return numberValue.toLocaleString('pt-BR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  return cleanValue;
 };
 
 export const parseCurrencyToNumber = (value: string): number => {
+  // Se é apenas um número inteiro, converter diretamente
+  if (/^\d+$/.test(value)) {
+    return parseFloat(value);
+  }
+  
   // Remove all dots (thousand separators) and replace comma with dot for proper number conversion
   const cleanValue = value.replace(/\./g, '').replace(',', '.');
   const number = parseFloat(cleanValue);
@@ -52,5 +57,14 @@ export const formatCurrencyNoDecimals = (value: number): string => {
     currency: 'BRL',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
+  });
+};
+
+// Nova função para formatar apenas para visualização (não para edição)
+export const formatCurrencyForDisplay = (value: number): string => {
+  if (value === 0) return '-';
+  return value.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   });
 };

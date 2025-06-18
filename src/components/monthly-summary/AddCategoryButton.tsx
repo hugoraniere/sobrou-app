@@ -17,9 +17,9 @@ export const AddCategoryButton: React.FC<AddCategoryButtonProps> = ({
       variant="ghost"
       size="sm"
       onClick={onClick}
-      className={`text-xs text-gray-500 hover:text-gray-700 h-8 ${className}`}
+      className={`text-xs text-gray-500 hover:text-gray-700 h-6 px-2 ${className}`}
     >
-      <Plus className="h-3 w-3 mr-1" />
+      <Plus className="h-2.5 w-2.5 mr-1" />
       Adicionar categoria
     </Button>
   );
