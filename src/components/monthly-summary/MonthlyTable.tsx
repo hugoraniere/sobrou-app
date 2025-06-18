@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MONTHS_SHORT } from '@/types/monthly-summary';
@@ -138,55 +138,63 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
   return (
     <>
       <Card className="w-full">
-        <ScrollArea className="w-full">
-          <div className="min-w-[1000px]" onClick={handleTableClick}>
-            <Table>
-              <TableHeader className="sticky top-0 bg-white z-10">
-                <TableRow>
-                  <TableHead className="w-40 font-bold bg-gray-50 sticky left-0 z-20 text-xs px-2 h-6">
-                    Categoria
-                  </TableHead>
-                  {MONTHS_SHORT.map((month, index) => (
-                    <TableHead 
-                      key={index} 
-                      className={cn(
-                        "text-center min-w-[70px] font-bold text-xs px-1 h-6",
-                        index === currentMonth && "bg-blue-50 border-r-2 border-blue-500"
-                      )}
-                    >
-                      {month}
+        <CardHeader>
+          <CardTitle>Gastos Mensais {year}</CardTitle>
+          <CardDescription>
+            Registre seus gastos reais e receitas ao longo do ano. Use arrastar e soltar para preencher múltiplas células rapidamente.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ScrollArea className="w-full">
+            <div className="min-w-[1000px]" onClick={handleTableClick}>
+              <Table>
+                <TableHeader className="sticky top-0 bg-white z-10">
+                  <TableRow>
+                    <TableHead className="w-40 font-bold bg-gray-50 sticky left-0 z-20 text-xs px-2 h-6">
+                      Categoria
                     </TableHead>
+                    {MONTHS_SHORT.map((month, index) => (
+                      <TableHead 
+                        key={index} 
+                        className={cn(
+                          "text-center min-w-[70px] font-bold text-xs px-1 h-6",
+                          index === currentMonth && "bg-blue-50 border-r-2 border-blue-500"
+                        )}
+                      >
+                        {month}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sections.map(sectionConfig => (
+                    <TableSection
+                      key={sectionConfig.section}
+                      title={sectionConfig.title}
+                      section={sectionConfig.section}
+                      categories={sectionConfig.categories}
+                      totals={sectionConfig.totals}
+                      currentMonth={currentMonth}
+                      bgColor={sectionConfig.bgColor}
+                      textColor={sectionConfig.textColor}
+                      selectedCell={dragFill.selectedCell}
+                      onAddCategory={handleAddCategory}
+                      onCategoryNameChange={handleCategoryNameChange}
+                      onValueChange={updateCategoryValue}
+                      onCellSelect={handleCellSelect}
+                      onDragStart={handleDragStart}
+                      onDragMove={handleDragMove}
+                      onDragEnd={handleDragEnd}
+                      isInFillRange={dragFill.isInFillRange}
+                    />
                   ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sections.map(sectionConfig => (
-                  <TableSection
-                    key={sectionConfig.section}
-                    title={sectionConfig.title}
-                    section={sectionConfig.section}
-                    categories={sectionConfig.categories}
-                    totals={sectionConfig.totals}
-                    currentMonth={currentMonth}
-                    bgColor={sectionConfig.bgColor}
-                    textColor={sectionConfig.textColor}
-                    selectedCell={dragFill.selectedCell}
-                    onAddCategory={handleAddCategory}
-                    onCategoryNameChange={handleCategoryNameChange}
-                    onValueChange={updateCategoryValue}
-                    onCellSelect={handleCellSelect}
-                    onDragStart={handleDragStart}
-                    onDragMove={handleDragMove}
-                    onDragEnd={handleDragEnd}
-                    isInFillRange={dragFill.isInFillRange}
-                  />
-                ))}
 
-                <SurplusRow totals={totals} currentMonth={currentMonth} />
-              </TableBody>
-            </Table>
-          </div>
-        </ScrollArea>
+                  <SurplusRow totals={totals} currentMonth={currentMonth} />
+                </TableBody>
+              </Table>
+            </div>
+          </ScrollArea>
+        </CardContent>
       </Card>
 
       <AddCategoryDialog

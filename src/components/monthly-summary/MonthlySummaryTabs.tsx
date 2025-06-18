@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MonthlyTable } from './MonthlyTable';
 import { PlanningTable } from './PlanningTable';
@@ -12,13 +12,24 @@ interface MonthlySummaryTabsProps {
 
 export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) => {
   const [activeTab, setActiveTab] = useState('table');
+  
+  // Estado global para o toggle de visão detalhada/simples
+  const [isDetailedView, setIsDetailedView] = useState(() => {
+    const stored = localStorage.getItem('planningViewMode');
+    return stored ? JSON.parse(stored) : false; // Por padrão, visão simples
+  });
+
+  // Salvar preferência no localStorage
+  useEffect(() => {
+    localStorage.setItem('planningViewMode', JSON.stringify(isDetailedView));
+  }, [isDetailedView]);
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid w-full grid-cols-3 mb-6">
         <TabsTrigger value="table" className="flex items-center gap-2">
           <FileText className="h-4 w-4" />
-          Tabela
+          Gastos Mensais
         </TabsTrigger>
         <TabsTrigger value="planning" className="flex items-center gap-2">
           <Calculator className="h-4 w-4" />
@@ -35,11 +46,18 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
       </TabsContent>
 
       <TabsContent value="planning" className="mt-0">
-        <PlanningTable year={year} />
+        <PlanningTable 
+          year={year} 
+          isDetailedView={isDetailedView}
+          onToggleView={setIsDetailedView}
+        />
       </TabsContent>
 
       <TabsContent value="comparative" className="mt-0">
-        <ComparativeTable year={year} />
+        <ComparativeTable 
+          year={year} 
+          isDetailedView={isDetailedView}
+        />
       </TabsContent>
     </Tabs>
   );

@@ -9,17 +9,48 @@ import { ComparativeTooltip } from './ComparativeTooltip';
 
 interface ComparativeTableProps {
   year: number;
+  isDetailedView: boolean;
 }
 
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
-  const { realData, planningData } = useUnifiedMonthlySummary(year);
+export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDetailedView }) => {
+  const { 
+    realData, 
+    planningData, 
+    simplePlanningData,
+    simplePlanningTotals 
+  } = useUnifiedMonthlySummary(year);
   const { isMobile } = useResponsive();
   
   // Estado para o mês selecionado (inicializado com o mês atual)
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const currentMonth = new Date().getMonth();
+
+  // Determinar qual dados de planejamento usar baseado no toggle
+  const currentPlanningData = isDetailedView ? planningData : {
+    year: simplePlanningData.year,
+    revenue: simplePlanningData.revenue.map(cat => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(cat.monthlyValue)
+    })),
+    essentialExpenses: simplePlanningData.essentialExpenses.map(cat => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(cat.monthlyValue)
+    })),
+    nonEssentialExpenses: simplePlanningData.nonEssentialExpenses.map(cat => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(cat.monthlyValue)
+    })),
+    reserves: simplePlanningData.reserves.map(cat => ({
+      id: cat.id,
+      displayName: cat.displayName,
+      values: Array(12).fill(cat.monthlyValue)
+    }))
+  };
 
   const getVarianceColor = (real: number, planned: number) => {
     if (planned === 0) return 'text-gray-500';
@@ -37,35 +68,40 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year }) => {
     {
       title: 'RECEITAS',
       realCategories: realData.revenue,
-      planningCategories: planningData.revenue,
+      planningCategories: currentPlanningData.revenue,
       bgColor: 'bg-green-100'
     },
     {
       title: 'GASTOS ESSENCIAIS',
       realCategories: realData.essentialExpenses,
-      planningCategories: planningData.essentialExpenses,
+      planningCategories: currentPlanningData.essentialExpenses,
       bgColor: 'bg-red-100'
     },
     {
       title: 'GASTOS NÃO ESSENCIAIS',
       realCategories: realData.nonEssentialExpenses,
-      planningCategories: planningData.nonEssentialExpenses,
+      planningCategories: currentPlanningData.nonEssentialExpenses,
       bgColor: 'bg-orange-100'
     },
     {
       title: 'RESERVAS',
       realCategories: realData.reserves,
-      planningCategories: planningData.reserves,
+      planningCategories: currentPlanningData.reserves,
       bgColor: 'bg-blue-100'
     }
   ];
 
+  const getDescription = () => {
+    const viewType = isDetailedView ? 'detalhado' : 'simples';
+    return `Compare seus gastos reais com o planejamento ${viewType} por categoria. Clique nos meses para alterar a comparação.`;
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Comparativo Detalhado: Real vs Planejado {year}</CardTitle>
+        <CardTitle>Comparativo: Real vs Planejado {year}</CardTitle>
         <CardDescription>
-          Compare seus gastos reais com o planejamento por categoria. Clique nos meses para alterar a comparação.
+          {getDescription()}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">

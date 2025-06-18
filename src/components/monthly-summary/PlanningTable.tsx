@@ -13,27 +13,18 @@ import { cn } from '@/lib/utils';
 
 interface PlanningTableProps {
   year: number;
+  isDetailedView: boolean;
+  onToggleView: (detailed: boolean) => void;
 }
 
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-export const PlanningTable: React.FC<PlanningTableProps> = ({ year }) => {
+export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedView, onToggleView }) => {
   const { planningData: data, updatePlanningValue: updateCategoryValue, planningTotals: totals } = useUnifiedMonthlySummary(year);
   const dragFill = useDragFill();
   const { isMobile } = useResponsive();
 
-  // Estado para controlar qual visualização está ativa
-  const [isDetailedView, setIsDetailedView] = useState(() => {
-    const stored = localStorage.getItem('planningViewMode');
-    return stored ? JSON.parse(stored) : false; // Por padrão, visão simples
-  });
-
   const currentMonth = new Date().getMonth();
-
-  // Salvar preferência no localStorage
-  useEffect(() => {
-    localStorage.setItem('planningViewMode', JSON.stringify(isDetailedView));
-  }, [isDetailedView]);
 
   const handleDragFillEnd = () => {
     const range = dragFill.endDrag();
@@ -70,7 +61,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year }) => {
           </div>
           <PlanningViewToggle
             isDetailedView={isDetailedView}
-            onToggle={setIsDetailedView}
+            onToggle={onToggleView}
           />
         </div>
       </CardHeader>
