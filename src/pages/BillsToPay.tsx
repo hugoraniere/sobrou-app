@@ -4,14 +4,17 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AddBillDialog } from '@/components/bills/AddBillDialog';
 import { BillsList } from '@/components/bills/BillsList';
+import { BillFilters } from '@/components/bills/BillFilters';
 import { useBillsData } from '@/hooks/useBillsData';
-import { CreateBillData, Bill } from '@/types/bills';
+import { useBillFilters } from '@/hooks/useBillFilters';
+import { CreateBillData, Bill, BillPeriodFilter } from '@/types/bills';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 
 const BillsToPay: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
+  const [activeFilter, setActiveFilter] = useState<BillPeriodFilter>('all');
 
   const {
     bills,
@@ -24,6 +27,11 @@ const BillsToPay: React.FC = () => {
     isCreating,
     isUpdating,
   } = useBillsData();
+
+  // Usar o hook de filtros para as contas não pagas
+  const unpaidBills = bills.filter(bill => !bill.is_paid);
+  const { filteredBills, billCounts } = useBillFilters(unpaidBills, activeFilter);
+  const paidBills = bills.filter(bill => bill.is_paid);
 
   const handleAddBill = () => {
     setEditingBill(null);
@@ -66,9 +74,9 @@ const BillsToPay: React.FC = () => {
     }
   };
 
-  // Separar contas pagas e não pagas
-  const unpaidBills = bills.filter(bill => !bill.is_paid);
-  const paidBills = bills.filter(bill => bill.is_paid);
+  const handleFilterChange = (filter: BillPeriodFilter) => {
+    setActiveFilter(filter);
+  };
 
   return (
     <div className="space-y-6">
@@ -113,9 +121,16 @@ const BillsToPay: React.FC = () => {
       {/* Contas em aberto */}
       {!isLoading && unpaidBills.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">Contas em Aberto</h2>
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-semibold text-gray-900">Contas em Aberto</h2>
+            <BillFilters
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
+              counts={billCounts}
+            />
+          </div>
           <BillsList
-            bills={unpaidBills}
+            bills={filteredBills}
             onEdit={handleEditBill}
             onDelete={handleDeleteBill}
             onTogglePaid={handleTogglePaid}
