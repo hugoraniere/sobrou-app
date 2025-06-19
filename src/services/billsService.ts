@@ -163,7 +163,7 @@ export const billsService = {
   async markAsUnpaid(id: string): Promise<Bill> {
     return this.updateBill(id, {
       is_paid: false,
-      paid_date: undefined
+      paid_date: null // Corrigido: usar null em vez de undefined
     });
   }
 };
