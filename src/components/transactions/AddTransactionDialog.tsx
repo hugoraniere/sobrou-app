@@ -19,11 +19,13 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{t('transactions.add', 'Adicionar Transação')}</DialogTitle>
-          <DialogDescription>
-            {t('transactions.addDescription', 'Preencha os detalhes da nova transação')}
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="space-y-2 pb-4">
+          <DialogTitle className="text-lg font-semibold text-gray-900">
+            {t('transactions.add', 'Nova Transação')}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-600">
+            {t('transactions.addDescription', 'Adicione uma nova transação rapidamente')}
           </DialogDescription>
         </DialogHeader>
         

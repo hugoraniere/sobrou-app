@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { parseCurrencyToNumber } from '@/utils/currencyUtils';
 
 const transactionFormSchema = z.object({
-  description: z.string().min(2, { message: "A descrição deve ter pelo menos 2 caracteres" }),
+  description: z.string().optional(),
   amount: z.string().min(1, { message: "O valor é obrigatório" }),
   category: z.string().min(1, { message: "A categoria é obrigatória" }),
   date: z.date(),
@@ -45,7 +45,7 @@ export const useTransactionForm = (onSuccess?: () => void) => {
       const { error } = await supabase
         .from('transactions')
         .insert({
-          description: data.description,
+          description: data.description || 'Transação sem descrição',
           amount: parseCurrencyToNumber(data.amount),
           category: data.category,
           date: data.date.toISOString().split('T')[0],
