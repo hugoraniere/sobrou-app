@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Bill, CreateBillData, UpdateBillData } from "@/types/bills";
 import { addDays, addWeeks, addMonths, addYears } from 'date-fns';
@@ -161,9 +160,25 @@ export const billsService = {
   },
 
   async markAsUnpaid(id: string): Promise<Bill> {
-    return this.updateBill(id, {
-      is_paid: false,
-      paid_date: null // Corrigido: usar null em vez de undefined
-    });
+    const { data, error } = await supabase
+      .from('bills_to_pay')
+      .update({
+        is_paid: false,
+        paid_date: null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error marking bill as unpaid:', error);
+      throw error;
+    }
+
+    return {
+      ...data,
+      recurrence_frequency: data.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+    };
   }
 };
