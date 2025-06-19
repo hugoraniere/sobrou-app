@@ -13,7 +13,7 @@ import { CreateBillTransactionData } from '@/types/billTransactions';
 const transactionSchema = z.object({
   amount: z.string().min(1, 'Valor é obrigatório'),
   type: z.enum(['debit', 'credit'], { required_error: 'Tipo é obrigatório' }),
-  description: z.string().min(1, 'Descrição é obrigatória'),
+  description: z.string().optional(),
   transaction_date: z.string().min(1, 'Data é obrigatória'),
 });
 
@@ -42,6 +42,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       transaction_date: new Date().toISOString().split('T')[0],
+      description: '',
     },
   });
 
@@ -52,7 +53,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
       bill_id: billId,
       amount: parseFloat(data.amount),
       type: data.type,
-      description: data.description,
+      description: data.description || '',
       transaction_date: data.transaction_date,
     });
   };
@@ -106,7 +107,9 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Descrição *</Label>
+        <Label htmlFor="description">
+          Descrição <span className="text-gray-400 ml-1 font-normal">(opcional)</span>
+        </Label>
         <Textarea
           id="description"
           placeholder={
