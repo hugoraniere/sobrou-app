@@ -31,6 +31,7 @@ export const useTransactionForm = (onSuccess?: () => void) => {
       date: new Date(),
       type: 'expense'
     },
+    mode: 'onChange'
   });
 
   const handleSubmit = async (data: TransactionFormValues) => {
@@ -45,7 +46,7 @@ export const useTransactionForm = (onSuccess?: () => void) => {
       const { error } = await supabase
         .from('transactions')
         .insert({
-          description: data.description || 'Transação sem descrição',
+          description: data.description || null,
           amount: parseCurrencyToNumber(data.amount),
           category: data.category,
           date: data.date.toISOString().split('T')[0],

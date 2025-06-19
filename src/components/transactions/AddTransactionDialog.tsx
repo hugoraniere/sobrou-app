@@ -19,9 +19,9 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] min-h-[500px] overflow-y-auto">
         <DialogHeader className="space-y-2 pb-4">
-          <DialogTitle className="text-lg font-semibold text-gray-900">
+          <DialogTitle className="text-xl font-semibold text-gray-900">
             {t('transactions.add', 'Nova Transação')}
           </DialogTitle>
           <DialogDescription className="text-sm text-gray-600">
