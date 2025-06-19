@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar, Edit2, Trash2, Check, X, Repeat, History } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -40,18 +40,30 @@ export const BillCard: React.FC<BillCardProps> = ({
   const hasTransactions = balanceData?.transactions_total !== 0;
   const isFullyPaid = currentBalance <= 0;
   const isOverdue = !bill.is_paid && new Date(bill.due_date) < new Date();
+  
+  // Calcular proximidade do vencimento
+  const daysUntilDue = differenceInDays(new Date(bill.due_date), new Date());
+  const isNearDue = !bill.is_paid && !isOverdue && daysUntilDue >= 0 && daysUntilDue <= 3;
+  
+  // Determinar cor do stroke lateral
+  const getCardBorderClass = () => {
+    if (isOverdue) return 'border-l-4 border-red-500';
+    if (isNearDue) return 'border-l-4 border-yellow-500';
+    return 'border-l-4 border-gray-300';
+  };
 
   return (
     <>
       <Card className={cn(
         "w-full transition-all duration-200 hover:shadow-sm border-gray-200",
+        getCardBorderClass(),
         bill.is_paid && "opacity-60"
       )}>
-        <CardContent className="p-3">
-          {/* Linha principal compacta: Título, Badges, Valor, Saldo, Data, Ações */}
-          <div className="flex items-center justify-between gap-3">
+        <CardContent className="p-4">
+          {/* Layout Desktop */}
+          <div className="hidden sm:flex items-center justify-between gap-4">
             {/* Seção esquerda: Título e badges */}
-            <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <h3 className={cn(
                 "text-sm font-medium text-gray-900 truncate",
                 bill.is_paid && "line-through text-gray-500"
@@ -59,33 +71,39 @@ export const BillCard: React.FC<BillCardProps> = ({
                 {bill.title}
               </h3>
               
-              {/* Badges minimalistas */}
-              <div className="flex items-center gap-1">
+              {/* Badges maiores */}
+              <div className="flex items-center gap-2">
                 {bill.is_recurring && (
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-gray-300 text-gray-500 h-4">
-                    <Repeat className="h-2.5 w-2.5 mr-0.5" />
+                  <Badge variant="outline" className="text-xs px-2 py-1 border-gray-300 text-gray-600 h-6">
+                    <Repeat className="h-3 w-3 mr-1" />
                     {frequencyLabels[bill.recurrence_frequency]}
                   </Badge>
                 )}
                 
                 {bill.is_paid && (
-                  <span className="text-[10px] text-green-600 font-medium">Paga</span>
+                  <Badge variant="success" className="text-xs px-2 py-1 h-6">
+                    Paga
+                  </Badge>
                 )}
                 
                 {isFullyPaid && !bill.is_paid && (
-                  <span className="text-[10px] text-green-600 font-medium">Quitada</span>
+                  <Badge variant="success" className="text-xs px-2 py-1 h-6">
+                    Quitada
+                  </Badge>
                 )}
                 
                 {isOverdue && !bill.is_paid && !isFullyPaid && (
-                  <span className="text-[10px] text-red-600 font-medium">Vencida</span>
+                  <Badge variant="destructive" className="text-xs px-2 py-1 h-6">
+                    Vencida
+                  </Badge>
                 )}
               </div>
             </div>
             
             {/* Seção central: Valores */}
-            <div className="flex items-center gap-3 text-[10px]">
-              <div className="text-right">
-                <div className="text-gray-500 mb-0.5">Valor</div>
+            <div className="flex items-center gap-4">
+              <div className="text-left">
+                <div className="text-xs text-gray-500 mb-1">Valor</div>
                 <div className={cn(
                   "font-medium text-xs",
                   bill.is_paid ? "text-gray-500" : "text-gray-900"
@@ -95,8 +113,8 @@ export const BillCard: React.FC<BillCardProps> = ({
               </div>
               
               {hasTransactions && (
-                <div className="text-right">
-                  <div className="text-gray-500 mb-0.5">Saldo</div>
+                <div className="text-left">
+                  <div className="text-xs text-gray-500 mb-1">Saldo</div>
                   <div className={cn(
                     "font-medium text-xs",
                     isFullyPaid ? "text-green-600" : "text-orange-600"
@@ -106,10 +124,10 @@ export const BillCard: React.FC<BillCardProps> = ({
                 </div>
               )}
               
-              <div className="text-right">
-                <div className="text-gray-500 mb-0.5">Vencimento</div>
+              <div className="text-left">
+                <div className="text-xs text-gray-500 mb-1">Vencimento</div>
                 <div className="flex items-center gap-1 text-gray-700">
-                  <Calendar className="h-2.5 w-2.5" />
+                  <Calendar className="h-3 w-3" />
                   <span className="font-medium text-xs">
                     {format(new Date(bill.due_date), 'dd/MM/yyyy', { locale: ptBR })}
                   </span>
@@ -117,15 +135,15 @@ export const BillCard: React.FC<BillCardProps> = ({
               </div>
             </div>
 
-            {/* Seção direita: Ações compactas */}
-            <div className="flex items-center gap-0.5">
+            {/* Seção direita: Ações com melhor espaçamento */}
+            <div className="flex items-center gap-1">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setTransactionsDialogOpen(true)}
-                className="h-6 px-2 text-[10px] border-gray-300 hover:bg-gray-50"
+                className="h-7 px-3 text-xs border-gray-300 hover:bg-gray-50"
               >
-                <History className="h-2.5 w-2.5 mr-1" />
+                <History className="h-3 w-3 mr-1" />
                 Transações
               </Button>
               
@@ -134,14 +152,14 @@ export const BillCard: React.FC<BillCardProps> = ({
                 size="sm"
                 onClick={() => onTogglePaid(bill.id, !bill.is_paid)}
                 className={cn(
-                  "h-6 w-6 p-0 border-gray-300 hover:bg-gray-50",
+                  "h-7 w-7 p-0 border-gray-300 hover:bg-gray-50",
                   bill.is_paid && "bg-green-50 border-green-300 hover:bg-green-100"
                 )}
               >
                 {bill.is_paid ? (
-                  <X className="h-2.5 w-2.5 text-green-700" />
+                  <X className="h-3 w-3 text-green-700" />
                 ) : (
-                  <Check className="h-2.5 w-2.5 text-gray-600" />
+                  <Check className="h-3 w-3 text-gray-600" />
                 )}
               </Button>
               
@@ -149,28 +167,156 @@ export const BillCard: React.FC<BillCardProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => onEdit(bill)}
-                className="h-6 w-6 p-0 border-gray-300 hover:bg-gray-50"
+                className="h-7 w-7 p-0 border-gray-300 hover:bg-gray-50"
               >
-                <Edit2 className="h-2.5 w-2.5 text-gray-600" />
+                <Edit2 className="h-3 w-3 text-gray-600" />
               </Button>
               
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => onDelete(bill.id)}
-                className="h-6 w-6 p-0 border-gray-300 hover:bg-red-50 hover:border-red-300"
+                className="h-7 w-7 p-0 border-gray-300 hover:bg-red-50 hover:border-red-300"
               >
-                <Trash2 className="h-2.5 w-2.5 text-gray-600 hover:text-red-600" />
+                <Trash2 className="h-3 w-3 text-gray-600 hover:text-red-600" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Layout Mobile - Vertical */}
+          <div className="sm:hidden space-y-3">
+            {/* Título e badges */}
+            <div className="space-y-2">
+              <h3 className={cn(
+                "text-sm font-medium text-gray-900",
+                bill.is_paid && "line-through text-gray-500"
+              )}>
+                {bill.title}
+              </h3>
+              
+              <div className="flex flex-wrap gap-2">
+                {bill.is_recurring && (
+                  <Badge variant="outline" className="text-xs px-2 py-1 border-gray-300 text-gray-600 h-6">
+                    <Repeat className="h-3 w-3 mr-1" />
+                    {frequencyLabels[bill.recurrence_frequency]}
+                  </Badge>
+                )}
+                
+                {bill.is_paid && (
+                  <Badge variant="success" className="text-xs px-2 py-1 h-6">
+                    Paga
+                  </Badge>
+                )}
+                
+                {isFullyPaid && !bill.is_paid && (
+                  <Badge variant="success" className="text-xs px-2 py-1 h-6">
+                    Quitada
+                  </Badge>
+                )}
+                
+                {isOverdue && !bill.is_paid && !isFullyPaid && (
+                  <Badge variant="destructive" className="text-xs px-2 py-1 h-6">
+                    Vencida
+                  </Badge>
+                )}
+              </div>
+            </div>
+            
+            {/* Valores */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="text-left">
+                <div className="text-xs text-gray-500 mb-1">Valor</div>
+                <div className={cn(
+                  "font-medium text-xs",
+                  bill.is_paid ? "text-gray-500" : "text-gray-900"
+                )}>
+                  {formatCurrency(bill.amount)}
+                </div>
+              </div>
+              
+              {hasTransactions && (
+                <div className="text-left">
+                  <div className="text-xs text-gray-500 mb-1">Saldo</div>
+                  <div className={cn(
+                    "font-medium text-xs",
+                    isFullyPaid ? "text-green-600" : "text-orange-600"
+                  )}>
+                    {formatCurrency(Math.max(0, currentBalance))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-left col-span-2">
+                <div className="text-xs text-gray-500 mb-1">Vencimento</div>
+                <div className="flex items-center gap-1 text-gray-700">
+                  <Calendar className="h-3 w-3" />
+                  <span className="font-medium text-xs">
+                    {format(new Date(bill.due_date), 'dd/MM/yyyy', { locale: ptBR })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Ações mobile */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTransactionsDialogOpen(true)}
+                className="h-7 px-3 text-xs border-gray-300 hover:bg-gray-50 flex-1"
+              >
+                <History className="h-3 w-3 mr-1" />
+                Transações
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onTogglePaid(bill.id, !bill.is_paid)}
+                className={cn(
+                  "h-7 px-3 text-xs border-gray-300 hover:bg-gray-50",
+                  bill.is_paid && "bg-green-50 border-green-300 hover:bg-green-100"
+                )}
+              >
+                {bill.is_paid ? (
+                  <>
+                    <X className="h-3 w-3 mr-1 text-green-700" />
+                    Desmarcar
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-3 w-3 mr-1 text-gray-600" />
+                    Marcar Paga
+                  </>
+                )}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(bill)}
+                className="h-7 w-7 p-0 border-gray-300 hover:bg-gray-50"
+              >
+                <Edit2 className="h-3 w-3 text-gray-600" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(bill.id)}
+                className="h-7 w-7 p-0 border-gray-300 hover:bg-red-50 hover:border-red-300"
+              >
+                <Trash2 className="h-3 w-3 text-gray-600 hover:text-red-600" />
               </Button>
             </div>
           </div>
 
           {/* Linha secundária: Descrição e notas (apenas se existirem) */}
           {(bill.description || bill.notes) && (
-            <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">
+            <div className="mt-3 pt-3 border-t border-gray-100 space-y-1">
               {bill.description && (
                 <p className={cn(
-                  "text-[11px] text-gray-600 leading-tight",
+                  "text-xs text-gray-600 leading-tight",
                   bill.is_paid && "text-gray-400"
                 )}>
                   {bill.description}
@@ -179,7 +325,7 @@ export const BillCard: React.FC<BillCardProps> = ({
 
               {bill.notes && (
                 <p className={cn(
-                  "text-[10px] text-gray-500 leading-tight",
+                  "text-xs text-gray-500 leading-tight",
                   bill.is_paid && "text-gray-400"
                 )}>
                   <span className="font-medium">Obs:</span> {bill.notes}
@@ -190,8 +336,8 @@ export const BillCard: React.FC<BillCardProps> = ({
 
           {/* Próximo vencimento para recorrentes */}
           {bill.is_recurring && bill.next_due_date && !bill.is_paid && (
-            <div className="mt-2 pt-2 border-t border-gray-100">
-              <p className="text-[10px] text-blue-600 leading-tight">
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <p className="text-xs text-blue-600 leading-tight">
                 Próximo: {format(new Date(bill.next_due_date), 'dd/MM/yyyy', { locale: ptBR })}
               </p>
             </div>

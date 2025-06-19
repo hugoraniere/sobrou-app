@@ -142,7 +142,7 @@ export const billsService = {
         bill.recurrence_frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
       );
       
-      await this.createBill({
+      await billsService.createBill({
         title: bill.title,
         amount: bill.amount,
         due_date: bill.next_due_date,

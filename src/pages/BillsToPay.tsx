@@ -81,14 +81,14 @@ const BillsToPay: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Contas a Pagar</h1>
           <p className="text-gray-600 mt-1">
             Acompanhe suas contas futuras e evite atrasos.
           </p>
         </div>
-        <Button onClick={handleAddBill} className="flex items-center gap-2">
+        <Button onClick={handleAddBill} className="flex items-center gap-2 self-start sm:self-auto">
           <Plus className="h-4 w-4" />
           Nova conta
         </Button>
@@ -121,7 +121,7 @@ const BillsToPay: React.FC = () => {
       {/* Contas em aberto */}
       {!isLoading && unpaidBills.length > 0 && (
         <div className="space-y-4">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h2 className="text-xl font-semibold text-gray-900">Contas em Aberto</h2>
             <BillFilters
               activeFilter={activeFilter}

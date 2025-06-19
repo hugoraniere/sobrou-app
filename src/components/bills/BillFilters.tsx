@@ -41,13 +41,6 @@ export const BillFilters: React.FC<BillFiltersProps> = ({
     'all',
   ];
 
-  const getVariant = (filter: BillPeriodFilter) => {
-    if (filter === 'overdue' && counts.overdue > 0) {
-      return activeFilter === filter ? 'destructive' : 'outline';
-    }
-    return activeFilter === filter ? 'default' : 'outline';
-  };
-
   const getCount = (filter: BillPeriodFilter) => {
     switch (filter) {
       case 'overdue': return counts.overdue;
@@ -61,18 +54,23 @@ export const BillFilters: React.FC<BillFiltersProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 justify-end">
       {filters.map((filter) => {
         const count = getCount(filter);
+        const isActive = activeFilter === filter;
+        const isOverdue = filter === 'overdue';
+        
         return (
           <Button
             key={filter}
-            variant={getVariant(filter)}
+            variant="outline"
             size="sm"
             onClick={() => onFilterChange(filter)}
             className={cn(
-              "flex items-center gap-2",
-              filter === 'overdue' && count > 0 && "text-red-600 border-red-200"
+              "flex items-center gap-2 text-xs h-8 px-3 bg-gray-100 border-gray-300 hover:bg-gray-200",
+              isActive && !isOverdue && "bg-primary text-white border-primary hover:bg-primary/90",
+              isActive && isOverdue && "bg-red-500 text-white border-red-500 hover:bg-red-600",
+              !isActive && isOverdue && count > 0 && "text-red-600 border-red-200 bg-red-50 hover:bg-red-100"
             )}
           >
             {filterLabels[filter]}
@@ -80,9 +78,10 @@ export const BillFilters: React.FC<BillFiltersProps> = ({
               <Badge 
                 variant="secondary" 
                 className={cn(
-                  "ml-1 h-5 px-1.5 text-xs",
-                  activeFilter === filter && "bg-white/20",
-                  filter === 'overdue' && count > 0 && "bg-red-100 text-red-700"
+                  "ml-1 h-4 px-1.5 text-xs font-medium",
+                  isActive && "bg-white/20 text-white",
+                  !isActive && isOverdue && count > 0 && "bg-red-100 text-red-700",
+                  !isActive && !isOverdue && "bg-white text-gray-700"
                 )}
               >
                 {count}
