@@ -1,39 +1,41 @@
 import React, { useState } from 'react';
-import { YearSelector } from '@/components/monthly-summary/YearSelector';
-import { MonthlySummaryTabs } from '@/components/monthly-summary/MonthlySummaryTabs';
-import { useResponsive } from '@/hooks/useResponsive';
-import { cn } from '@/lib/utils';
 
-const MonthlySummary = () => {
-  const { isMobile } = useResponsive();
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+const tabs = [
+  { id: 'gastos', label: 'Gastos' },
+  { id: 'plano', label: 'Plano' },
+  { id: 'comparativo', label: 'Comparativo' },
+];
+
+type Props = {
+  year: number;
+};
+
+export const MonthlySummaryTabs = ({ year }: Props) => {
+  const [activeTab, setActiveTab] = useState('gastos');
 
   return (
-    <div className="w-full max-w-screen px-4 pb-10 box-border overflow-x-hidden">
-      {/* Header */}
-      <div className={cn(
-        "flex justify-between items-center",
-        isMobile && "flex-col gap-3"
-      )}>
-        <div className="w-full">
-          <h1 className={cn("font-bold text-gray-900", isMobile ? "text-xl" : "text-3xl")}>
-            Resumo Mensal
-          </h1>
-          {!isMobile && (
-            <p className="text-gray-600 text-sm mt-1">
-              Visualize, planeje e compare seu orçamento financeiro
-            </p>
-          )}
-        </div>
-        <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
+    <div className="w-full space-y-4">
+      {/* Container de abas */}
+      <div className="flex w-full flex-wrap justify-between gap-2 sm:gap-4">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 min-w-[80px] sm:min-w-[120px] text-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeTab === tab.id ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Conteúdo principal */}
-      <div className="w-full overflow-x-auto">
-        <MonthlySummaryTabs year={selectedYear} />
+      {/* Conteúdo da aba ativa */}
+      <div className="w-full bg-background rounded-lg p-4 border">
+        {activeTab === 'gastos' && <p>Conteúdo de Gastos para {year}</p>}
+        {activeTab === 'plano' && <p>Conteúdo do Plano para {year}</p>}
+        {activeTab === 'comparativo' && <p>Conteúdo Comparativo para {year}</p>}
       </div>
     </div>
   );
 };
-
-export default MonthlySummary;
