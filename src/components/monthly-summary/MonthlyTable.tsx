@@ -67,20 +67,17 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
 
   return (
     <>
-      <Card className="w-full border-0 rounded-none">
-        <CardHeader className={cn(isMobile ? "p-4 pb-3" : "p-6")}>
-          <CardTitle className={cn(isMobile ? "text-lg" : "text-xl")}>
+      <Card className="w-full max-w-[330px] border-0 rounded-none">
+        <CardHeader className="p-2">
+          <CardTitle className="text-base">
             Gastos Mensais {year}
           </CardTitle>
-          <CardDescription className={cn(isMobile ? "text-xs" : "text-sm")}>
-            {isMobile 
-              ? "Registre seus gastos reais e receitas. Use arrastar para preencher células."
-              : "Registre seus gastos reais e receitas ao longo do ano. Use arrastar e soltar para preencher múltiplas células rapidamente. Arraste o ícone de 6 pontinhos para reordenar categorias."
-            }
+          <CardDescription className="text-xs">
+            Registre seus gastos reais e receitas.
           </CardDescription>
         </CardHeader>
-        <CardContent className={cn("w-full", isMobile ? "p-0" : "p-6 pt-0")}>
-          <div className="w-full overflow-x-auto">
+        <CardContent className="w-full p-0">
+          <div className="w-full max-w-[330px] overflow-x-auto">
             <MonthlyTableContent
               data={data}
               totals={totals}
