@@ -99,7 +99,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
             className={cn(
               TABLE_CELL_STYLES.HEADER,
               `text-center font-semibold ${textColor} cursor-pointer`,
-              getCurrentMonthColumnStyle(index === currentMonth)
+              getCurrentMonthColumnStyle(index === currentMonth) // Esta função agora inclui o z-index baixo
             )}
             onClick={onToggleExpanded}
           >
@@ -154,7 +154,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
                 key={index} 
                 className={cn(
                   TABLE_CELL_STYLES.DATA_CELL,
-                  getCurrentMonthColumnStyle(index === currentMonth),
+                  getCurrentMonthColumnStyle(index === currentMonth), // Esta função agora inclui o z-index baixo
                   bgColor.replace('50', '25')
                 )}
               />
