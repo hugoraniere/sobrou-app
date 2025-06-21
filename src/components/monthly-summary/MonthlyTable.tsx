@@ -68,7 +68,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
 
   return (
     <>
-      <Card className="w-full max-w-[330px] border-0 rounded-none">
+      <Card className="w-full border-0 rounded-none">
         <CardHeader className="p-2">
           <CardTitle className="text-base">
             Gastos Mensais {year}
@@ -78,7 +78,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="w-full p-0">
-          <div className="w-full max-w-[330px] overflow-x-auto">
+          <div className="w-full overflow-x-auto">
             <MonthlyTableContent
               data={data}
               totals={totals}

@@ -10,7 +10,7 @@ const MonthlySummary = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   return (
-    <div className="w-full max-w-[330px] mx-auto min-h-screen">
+    <div className="w-full mx-auto min-h-screen px-4">
       {/* Header */}
       <div className="w-full mt-6 mb-6">
         <div className={cn(
@@ -31,8 +31,8 @@ const MonthlySummary = () => {
         </div>
       </div>
 
-      {/* Card da tabela com largura limitada */}
-      <div className="w-full max-w-[330px] bg-white rounded-lg border overflow-hidden">
+      {/* Card da tabela responsivo */}
+      <div className="w-full bg-white rounded-lg border overflow-hidden">
         <MonthlySummaryTabs year={selectedYear} />
       </div>
     </div>

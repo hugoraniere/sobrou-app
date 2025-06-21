@@ -84,7 +84,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   ];
 
   return (
-    <div className="w-full max-w-[330px] overflow-x-auto">
+    <div className="w-full overflow-x-auto">
       <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
         <TableHeader>
           <TableRow>

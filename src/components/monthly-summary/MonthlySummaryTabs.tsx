@@ -27,8 +27,8 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
   }, [isDetailedView]);
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-[330px]">
-      <TabsList className="w-full max-w-[330px] mb-2 grid grid-cols-3 h-8 p-1">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <TabsList className="w-full mb-2 grid grid-cols-3 h-8 p-1">
         <TabsTrigger 
           value="table" 
           className="flex items-center justify-center flex-1 text-center text-xs px-2 py-1 min-w-0"
@@ -49,11 +49,11 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="table" className="mt-0 w-full max-w-[330px]">
+      <TabsContent value="table" className="mt-0 w-full">
         <MonthlyTable year={year} />
       </TabsContent>
 
-      <TabsContent value="planning" className="mt-0 w-full max-w-[330px]">
+      <TabsContent value="planning" className="mt-0 w-full">
         <PlanningTable 
           year={year} 
           isDetailedView={isDetailedView}
@@ -61,7 +61,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         />
       </TabsContent>
 
-      <TabsContent value="comparative" className="mt-0 w-full max-w-[330px]">
+      <TabsContent value="comparative" className="mt-0 w-full">
         <ComparativeTable 
           year={year} 
           isDetailedView={isDetailedView}
