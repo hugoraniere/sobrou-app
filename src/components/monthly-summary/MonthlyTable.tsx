@@ -6,12 +6,15 @@ import { MonthlyTableContent } from './table/MonthlyTableContent';
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useDragFill } from '@/hooks/useDragFill';
 import { createMonthlyTableHandlers } from './table/MonthlyTableHandlers';
+import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 interface MonthlyTableProps {
   year: number;
 }
 
 export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
+  const { isMobile } = useResponsive();
   const { 
     realData: data, 
     updateRealValue: updateCategoryValue, 
@@ -65,13 +68,21 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
   return (
     <>
       <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Gastos Mensais {year}</CardTitle>
-          <CardDescription>
-            Registre seus gastos reais e receitas ao longo do ano. Use arrastar e soltar para preencher múltiplas células rapidamente. Arraste o ícone de 6 pontinhos para reordenar categorias.
+        <CardHeader className={cn(isMobile ? "p-4 pb-2" : "p-6")}>
+          <CardTitle className={cn(isMobile ? "text-lg" : "text-xl")}>
+            Gastos Mensais {year}
+          </CardTitle>
+          <CardDescription className={cn(isMobile ? "text-xs" : "text-sm")}>
+            {isMobile 
+              ? "Registre seus gastos reais e receitas. Use arrastar para preencher células."
+              : "Registre seus gastos reais e receitas ao longo do ano. Use arrastar e soltar para preencher múltiplas células rapidamente. Arraste o ícone de 6 pontinhos para reordenar categorias."
+            }
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className={cn(
+          "overflow-x-auto",
+          isMobile ? "p-0" : "p-0"
+        )}>
           <MonthlyTableContent
             data={data}
             totals={totals}

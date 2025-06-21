@@ -4,17 +4,17 @@ import { cn } from '@/lib/utils';
 // Larguras padrão das colunas - otimizadas para mobile
 export const TABLE_COLUMN_WIDTHS = {
   CATEGORY: 'min-w-[140px]',
-  CATEGORY_MOBILE: 'w-[120px]', // Largura fixa menor para mobile
-  MONTH: 'min-w-[80px]',
-  MONTH_MOBILE: 'w-[60px]', // Largura fixa menor para mobile
-  PLANNING_SPECIAL: 'min-w-[100px]', // Para coluna especial do comparativo
+  CATEGORY_MOBILE: 'w-[100px]', // Reduzido para mobile
+  MONTH: 'min-w-[70px]',
+  MONTH_MOBILE: 'w-[50px]', // Reduzido para mobile
+  PLANNING_SPECIAL: 'min-w-[80px]', // Reduzido para coluna especial do comparativo
 } as const;
 
 // Classes de espaçamento e altura padronizadas
 export const TABLE_CELL_STYLES = {
-  HEADER: 'text-xs px-2 h-8',
-  DATA_CELL: 'text-xs px-1 py-2',
-  CATEGORY_CELL: 'text-xs px-2 py-2',
+  HEADER: 'text-xs px-1 h-8', // Reduzido padding horizontal
+  DATA_CELL: 'text-xs px-1 py-1', // Reduzido padding
+  CATEGORY_CELL: 'text-xs px-2 py-1', // Reduzido padding vertical
 } as const;
 
 // Z-indexes consistentes - hierarquia corrigida para mobile

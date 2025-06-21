@@ -30,38 +30,44 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className={cn(
-        "w-full mb-6",
-        isMobile ? "grid grid-cols-3 h-12" : "grid grid-cols-3"
+        "w-full mb-4",
+        isMobile ? "h-10 p-1" : "h-10"
       )}>
         <TabsTrigger 
           value="table" 
           className={cn(
-            "flex items-center gap-2",
-            isMobile ? "text-xs px-2" : "text-sm"
+            "flex items-center gap-1 flex-1",
+            isMobile ? "text-xs px-1 py-2" : "text-sm gap-2"
           )}
         >
           <FileText className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
-          {isMobile ? "Gastos" : "Gastos Mensais"}
+          <span className={cn(isMobile && "text-[10px]")}>
+            {isMobile ? "Gastos" : "Gastos Mensais"}
+          </span>
         </TabsTrigger>
         <TabsTrigger 
           value="planning" 
           className={cn(
-            "flex items-center gap-2",
-            isMobile ? "text-xs px-2" : "text-sm"
+            "flex items-center gap-1 flex-1",
+            isMobile ? "text-xs px-1 py-2" : "text-sm gap-2"
           )}
         >
           <Calculator className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
-          Planejamento
+          <span className={cn(isMobile && "text-[10px]")}>
+            Planejamento
+          </span>
         </TabsTrigger>
         <TabsTrigger 
           value="comparative" 
           className={cn(
-            "flex items-center gap-2",
-            isMobile ? "text-xs px-2" : "text-sm"
+            "flex items-center gap-1 flex-1",
+            isMobile ? "text-xs px-1 py-2" : "text-sm gap-2"
           )}
         >
           <BarChart3 className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
-          Comparativo
+          <span className={cn(isMobile && "text-[10px]")}>
+            Comparativo
+          </span>
         </TabsTrigger>
       </TabsList>
 

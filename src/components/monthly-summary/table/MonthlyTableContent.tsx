@@ -84,8 +84,11 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   ];
 
   return (
-    <div className="w-full overflow-x-auto">
-      <Table className="w-full">
+    <div className="w-full min-w-0">
+      <Table className={cn(
+        "w-full",
+        isMobile && "min-w-[600px]" // Largura mínima para scroll horizontal em mobile
+      )}>
         <TableHeader>
           <TableRow>
             <TableHead className={cn(
