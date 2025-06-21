@@ -10,20 +10,17 @@ const MonthlySummary = () => {
 
   const content = (
     <>
-      {/* Header */}
       <div
         className={cn(
           "flex justify-between mb-4",
           isMobile ? "flex-col gap-3 items-center text-center" : "items-center mb-6"
         )}
       >
-        <div className={cn(isMobile ? "w-full" : "")}>
-          <h1
-            className={cn(
-              "font-bold text-gray-900",
-              isMobile ? "text-xl" : "text-3xl"
-            )}
-          >
+        <div className="w-full">
+          <h1 className={cn(
+            "font-bold text-gray-900",
+            isMobile ? "text-xl" : "text-3xl"
+          )}>
             Resumo Mensal
           </h1>
           {!isMobile && (
@@ -36,23 +33,15 @@ const MonthlySummary = () => {
         <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
       </div>
 
-      {/* Content */}
-      <MonthlySummaryTabs year={selectedYear} />
+      {/* Envolve a tabela com scroll horizontal */}
+      <div className="w-full overflow-x-auto rounded-lg border bg-white">
+        <MonthlySummaryTabs year={selectedYear} />
+      </div>
     </>
   );
 
-  // Mobile: sem scroll horizontal + padding lateral único de 16px
-  if (isMobile) {
-    return (
-      <main className="w-full max-w-screen w-screen overflow-x-hidden px-4 pt-6 pb-10">
-        {content}
-      </main>
-    );
-  }
-
-  // Desktop padrão
   return (
-    <main className="w-full px-6 py-8">
+    <main className="w-full max-w-screen overflow-x-hidden px-4 pb-10">
       {content}
     </main>
   );
