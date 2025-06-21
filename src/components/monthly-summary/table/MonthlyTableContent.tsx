@@ -84,14 +84,14 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   ];
 
   return (
-    <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
-      <Table className="min-w-full">
+    <div className="w-full overflow-x-auto">
+      <Table className="w-full">
         <TableHeader>
           <TableRow>
             <TableHead className={cn(
-              TABLE_COLUMN_WIDTHS.CATEGORY,
+              isMobile ? TABLE_COLUMN_WIDTHS.CATEGORY_MOBILE : TABLE_COLUMN_WIDTHS.CATEGORY,
               TABLE_CELL_STYLES.HEADER,
-              "sticky left-0 bg-white border-r-2 border-gray-300", // Borda mais visível
+              "sticky left-0 bg-white border-r-2 border-gray-300",
               TABLE_Z_INDEX.STICKY_CATEGORY
             )}>
               Categoria
@@ -100,7 +100,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
               <TableHead 
                 key={month} 
                 className={cn(
-                  TABLE_COLUMN_WIDTHS.MONTH,
+                  isMobile ? TABLE_COLUMN_WIDTHS.MONTH_MOBILE : TABLE_COLUMN_WIDTHS.MONTH,
                   TABLE_CELL_STYLES.HEADER,
                   "text-center",
                   getCurrentMonthColumnStyle(index === currentMonth)

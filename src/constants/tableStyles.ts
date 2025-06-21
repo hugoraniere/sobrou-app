@@ -1,10 +1,12 @@
 
 import { cn } from '@/lib/utils';
 
-// Larguras padrão das colunas
+// Larguras padrão das colunas - otimizadas para mobile
 export const TABLE_COLUMN_WIDTHS = {
   CATEGORY: 'min-w-[140px]',
+  CATEGORY_MOBILE: 'w-[120px]', // Largura fixa menor para mobile
   MONTH: 'min-w-[80px]',
+  MONTH_MOBILE: 'w-[60px]', // Largura fixa menor para mobile
   PLANNING_SPECIAL: 'min-w-[100px]', // Para coluna especial do comparativo
 } as const;
 

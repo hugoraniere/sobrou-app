@@ -5,12 +5,15 @@ import { MonthlyTable } from './MonthlyTable';
 import { PlanningTable } from './PlanningTable';
 import { ComparativeTable } from './ComparativeTable';
 import { Calculator, FileText, BarChart3 } from 'lucide-react';
+import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 interface MonthlySummaryTabsProps {
   year: number;
 }
 
 export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) => {
+  const { isMobile } = useResponsive();
   const [activeTab, setActiveTab] = useState('table');
   
   // Estado global para o toggle de visão detalhada/simples
@@ -26,17 +29,38 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-6">
-        <TabsTrigger value="table" className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          Gastos Mensais
+      <TabsList className={cn(
+        "w-full mb-6",
+        isMobile ? "grid grid-cols-3 h-12" : "grid grid-cols-3"
+      )}>
+        <TabsTrigger 
+          value="table" 
+          className={cn(
+            "flex items-center gap-2",
+            isMobile ? "text-xs px-2" : "text-sm"
+          )}
+        >
+          <FileText className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
+          {isMobile ? "Gastos" : "Gastos Mensais"}
         </TabsTrigger>
-        <TabsTrigger value="planning" className="flex items-center gap-2">
-          <Calculator className="h-4 w-4" />
+        <TabsTrigger 
+          value="planning" 
+          className={cn(
+            "flex items-center gap-2",
+            isMobile ? "text-xs px-2" : "text-sm"
+          )}
+        >
+          <Calculator className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
           Planejamento
         </TabsTrigger>
-        <TabsTrigger value="comparative" className="flex items-center gap-2">
-          <BarChart3 className="h-4 w-4" />
+        <TabsTrigger 
+          value="comparative" 
+          className={cn(
+            "flex items-center gap-2",
+            isMobile ? "text-xs px-2" : "text-sm"
+          )}
+        >
+          <BarChart3 className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
           Comparativo
         </TabsTrigger>
       </TabsList>
