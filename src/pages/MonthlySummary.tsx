@@ -9,9 +9,9 @@ const MonthlySummary = () => {
   const { isMobile } = useResponsive();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  return (
-    <div className="w-full">
-      {/* Header simplificado */}
+  const content = (
+    <>
+      {/* Header */}
       <div className={cn(
         "flex items-center justify-between mb-4",
         isMobile ? "flex-col gap-3" : "mb-6"
@@ -38,6 +38,24 @@ const MonthlySummary = () => {
 
       {/* Content */}
       <MonthlySummaryTabs year={selectedYear} />
+    </>
+  );
+
+  // Mobile wrapper com controle específico de largura e overflow
+  if (isMobile) {
+    return (
+      <div className="w-full max-w-[100vw] overflow-x-hidden">
+        <div className="px-4 w-full">
+          {content}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop - mantém layout original
+  return (
+    <div className="w-full">
+      {content}
     </div>
   );
 };

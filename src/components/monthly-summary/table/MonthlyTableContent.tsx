@@ -84,10 +84,13 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   ];
 
   return (
-    <div className="w-full min-w-0">
+    <div className={cn(
+      "w-full",
+      isMobile ? "min-w-0" : ""
+    )}>
       <Table className={cn(
-        "w-full",
-        isMobile && "min-w-[600px]" // Largura mínima para scroll horizontal em mobile
+        "w-full border-collapse",
+        isMobile && "min-w-[480px]" // Largura mínima reduzida para mobile
       )}>
         <TableHeader>
           <TableRow>

@@ -35,33 +35,37 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
 
   return (
     <div className={cn(
-      "flex items-center",
-      isMobile ? "gap-2" : "gap-4",
+      "flex items-center shrink-0",
+      isMobile ? "gap-1" : "gap-4",
       className
     )}>
       <Button
         variant="outline"
-        size={isMobile ? "sm" : "sm"}
+        size="sm"
         onClick={handlePreviousYear}
         disabled={currentYear <= minYear}
-        className={cn(isMobile && "h-8 w-8 p-0")}
+        className={cn(
+          isMobile && "h-7 w-7 p-0"
+        )}
       >
         <ChevronLeft className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
       </Button>
       
       <div className={cn(
-        "font-bold text-gray-900 text-center",
-        isMobile ? "text-lg min-w-[60px]" : "text-2xl min-w-[80px]"
+        "font-bold text-gray-900 text-center shrink-0",
+        isMobile ? "text-base min-w-[50px]" : "text-2xl min-w-[80px]"
       )}>
         {currentYear}
       </div>
       
       <Button
         variant="outline"
-        size={isMobile ? "sm" : "sm"}
+        size="sm"
         onClick={handleNextYear}
         disabled={currentYear >= maxYear}
-        className={cn(isMobile && "h-8 w-8 p-0")}
+        className={cn(
+          isMobile && "h-7 w-7 p-0"
+        )}
       >
         <ChevronRight className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
       </Button>
