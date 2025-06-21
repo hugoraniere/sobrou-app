@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MonthlyTable } from './MonthlyTable';
 import { PlanningTable } from './PlanningTable';
 import { ComparativeTable } from './ComparativeTable';
-import { Calculator, FileText, BarChart3 } from 'lucide-react';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 
@@ -31,23 +31,20 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
       <TabsList className="w-full max-w-[330px] mb-2 grid grid-cols-3 h-8 p-1">
         <TabsTrigger 
           value="table" 
-          className="flex items-center gap-1 flex-1 text-center text-xs px-1 py-1 min-w-0"
+          className="flex items-center justify-center flex-1 text-center text-xs px-2 py-1 min-w-0"
         >
-          <FileText className="h-3 w-3 shrink-0" />
           <span className="truncate">Gastos</span>
         </TabsTrigger>
         <TabsTrigger 
           value="planning" 
-          className="flex items-center gap-1 flex-1 text-center text-xs px-1 py-1 min-w-0"
+          className="flex items-center justify-center flex-1 text-center text-xs px-2 py-1 min-w-0"
         >
-          <Calculator className="h-3 w-3 shrink-0" />
           <span className="truncate">Plano</span>
         </TabsTrigger>
         <TabsTrigger 
           value="comparative" 
-          className="flex items-center gap-1 flex-1 text-center text-xs px-1 py-1 min-w-0"
+          className="flex items-center justify-center flex-1 text-center text-xs px-2 py-1 min-w-0"
         >
-          <BarChart3 className="h-3 w-3 shrink-0" />
           <span className="truncate">Comp.</span>
         </TabsTrigger>
       </TabsList>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
@@ -84,17 +85,17 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
 
   return (
     <div className="w-full max-w-[330px] overflow-x-auto">
-      <Table className="w-full border-collapse min-w-[320px] max-w-[330px]">
+      <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[80px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
+            <TableHead className="w-[120px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
               Categoria
             </TableHead>
             {months.map((month, index) => (
               <TableHead 
                 key={month} 
                 className={cn(
-                  "w-[18px] text-xs px-0 text-center h-6",
+                  "w-[40px] text-xs px-1 text-center h-6",
                   getCurrentMonthColumnStyle(index === currentMonth)
                 )}
               >
