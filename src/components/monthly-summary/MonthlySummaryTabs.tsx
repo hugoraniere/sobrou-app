@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MonthlyTable } from './MonthlyTable';
@@ -31,16 +30,16 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className={cn(
         "w-full mb-4 grid grid-cols-3",
-        isMobile ? "h-9 p-0.5" : "h-10"
+        isMobile ? "h-10 p-1" : "h-10"
       )}>
         <TabsTrigger 
           value="table" 
           className={cn(
             "flex items-center gap-1 flex-1 text-center",
-            isMobile ? "text-xs px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            isMobile ? "text-sm px-2 py-2 min-w-0" : "text-sm gap-2"
           )}
         >
-          <FileText className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
+          <FileText className={cn(isMobile ? "h-4 w-4 shrink-0" : "h-4 w-4")} />
           <span className={cn(isMobile && "truncate")}>
             {isMobile ? "Gastos" : "Gastos Mensais"}
           </span>
@@ -49,10 +48,10 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           value="planning" 
           className={cn(
             "flex items-center gap-1 flex-1 text-center",
-            isMobile ? "text-xs px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            isMobile ? "text-sm px-2 py-2 min-w-0" : "text-sm gap-2"
           )}
         >
-          <Calculator className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
+          <Calculator className={cn(isMobile ? "h-4 w-4 shrink-0" : "h-4 w-4")} />
           <span className={cn(isMobile && "truncate")}>
             {isMobile ? "Plano" : "Planejamento"}
           </span>
@@ -61,21 +60,21 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           value="comparative" 
           className={cn(
             "flex items-center gap-1 flex-1 text-center",
-            isMobile ? "text-xs px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            isMobile ? "text-sm px-2 py-2 min-w-0" : "text-sm gap-2"
           )}
         >
-          <BarChart3 className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
+          <BarChart3 className={cn(isMobile ? "h-4 w-4 shrink-0" : "h-4 w-4")} />
           <span className={cn(isMobile && "truncate")}>
             {isMobile ? "Comp." : "Comparativo"}
           </span>
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="table" className="mt-0">
+      <TabsContent value="table" className="mt-0 w-full">
         <MonthlyTable year={year} />
       </TabsContent>
 
-      <TabsContent value="planning" className="mt-0">
+      <TabsContent value="planning" className="mt-0 w-full">
         <PlanningTable 
           year={year} 
           isDetailedView={isDetailedView}
@@ -83,7 +82,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         />
       </TabsContent>
 
-      <TabsContent value="comparative" className="mt-0">
+      <TabsContent value="comparative" className="mt-0 w-full">
         <ComparativeTable 
           year={year} 
           isDetailedView={isDetailedView}

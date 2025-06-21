@@ -10,11 +10,11 @@ const MonthlySummary = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="w-full min-h-screen">
       {/* Header */}
-      <div className="mt-6 mb-6">
+      <div className="w-full mt-6 mb-6">
         <div className={cn(
-          "flex justify-between items-center",
+          "flex justify-between items-center w-full",
           isMobile && "flex-col gap-3"
         )}>
           <div className="w-full">
@@ -31,8 +31,8 @@ const MonthlySummary = () => {
         </div>
       </div>
 
-      {/* Card da tabela com largura total e scroll interno */}
-      <div className="w-full bg-white rounded-lg border overflow-hidden">
+      {/* Card da tabela ocupando 100% da largura */}
+      <div className="w-full bg-white rounded-lg border">
         <MonthlySummaryTabs year={selectedYear} />
       </div>
     </div>
