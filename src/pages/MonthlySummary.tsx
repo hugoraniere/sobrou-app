@@ -9,7 +9,7 @@ const MonthlySummary = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   return (
-    <div className="w-full max-w-screen overflow-x-hidden px-4 pb-10 box-border">
+    <div className="w-full max-w-screen-sm mx-auto px-4 pb-10 overflow-x-hidden">
       {/* Header */}
       <div className={cn(
         "flex justify-between items-center mb-4",
@@ -28,9 +28,9 @@ const MonthlySummary = () => {
         <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
       </div>
 
-      {/* Tabela com scroll horizontal DENTRO do card, não na página */}
-      <div className="overflow-x-auto rounded-lg border bg-white">
-        <div className="min-w-[768px] w-full">
+      {/* Tabela com scroll interno */}
+      <div className="overflow-x-auto bg-white border rounded-lg">
+        <div className="min-w-[768px] w-full px-4">
           <MonthlySummaryTabs year={selectedYear} />
         </div>
       </div>
