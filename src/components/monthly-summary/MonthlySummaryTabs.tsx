@@ -37,7 +37,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           value="table" 
           className={cn(
             "flex items-center gap-1 flex-1 text-center",
-            isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            isMobile ? "text-xs px-1 py-1.5 min-w-0" : "text-sm gap-2"
           )}
         >
           <FileText className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
@@ -49,7 +49,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           value="planning" 
           className={cn(
             "flex items-center gap-1 flex-1 text-center",
-            isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            isMobile ? "text-xs px-1 py-1.5 min-w-0" : "text-sm gap-2"
           )}
         >
           <Calculator className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
@@ -61,7 +61,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           value="comparative" 
           className={cn(
             "flex items-center gap-1 flex-1 text-center",
-            isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            isMobile ? "text-xs px-1 py-1.5 min-w-0" : "text-sm gap-2"
           )}
         >
           <BarChart3 className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
