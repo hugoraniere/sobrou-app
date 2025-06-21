@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { YearSelector } from '@/components/monthly-summary/YearSelector';
 import { MonthlySummaryTabs } from '@/components/monthly-summary/MonthlySummaryTabs';
@@ -12,15 +11,19 @@ const MonthlySummary = () => {
   const content = (
     <>
       {/* Header */}
-      <div className={cn(
-        "flex items-center justify-between mb-4",
-        isMobile ? "flex-col gap-3" : "mb-6"
-      )}>
-        <div className={cn(isMobile && "w-full text-center")}>
-          <h1 className={cn(
-            "font-bold text-gray-900",
-            isMobile ? "text-xl" : "text-3xl"
-          )}>
+      <div
+        className={cn(
+          "flex justify-between mb-4",
+          isMobile ? "flex-col gap-3 items-center text-center" : "items-center mb-6"
+        )}
+      >
+        <div className={cn(isMobile ? "w-full" : "")}>
+          <h1
+            className={cn(
+              "font-bold text-gray-900",
+              isMobile ? "text-xl" : "text-3xl"
+            )}
+          >
             Resumo Mensal
           </h1>
           {!isMobile && (
@@ -29,11 +32,8 @@ const MonthlySummary = () => {
             </p>
           )}
         </div>
-        
-        <YearSelector
-          currentYear={selectedYear}
-          onYearChange={setSelectedYear}
-        />
+
+        <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
       </div>
 
       {/* Content */}
@@ -41,22 +41,20 @@ const MonthlySummary = () => {
     </>
   );
 
-  // Mobile wrapper com controle específico de largura e overflow
+  // Mobile: sem scroll horizontal + padding lateral único de 16px
   if (isMobile) {
     return (
-      <div className="w-full max-w-[100vw] overflow-x-hidden">
-        <div className="px-4 w-full">
-          {content}
-        </div>
-      </div>
+      <main className="w-full max-w-screen w-screen overflow-x-hidden px-4 pt-6 pb-10">
+        {content}
+      </main>
     );
   }
 
-  // Desktop - mantém layout original
+  // Desktop padrão
   return (
-    <div className="w-full">
+    <main className="w-full px-6 py-8">
       {content}
-    </div>
+    </main>
   );
 };
 
