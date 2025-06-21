@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils';
 // Larguras padrão das colunas - otimizadas para mobile
 export const TABLE_COLUMN_WIDTHS = {
   CATEGORY: 'min-w-[140px]',
-  CATEGORY_MOBILE: 'w-[80px]', // Reduzido ainda mais para mobile
+  CATEGORY_MOBILE: 'w-[100px]', // Largura fixa otimizada para mobile
   MONTH: 'min-w-[70px]',
-  MONTH_MOBILE: 'w-[32px]', // Reduzido para mobile
-  PLANNING_SPECIAL: 'min-w-[80px]', // Reduzido para coluna especial do comparativo
+  MONTH_MOBILE: 'w-[50px]', // Largura fixa otimizada para mobile
+  PLANNING_SPECIAL: 'min-w-[80px]', // Para coluna especial do comparativo
 } as const;
 
 // Classes de espaçamento e altura padronizadas

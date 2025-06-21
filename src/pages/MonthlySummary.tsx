@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { YearSelector } from '@/components/monthly-summary/YearSelector';
 import { MonthlySummaryTabs } from '@/components/monthly-summary/MonthlySummaryTabs';
@@ -9,13 +10,13 @@ const MonthlySummary = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   return (
-    <div className="w-full max-w-screen-sm mx-auto px-4 pb-10 overflow-x-hidden">
+    <div className="space-y-6">
       {/* Header */}
       <div className={cn(
-        "flex justify-between items-center mb-4",
-        isMobile && "flex-col gap-3 text-center"
+        "flex justify-between items-center",
+        isMobile && "flex-col gap-3"
       )}>
-        <div className="w-full">
+        <div>
           <h1 className={cn("font-bold text-gray-900", isMobile ? "text-xl" : "text-3xl")}>
             Resumo Mensal
           </h1>
@@ -28,12 +29,8 @@ const MonthlySummary = () => {
         <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
       </div>
 
-      {/* Tabela com scroll interno */}
-      <div className="overflow-x-auto bg-white border rounded-lg">
-        <div className="min-w-[768px] w-full px-4">
-          <MonthlySummaryTabs year={selectedYear} />
-        </div>
-      </div>
+      {/* Conteúdo principal */}
+      <MonthlySummaryTabs year={selectedYear} />
     </div>
   );
 };

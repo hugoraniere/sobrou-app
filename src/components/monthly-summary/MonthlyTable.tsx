@@ -79,22 +79,20 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
             }
           </CardDescription>
         </CardHeader>
-        <CardContent className={cn(
-          isMobile 
-            ? "p-0 overflow-x-auto max-w-full" 
-            : "p-0"
-        )}>
-          <MonthlyTableContent
-            data={data}
-            totals={totals}
-            currentMonth={currentMonth}
-            selectedCell={dragFill.selectedCell}
-            handlers={handlers}
-            onAddCategory={handleAddCategory}
-            onValueChange={updateCategoryValue}
-            onCategoryReorder={handleCategoryReorder}
-            isInFillRange={dragFill.isInFillRange}
-          />
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <MonthlyTableContent
+              data={data}
+              totals={totals}
+              currentMonth={currentMonth}
+              selectedCell={dragFill.selectedCell}
+              handlers={handlers}
+              onAddCategory={handleAddCategory}
+              onValueChange={updateCategoryValue}
+              onCategoryReorder={handleCategoryReorder}
+              isInFillRange={dragFill.isInFillRange}
+            />
+          </div>
         </CardContent>
       </Card>
 
