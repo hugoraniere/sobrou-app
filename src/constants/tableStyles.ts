@@ -15,12 +15,12 @@ export const TABLE_CELL_STYLES = {
   CATEGORY_CELL: 'text-xs px-2 py-2',
 } as const;
 
-// Z-indexes consistentes - hierarquia corrigida
+// Z-indexes consistentes - hierarquia corrigida para mobile
 export const TABLE_Z_INDEX = {
   STICKY_CATEGORY: 'z-30',  // Maior z-index para células de categoria sticky
+  SECTION_HEADER: 'z-25',   // Headers das seções - AUMENTADO para ficar acima do stroke
   TABLE_HEADER: 'z-20',     // Header da tabela
-  SECTION_HEADER: 'z-10',   // Header das seções
-  MONTH_HIGHLIGHT: 'z-5',   // Células de mês com destaque (stroke) - NOVO
+  MONTH_HIGHLIGHT: 'z-5',   // Células de mês com destaque (stroke)
 } as const;
 
 // Cores de seção padronizadas

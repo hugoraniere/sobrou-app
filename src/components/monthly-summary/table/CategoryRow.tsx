@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -94,7 +95,7 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
       >
         <TableCell className={cn(
           TABLE_CELL_STYLES.CATEGORY_CELL,
-          "sticky left-0 bg-white border-r",
+          "sticky left-0 bg-white border-r-2 border-gray-300", // Borda mais visível
           TABLE_Z_INDEX.STICKY_CATEGORY
         )}>
           <div className="flex items-center justify-between">

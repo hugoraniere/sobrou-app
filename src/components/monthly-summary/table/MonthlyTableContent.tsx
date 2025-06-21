@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
@@ -90,8 +91,8 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
             <TableHead className={cn(
               TABLE_COLUMN_WIDTHS.CATEGORY,
               TABLE_CELL_STYLES.HEADER,
-              "sticky left-0 bg-white border-r",
-              TABLE_Z_INDEX.STICKY_CATEGORY // Manter z-index alto para header de categoria
+              "sticky left-0 bg-white border-r-2 border-gray-300", // Borda mais visível
+              TABLE_Z_INDEX.STICKY_CATEGORY
             )}>
               Categoria
             </TableHead>
@@ -102,7 +103,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
                   TABLE_COLUMN_WIDTHS.MONTH,
                   TABLE_CELL_STYLES.HEADER,
                   "text-center",
-                  getCurrentMonthColumnStyle(index === currentMonth) // Esta função agora inclui o z-index baixo
+                  getCurrentMonthColumnStyle(index === currentMonth)
                 )}
               >
                 {month}

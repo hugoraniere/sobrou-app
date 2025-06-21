@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { formatCurrency, cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface MonthlyTotals {
   revenue: number;
@@ -20,7 +20,10 @@ interface SurplusRowProps {
 export const SurplusRow: React.FC<SurplusRowProps> = ({ totals, currentMonth }) => {
   return (
     <TableRow className="border-t-2 border-gray-300 bg-gray-50">
-      <TableCell className="font-bold text-gray-700 sticky left-0 z-10 bg-gray-50 text-xs px-2 py-2 border-r">
+      <TableCell className={cn(
+        "font-bold text-gray-700 sticky left-0 bg-gray-50 text-xs px-2 py-2 border-r-2 border-gray-300",
+        TABLE_Z_INDEX.STICKY_CATEGORY // Z-index correto para célula sticky
+      )}>
         SUPERÁVIT (R - D1 - D2 - Reservas)
       </TableCell>
       {totals.map((monthTotal, index) => (

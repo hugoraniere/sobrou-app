@@ -78,8 +78,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
         <TableCell 
           className={cn(
             TABLE_CELL_STYLES.HEADER,
-            `font-bold sticky left-0 border-r ${bgColor} ${textColor} cursor-pointer`,
-            TABLE_Z_INDEX.SECTION_HEADER,
+            `font-bold sticky left-0 border-r-2 border-gray-300 ${bgColor} ${textColor} cursor-pointer`,
+            TABLE_Z_INDEX.SECTION_HEADER, // Z-index aumentado para ficar acima do stroke
             "flex items-center gap-2"
           )}
           onClick={onToggleExpanded}
@@ -99,7 +99,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
             className={cn(
               TABLE_CELL_STYLES.HEADER,
               `text-center font-semibold ${textColor} cursor-pointer`,
-              getCurrentMonthColumnStyle(index === currentMonth) // Esta função agora inclui o z-index baixo
+              getCurrentMonthColumnStyle(index === currentMonth)
             )}
             onClick={onToggleExpanded}
           >
