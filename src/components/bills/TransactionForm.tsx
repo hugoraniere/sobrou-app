@@ -59,8 +59,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Tipo de Transação *</Label>
           <Select onValueChange={(value: 'debit' | 'credit') => setValue('type', value)}>
@@ -126,11 +126,11 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         )}
       </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel} className="w-full sm:w-auto">
           Cancelar
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
           {isSubmitting ? 'Salvando...' : 'Adicionar Transação'}
         </Button>
       </div>
