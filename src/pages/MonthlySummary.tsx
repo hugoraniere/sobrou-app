@@ -8,19 +8,15 @@ const MonthlySummary = () => {
   const { isMobile } = useResponsive();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  const content = (
-    <>
-      <div
-        className={cn(
-          "flex justify-between mb-4",
-          isMobile ? "flex-col gap-3 items-center text-center" : "items-center mb-6"
-        )}
-      >
+  return (
+    <div className="w-full max-w-screen overflow-x-hidden px-4 pb-10 box-border">
+      {/* Header */}
+      <div className={cn(
+        "flex justify-between items-center mb-4",
+        isMobile && "flex-col gap-3 text-center"
+      )}>
         <div className="w-full">
-          <h1 className={cn(
-            "font-bold text-gray-900",
-            isMobile ? "text-xl" : "text-3xl"
-          )}>
+          <h1 className={cn("font-bold text-gray-900", isMobile ? "text-xl" : "text-3xl")}>
             Resumo Mensal
           </h1>
           {!isMobile && (
@@ -29,21 +25,16 @@ const MonthlySummary = () => {
             </p>
           )}
         </div>
-
         <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
       </div>
 
-      {/* Envolve a tabela com scroll horizontal */}
-      <div className="w-full overflow-x-auto rounded-lg border bg-white">
-        <MonthlySummaryTabs year={selectedYear} />
+      {/* Tabela com scroll horizontal DENTRO do card, não na página */}
+      <div className="overflow-x-auto rounded-lg border bg-white">
+        <div className="min-w-[768px] w-full">
+          <MonthlySummaryTabs year={selectedYear} />
+        </div>
       </div>
-    </>
-  );
-
-  return (
-    <main className="w-full max-w-screen overflow-x-hidden px-4 pb-10">
-      {content}
-    </main>
+    </div>
   );
 };
 
