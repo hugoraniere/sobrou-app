@@ -1,78 +1,63 @@
-// app/(pages)/monthly/summary/page.tsx
 
-'use client';
-
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { YearSelector } from '@/components/monthly-summary/YearSelector';
+import { MonthlySummaryTabs } from '@/components/monthly-summary/MonthlySummaryTabs';
+import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 
-const initialData = [
-  { category: 'Moradia', value: '' },
-  { category: 'Transporte', value: '' },
-  { category: 'Alimentação', value: '' },
-  { category: 'Lazer', value: '' },
-  { category: 'Saúde', value: '' },
-];
+const MonthlySummary = () => {
+  const { isMobile } = useResponsive();
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-export default function MonthlySummary() {
-  const [data, setData] = useState(initialData);
-  const [newCategory, setNewCategory] = useState('');
-
-  const handleChange = (index: number, value: string) => {
-    const updated = [...data];
-    updated[index].value = value;
-    setData(updated);
-  };
-
-  const handleAddCategory = () => {
-    if (newCategory.trim() !== '') {
-      setData([...data, { category: capitalize(newCategory.trim()), value: '' }]);
-      setNewCategory('');
-    }
-  };
-
-  const capitalize = (str: string) =>
-    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
-  return (
-    <main className="w-full max-w-[100vw] px-4 md:px-8 py-6 overflow-x-hidden">
-      <div className="mx-auto max-w-2xl w-full space-y-6">
-        <h1 className="text-2xl font-semibold">Resumo Mensal</h1>
-
-        <Card className="p-4 space-y-4 w-full overflow-x-auto">
-          {data.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between gap-4"
-            >
-              <Label className="text-sm min-w-[120px]">{item.category}</Label>
-              <Input
-                type="number"
-                placeholder="0,00"
-                className="text-sm"
-                value={item.value}
-                onChange={(e) => handleChange(index, e.target.value)}
-              />
-            </div>
-          ))}
-
-          <div className="flex items-center gap-2 pt-2">
-            <Input
-              placeholder="Nova categoria"
-              className="text-sm"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-            />
-            <Button onClick={handleAddCategory} variant="outline" size="icon">
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        </Card>
+  const content = (
+    <>
+      {/* Header */}
+      <div className={cn(
+        "flex items-center justify-between mb-4",
+        isMobile ? "flex-col gap-3" : "mb-6"
+      )}>
+        <div className={cn(isMobile && "w-full text-center")}>
+          <h1 className={cn(
+            "font-bold text-gray-900",
+            isMobile ? "text-xl" : "text-3xl"
+          )}>
+            Resumo Mensal
+          </h1>
+          {!isMobile && (
+            <p className="text-gray-600 text-sm mt-1">
+              Visualize, planeje e compare seu orçamento financeiro
+            </p>
+          )}
+        </div>
+        
+        <YearSelector
+          currentYear={selectedYear}
+          onYearChange={setSelectedYear}
+        />
       </div>
-    </main>
+
+      {/* Content */}
+      <MonthlySummaryTabs year={selectedYear} />
+    </>
   );
-}
+
+  // Mobile wrapper com controle específico de largura e overflow
+  if (isMobile) {
+    return (
+      <div className="w-full max-w-[100vw] overflow-x-hidden">
+        <div className="px-4 w-full">
+          {content}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop - mantém layout original
+  return (
+    <div className="w-full">
+      {content}
+    </div>
+  );
+};
+
+export default MonthlySummary;
