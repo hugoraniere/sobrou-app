@@ -77,8 +77,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
       <TableRow className={cn(bgColor, "hover:opacity-80 transition-opacity")}>
         <TableCell 
           className={cn(
-            TABLE_CELL_STYLES.HEADER,
-            `font-bold sticky left-0 ${bgColor} ${textColor} cursor-pointer`,
+            "font-bold sticky left-0 text-xs px-2 py-1 cursor-pointer",
+            `${bgColor} ${textColor}`,
             CATEGORY_COLUMN_BORDER,
             TABLE_Z_INDEX.SECTION_HEADER,
             "flex items-center gap-2"
@@ -98,8 +98,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
           <TableCell 
             key={index} 
             className={cn(
-              TABLE_CELL_STYLES.HEADER,
-              `text-center font-semibold ${textColor} cursor-pointer`,
+              "text-center font-semibold text-xs px-1 py-1 cursor-pointer",
+              textColor,
               getCurrentMonthColumnStyle(index === currentMonth)
             )}
             onClick={onToggleExpanded}
@@ -140,8 +140,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
           {/* Linha para adicionar categoria - MOVIDA PARA O FINAL e visível apenas quando expandido */}
           <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
             <TableCell className={cn(
-              TABLE_CELL_STYLES.CATEGORY_CELL,
-              "sticky left-0",
+              "sticky left-0 text-xs px-2 py-1",
               CATEGORY_COLUMN_BORDER,
               bgColor.replace('50', '25'),
               TABLE_Z_INDEX.SECTION_HEADER
@@ -155,8 +154,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
               <TableCell 
                 key={index} 
                 className={cn(
-                  TABLE_CELL_STYLES.DATA_CELL,
-                  getCurrentMonthColumnStyle(index === currentMonth), // Esta função agora inclui o z-index baixo
+                  "text-xs px-1 py-1",
+                  getCurrentMonthColumnStyle(index === currentMonth),
                   bgColor.replace('50', '25')
                 )}
               />
