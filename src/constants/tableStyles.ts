@@ -17,8 +17,8 @@ export const TABLE_CELL_STYLES = {
   CATEGORY_CELL: 'text-xs px-1 py-1', // Padding reduzido
 } as const;
 
-// Borda padronizada para coluna de categoria - aplicada na coluna inteira
-export const CATEGORY_COLUMN_BORDER = 'border-r border-gray-200';
+// Borda aplicada APENAS no header da coluna de categoria para criar stroke da coluna inteira
+export const CATEGORY_COLUMN_BORDER = 'border-r-2 border-gray-300';
 
 // Z-indexes consistentes - hierarquia corrigida para mobile
 export const TABLE_Z_INDEX = {

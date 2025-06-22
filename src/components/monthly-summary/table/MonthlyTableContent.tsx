@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
@@ -96,7 +97,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
             <TableRow>
               <TableHead className={cn(
                 "sticky left-0 bg-white text-xs px-2 py-1",
-                CATEGORY_COLUMN_BORDER,
+                CATEGORY_COLUMN_BORDER, // Stroke aplicado APENAS no header
                 TABLE_Z_INDEX.STICKY_CATEGORY,
                 // Garantir largura consistente
                 "min-w-[140px] w-[140px] max-w-[140px]",

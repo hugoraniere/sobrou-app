@@ -9,7 +9,7 @@ import { useCategoryDragDrop } from '@/hooks/useCategoryDragDrop';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
 import { getCurrentMonthCellStyle } from '@/utils/monthStyleUtils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX, CATEGORY_COLUMN_BORDER } from '@/constants/tableStyles';
+import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface TableSectionProps {
   title: string;
@@ -78,10 +78,9 @@ export const TableSection: React.FC<TableSectionProps> = ({
           className={cn(
             "font-bold sticky left-0 text-xs px-2 py-1 cursor-pointer",
             `${bgColor} ${textColor}`,
-            CATEGORY_COLUMN_BORDER,
             TABLE_Z_INDEX.SECTION_HEADER,
             "flex items-center gap-2",
-            // Garantir largura consistente
+            // Garantir largura consistente - SEM BORDER
             "min-w-[140px] w-[140px] max-w-[140px]",
             "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
           )}
@@ -143,10 +142,9 @@ export const TableSection: React.FC<TableSectionProps> = ({
           <TableRow className="hover:bg-gray-50/50">
             <TableCell className={cn(
               "sticky left-0 text-xs py-1 bg-white",
-              CATEGORY_COLUMN_BORDER,
               TABLE_Z_INDEX.SECTION_HEADER,
               "px-4", // 16px de padding lateral
-              // Garantir largura consistente
+              // Garantir largura consistente - SEM BORDER
               "min-w-[140px] w-[140px] max-w-[140px]",
               "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
             )}>
