@@ -6,11 +6,14 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { ComparativeTableHeader } from './comparative/ComparativeTableHeader';
 import { ComparativeTableSection } from './comparative/ComparativeTableSection';
+
 interface ComparativeTableProps {
   year: number;
   isDetailedView: boolean;
 }
+
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
 export const ComparativeTable: React.FC<ComparativeTableProps> = ({
   year,
   isDetailedView
@@ -25,6 +28,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
   } = useResponsive();
   const currentMonth = new Date().getMonth();
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+
   const handleMonthClick = (monthIndex: number) => {
     setSelectedMonth(monthIndex);
   };
@@ -78,22 +82,42 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
     const viewType = isDetailedView ? 'detalhado' : 'simples';
     return `Compare seus gastos reais com o planejamento ${viewType} por categoria.`;
   };
-  return <Card>
+
+  return (
+    <Card className={cn(
+      "w-full",
+      isMobile ? "max-w-[calc(100vw-16px)]" : "max-w-[calc(100vw-32px)]"
+    )}>
       <CardHeader>
         <CardTitle className="text-lg">Comparativo: Real vs Planejado {year}</CardTitle>
         <CardDescription>
           {getDescription()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
-          <Table className="min-w-full">
-            <ComparativeTableHeader months={months} currentMonth={currentMonth} selectedMonth={selectedMonth} onMonthClick={handleMonthClick} />
-            <TableBody>
-              {sections.map(section => <ComparativeTableSection key={section.title} title={section.title} sectionKey={section.sectionKey} realCategories={section.realCategories} planningCategories={section.planningCategories} currentMonth={currentMonth} selectedMonth={selectedMonth} months={months} />)}
-            </TableBody>
-          </Table>
-        </div>
+      <CardContent className="p-0 overflow-x-auto">
+        <Table className="min-w-full w-max">
+          <ComparativeTableHeader 
+            months={months} 
+            currentMonth={currentMonth} 
+            selectedMonth={selectedMonth} 
+            onMonthClick={handleMonthClick} 
+          />
+          <TableBody>
+            {sections.map(section => (
+              <ComparativeTableSection 
+                key={section.title} 
+                title={section.title} 
+                sectionKey={section.sectionKey} 
+                realCategories={section.realCategories} 
+                planningCategories={section.planningCategories} 
+                currentMonth={currentMonth} 
+                selectedMonth={selectedMonth} 
+                months={months} 
+              />
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };

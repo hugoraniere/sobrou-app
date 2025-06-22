@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddCategoryDialog } from './AddCategoryDialog';
@@ -15,6 +14,7 @@ interface MonthlyTableProps {
 
 export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
   const { isMobile } = useResponsive();
+  
   const { 
     realData: data, 
     updateRealValue: updateCategoryValue, 
@@ -68,7 +68,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
   return (
     <>
       <Card className={cn(
-        "w-full overflow-x-hidden",
+        "w-full",
         isMobile ? "max-w-[calc(100vw-16px)]" : "max-w-[calc(100vw-32px)]"
       )}>
         <CardHeader className={cn(isMobile ? "p-3 pb-2" : "p-6")}>
@@ -82,10 +82,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
             }
           </CardDescription>
         </CardHeader>
-        <CardContent className={cn(
-          "pt-0 pb-0 overflow-x-auto",
-          isMobile ? "px-0" : "px-0"
-        )}>
+        <CardContent className="p-0 overflow-x-auto">
           <MonthlyTableContent
             data={data}
             totals={totals}
