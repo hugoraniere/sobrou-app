@@ -1,19 +1,20 @@
 
 import React, { useState } from 'react';
-import { Table, TableBody } from "@/components/ui/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { ComparativeTableHeader } from './comparative/ComparativeTableHeader';
 import { ComparativeTableSection } from './comparative/ComparativeTableSection';
+import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
 
 interface ComparativeTableProps {
   year: number;
   isDetailedView: boolean;
 }
 
-const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 
 export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDetailedView }) => {
   const { 
@@ -84,26 +85,45 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
 
   const getDescription = () => {
     const viewType = isDetailedView ? 'detalhado' : 'simples';
-    return `Compare seus gastos reais com o planejamento ${viewType} por categoria.`;
+    return `Compare seus gastos reais com o planejamento ${viewType}.`;
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Comparativo: Real vs Planejado {year}</CardTitle>
-        <CardDescription>
+    <Card className="w-full border-0 rounded-none">
+      <CardHeader className="p-2">
+        <CardTitle className="text-base">
+          Comparativo: Real vs Planejado {year}
+        </CardTitle>
+        <CardDescription className="text-xs">
           {getDescription()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
-          <Table className="min-w-full">
-            <ComparativeTableHeader
-              months={months}
-              currentMonth={currentMonth}
-              selectedMonth={selectedMonth}
-              onMonthClick={handleMonthClick}
-            />
+      <CardContent className="w-full p-0">
+        <div className="w-full overflow-x-auto">
+          <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[120px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
+                  Categoria
+                </TableHead>
+                <TableHead className="w-[60px] text-xs px-1 text-center h-6 bg-gray-100">
+                  Plano
+                </TableHead>
+                {months.map((month, index) => (
+                  <TableHead 
+                    key={month} 
+                    className={cn(
+                      "w-[40px] text-xs px-1 text-center h-6 cursor-pointer hover:bg-gray-50",
+                      getCurrentMonthColumnStyle(index === currentMonth),
+                      index === selectedMonth && "bg-blue-100 text-blue-800 font-semibold"
+                    )}
+                    onClick={() => handleMonthClick(index)}
+                  >
+                    {month}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
             <TableBody>
               {sections.map((section) => (
                 <ComparativeTableSection

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,7 @@ interface PlanningTableProps {
   onToggleView: (detailed: boolean) => void;
 }
 
-const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 
 export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedView, onToggleView }) => {
   const { 
@@ -75,9 +76,9 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
 
   const getDescription = () => {
     if (isDetailedView) {
-      return "Defina seus valores planejados para cada categoria e mês com controle detalhado";
+      return "Defina seus valores planejados para cada categoria e mês.";
     }
-    return "Defina um valor mensal planejado para cada categoria. Os valores serão distribuídos automaticamente pelos 12 meses";
+    return "Defina um valor mensal planejado para cada categoria.";
   };
 
   const sections = [
@@ -109,12 +110,14 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
 
   return (
     <>
-      <Card>
-        <CardHeader>
+      <Card className="w-full border-0 rounded-none">
+        <CardHeader className="p-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <CardTitle>Planejamento Financeiro {year}</CardTitle>
-              <CardDescription className="mt-2">
+              <CardTitle className="text-base">
+                Planejamento Financeiro {year}
+              </CardTitle>
+              <CardDescription className="text-xs">
                 {getDescription()}
               </CardDescription>
             </div>
@@ -124,27 +127,20 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="w-full p-0">
           {isDetailedView ? (
-            <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
-              <Table className="min-w-full">
+            <div className="w-full overflow-x-auto">
+              <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={cn(
-                      TABLE_COLUMN_WIDTHS.CATEGORY,
-                      TABLE_CELL_STYLES.HEADER,
-                      "sticky left-0 bg-white border-r",
-                      TABLE_Z_INDEX.STICKY_CATEGORY
-                    )}>
+                    <TableHead className="w-[120px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
                       Categoria
                     </TableHead>
                     {months.map((month, index) => (
                       <TableHead 
                         key={month} 
                         className={cn(
-                          TABLE_COLUMN_WIDTHS.MONTH,
-                          TABLE_CELL_STYLES.HEADER,
-                          "text-center",
+                          "w-[40px] text-xs px-1 text-center h-6",
                           getCurrentMonthColumnStyle(index === currentMonth)
                         )}
                       >

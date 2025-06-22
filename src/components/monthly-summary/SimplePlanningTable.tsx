@@ -137,14 +137,14 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <Table className="min-w-full">
+      <div className="w-full overflow-x-auto">
+        <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[200px] text-sm">
+              <TableHead className="w-[120px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
                 Categoria
               </TableHead>
-              <TableHead className="text-center min-w-[150px] text-sm">
+              <TableHead className="w-[150px] text-xs px-1 text-center h-6">
                 Valor Planejado (Mensal)
               </TableHead>
             </TableRow>
