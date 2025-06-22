@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MonthlyTable } from './MonthlyTable';
 import { PlanningTable } from './PlanningTable';
 import { ComparativeTable } from './ComparativeTable';
-import { Calculator, FileText, BarChart3 } from 'lucide-react';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 
@@ -37,11 +36,10 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           <TabsTrigger 
             value="table" 
             className={cn(
-              "flex items-center gap-1 flex-1 text-center",
-              isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+              "flex items-center justify-center flex-1 text-center text-sm",
+              isMobile ? "px-1 py-1.5 min-w-0" : ""
             )}
           >
-            <FileText className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
             <span className={cn(isMobile && "truncate")}>
               {isMobile ? "Gastos" : "Gastos Mensais"}
             </span>
@@ -49,11 +47,10 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           <TabsTrigger 
             value="planning" 
             className={cn(
-              "flex items-center gap-1 flex-1 text-center",
-              isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+              "flex items-center justify-center flex-1 text-center text-sm",
+              isMobile ? "px-1 py-1.5 min-w-0" : ""
             )}
           >
-            <Calculator className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
             <span className={cn(isMobile && "truncate")}>
               {isMobile ? "Plano" : "Planejamento"}
             </span>
@@ -61,11 +58,10 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           <TabsTrigger 
             value="comparative" 
             className={cn(
-              "flex items-center gap-1 flex-1 text-center",
-              isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+              "flex items-center justify-center flex-1 text-center text-sm",
+              isMobile ? "px-1 py-1.5 min-w-0" : ""
             )}
           >
-            <BarChart3 className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
             <span className={cn(isMobile && "truncate")}>
               {isMobile ? "Comp." : "Comparativo"}
             </span>
