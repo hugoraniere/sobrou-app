@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -6,10 +7,15 @@ import { CellPosition } from '@/hooks/useDragFill';
 import { CategoryRow } from './CategoryRow';
 import { AddCategoryButton } from '../AddCategoryButton';
 import { useCategoryDragDrop } from '@/hooks/useCategoryDragDrop';
+import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
 import { getCurrentMonthCellStyle } from '@/utils/monthStyleUtils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
+import { 
+  getCategoryColumnWidth, 
+  getTableCellClass, 
+  TABLE_Z_INDEX 
+} from '@/constants/tableStyles';
 
 interface TableSectionProps {
   title: string;
@@ -54,6 +60,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
   onDragEnd,
   isInFillRange,
 }) => {
+  const { isMobile } = useResponsive();
   const categoryDragDrop = useCategoryDragDrop();
 
   // Calcular totais por mês
@@ -76,13 +83,12 @@ export const TableSection: React.FC<TableSectionProps> = ({
       <TableRow className={cn(bgColor, "hover:opacity-80 transition-opacity")}>
         <TableCell 
           className={cn(
-            "font-bold sticky left-0 text-xs px-2 py-1 cursor-pointer",
+            "font-bold sticky left-0 cursor-pointer",
+            getCategoryColumnWidth(isMobile),
             `${bgColor} ${textColor}`,
+            getTableCellClass('HEADER'),
             TABLE_Z_INDEX.SECTION_HEADER,
-            "flex items-center gap-2",
-            // Garantir largura consistente - SEM BORDER
-            "min-w-[140px] w-[140px] max-w-[140px]",
-            "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
+            "flex items-center gap-2"
           )}
           onClick={onToggleExpanded}
         >
@@ -99,7 +105,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
           <TableCell 
             key={index} 
             className={cn(
-              "text-center font-semibold text-xs px-1 py-1 cursor-pointer",
+              "text-center font-semibold cursor-pointer",
+              getTableCellClass('HEADER'),
               textColor,
               getCurrentMonthCellStyle(index === currentMonth)
             )}
@@ -141,12 +148,10 @@ export const TableSection: React.FC<TableSectionProps> = ({
           {/* Linha para adicionar categoria */}
           <TableRow className="hover:bg-gray-50/50">
             <TableCell className={cn(
-              "sticky left-0 text-xs py-1 bg-white",
-              TABLE_Z_INDEX.SECTION_HEADER,
-              "px-4", // 16px de padding lateral
-              // Garantir largura consistente - SEM BORDER
-              "min-w-[140px] w-[140px] max-w-[140px]",
-              "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
+              "sticky left-0 bg-white",
+              getCategoryColumnWidth(isMobile),
+              getTableCellClass('CATEGORY_CELL'),
+              TABLE_Z_INDEX.SECTION_HEADER
             )}>
               <AddCategoryButton 
                 onClick={onAddCategory}
@@ -157,7 +162,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
               <TableCell 
                 key={index} 
                 className={cn(
-                  "text-xs px-1 py-1 bg-white",
+                  getTableCellClass('DATA_CELL'),
+                  "bg-white",
                   getCurrentMonthCellStyle(index === currentMonth)
                 )}
               />

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,14 @@ import { Trash, GripVertical } from 'lucide-react';
 import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
 import { DeleteCategoryDialog } from '../DeleteCategoryDialog';
+import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthCellStyle } from '@/utils/monthStyleUtils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
+import { 
+  getCategoryColumnWidth, 
+  getTableCellClass, 
+  TABLE_Z_INDEX 
+} from '@/constants/tableStyles';
 import { EditableCategoryName } from '../EditableCategoryName';
 import { EditableCell } from '../EditableCell';
 
@@ -54,6 +60,7 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
   isDraggedCategory,
   isDragOverCategory,
 }) => {
+  const { isMobile } = useResponsive();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleRemoveClick = () => {
@@ -93,12 +100,10 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
         onDrop={handleCategoryDrop}
       >
         <TableCell className={cn(
-          TABLE_CELL_STYLES.CATEGORY_CELL,
           "sticky left-0 bg-white",
-          TABLE_Z_INDEX.STICKY_CATEGORY,
-          // Garantir largura consistente - SEM BORDER
-          "min-w-[140px] w-[140px] max-w-[140px]",
-          "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
+          getCategoryColumnWidth(isMobile),
+          getTableCellClass('CATEGORY_CELL'),
+          TABLE_Z_INDEX.STICKY_CATEGORY
         )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-1">
@@ -145,7 +150,7 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
             <TableCell
               key={monthIndex}
               className={cn(
-                TABLE_CELL_STYLES.DATA_CELL,
+                getTableCellClass('DATA_CELL'),
                 "text-center relative",
                 getCurrentMonthCellStyle(monthIndex === currentMonth),
                 isSelected && "ring-2 ring-blue-400",

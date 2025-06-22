@@ -6,7 +6,13 @@ import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX, CATEGORY_COLUMN_BORDER } from '@/constants/tableStyles';
+import { 
+  getCategoryColumnWidth, 
+  getMonthColumnWidth, 
+  getTableCellClass, 
+  TABLE_Z_INDEX,
+  getCategoryColumnStroke
+} from '@/constants/tableStyles';
 
 interface MonthlyTableContentProps {
   data: any;
@@ -91,17 +97,16 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
       )}>
         <Table className={cn(
           "w-full border-collapse",
-          isMobile && "min-w-[480px]" // Largura mínima reduzida para mobile
+          isMobile && "min-w-[600px]" // Largura mínima adequada para scroll horizontal
         )}>
           <TableHeader>
             <TableRow>
               <TableHead className={cn(
-                "sticky left-0 bg-white text-xs px-2 py-1",
-                CATEGORY_COLUMN_BORDER, // Stroke aplicado APENAS no header
-                TABLE_Z_INDEX.STICKY_CATEGORY,
-                // Garantir largura consistente
-                "min-w-[140px] w-[140px] max-w-[140px]",
-                "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
+                "sticky left-0 bg-white",
+                getCategoryColumnWidth(isMobile),
+                getCategoryColumnStroke(), // Aplicar stroke na coluna inteira
+                getTableCellClass('HEADER'),
+                TABLE_Z_INDEX.STICKY_CATEGORY
               )}>
                 Categoria
               </TableHead>
@@ -109,10 +114,10 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
                 <TableHead 
                   key={month} 
                   className={cn(
-                    isMobile ? TABLE_COLUMN_WIDTHS.MONTH_MOBILE : TABLE_COLUMN_WIDTHS.MONTH,
-                    TABLE_CELL_STYLES.HEADER,
+                    getMonthColumnWidth(isMobile),
+                    getTableCellClass('HEADER'),
                     "text-center",
-                    getCurrentMonthColumnStyle(index === currentMonth) // Stroke aplicado na coluna inteira
+                    getCurrentMonthColumnStyle(index === currentMonth)
                   )}
                 >
                   {month}

@@ -1,31 +1,34 @@
 
 import { cn } from '@/lib/utils';
 
-// Larguras padrão das colunas - otimizadas para mobile
+// Larguras padronizadas das colunas - consistentes em toda a tabela
 export const TABLE_COLUMN_WIDTHS = {
-  CATEGORY: 'min-w-[140px]',
-  CATEGORY_MOBILE: 'w-[72px]', // Reduzido de 80px para 72px (10% menor)
-  MONTH: 'min-w-[70px]',
-  MONTH_MOBILE: 'w-[32px]', // Reduzido para mobile
-  PLANNING_SPECIAL: 'min-w-[80px]', // Reduzido para coluna especial do comparativo
+  // Coluna de categoria - largura fixa para garantir consistência
+  CATEGORY_DESKTOP: 'w-[160px] min-w-[160px] max-w-[160px]',
+  CATEGORY_MOBILE: 'w-[80px] min-w-[80px] max-w-[80px]',
+  
+  // Colunas de mês - largura fixa para garantir alinhamento
+  MONTH_DESKTOP: 'w-[80px] min-w-[80px] max-w-[80px]',
+  MONTH_MOBILE: 'w-[60px] min-w-[60px] max-w-[60px]',
 } as const;
 
 // Classes de espaçamento e altura padronizadas
 export const TABLE_CELL_STYLES = {
-  HEADER: 'text-xs px-0.5 h-8', // Padding reduzido para mobile
-  DATA_CELL: 'text-xs px-0.5 py-1', // Padding reduzido
-  CATEGORY_CELL: 'text-xs px-1 py-1', // Padding reduzido
+  HEADER: 'text-xs px-2 py-2 h-10',
+  DATA_CELL: 'text-xs px-2 py-2',
+  CATEGORY_CELL: 'text-xs px-3 py-2',
 } as const;
 
-// Borda aplicada APENAS no header da coluna de categoria para criar stroke da coluna inteira
-export const CATEGORY_COLUMN_BORDER = 'border-r-2 border-gray-300';
+// Classe para aplicar stroke na coluna de categoria inteira
+export const CATEGORY_COLUMN_STROKE = 'relative after:content-[""] after:absolute after:top-0 after:right-0 after:bottom-0 after:w-[2px] after:bg-gray-300 after:z-10';
 
-// Z-indexes consistentes - hierarquia corrigida para mobile
+// Z-indexes consistentes - hierarquia para mobile e desktop
 export const TABLE_Z_INDEX = {
-  STICKY_CATEGORY: 'z-30',  // Maior z-index para células de categoria sticky
-  SECTION_HEADER: 'z-25',   // Headers das seções - AUMENTADO para ficar acima do stroke
-  TABLE_HEADER: 'z-20',     // Header da tabela
-  MONTH_HIGHLIGHT: 'z-5',   // Células de mês com destaque (stroke)
+  STICKY_CATEGORY: 'z-40',  // Coluna de categoria sticky
+  CATEGORY_STROKE: 'z-35',  // Stroke da coluna de categoria
+  SECTION_HEADER: 'z-30',   // Headers das seções
+  TABLE_HEADER: 'z-25',     // Header da tabela
+  MONTH_HIGHLIGHT: 'z-10',  // Células de mês com destaque
 } as const;
 
 // Cores de seção padronizadas
@@ -48,14 +51,19 @@ export const SECTION_COLORS = {
   },
 } as const;
 
+// Função helper para obter largura da coluna de categoria com responsividade
+export const getCategoryColumnWidth = (isMobile?: boolean) => {
+  return isMobile ? TABLE_COLUMN_WIDTHS.CATEGORY_MOBILE : TABLE_COLUMN_WIDTHS.CATEGORY_DESKTOP;
+};
+
+// Função helper para obter largura das colunas de mês com responsividade
+export const getMonthColumnWidth = (isMobile?: boolean) => {
+  return isMobile ? TABLE_COLUMN_WIDTHS.MONTH_MOBILE : TABLE_COLUMN_WIDTHS.MONTH_DESKTOP;
+};
+
 // Função helper para aplicar estilos de célula consistentes
 export const getTableCellClass = (type: keyof typeof TABLE_CELL_STYLES, additionalClasses?: string) => {
   return cn(TABLE_CELL_STYLES[type], additionalClasses);
-};
-
-// Função helper para aplicar larguras de coluna consistentes
-export const getColumnWidthClass = (type: keyof typeof TABLE_COLUMN_WIDTHS, additionalClasses?: string) => {
-  return cn(TABLE_COLUMN_WIDTHS[type], additionalClasses);
 };
 
 // Função helper para aplicar cores de seção consistentes
@@ -77,4 +85,9 @@ export const getCurrentMonthHeaderStyle = (isCurrent: boolean, additionalClasses
     isCurrent && "bg-blue-100 text-blue-800",
     additionalClasses
   );
+};
+
+// Função helper para aplicar stroke na coluna de categoria
+export const getCategoryColumnStroke = (additionalClasses?: string) => {
+  return cn(CATEGORY_COLUMN_STROKE, additionalClasses);
 };
