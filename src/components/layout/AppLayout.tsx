@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
@@ -35,10 +34,7 @@ const AppLayoutContent: React.FC<AppLayoutContentProps> = ({ children }) => {
         
         {/* Main content */}
         <main className="flex-1 w-full overflow-x-hidden">
-          <div className={cn(
-            "mx-auto py-4 overflow-x-hidden w-full max-w-full",
-            isMobile ? "px-4" : "container px-4 sm:px-6 md:px-8"
-          )}>
+          <div className="w-full max-w-none mx-auto py-4 overflow-x-hidden">
             {children}
           </div>
 
