@@ -89,7 +89,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
   };
 
   return (
-    <Card className="w-full border-0 rounded-none">
+    <Card className="w-full max-w-full border-0 rounded-none">
       <CardHeader className="p-2">
         <CardTitle className="text-base">
           Comparativo: Real vs Planejado {year}
@@ -98,12 +98,18 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
           {getDescription()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="w-full p-0">
-        <div className="w-full overflow-x-auto">
-          <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
+      <CardContent className="w-full max-w-full p-0">
+        <div className="w-full max-w-full overflow-x-auto">
+          <Table className="w-full border-collapse" style={{ 
+            minWidth: isMobile ? '100%' : '600px',
+            maxWidth: '100%'
+          }}>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[120px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
+                <TableHead className={cn(
+                  "text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30",
+                  isMobile ? "w-[100px]" : "w-[120px]"
+                )}>
                   Categoria
                 </TableHead>
                 <TableHead className="w-[60px] text-xs px-1 text-center h-6 bg-gray-100">
@@ -111,9 +117,10 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                 </TableHead>
                 {months.map((month, index) => (
                   <TableHead 
-                    key={month} 
+                    key={`comparative-month-${index}`}
                     className={cn(
-                      "w-[40px] text-xs px-1 text-center h-6 cursor-pointer hover:bg-gray-50",
+                      "text-xs px-1 text-center h-6 cursor-pointer hover:bg-gray-50",
+                      isMobile ? "w-[50px]" : "w-[60px]",
                       getCurrentMonthColumnStyle(index === currentMonth),
                       index === selectedMonth && "bg-blue-100 text-blue-800 font-semibold"
                     )}

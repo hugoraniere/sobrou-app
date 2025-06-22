@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { AddCategoryDialog } from './AddCategoryDialog';
 import { AddCategoryButton } from './AddCategoryButton';
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
+import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
 
@@ -75,6 +76,8 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
     updateSimplePlanningValue,
     addRealCategory: addCategory
   } = useUnifiedMonthlySummary(year);
+  
+  const { isMobile } = useResponsive();
 
   const [dialogState, setDialogState] = useState<{
     open: boolean;
@@ -137,11 +140,17 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
 
   return (
     <>
-      <div className="w-full overflow-x-auto">
-        <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
+      <div className="w-full max-w-full overflow-x-auto">
+        <Table className="w-full border-collapse" style={{ 
+          minWidth: isMobile ? '100%' : '400px',
+          maxWidth: '100%'
+        }}>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[120px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
+              <TableHead className={cn(
+                "text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30",
+                isMobile ? "w-[120px]" : "w-[150px]"
+              )}>
                 Categoria
               </TableHead>
               <TableHead className="w-[150px] text-xs px-1 text-center h-6">

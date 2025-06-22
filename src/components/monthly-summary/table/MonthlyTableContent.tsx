@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface MonthlyTableContentProps {
   data: any;
@@ -84,18 +83,25 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   ];
 
   return (
-    <div className="w-full overflow-x-auto">
-      <Table className="w-full border-collapse" style={{ minWidth: '600px' }}>
+    <div className="w-full max-w-full overflow-x-auto">
+      <Table className="w-full border-collapse" style={{ 
+        minWidth: isMobile ? '100%' : '600px',
+        maxWidth: '100%'
+      }}>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[120px] text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30">
+            <TableHead className={cn(
+              "text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30",
+              isMobile ? "w-[100px]" : "w-[120px]"
+            )}>
               Categoria
             </TableHead>
             {months.map((month, index) => (
               <TableHead 
-                key={month} 
+                key={`month-${index}`}
                 className={cn(
-                  "w-[40px] text-xs px-1 text-center h-6",
+                  "text-xs px-1 text-center h-6",
+                  isMobile ? "w-[50px]" : "w-[60px]",
                   getCurrentMonthColumnStyle(index === currentMonth)
                 )}
               >
