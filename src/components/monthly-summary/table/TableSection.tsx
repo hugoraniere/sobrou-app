@@ -10,7 +10,7 @@ import { useCategoryDragDrop } from '@/hooks/useCategoryDragDrop';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
+import { TABLE_CELL_STYLES, TABLE_Z_INDEX, CATEGORY_COLUMN_BORDER } from '@/constants/tableStyles';
 
 interface TableSectionProps {
   title: string;
@@ -78,8 +78,9 @@ export const TableSection: React.FC<TableSectionProps> = ({
         <TableCell 
           className={cn(
             TABLE_CELL_STYLES.HEADER,
-            `font-bold sticky left-0 border-r-2 border-gray-300 ${bgColor} ${textColor} cursor-pointer`,
-            TABLE_Z_INDEX.SECTION_HEADER, // Z-index aumentado para ficar acima do stroke
+            `font-bold sticky left-0 ${bgColor} ${textColor} cursor-pointer`,
+            CATEGORY_COLUMN_BORDER,
+            TABLE_Z_INDEX.SECTION_HEADER,
             "flex items-center gap-2"
           )}
           onClick={onToggleExpanded}
@@ -140,7 +141,8 @@ export const TableSection: React.FC<TableSectionProps> = ({
           <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
             <TableCell className={cn(
               TABLE_CELL_STYLES.CATEGORY_CELL,
-              "sticky left-0 border-r",
+              "sticky left-0",
+              CATEGORY_COLUMN_BORDER,
               bgColor.replace('50', '25'),
               TABLE_Z_INDEX.SECTION_HEADER
             )}>

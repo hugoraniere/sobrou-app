@@ -80,9 +80,8 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
           </CardDescription>
         </CardHeader>
         <CardContent className={cn(
-          isMobile 
-            ? "p-0 overflow-x-auto max-w-full" 
-            : "p-0"
+          "pt-0 pb-0 overflow-x-auto",
+          isMobile ? "px-3" : "px-6"
         )}>
           <MonthlyTableContent
             data={data}

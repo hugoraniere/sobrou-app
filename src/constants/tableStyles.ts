@@ -17,6 +17,9 @@ export const TABLE_CELL_STYLES = {
   CATEGORY_CELL: 'text-xs px-1 py-1', // Padding reduzido
 } as const;
 
+// Borda padronizada para coluna de categoria
+export const CATEGORY_COLUMN_BORDER = 'border-r border-gray-200';
+
 // Z-indexes consistentes - hierarquia corrigida para mobile
 export const TABLE_Z_INDEX = {
   STICKY_CATEGORY: 'z-30',  // Maior z-index para células de categoria sticky

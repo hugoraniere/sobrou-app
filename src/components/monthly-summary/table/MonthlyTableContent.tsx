@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
+import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX, CATEGORY_COLUMN_BORDER } from '@/constants/tableStyles';
 
 interface MonthlyTableContentProps {
   data: any;
@@ -97,7 +97,8 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
             <TableHead className={cn(
               isMobile ? TABLE_COLUMN_WIDTHS.CATEGORY_MOBILE : TABLE_COLUMN_WIDTHS.CATEGORY,
               TABLE_CELL_STYLES.HEADER,
-              "sticky left-0 bg-white border-r-2 border-gray-300",
+              "sticky left-0 bg-white",
+              CATEGORY_COLUMN_BORDER,
               TABLE_Z_INDEX.STICKY_CATEGORY
             )}>
               Categoria

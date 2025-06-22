@@ -8,7 +8,7 @@ import { CellPosition } from '@/hooks/useDragFill';
 import { DeleteCategoryDialog } from '../DeleteCategoryDialog';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
+import { TABLE_CELL_STYLES, TABLE_Z_INDEX, CATEGORY_COLUMN_BORDER } from '@/constants/tableStyles';
 import { EditableCategoryName } from '../EditableCategoryName';
 import { EditableCell } from '../EditableCell';
 
@@ -95,7 +95,8 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
       >
         <TableCell className={cn(
           TABLE_CELL_STYLES.CATEGORY_CELL,
-          "sticky left-0 bg-white border-r-2 border-gray-300", // Borda mais visível
+          "sticky left-0 bg-white",
+          CATEGORY_COLUMN_BORDER,
           TABLE_Z_INDEX.STICKY_CATEGORY
         )}>
           <div className="flex items-center justify-between">
