@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 // Larguras padrão das colunas - otimizadas para mobile
 export const TABLE_COLUMN_WIDTHS = {
   CATEGORY: 'min-w-[140px]',
-  CATEGORY_MOBILE: 'w-[80px]', // Reduzido ainda mais para mobile
+  CATEGORY_MOBILE: 'w-[72px]', // Reduzido de 80px para 72px (10% menor)
   MONTH: 'min-w-[70px]',
   MONTH_MOBILE: 'w-[32px]', // Reduzido para mobile
   PLANNING_SPECIAL: 'min-w-[80px]', // Reduzido para coluna especial do comparativo
@@ -17,7 +17,7 @@ export const TABLE_CELL_STYLES = {
   CATEGORY_CELL: 'text-xs px-1 py-1', // Padding reduzido
 } as const;
 
-// Borda padronizada para coluna de categoria
+// Borda padronizada para coluna de categoria - aplicada na coluna inteira
 export const CATEGORY_COLUMN_BORDER = 'border-r border-gray-200';
 
 // Z-indexes consistentes - hierarquia corrigida para mobile

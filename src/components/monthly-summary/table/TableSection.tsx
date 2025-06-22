@@ -80,7 +80,10 @@ export const TableSection: React.FC<TableSectionProps> = ({
             `${bgColor} ${textColor}`,
             CATEGORY_COLUMN_BORDER,
             TABLE_Z_INDEX.SECTION_HEADER,
-            "flex items-center gap-2"
+            "flex items-center gap-2",
+            // Garantir largura consistente
+            "min-w-[140px] w-[140px] max-w-[140px]",
+            "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
           )}
           onClick={onToggleExpanded}
         >
@@ -136,13 +139,16 @@ export const TableSection: React.FC<TableSectionProps> = ({
             />
           ))}
           
-          {/* Linha para adicionar categoria - MOVIDA PARA O FINAL e visível apenas quando expandido */}
+          {/* Linha para adicionar categoria */}
           <TableRow className="hover:bg-gray-50/50">
             <TableCell className={cn(
               "sticky left-0 text-xs py-1 bg-white",
               CATEGORY_COLUMN_BORDER,
               TABLE_Z_INDEX.SECTION_HEADER,
-              "px-4" // 16px de padding lateral
+              "px-4", // 16px de padding lateral
+              // Garantir largura consistente
+              "min-w-[140px] w-[140px] max-w-[140px]",
+              "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
             )}>
               <AddCategoryButton 
                 onClick={onAddCategory}

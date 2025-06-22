@@ -97,7 +97,10 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
           TABLE_CELL_STYLES.CATEGORY_CELL,
           "sticky left-0 bg-white",
           CATEGORY_COLUMN_BORDER,
-          TABLE_Z_INDEX.STICKY_CATEGORY
+          TABLE_Z_INDEX.STICKY_CATEGORY,
+          // Garantir largura consistente
+          "min-w-[140px] w-[140px] max-w-[140px]",
+          "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
         )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-1">

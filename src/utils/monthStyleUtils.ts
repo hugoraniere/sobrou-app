@@ -1,21 +1,21 @@
-
 import { cn } from '@/lib/utils';
 import { TABLE_Z_INDEX } from '@/constants/tableStyles';
 
+// Estilo para coluna do mês atual - aplicado no header da coluna
 export const getCurrentMonthColumnStyle = (isCurrentMonth: boolean, additionalClasses?: string) => {
   return cn(
     isCurrentMonth && [
-      "border-l border-r border-blue-500",
+      "border-l-2 border-r-2 border-blue-500 bg-blue-50",
       TABLE_Z_INDEX.MONTH_HIGHLIGHT
     ],
     additionalClasses
   );
 };
 
-// Nova função para células sem stroke
+// Função para células sem stroke - células individuais não têm bordas laterais
 export const getCurrentMonthCellStyle = (isCurrentMonth: boolean, additionalClasses?: string) => {
   return cn(
-    // Remove o stroke das células individuais - sem bordas laterais
+    isCurrentMonth && "bg-blue-50", // Apenas background, sem bordas
     additionalClasses
   );
 };

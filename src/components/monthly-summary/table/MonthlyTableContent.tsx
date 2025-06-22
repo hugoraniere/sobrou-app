@@ -95,11 +95,12 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
           <TableHeader>
             <TableRow>
               <TableHead className={cn(
-                isMobile ? TABLE_COLUMN_WIDTHS.CATEGORY_MOBILE : TABLE_COLUMN_WIDTHS.CATEGORY,
-                TABLE_CELL_STYLES.HEADER,
-                "sticky left-0 bg-white",
+                "sticky left-0 bg-white text-xs px-2 py-1",
                 CATEGORY_COLUMN_BORDER,
-                TABLE_Z_INDEX.STICKY_CATEGORY
+                TABLE_Z_INDEX.STICKY_CATEGORY,
+                // Garantir largura consistente
+                "min-w-[140px] w-[140px] max-w-[140px]",
+                "sm:min-w-[72px] sm:w-[72px] sm:max-w-[72px]" // Mobile
               )}>
                 Categoria
               </TableHead>
@@ -110,7 +111,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
                     isMobile ? TABLE_COLUMN_WIDTHS.MONTH_MOBILE : TABLE_COLUMN_WIDTHS.MONTH,
                     TABLE_CELL_STYLES.HEADER,
                     "text-center",
-                    getCurrentMonthColumnStyle(index === currentMonth)
+                    getCurrentMonthColumnStyle(index === currentMonth) // Stroke aplicado na coluna inteira
                   )}
                 >
                   {month}
