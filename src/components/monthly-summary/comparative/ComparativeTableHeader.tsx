@@ -2,9 +2,11 @@
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
+import { useResponsive } from '@/hooks/useResponsive';
 import { 
-  TABLE_COLUMN_WIDTHS, 
-  TABLE_CELL_STYLES, 
+  getCategoryColumnWidth, 
+  getMonthColumnWidth, 
+  getTableCellClass, 
   TABLE_Z_INDEX,
   getCurrentMonthHeaderStyle,
   getSelectedMonthHeaderStyle
@@ -23,20 +25,22 @@ export const ComparativeTableHeader: React.FC<ComparativeTableHeaderProps> = ({
   selectedMonth,
   onMonthClick
 }) => {
+  const { isMobile } = useResponsive();
+
   return (
     <TableHeader>
       <TableRow>
         <TableHead className={cn(
-          TABLE_COLUMN_WIDTHS.CATEGORY,
-          TABLE_CELL_STYLES.HEADER,
+          getCategoryColumnWidth(isMobile),
+          getTableCellClass('HEADER'),
           "sticky left-0 bg-white border-r",
           TABLE_Z_INDEX.STICKY_CATEGORY
         )}>
           Categoria
         </TableHead>
         <TableHead className={cn(
-          TABLE_COLUMN_WIDTHS.PLANNING_SPECIAL,
-          TABLE_CELL_STYLES.HEADER,
+          getMonthColumnWidth(isMobile), // Usar a mesma largura dos meses
+          getTableCellClass('HEADER'),
           "text-center bg-gray-100 border-l-4 border-gray-400"
         )}>
           Planejado ({months[selectedMonth]})
@@ -45,8 +49,8 @@ export const ComparativeTableHeader: React.FC<ComparativeTableHeaderProps> = ({
           <TableHead 
             key={month} 
             className={cn(
-              TABLE_COLUMN_WIDTHS.MONTH,
-              TABLE_CELL_STYLES.HEADER,
+              getMonthColumnWidth(isMobile),
+              getTableCellClass('HEADER'),
               "text-center cursor-pointer hover:bg-gray-50",
               getCurrentMonthHeaderStyle(index === currentMonth),
               getSelectedMonthHeaderStyle(index === selectedMonth)
