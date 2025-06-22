@@ -1,11 +1,17 @@
 
 import React, { useState } from 'react';
-import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { 
+  ConstrainedTable, 
+  ConstrainedTableHeader, 
+  ConstrainedTableBody, 
+  ConstrainedTableRow, 
+  ConstrainedTableHead 
+} from './ConstrainedTable';
 
 interface MonthlyTableContentProps {
   data: any;
@@ -36,7 +42,6 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
 }) => {
   const { isMobile } = useResponsive();
 
-  // Estado para controlar quais seções estão expandidas
   const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     revenue: true,
     essentialExpenses: true,
@@ -82,35 +87,43 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
     }
   ];
 
+  // Definir larguras das colunas responsivamente
+  const getCategoryColumnWidth = () => isMobile ? "120px" : "140px";
+  const getMonthColumnWidth = () => isMobile ? "45px" : "60px";
+
   return (
-    <div className="w-full max-w-full overflow-x-auto">
-      <Table className="w-full border-collapse" style={{ 
-        minWidth: isMobile ? '100%' : '600px',
-        maxWidth: '100%'
-      }}>
-        <TableHeader>
-          <TableRow>
-            <TableHead className={cn(
-              "text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30",
-              isMobile ? "w-[100px]" : "w-[120px]"
-            )}>
+    <div className="w-full overflow-x-auto">
+      <ConstrainedTable 
+        style={{ 
+          minWidth: isMobile ? "660px" : "800px"
+        }}
+      >
+        <ConstrainedTableHeader>
+          <ConstrainedTableRow>
+            <ConstrainedTableHead 
+              className={cn(
+                "sticky left-0 bg-white border-r-2 border-gray-300 z-30",
+                "font-semibold"
+              )}
+              style={{ width: getCategoryColumnWidth() }}
+            >
               Categoria
-            </TableHead>
+            </ConstrainedTableHead>
             {months.map((month, index) => (
-              <TableHead 
+              <ConstrainedTableHead 
                 key={`month-${index}`}
                 className={cn(
-                  "text-xs px-1 text-center h-6",
-                  isMobile ? "w-[50px]" : "w-[60px]",
+                  "text-center font-semibold",
                   getCurrentMonthColumnStyle(index === currentMonth)
                 )}
+                style={{ width: getMonthColumnWidth() }}
               >
                 {month}
-              </TableHead>
+              </ConstrainedTableHead>
             ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+          </ConstrainedTableRow>
+        </ConstrainedTableHeader>
+        <ConstrainedTableBody>
           {sections.map((sectionData) => (
             <TableSection
               key={sectionData.title}
@@ -140,8 +153,8 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
             totals={totals}
             currentMonth={currentMonth}
           />
-        </TableBody>
-      </Table>
+        </ConstrainedTableBody>
+      </ConstrainedTable>
     </div>
   );
 };

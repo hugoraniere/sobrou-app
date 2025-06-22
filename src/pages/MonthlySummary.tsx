@@ -12,12 +12,12 @@ const MonthlySummary = () => {
   return (
     <div className="w-full max-w-full mx-auto min-h-screen px-2 sm:px-4 overflow-hidden">
       {/* Header */}
-      <div className="w-full max-w-full mt-6 mb-6">
+      <div className="w-full max-w-full mt-6 mb-6 overflow-hidden">
         <div className={cn(
           "flex justify-between items-center w-full max-w-full",
           isMobile && "flex-col gap-3"
         )}>
-          <div className="w-full max-w-full">
+          <div className="w-full max-w-full overflow-hidden">
             <h1 className={cn("font-bold text-gray-900", isMobile ? "text-xl" : "text-3xl")}>
               Resumo Mensal
             </h1>

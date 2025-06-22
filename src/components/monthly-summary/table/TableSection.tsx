@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { TableRow, TableCell } from "@/components/ui/table";
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
@@ -10,7 +9,10 @@ import { useCategoryDragDrop } from '@/hooks/useCategoryDragDrop';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
+import { 
+  ConstrainedTableRow, 
+  ConstrainedTableCell 
+} from './ConstrainedTable';
 
 interface TableSectionProps {
   title: string;
@@ -74,12 +76,10 @@ export const TableSection: React.FC<TableSectionProps> = ({
   return (
     <>
       {/* Header da seção - agora clicável */}
-      <TableRow className={cn(bgColor, "hover:opacity-80 transition-opacity")}>
-        <TableCell 
+      <ConstrainedTableRow className={cn(bgColor, "hover:opacity-80 transition-opacity")}>
+        <ConstrainedTableCell 
           className={cn(
-            TABLE_CELL_STYLES.HEADER,
-            `font-bold sticky left-0 border-r-2 border-gray-300 ${bgColor} ${textColor} cursor-pointer`,
-            TABLE_Z_INDEX.SECTION_HEADER, // Z-index aumentado para ficar acima do stroke
+            `font-bold sticky left-0 border-r-2 border-gray-300 ${bgColor} ${textColor} cursor-pointer z-30`,
             "flex items-center gap-2"
           )}
           onClick={onToggleExpanded}
@@ -92,21 +92,20 @@ export const TableSection: React.FC<TableSectionProps> = ({
             )} 
           />
           {title}
-        </TableCell>
+        </ConstrainedTableCell>
         {totals.map((total, index) => (
-          <TableCell 
+          <ConstrainedTableCell 
             key={index} 
             className={cn(
-              TABLE_CELL_STYLES.HEADER,
               `text-center font-semibold ${textColor} cursor-pointer`,
               getCurrentMonthColumnStyle(index === currentMonth)
             )}
             onClick={onToggleExpanded}
           >
             {formatCurrency(total)}
-          </TableCell>
+          </ConstrainedTableCell>
         ))}
-      </TableRow>
+      </ConstrainedTableRow>
       
       {/* Linhas das categorias - mostradas apenas se expandido */}
       {isExpanded && (
@@ -136,30 +135,27 @@ export const TableSection: React.FC<TableSectionProps> = ({
             />
           ))}
           
-          {/* Linha para adicionar categoria - MOVIDA PARA O FINAL e visível apenas quando expandido */}
-          <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
-            <TableCell className={cn(
-              TABLE_CELL_STYLES.CATEGORY_CELL,
-              "sticky left-0 border-r",
-              bgColor.replace('50', '25'),
-              TABLE_Z_INDEX.SECTION_HEADER
+          {/* Linha para adicionar categoria */}
+          <ConstrainedTableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
+            <ConstrainedTableCell className={cn(
+              "sticky left-0 border-r z-30",
+              bgColor.replace('50', '25')
             )}>
               <AddCategoryButton 
                 onClick={onAddCategory}
                 className="w-full justify-center text-gray-600 hover:text-gray-800"
               />
-            </TableCell>
+            </ConstrainedTableCell>
             {Array(12).fill(0).map((_, index) => (
-              <TableCell 
+              <ConstrainedTableCell 
                 key={index} 
                 className={cn(
-                  TABLE_CELL_STYLES.DATA_CELL,
-                  getCurrentMonthColumnStyle(index === currentMonth), // Esta função agora inclui o z-index baixo
+                  getCurrentMonthColumnStyle(index === currentMonth),
                   bgColor.replace('50', '25')
                 )}
               />
             ))}
-          </TableRow>
+          </ConstrainedTableRow>
         </>
       )}
     </>

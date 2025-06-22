@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash, GripVertical } from 'lucide-react';
 import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
@@ -8,9 +7,12 @@ import { CellPosition } from '@/hooks/useDragFill';
 import { DeleteCategoryDialog } from '../DeleteCategoryDialog';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 import { EditableCategoryName } from '../EditableCategoryName';
 import { EditableCell } from '../EditableCell';
+import { 
+  ConstrainedTableRow, 
+  ConstrainedTableCell 
+} from './ConstrainedTable';
 
 interface CategoryRowProps {
   category: EditableCategoryData;
@@ -83,20 +85,17 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
 
   return (
     <>
-      <TableRow 
+      <ConstrainedTableRow 
         className={cn(
           "hover:bg-gray-50/50 group transition-all duration-200",
           isDraggedCategory && "opacity-50",
           isDragOverCategory && "border-t-2 border-blue-500"
         )}
-        draggable={false}
         onDragOver={handleCategoryDragOver}
         onDrop={handleCategoryDrop}
       >
-        <TableCell className={cn(
-          TABLE_CELL_STYLES.CATEGORY_CELL,
-          "sticky left-0 bg-white border-r-2 border-gray-300", // Borda mais visível
-          TABLE_Z_INDEX.STICKY_CATEGORY
+        <ConstrainedTableCell className={cn(
+          "sticky left-0 bg-white border-r-2 border-gray-300 z-30"
         )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-1">
@@ -123,7 +122,7 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
               <Trash className="h-3 w-3" />
             </Button>
           </div>
-        </TableCell>
+        </ConstrainedTableCell>
         
         {category.values.map((value, monthIndex) => {
           const cellPosition: CellPosition = {
@@ -140,16 +139,14 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
           const isInRange = isInFillRange(cellPosition);
           
           return (
-            <TableCell
+            <ConstrainedTableCell
               key={monthIndex}
               className={cn(
-                TABLE_CELL_STYLES.DATA_CELL,
                 "text-center relative",
                 getCurrentMonthColumnStyle(monthIndex === currentMonth),
                 isSelected && "ring-2 ring-blue-400",
                 isInRange && "bg-blue-100"
               )}
-              data-cell-position={`${section}-${category.id}-${monthIndex}`}
             >
               <EditableCell
                 value={value}
@@ -162,10 +159,10 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
                 onDragMove={() => onDragMove(cellPosition)}
                 onDragEnd={onDragEnd}
               />
-            </TableCell>
+            </ConstrainedTableCell>
           );
         })}
-      </TableRow>
+      </ConstrainedTableRow>
 
       <DeleteCategoryDialog
         open={showDeleteDialog}

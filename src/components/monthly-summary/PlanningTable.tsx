@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlanningTableSection } from './table/PlanningTableSection';
 import { SurplusRow } from './table/SurplusRow';
@@ -12,6 +11,13 @@ import { useDragFill } from '@/hooks/useDragFill';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { 
+  ConstrainedTable, 
+  ConstrainedTableHeader, 
+  ConstrainedTableBody, 
+  ConstrainedTableRow, 
+  ConstrainedTableHead 
+} from './table/ConstrainedTable';
 
 interface PlanningTableProps {
   year: number;
@@ -107,9 +113,13 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
     }
   ];
 
+  // Definir larguras das colunas responsivamente
+  const getCategoryColumnWidth = () => isMobile ? "120px" : "140px";
+  const getMonthColumnWidth = () => isMobile ? "45px" : "60px";
+
   return (
     <>
-      <Card className="w-full max-w-full border-0 rounded-none">
+      <Card className="w-full max-w-full border-0 rounded-none overflow-hidden">
         <CardHeader className="p-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -126,36 +136,37 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
             />
           </div>
         </CardHeader>
-        <CardContent className="w-full max-w-full p-0">
+        <CardContent className="w-full max-w-full p-0 overflow-hidden">
           {isDetailedView ? (
-            <div className="w-full max-w-full overflow-x-auto">
-              <Table className="w-full border-collapse" style={{ 
-                minWidth: isMobile ? '100%' : '600px',
-                maxWidth: '100%'
-              }}>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className={cn(
-                      "text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30",
-                      isMobile ? "w-[100px]" : "w-[120px]"
-                    )}>
+            <div className="w-full overflow-x-auto">
+              <ConstrainedTable 
+                style={{ 
+                  minWidth: isMobile ? "660px" : "800px"
+                }}
+              >
+                <ConstrainedTableHeader>
+                  <ConstrainedTableRow>
+                    <ConstrainedTableHead 
+                      className="sticky left-0 bg-white border-r-2 border-gray-300 z-30 font-semibold"
+                      style={{ width: getCategoryColumnWidth() }}
+                    >
                       Categoria
-                    </TableHead>
+                    </ConstrainedTableHead>
                     {months.map((month, index) => (
-                      <TableHead 
+                      <ConstrainedTableHead 
                         key={`planning-month-${index}`}
                         className={cn(
-                          "text-xs px-1 text-center h-6",
-                          isMobile ? "w-[50px]" : "w-[60px]",
+                          "text-center font-semibold",
                           getCurrentMonthColumnStyle(index === currentMonth)
                         )}
+                        style={{ width: getMonthColumnWidth() }}
                       >
                         {month}
-                      </TableHead>
+                      </ConstrainedTableHead>
                     ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+                  </ConstrainedTableRow>
+                </ConstrainedTableHeader>
+                <ConstrainedTableBody>
                   {sections.map((section) => (
                     <PlanningTableSection
                       key={section.title}
@@ -174,8 +185,8 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                     totals={totals}
                     currentMonth={currentMonth}
                   />
-                </TableBody>
-              </Table>
+                </ConstrainedTableBody>
+              </ConstrainedTable>
             </div>
           ) : (
             <SimplePlanningTable year={year} />

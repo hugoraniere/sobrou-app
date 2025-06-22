@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
 import { AddCategoryDialog } from './AddCategoryDialog';
 import { AddCategoryButton } from './AddCategoryButton';
@@ -8,6 +7,14 @@ import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { formatCurrencyInput, parseCurrencyToNumber } from '@/utils/currencyUtils';
+import { 
+  ConstrainedTable, 
+  ConstrainedTableHeader, 
+  ConstrainedTableBody, 
+  ConstrainedTableRow, 
+  ConstrainedTableHead,
+  ConstrainedTableCell 
+} from './table/ConstrainedTable';
 
 interface SimplePlanningTableProps {
   year: number;
@@ -38,23 +45,23 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
   return (
     <>
       {/* Cabeçalho da seção com botão de adicionar */}
-      <TableRow className={cn(className, "font-semibold")}>
-        <TableCell colSpan={2} className="py-3">
+      <ConstrainedTableRow className={cn(className, "font-semibold")}>
+        <ConstrainedTableCell colSpan={2}>
           <div className="flex items-center justify-between">
             <span>{title}</span>
             <AddCategoryButton onClick={onAddCategory} />
           </div>
-        </TableCell>
-      </TableRow>
+        </ConstrainedTableCell>
+      </ConstrainedTableRow>
       
       {/* Categorias da seção */}
       {categories.map((category) => {
         return (
-          <TableRow key={category.id} className="hover:bg-gray-50">
-            <TableCell className="font-medium">
+          <ConstrainedTableRow key={category.id} className="hover:bg-gray-50">
+            <ConstrainedTableCell className="font-medium">
               {category.displayName}
-            </TableCell>
-            <TableCell className="text-center">
+            </ConstrainedTableCell>
+            <ConstrainedTableCell className="text-center">
               <Input
                 type="text"
                 className="text-center max-w-32 mx-auto"
@@ -62,8 +69,8 @@ const SimplePlanningTableSection: React.FC<SimplePlanningTableSectionProps> = ({
                 onChange={(e) => handleValueChange(category.id, e.target.value)}
                 placeholder="0,00"
               />
-            </TableCell>
-          </TableRow>
+            </ConstrainedTableCell>
+          </ConstrainedTableRow>
         );
       })}
     </>
@@ -138,27 +145,35 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
     }
   ];
 
+  // Definir larguras das colunas responsivamente
+  const getCategoryColumnWidth = () => isMobile ? "150px" : "200px";
+  const getValueColumnWidth = () => isMobile ? "120px" : "150px";
+
   return (
     <>
-      <div className="w-full max-w-full overflow-x-auto">
-        <Table className="w-full border-collapse" style={{ 
-          minWidth: isMobile ? '100%' : '400px',
-          maxWidth: '100%'
-        }}>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={cn(
-                "text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30",
-                isMobile ? "w-[120px]" : "w-[150px]"
-              )}>
+      <div className="w-full overflow-x-auto">
+        <ConstrainedTable 
+          style={{ 
+            minWidth: isMobile ? "270px" : "350px"
+          }}
+        >
+          <ConstrainedTableHeader>
+            <ConstrainedTableRow>
+              <ConstrainedTableHead 
+                className="sticky left-0 bg-white border-r-2 border-gray-300 z-30 font-semibold"
+                style={{ width: getCategoryColumnWidth() }}
+              >
                 Categoria
-              </TableHead>
-              <TableHead className="w-[150px] text-xs px-1 text-center h-6">
+              </ConstrainedTableHead>
+              <ConstrainedTableHead 
+                className="text-center font-semibold"
+                style={{ width: getValueColumnWidth() }}
+              >
                 Valor Planejado (Mensal)
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+              </ConstrainedTableHead>
+            </ConstrainedTableRow>
+          </ConstrainedTableHeader>
+          <ConstrainedTableBody>
             {sections.map((section) => (
               <SimplePlanningTableSection
                 key={section.title}
@@ -170,8 +185,8 @@ export const SimplePlanningTable: React.FC<SimplePlanningTableProps> = ({ year }
                 className={section.className}
               />
             ))}
-          </TableBody>
-        </Table>
+          </ConstrainedTableBody>
+        </ConstrainedTable>
       </div>
 
       <AddCategoryDialog

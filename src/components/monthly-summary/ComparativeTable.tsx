@@ -1,13 +1,18 @@
 
 import React, { useState } from 'react';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
-import { ComparativeTableHeader } from './comparative/ComparativeTableHeader';
 import { ComparativeTableSection } from './comparative/ComparativeTableSection';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { 
+  ConstrainedTable, 
+  ConstrainedTableHeader, 
+  ConstrainedTableBody, 
+  ConstrainedTableRow, 
+  ConstrainedTableHead 
+} from './table/ConstrainedTable';
 
 interface ComparativeTableProps {
   year: number;
@@ -88,8 +93,13 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
     return `Compare seus gastos reais com o planejamento ${viewType}.`;
   };
 
+  // Definir larguras das colunas responsivamente
+  const getCategoryColumnWidth = () => isMobile ? "100px" : "120px";
+  const getPlanColumnWidth = () => isMobile ? "50px" : "60px";
+  const getMonthColumnWidth = () => isMobile ? "45px" : "50px";
+
   return (
-    <Card className="w-full max-w-full border-0 rounded-none">
+    <Card className="w-full max-w-full border-0 rounded-none overflow-hidden">
       <CardHeader className="p-2">
         <CardTitle className="text-base">
           Comparativo: Real vs Planejado {year}
@@ -98,40 +108,44 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
           {getDescription()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="w-full max-w-full p-0">
-        <div className="w-full max-w-full overflow-x-auto">
-          <Table className="w-full border-collapse" style={{ 
-            minWidth: isMobile ? '100%' : '600px',
-            maxWidth: '100%'
-          }}>
-            <TableHeader>
-              <TableRow>
-                <TableHead className={cn(
-                  "text-xs px-1 h-6 sticky left-0 bg-white border-r-2 border-gray-300 z-30",
-                  isMobile ? "w-[100px]" : "w-[120px]"
-                )}>
+      <CardContent className="w-full max-w-full p-0 overflow-hidden">
+        <div className="w-full overflow-x-auto">
+          <ConstrainedTable 
+            style={{ 
+              minWidth: isMobile ? "730px" : "860px"
+            }}
+          >
+            <ConstrainedTableHeader>
+              <ConstrainedTableRow>
+                <ConstrainedTableHead 
+                  className="sticky left-0 bg-white border-r-2 border-gray-300 z-30 font-semibold"
+                  style={{ width: getCategoryColumnWidth() }}
+                >
                   Categoria
-                </TableHead>
-                <TableHead className="w-[60px] text-xs px-1 text-center h-6 bg-gray-100">
+                </ConstrainedTableHead>
+                <ConstrainedTableHead 
+                  className="text-center bg-gray-100 font-semibold"
+                  style={{ width: getPlanColumnWidth() }}
+                >
                   Plano
-                </TableHead>
+                </ConstrainedTableHead>
                 {months.map((month, index) => (
-                  <TableHead 
+                  <ConstrainedTableHead 
                     key={`comparative-month-${index}`}
                     className={cn(
-                      "text-xs px-1 text-center h-6 cursor-pointer hover:bg-gray-50",
-                      isMobile ? "w-[50px]" : "w-[60px]",
+                      "text-center cursor-pointer hover:bg-gray-50 font-semibold",
                       getCurrentMonthColumnStyle(index === currentMonth),
-                      index === selectedMonth && "bg-blue-100 text-blue-800 font-semibold"
+                      index === selectedMonth && "bg-blue-100 text-blue-800"
                     )}
+                    style={{ width: getMonthColumnWidth() }}
                     onClick={() => handleMonthClick(index)}
                   >
                     {month}
-                  </TableHead>
+                  </ConstrainedTableHead>
                 ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+              </ConstrainedTableRow>
+            </ConstrainedTableHeader>
+            <ConstrainedTableBody>
               {sections.map((section) => (
                 <ComparativeTableSection
                   key={section.title}
@@ -144,8 +158,8 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({ year, isDeta
                   months={months}
                 />
               ))}
-            </TableBody>
-          </Table>
+            </ConstrainedTableBody>
+          </ConstrainedTable>
         </div>
       </CardContent>
     </Card>
