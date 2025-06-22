@@ -20,7 +20,7 @@ export const AddCategoryButton: React.FC<AddCategoryButtonProps> = ({
       variant="ghost"
       size="sm"
       onClick={onClick}
-      className={`text-xs h-6 px-2 ${className}`}
+      className={`text-xs h-6 px-0 ${className}`}
     >
       <Plus className="h-2.5 w-2.5 mr-1" />
       {isMobile ? 'Adicionar' : 'Adicionar categoria'}

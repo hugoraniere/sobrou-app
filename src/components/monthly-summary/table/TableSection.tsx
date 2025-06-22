@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -138,25 +137,24 @@ export const TableSection: React.FC<TableSectionProps> = ({
           ))}
           
           {/* Linha para adicionar categoria - MOVIDA PARA O FINAL e visível apenas quando expandido */}
-          <TableRow className={cn(bgColor.replace('50', '25'), 'hover:bg-opacity-80')}>
+          <TableRow className="hover:bg-gray-50/50">
             <TableCell className={cn(
-              "sticky left-0 text-xs px-2 py-1",
+              "sticky left-0 text-xs py-1 bg-white",
               CATEGORY_COLUMN_BORDER,
-              bgColor.replace('50', '25'),
-              TABLE_Z_INDEX.SECTION_HEADER
+              TABLE_Z_INDEX.SECTION_HEADER,
+              "px-4" // 16px de padding lateral
             )}>
               <AddCategoryButton 
                 onClick={onAddCategory}
-                className="w-full justify-center text-gray-600 hover:text-gray-800"
+                className="w-full justify-start text-gray-600 hover:text-gray-800 px-0"
               />
             </TableCell>
             {Array(12).fill(0).map((_, index) => (
               <TableCell 
                 key={index} 
                 className={cn(
-                  "text-xs px-1 py-1",
-                  getCurrentMonthCellStyle(index === currentMonth),
-                  bgColor.replace('50', '25')
+                  "text-xs px-1 py-1 bg-white",
+                  getCurrentMonthCellStyle(index === currentMonth)
                 )}
               />
             ))}
