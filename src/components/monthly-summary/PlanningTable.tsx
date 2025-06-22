@@ -1,5 +1,5 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlanningTableSection } from './table/PlanningTableSection';
 import { SurplusRow } from './table/SurplusRow';
@@ -11,13 +11,7 @@ import { useDragFill } from '@/hooks/useDragFill';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { 
-  ConstrainedTable, 
-  ConstrainedTableHeader, 
-  ConstrainedTableBody, 
-  ConstrainedTableRow, 
-  ConstrainedTableHead 
-} from './table/ConstrainedTable';
+import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface PlanningTableProps {
   year: number;
@@ -25,7 +19,7 @@ interface PlanningTableProps {
   onToggleView: (detailed: boolean) => void;
 }
 
-const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedView, onToggleView }) => {
   const { 
@@ -81,9 +75,9 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
 
   const getDescription = () => {
     if (isDetailedView) {
-      return "Defina seus valores planejados para cada categoria e mês.";
+      return "Defina seus valores planejados para cada categoria e mês com controle detalhado";
     }
-    return "Defina um valor mensal planejado para cada categoria.";
+    return "Defina um valor mensal planejado para cada categoria. Os valores serão distribuídos automaticamente pelos 12 meses";
   };
 
   const sections = [
@@ -113,20 +107,14 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
     }
   ];
 
-  // Definir larguras das colunas responsivamente
-  const getCategoryColumnWidth = () => isMobile ? "120px" : "140px";
-  const getMonthColumnWidth = () => isMobile ? "45px" : "60px";
-
   return (
     <>
-      <Card className="w-full max-w-full border-0 rounded-none overflow-hidden">
-        <CardHeader className="p-2">
+      <Card>
+        <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <CardTitle className="text-base">
-                Planejamento Financeiro {year}
-              </CardTitle>
-              <CardDescription className="text-xs">
+              <CardTitle>Planejamento Financeiro {year}</CardTitle>
+              <CardDescription className="mt-2">
                 {getDescription()}
               </CardDescription>
             </div>
@@ -136,37 +124,36 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
             />
           </div>
         </CardHeader>
-        <CardContent className="w-full max-w-full p-0 overflow-hidden">
+        <CardContent className="p-0">
           {isDetailedView ? (
-            <div className="w-full overflow-x-auto">
-              <ConstrainedTable 
-                style={{ 
-                  minWidth: isMobile ? "660px" : "800px"
-                }}
-              >
-                <ConstrainedTableHeader>
-                  <ConstrainedTableRow>
-                    <ConstrainedTableHead 
-                      className="sticky left-0 bg-white border-r-2 border-gray-300 z-30 font-semibold"
-                      style={{ width: getCategoryColumnWidth() }}
-                    >
+            <div className={cn("overflow-x-auto", isMobile && "max-w-[calc(100vw-2rem)]")}>
+              <Table className="min-w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className={cn(
+                      TABLE_COLUMN_WIDTHS.CATEGORY,
+                      TABLE_CELL_STYLES.HEADER,
+                      "sticky left-0 bg-white border-r",
+                      TABLE_Z_INDEX.STICKY_CATEGORY
+                    )}>
                       Categoria
-                    </ConstrainedTableHead>
+                    </TableHead>
                     {months.map((month, index) => (
-                      <ConstrainedTableHead 
-                        key={`planning-month-${index}`}
+                      <TableHead 
+                        key={month} 
                         className={cn(
-                          "text-center font-semibold",
+                          TABLE_COLUMN_WIDTHS.MONTH,
+                          TABLE_CELL_STYLES.HEADER,
+                          "text-center",
                           getCurrentMonthColumnStyle(index === currentMonth)
                         )}
-                        style={{ width: getMonthColumnWidth() }}
                       >
                         {month}
-                      </ConstrainedTableHead>
+                      </TableHead>
                     ))}
-                  </ConstrainedTableRow>
-                </ConstrainedTableHeader>
-                <ConstrainedTableBody>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {sections.map((section) => (
                     <PlanningTableSection
                       key={section.title}
@@ -185,8 +172,8 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({ year, isDetailedVi
                     totals={totals}
                     currentMonth={currentMonth}
                   />
-                </ConstrainedTableBody>
-              </ConstrainedTable>
+                </TableBody>
+              </Table>
             </div>
           ) : (
             <SimplePlanningTable year={year} />

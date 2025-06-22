@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MonthlyTable } from './MonthlyTable';
 import { PlanningTable } from './PlanningTable';
 import { ComparativeTable } from './ComparativeTable';
+import { Calculator, FileText, BarChart3 } from 'lucide-react';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 
@@ -27,46 +28,69 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
   }, [isDetailedView]);
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="w-full mb-2 grid grid-cols-3 h-8 p-1">
-        <TabsTrigger 
-          value="table" 
-          className="flex items-center justify-center flex-1 text-center text-xs px-2 py-1 min-w-0"
-        >
-          <span className="truncate">Gastos</span>
-        </TabsTrigger>
-        <TabsTrigger 
-          value="planning" 
-          className="flex items-center justify-center flex-1 text-center text-xs px-2 py-1 min-w-0"
-        >
-          <span className="truncate">Plano</span>
-        </TabsTrigger>
-        <TabsTrigger 
-          value="comparative" 
-          className="flex items-center justify-center flex-1 text-center text-xs px-2 py-1 min-w-0"
-        >
-          <span className="truncate">Comp.</span>
-        </TabsTrigger>
-      </TabsList>
+    <div className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className={cn(
+          "w-full mb-4 grid grid-cols-3",
+          isMobile ? "h-9 p-0.5" : "h-10"
+        )}>
+          <TabsTrigger 
+            value="table" 
+            className={cn(
+              "flex items-center gap-1 flex-1 text-center",
+              isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            )}
+          >
+            <FileText className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
+            <span className={cn(isMobile && "truncate")}>
+              {isMobile ? "Gastos" : "Gastos Mensais"}
+            </span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="planning" 
+            className={cn(
+              "flex items-center gap-1 flex-1 text-center",
+              isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            )}
+          >
+            <Calculator className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
+            <span className={cn(isMobile && "truncate")}>
+              {isMobile ? "Plano" : "Planejamento"}
+            </span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="comparative" 
+            className={cn(
+              "flex items-center gap-1 flex-1 text-center",
+              isMobile ? "text-[10px] px-1 py-1.5 min-w-0" : "text-sm gap-2"
+            )}
+          >
+            <BarChart3 className={cn(isMobile ? "h-3 w-3 shrink-0" : "h-4 w-4")} />
+            <span className={cn(isMobile && "truncate")}>
+              {isMobile ? "Comp." : "Comparativo"}
+            </span>
+          </TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="table" className="mt-0 w-full">
-        <MonthlyTable year={year} />
-      </TabsContent>
+        <TabsContent value="table" className="mt-0">
+          <MonthlyTable year={year} />
+        </TabsContent>
 
-      <TabsContent value="planning" className="mt-0 w-full">
-        <PlanningTable 
-          year={year} 
-          isDetailedView={isDetailedView}
-          onToggleView={setIsDetailedView}
-        />
-      </TabsContent>
+        <TabsContent value="planning" className="mt-0">
+          <PlanningTable 
+            year={year} 
+            isDetailedView={isDetailedView}
+            onToggleView={setIsDetailedView}
+          />
+        </TabsContent>
 
-      <TabsContent value="comparative" className="mt-0 w-full">
-        <ComparativeTable 
-          year={year} 
-          isDetailedView={isDetailedView}
-        />
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="comparative" className="mt-0">
+          <ComparativeTable 
+            year={year} 
+            isDetailedView={isDetailedView}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };

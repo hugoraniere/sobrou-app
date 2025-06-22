@@ -15,7 +15,6 @@ interface MonthlyTableProps {
 
 export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
   const { isMobile } = useResponsive();
-  
   const { 
     realData: data, 
     updateRealValue: updateCategoryValue, 
@@ -68,29 +67,34 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
 
   return (
     <>
-      <Card className="w-full border-0 rounded-none">
-        <CardHeader className="p-2">
-          <CardTitle className="text-base">
+      <Card className="w-full">
+        <CardHeader className={cn(isMobile ? "p-3 pb-2" : "p-6")}>
+          <CardTitle className={cn(isMobile ? "text-lg" : "text-xl")}>
             Gastos Mensais {year}
           </CardTitle>
-          <CardDescription className="text-xs">
-            Registre seus gastos reais e receitas.
+          <CardDescription className={cn(isMobile ? "text-xs" : "text-sm")}>
+            {isMobile 
+              ? "Registre seus gastos reais e receitas. Use arrastar para preencher células."
+              : "Registre seus gastos reais e receitas ao longo do ano. Use arrastar e soltar para preencher múltiplas células rapidamente. Arraste o ícone de 6 pontinhos para reordenar categorias."
+            }
           </CardDescription>
         </CardHeader>
-        <CardContent className="w-full p-0">
-          <div className="w-full overflow-x-auto">
-            <MonthlyTableContent
-              data={data}
-              totals={totals}
-              currentMonth={currentMonth}
-              selectedCell={dragFill.selectedCell}
-              handlers={handlers}
-              onAddCategory={handleAddCategory}
-              onValueChange={updateCategoryValue}
-              onCategoryReorder={handleCategoryReorder}
-              isInFillRange={dragFill.isInFillRange}
-            />
-          </div>
+        <CardContent className={cn(
+          isMobile 
+            ? "p-0 overflow-x-auto max-w-full" 
+            : "p-0"
+        )}>
+          <MonthlyTableContent
+            data={data}
+            totals={totals}
+            currentMonth={currentMonth}
+            selectedCell={dragFill.selectedCell}
+            handlers={handlers}
+            onAddCategory={handleAddCategory}
+            onValueChange={updateCategoryValue}
+            onCategoryReorder={handleCategoryReorder}
+            isInFillRange={dragFill.isInFillRange}
+          />
         </CardContent>
       </Card>
 

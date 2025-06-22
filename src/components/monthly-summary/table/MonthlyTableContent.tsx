@@ -1,17 +1,12 @@
 
 import React, { useState } from 'react';
+import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { TableSection } from './TableSection';
 import { SurplusRow } from './SurplusRow';
 import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
-import { 
-  ConstrainedTable, 
-  ConstrainedTableHeader, 
-  ConstrainedTableBody, 
-  ConstrainedTableRow, 
-  ConstrainedTableHead 
-} from './ConstrainedTable';
+import { TABLE_COLUMN_WIDTHS, TABLE_CELL_STYLES, TABLE_Z_INDEX } from '@/constants/tableStyles';
 
 interface MonthlyTableContentProps {
   data: any;
@@ -25,7 +20,7 @@ interface MonthlyTableContentProps {
   isInFillRange: (position: any) => boolean;
 }
 
-const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 type SectionKey = 'revenue' | 'essentialExpenses' | 'nonEssentialExpenses' | 'reserves';
 
@@ -42,6 +37,7 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
 }) => {
   const { isMobile } = useResponsive();
 
+  // Estado para controlar quais seções estão expandidas
   const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     revenue: true,
     essentialExpenses: true,
@@ -87,43 +83,41 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
     }
   ];
 
-  // Definir larguras das colunas responsivamente
-  const getCategoryColumnWidth = () => isMobile ? "120px" : "140px";
-  const getMonthColumnWidth = () => isMobile ? "45px" : "60px";
-
   return (
-    <div className="w-full overflow-x-auto">
-      <ConstrainedTable 
-        style={{ 
-          minWidth: isMobile ? "660px" : "800px"
-        }}
-      >
-        <ConstrainedTableHeader>
-          <ConstrainedTableRow>
-            <ConstrainedTableHead 
-              className={cn(
-                "sticky left-0 bg-white border-r-2 border-gray-300 z-30",
-                "font-semibold"
-              )}
-              style={{ width: getCategoryColumnWidth() }}
-            >
+    <div className={cn(
+      "w-full",
+      isMobile ? "min-w-0" : ""
+    )}>
+      <Table className={cn(
+        "w-full border-collapse",
+        isMobile && "min-w-[480px]" // Largura mínima reduzida para mobile
+      )}>
+        <TableHeader>
+          <TableRow>
+            <TableHead className={cn(
+              isMobile ? TABLE_COLUMN_WIDTHS.CATEGORY_MOBILE : TABLE_COLUMN_WIDTHS.CATEGORY,
+              TABLE_CELL_STYLES.HEADER,
+              "sticky left-0 bg-white border-r-2 border-gray-300",
+              TABLE_Z_INDEX.STICKY_CATEGORY
+            )}>
               Categoria
-            </ConstrainedTableHead>
+            </TableHead>
             {months.map((month, index) => (
-              <ConstrainedTableHead 
-                key={`month-${index}`}
+              <TableHead 
+                key={month} 
                 className={cn(
-                  "text-center font-semibold",
+                  isMobile ? TABLE_COLUMN_WIDTHS.MONTH_MOBILE : TABLE_COLUMN_WIDTHS.MONTH,
+                  TABLE_CELL_STYLES.HEADER,
+                  "text-center",
                   getCurrentMonthColumnStyle(index === currentMonth)
                 )}
-                style={{ width: getMonthColumnWidth() }}
               >
                 {month}
-              </ConstrainedTableHead>
+              </TableHead>
             ))}
-          </ConstrainedTableRow>
-        </ConstrainedTableHeader>
-        <ConstrainedTableBody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {sections.map((sectionData) => (
             <TableSection
               key={sectionData.title}
@@ -153,8 +147,8 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
             totals={totals}
             currentMonth={currentMonth}
           />
-        </ConstrainedTableBody>
-      </ConstrainedTable>
+        </TableBody>
+      </Table>
     </div>
   );
 };
