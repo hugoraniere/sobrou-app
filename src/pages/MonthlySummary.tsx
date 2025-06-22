@@ -41,21 +41,15 @@ const MonthlySummary = () => {
     </>
   );
 
-  // Mobile wrapper com controle específico de largura e overflow
-  if (isMobile) {
-    return (
-      <div className="w-full max-w-[100vw] overflow-x-hidden">
-        <div className="px-4 w-full">
-          {content}
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop - mantém layout original
+  // Container principal com largura máxima do dispositivo
   return (
-    <div className="w-full">
-      {content}
+    <div className="w-full max-w-[100vw] overflow-x-hidden">
+      <div className={cn(
+        "w-full",
+        isMobile ? "px-2" : "px-4"
+      )}>
+        {content}
+      </div>
     </div>
   );
 };
