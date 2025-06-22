@@ -9,7 +9,7 @@ import { AddCategoryButton } from '../AddCategoryButton';
 import { useCategoryDragDrop } from '@/hooks/useCategoryDragDrop';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
-import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { getCurrentMonthCellStyle } from '@/utils/monthStyleUtils';
 import { TABLE_CELL_STYLES, TABLE_Z_INDEX, CATEGORY_COLUMN_BORDER } from '@/constants/tableStyles';
 
 interface TableSectionProps {
@@ -100,7 +100,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
             className={cn(
               "text-center font-semibold text-xs px-1 py-1 cursor-pointer",
               textColor,
-              getCurrentMonthColumnStyle(index === currentMonth)
+              getCurrentMonthCellStyle(index === currentMonth)
             )}
             onClick={onToggleExpanded}
           >
@@ -155,7 +155,7 @@ export const TableSection: React.FC<TableSectionProps> = ({
                 key={index} 
                 className={cn(
                   "text-xs px-1 py-1",
-                  getCurrentMonthColumnStyle(index === currentMonth),
+                  getCurrentMonthCellStyle(index === currentMonth),
                   bgColor.replace('50', '25')
                 )}
               />

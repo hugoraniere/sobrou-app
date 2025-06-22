@@ -7,7 +7,7 @@ import { EditableCategoryData } from '@/hooks/useEditableMonthlySummary';
 import { CellPosition } from '@/hooks/useDragFill';
 import { DeleteCategoryDialog } from '../DeleteCategoryDialog';
 import { cn } from '@/lib/utils';
-import { getCurrentMonthColumnStyle } from '@/utils/monthStyleUtils';
+import { getCurrentMonthCellStyle } from '@/utils/monthStyleUtils';
 import { TABLE_CELL_STYLES, TABLE_Z_INDEX, CATEGORY_COLUMN_BORDER } from '@/constants/tableStyles';
 import { EditableCategoryName } from '../EditableCategoryName';
 import { EditableCell } from '../EditableCell';
@@ -146,7 +146,7 @@ export const CategoryRow: React.FC<CategoryRowProps> = ({
               className={cn(
                 TABLE_CELL_STYLES.DATA_CELL,
                 "text-center relative",
-                getCurrentMonthColumnStyle(monthIndex === currentMonth),
+                getCurrentMonthCellStyle(monthIndex === currentMonth),
                 isSelected && "ring-2 ring-blue-400",
                 isInRange && "bg-blue-100"
               )}
