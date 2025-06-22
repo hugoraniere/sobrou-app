@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface AddCategoryButtonProps {
   onClick: () => void;
@@ -12,6 +13,8 @@ export const AddCategoryButton: React.FC<AddCategoryButtonProps> = ({
   onClick,
   className = ""
 }) => {
+  const { isMobile } = useResponsive();
+  
   return (
     <Button
       variant="ghost"
@@ -20,7 +23,7 @@ export const AddCategoryButton: React.FC<AddCategoryButtonProps> = ({
       className={`text-xs h-6 px-2 ${className}`}
     >
       <Plus className="h-2.5 w-2.5 mr-1" />
-      Adicionar categoria
+      {isMobile ? 'Adicionar' : 'Adicionar categoria'}
     </Button>
   );
 };
