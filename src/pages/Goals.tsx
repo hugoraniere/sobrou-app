@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SavingGoals } from '../components/SavingGoals';
+import SavingGoals from '../components/SavingGoals';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { Card } from '@/components/ui/card';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -45,8 +45,8 @@ const Goals = () => {
       <Card className="p-6">
         <SavingGoals 
           savingGoals={savingGoals}
-          onSavingGoalAdded={fetchData}
-          onSavingGoalUpdated={fetchData}
+          onGoalAdded={fetchData}
+          onGoalUpdated={fetchData}
         />
       </Card>
     </div>

@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import BillsList from '@/components/bills/BillsList';
-import BillBalanceCard from '@/components/bills/BillBalanceCard';
+import { BillsList } from '@/components/bills/BillsList';
+import { BillBalanceCard } from '@/components/bills/BillBalanceCard';
 import { useBillsData } from '@/hooks/useBillsData';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
@@ -10,7 +10,12 @@ import { cn } from '@/lib/utils';
 const BillsToPay = () => {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
-  const { bills, isLoading, error, refetch } = useBillsData();
+  const { bills, isLoading, error, updateBill, deleteBill, markAsPaid, markAsUnpaid } = useBillsData();
+
+  const handleRefetch = () => {
+    // As mutations do useBillsData já invalidam automaticamente as queries
+    // então não precisamos de uma função refetch explícita
+  };
 
   if (isLoading) {
     return (
@@ -36,13 +41,18 @@ const BillsToPay = () => {
       )}>
         <div className="text-center py-8">
           <p className="text-destructive mb-4">Erro ao carregar contas: {error.message}</p>
-          <button onClick={refetch} className="text-primary hover:underline">
+          <button onClick={handleRefetch} className="text-primary hover:underline">
             Tentar novamente
           </button>
         </div>
       </div>
     );
   }
+
+  // Calcular valores para o BillBalanceCard
+  const totalOriginalAmount = bills.reduce((sum, bill) => sum + bill.amount, 0);
+  const totalTransactions = 0; // Por enquanto 0, pois não temos transações implementadas
+  const currentBalance = totalOriginalAmount - totalTransactions;
 
   return (
     <div className={cn(
@@ -55,8 +65,18 @@ const BillsToPay = () => {
       </div>
 
       <div className="space-y-6">
-        <BillBalanceCard bills={bills} />
-        <BillsList bills={bills} onBillUpdated={refetch} />
+        <BillBalanceCard 
+          originalAmount={totalOriginalAmount}
+          currentBalance={currentBalance}
+          transactionsTotal={totalTransactions}
+          hasTransactions={false}
+        />
+        <BillsList 
+          bills={bills} 
+          onEdit={updateBill}
+          onDelete={deleteBill}
+          onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
+        />
       </div>
     </div>
   );
