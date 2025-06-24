@@ -2,7 +2,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import SavingGoals from '../components/SavingGoals';
-import { useDashboardData } from '../hooks/useDashboardData';
+import { useSavingGoals } from '../hooks/useSavingGoals';
 import { Card } from '@/components/ui/card';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
@@ -13,8 +13,9 @@ const Goals = () => {
   const {
     savingGoals,
     isLoading,
-    fetchData
-  } = useDashboardData();
+    error,
+    refetchGoals
+  } = useSavingGoals();
 
   if (isLoading) {
     return (
@@ -27,6 +28,25 @@ const Goals = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">Carregando metas...</p>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={cn(
+        "w-full",
+        isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl py-8"
+      )}>
+        <div className="text-center py-8">
+          <p className="text-destructive mb-4">Erro ao carregar metas: {error.message}</p>
+          <button 
+            onClick={refetchGoals} 
+            className="text-primary hover:underline"
+          >
+            Tentar novamente
+          </button>
         </div>
       </div>
     );
@@ -45,8 +65,8 @@ const Goals = () => {
       <Card className="p-6">
         <SavingGoals 
           savingGoals={savingGoals}
-          onGoalAdded={fetchData}
-          onGoalUpdated={fetchData}
+          onGoalAdded={refetchGoals}
+          onGoalUpdated={refetchGoals}
         />
       </Card>
     </div>
