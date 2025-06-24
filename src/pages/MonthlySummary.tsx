@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { YearSelector } from '@/components/monthly-summary/YearSelector';
 import { MonthlySummaryTabs } from '@/components/monthly-summary/MonthlySummaryTabs';
@@ -9,11 +8,14 @@ const MonthlySummary = () => {
   const { isMobile } = useResponsive();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  const content = (
-    <>
+  return (
+    <div className="w-full max-w-screen overflow-x-hidden px-4 pb-10 box-border">
       {/* Header */}
-      <div className={cn("flex items-center justify-between mb-4", isMobile ? "flex-col gap-3" : "mb-6")}>
-        <div className={cn(isMobile && "w-full text-center")}>
+      <div className={cn(
+        "flex justify-between items-center mb-4",
+        isMobile && "flex-col gap-3 text-center"
+      )}>
+        <div className="w-full">
           <h1 className={cn("font-bold text-gray-900", isMobile ? "text-xl" : "text-3xl")}>
             Resumo Mensal
           </h1>
@@ -23,20 +25,21 @@ const MonthlySummary = () => {
             </p>
           )}
         </div>
-        
         <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
       </div>
 
-      {/* Content */}
-      <MonthlySummaryTabs year={selectedYear} />
-    </>
-  );
+      {/* Tabs container */}
+      <div className="w-full mb-4">
+        {/* Certifique-se de que seu componente MonthlySummaryTabs distribui os tabs com `w-full flex justify-between` ou similar */}
+        <MonthlySummaryTabs year={selectedYear} />
+      </div>
 
-  // Container principal com padding de 16px e sem overflow horizontal
-  return (
-    <div className="w-full max-w-[100vw] overflow-x-hidden">
-      <div className="w-full px-4">
-        {content}
+      {/* Card com tabela scrollável internamente */}
+      <div className="bg-white rounded-lg border overflow-x-auto p-4">
+        <div className="min-w-[768px]">
+          {/* Aqui dentro a tabela real, com scroll horizontal interno */}
+          {/* Ex: MonthlySummaryTable ou conteúdo interno do tab selecionado */}
+        </div>
       </div>
     </div>
   );
