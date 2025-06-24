@@ -29,7 +29,7 @@ const MonthlySummary = () => {
 
   // Container principal com largura máxima do dispositivo
   return <div className="w-full max-w-[100vw] overflow-x-hidden">
-      <div className="w-full px-4 ">
+      <div className="w-full">
         {content}
       </div>
     </div>;
