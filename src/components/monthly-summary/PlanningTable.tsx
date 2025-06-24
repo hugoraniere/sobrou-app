@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlanningTableSection } from './table/PlanningTableSection';
 import { SurplusRow } from './table/SurplusRow';
 import { SimplePlanningTable } from './SimplePlanningTable';
@@ -115,8 +115,8 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({
 
   return (
     <>
-      <Card className="w-full">
-        <CardHeader>
+      <div className="w-full">
+        <CardHeader className="px-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="text-lg">Planejamento Financeiro {year}</CardTitle>
@@ -127,13 +127,11 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({
             <PlanningViewToggle isDetailedView={isDetailedView} onToggle={onToggleView} />
           </div>
         </CardHeader>
-        <CardContent className="p-0">
-          {isDetailedView ? (
-            <div className="overflow-x-auto">
-              <Table className={cn(
-                "w-full border-collapse",
-                isMobile ? "min-w-[560px]" : "min-w-[1000px]"
-              )}>
+        
+        {isDetailedView ? (
+          <div className="overflow-x-auto">
+            <div className={cn(isMobile ? "min-w-[480px]" : "min-w-[800px]")}>
+              <Table className="w-full border-collapse">
                 <TableHeader>
                   <TableRow>
                     <TableHead className={cn(
@@ -181,11 +179,11 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({
                 </TableBody>
               </Table>
             </div>
-          ) : (
-            <SimplePlanningTable year={year} />
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        ) : (
+          <SimplePlanningTable year={year} />
+        )}
+      </div>
 
       <AddCategoryDialog
         open={dialogState.open}

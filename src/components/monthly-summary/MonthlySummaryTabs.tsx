@@ -27,7 +27,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
   }, [isDetailedView]);
 
   return (
-    <div className="w-full max-w-none overflow-x-hidden">
+    <div className="w-full">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
           "w-full mb-4 grid grid-cols-3",
@@ -37,10 +37,11 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
             value="table" 
             className={cn(
               "flex items-center justify-center flex-1 text-center text-sm",
+              "!whitespace-normal truncate", // Override whitespace-nowrap
               isMobile ? "px-1 py-1.5 min-w-0" : ""
             )}
           >
-            <span className={cn(isMobile && "truncate")}>
+            <span className="truncate">
               {isMobile ? "Gastos" : "Gastos Mensais"}
             </span>
           </TabsTrigger>
@@ -48,10 +49,11 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
             value="planning" 
             className={cn(
               "flex items-center justify-center flex-1 text-center text-sm",
+              "!whitespace-normal truncate", // Override whitespace-nowrap
               isMobile ? "px-1 py-1.5 min-w-0" : ""
             )}
           >
-            <span className={cn(isMobile && "truncate")}>
+            <span className="truncate">
               {isMobile ? "Plano" : "Planejamento"}
             </span>
           </TabsTrigger>
@@ -59,32 +61,39 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
             value="comparative" 
             className={cn(
               "flex items-center justify-center flex-1 text-center text-sm",
+              "!whitespace-normal truncate", // Override whitespace-nowrap
               isMobile ? "px-1 py-1.5 min-w-0" : ""
             )}
           >
-            <span className={cn(isMobile && "truncate")}>
+            <span className="truncate">
               {isMobile ? "Comp." : "Comparativo"}
             </span>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="table" className="mt-0">
-          <MonthlyTable year={year} />
+          <div className="bg-white rounded-lg border overflow-x-auto p-4">
+            <MonthlyTable year={year} />
+          </div>
         </TabsContent>
 
         <TabsContent value="planning" className="mt-0">
-          <PlanningTable 
-            year={year} 
-            isDetailedView={isDetailedView}
-            onToggleView={setIsDetailedView}
-          />
+          <div className="bg-white rounded-lg border overflow-x-auto p-4">
+            <PlanningTable 
+              year={year} 
+              isDetailedView={isDetailedView}
+              onToggleView={setIsDetailedView}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="comparative" className="mt-0">
-          <ComparativeTable 
-            year={year} 
-            isDetailedView={isDetailedView}
-          />
+          <div className="bg-white rounded-lg border overflow-x-auto p-4">
+            <ComparativeTable 
+              year={year} 
+              isDetailedView={isDetailedView}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

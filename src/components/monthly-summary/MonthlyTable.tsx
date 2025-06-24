@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddCategoryDialog } from './AddCategoryDialog';
 import { MonthlyTableContent } from './table/MonthlyTableContent';
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
@@ -68,8 +68,8 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
 
   return (
     <>
-      <Card className="w-full">
-        <CardHeader className={cn(isMobile ? "p-3 pb-2" : "p-6")}>
+      <div className="w-full">
+        <CardHeader className={cn(isMobile ? "p-3 pb-2" : "p-6", "px-0")}>
           <CardTitle className={cn(isMobile ? "text-lg" : "text-xl")}>
             Gastos Mensais {year}
           </CardTitle>
@@ -80,20 +80,22 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
             }
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <MonthlyTableContent
-            data={data}
-            totals={totals}
-            currentMonth={currentMonth}
-            selectedCell={dragFill.selectedCell}
-            handlers={handlers}
-            onAddCategory={handleAddCategory}
-            onValueChange={updateCategoryValue}
-            onCategoryReorder={handleCategoryReorder}
-            isInFillRange={dragFill.isInFillRange}
-          />
-        </CardContent>
-      </Card>
+        <div className="overflow-x-auto">
+          <div className={cn(isMobile ? "min-w-[480px]" : "min-w-[800px]")}>
+            <MonthlyTableContent
+              data={data}
+              totals={totals}
+              currentMonth={currentMonth}
+              selectedCell={dragFill.selectedCell}
+              handlers={handlers}
+              onAddCategory={handleAddCategory}
+              onValueChange={updateCategoryValue}
+              onCategoryReorder={handleCategoryReorder}
+              isInFillRange={dragFill.isInFillRange}
+            />
+          </div>
+        </div>
+      </div>
 
       <AddCategoryDialog
         open={dialogState.open}

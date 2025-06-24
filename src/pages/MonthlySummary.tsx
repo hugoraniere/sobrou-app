@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { YearSelector } from '@/components/monthly-summary/YearSelector';
 import { MonthlySummaryTabs } from '@/components/monthly-summary/MonthlySummaryTabs';
@@ -28,19 +29,8 @@ const MonthlySummary = () => {
         <YearSelector currentYear={selectedYear} onYearChange={setSelectedYear} />
       </div>
 
-      {/* Tabs container */}
-      <div className="w-full mb-4">
-        {/* Certifique-se de que seu componente MonthlySummaryTabs distribui os tabs com `w-full flex justify-between` ou similar */}
-        <MonthlySummaryTabs year={selectedYear} />
-      </div>
-
-      {/* Card com tabela scrollável internamente */}
-      <div className="bg-white rounded-lg border overflow-x-auto p-4">
-        <div className="min-w-[768px]">
-          {/* Aqui dentro a tabela real, com scroll horizontal interno */}
-          {/* Ex: MonthlySummaryTable ou conteúdo interno do tab selecionado */}
-        </div>
-      </div>
+      {/* Tabs com tabela integrada */}
+      <MonthlySummaryTabs year={selectedYear} />
     </div>
   );
 };

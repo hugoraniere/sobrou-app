@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUnifiedMonthlySummary } from '@/hooks/useUnifiedMonthlySummary';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
@@ -85,40 +85,40 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
+    <div className="w-full">
+      <CardHeader className="px-0">
         <CardTitle className="text-lg">Comparativo: Real vs Planejado {year}</CardTitle>
         <CardDescription>
           {getDescription()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-0 overflow-x-auto">
-        <Table className={cn(
-          "w-full border-collapse",
-          isMobile ? "min-w-[650px]" : "min-w-[1100px]"
-        )}>
-          <ComparativeTableHeader 
-            months={months} 
-            currentMonth={currentMonth} 
-            selectedMonth={selectedMonth} 
-            onMonthClick={handleMonthClick} 
-          />
-          <TableBody>
-            {sections.map(section => (
-              <ComparativeTableSection 
-                key={section.title} 
-                title={section.title} 
-                sectionKey={section.sectionKey} 
-                realCategories={section.realCategories} 
-                planningCategories={section.planningCategories} 
-                currentMonth={currentMonth} 
-                selectedMonth={selectedMonth} 
-                months={months} 
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+      
+      <div className="overflow-x-auto">
+        <div className={cn(isMobile ? "min-w-[480px]" : "min-w-[900px]")}>
+          <Table className="w-full border-collapse">
+            <ComparativeTableHeader 
+              months={months} 
+              currentMonth={currentMonth} 
+              selectedMonth={selectedMonth} 
+              onMonthClick={handleMonthClick} 
+            />
+            <TableBody>
+              {sections.map(section => (
+                <ComparativeTableSection 
+                  key={section.title} 
+                  title={section.title} 
+                  sectionKey={section.sectionKey} 
+                  realCategories={section.realCategories} 
+                  planningCategories={section.planningCategories} 
+                  currentMonth={currentMonth} 
+                  selectedMonth={selectedMonth} 
+                  months={months} 
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    </div>
   );
 };
