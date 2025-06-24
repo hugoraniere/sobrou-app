@@ -83,10 +83,7 @@ const BillsToPay: React.FC = () => {
 
   return (
     <div className="w-full max-w-[100vw] overflow-x-hidden">
-      <div className={cn(
-        "w-full mx-auto",
-        isMobile ? "px-4" : "container max-w-screen-xl px-8"
-      )}>
+      <div className="w-full px-4">
         <div className="space-y-6 py-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

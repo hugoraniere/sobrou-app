@@ -115,7 +115,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({
 
   return (
     <>
-      <Card>
+      <Card className="w-full">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -129,11 +129,11 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({
         </CardHeader>
         <CardContent className="p-0">
           {isDetailedView ? (
-            <div className={cn(
-              "overflow-x-auto",
-              isMobile && "max-w-[calc(100vw-2rem)]"
-            )}>
-              <Table className="min-w-full">
+            <div className="overflow-x-auto">
+              <Table className={cn(
+                "w-full border-collapse",
+                isMobile ? "min-w-[560px]" : "min-w-[1000px]"
+              )}>
                 <TableHeader>
                   <TableRow>
                     <TableHead className={cn(

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,9 +24,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
     planningData,
     simplePlanningData
   } = useUnifiedMonthlySummary(year);
-  const {
-    isMobile
-  } = useResponsive();
+  const { isMobile } = useResponsive();
   const currentMonth = new Date().getMonth();
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
@@ -57,6 +56,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
       values: Array(12).fill(cat.monthlyValue)
     }))
   };
+
   const sections = [{
     title: 'RECEITAS',
     sectionKey: 'REVENUE' as const,
@@ -78,16 +78,14 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
     realCategories: realData.reserves,
     planningCategories: currentPlanningData.reserves
   }];
+
   const getDescription = () => {
     const viewType = isDetailedView ? 'detalhado' : 'simples';
     return `Compare seus gastos reais com o planejamento ${viewType} por categoria.`;
   };
 
   return (
-    <Card className={cn(
-      "w-full",
-      isMobile ? "max-w-[calc(100vw-16px)]" : "max-w-[calc(100vw-32px)]"
-    )}>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg">Comparativo: Real vs Planejado {year}</CardTitle>
         <CardDescription>
@@ -95,7 +93,10 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0 overflow-x-auto">
-        <Table className="min-w-full w-max">
+        <Table className={cn(
+          "w-full border-collapse",
+          isMobile ? "min-w-[650px]" : "min-w-[1100px]"
+        )}>
           <ComparativeTableHeader 
             months={months} 
             currentMonth={currentMonth} 

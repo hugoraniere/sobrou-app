@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddCategoryDialog } from './AddCategoryDialog';
@@ -67,10 +68,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
 
   return (
     <>
-      <Card className={cn(
-        "w-full",
-        isMobile ? "max-w-[calc(100vw-16px)]" : "max-w-[calc(100vw-32px)]"
-      )}>
+      <Card className="w-full">
         <CardHeader className={cn(isMobile ? "p-3 pb-2" : "p-6")}>
           <CardTitle className={cn(isMobile ? "text-lg" : "text-xl")}>
             Gastos Mensais {year}
