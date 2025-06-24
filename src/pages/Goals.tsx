@@ -20,7 +20,7 @@ const Goals = () => {
     return (
       <div className={cn(
         "w-full",
-        isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl"
+        isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl py-8"
       )}>
         <div className="flex items-center justify-center py-8">
           <div className="text-center">
@@ -35,7 +35,7 @@ const Goals = () => {
   return (
     <div className={cn(
       "w-full",
-      isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl"
+      isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl py-8"
     )}>
       <div className="mt-6 mb-6">
         <h1 className="text-3xl font-bold">{t('goals.title', 'Metas de Economia')}</h1>
