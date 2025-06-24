@@ -53,7 +53,7 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
   return (
     <div 
       className={cn(
-        "flex flex-col bg-white w-full max-w-[328px] mx-auto",
+        "flex flex-col bg-white w-full",
         showCardPadding ? "px-4" : "px-0"
       )}
       style={{ 

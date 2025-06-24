@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,10 +24,13 @@ import {
   Lock,
   Camera
 } from 'lucide-react';
+import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 const Profile = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { isMobile } = useResponsive();
   const [profileData, setProfileData] = useState({
     fullName: '',
     email: '',
@@ -84,8 +86,13 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">{t('profile.title', 'Perfil')}</h1>
+    <div className={cn(
+      "w-full",
+      isMobile ? "px-4" : "container mx-auto max-w-screen-xl"
+    )}>
+      <div className="mt-6 mb-6">
+        <h1 className="text-3xl font-bold">{t('profile.title', 'Perfil')}</h1>
+      </div>
 
       <div className="mb-8 flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
         <div className="w-full max-w-sm">

@@ -8,13 +8,21 @@ import ProfileTab from '@/components/settings/ProfileTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import WhatsAppTab from '@/components/settings/WhatsAppTab';
 import PagesTab from '@/components/settings/PagesTab';
+import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 const Settings = () => {
   const { t } = useTranslation();
+  const { isMobile } = useResponsive();
 
   return (
-    <div className="w-full">
-      <h1 className="text-3xl font-bold mb-6">{t('settings.title', 'Configurações')}</h1>
+    <div className={cn(
+      "w-full",
+      isMobile ? "px-4" : "container mx-auto max-w-screen-xl"
+    )}>
+      <div className="mt-6 mb-6">
+        <h1 className="text-3xl font-bold">{t('settings.title', 'Configurações')}</h1>
+      </div>
       
       <Tabs defaultValue="profile" className="space-y-6">
         <div className="border-b">

@@ -5,6 +5,7 @@ import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useResponsive } from '@/hooks/useResponsive';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -39,7 +40,10 @@ const Index = () => {
   const isLoading = authLoading || dataLoading;
   
   return (
-    <div className={isMobile ? "w-full" : "container mx-auto max-w-screen-xl w-full overflow-hidden"}>
+    <div className={cn(
+      "w-full",
+      isMobile ? "px-4" : "container mx-auto max-w-screen-xl"
+    )}>
       <div className="mt-6 mb-6">
         <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
         <p className="text-gray-600">Acompanhe suas finanças e analise seus hábitos de gastos</p>
