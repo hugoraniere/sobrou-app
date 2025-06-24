@@ -1,22 +1,22 @@
 
 import { cn } from '@/lib/utils';
 
-// Larguras padronizadas das colunas - consistentes em toda a tabela
+// Larguras padronizadas das colunas - otimizadas para evitar scroll horizontal
 export const TABLE_COLUMN_WIDTHS = {
-  // Coluna de categoria - largura fixa para garantir consistência
-  CATEGORY_DESKTOP: 'w-[160px] min-w-[160px] max-w-[160px]',
-  CATEGORY_MOBILE: 'w-[80px] min-w-[80px] max-w-[80px]',
+  // Coluna de categoria - reduzida para mobile
+  CATEGORY_DESKTOP: 'w-[140px] min-w-[140px] max-w-[140px]',
+  CATEGORY_MOBILE: 'w-[70px] min-w-[70px] max-w-[70px]',
   
-  // Colunas de mês - largura fixa para garantir alinhamento
-  MONTH_DESKTOP: 'w-[80px] min-w-[80px] max-w-[80px]',
-  MONTH_MOBILE: 'w-[60px] min-w-[60px] max-w-[60px]',
+  // Colunas de mês - otimizadas para caber na tela
+  MONTH_DESKTOP: 'w-[70px] min-w-[70px] max-w-[70px]',
+  MONTH_MOBILE: 'w-[50px] min-w-[50px] max-w-[50px]',
 } as const;
 
 // Classes de espaçamento e altura padronizadas
 export const TABLE_CELL_STYLES = {
-  HEADER: 'text-xs px-2 py-2 h-10',
-  DATA_CELL: 'text-xs px-2 py-2',
-  CATEGORY_CELL: 'text-xs px-3 py-2',
+  HEADER: 'text-xs px-1 py-2 h-10',
+  DATA_CELL: 'text-xs px-1 py-2',
+  CATEGORY_CELL: 'text-xs px-2 py-2',
 } as const;
 
 // Classe para aplicar stroke na coluna de categoria inteira

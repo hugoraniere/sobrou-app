@@ -90,74 +90,70 @@ export const MonthlyTableContent: React.FC<MonthlyTableContentProps> = ({
   ];
 
   return (
-    <div className="px-6">
-      <div className={cn(
-        "w-full",
-        isMobile ? "min-w-0" : ""
+    <div className="w-full overflow-x-auto">
+      <Table className={cn(
+        "w-full border-collapse",
+        // Calcular largura mínima baseada nas colunas: categoria + 12 meses
+        isMobile ? "min-w-[560px]" : "min-w-[1000px]"
       )}>
-        <Table className={cn(
-          "w-full border-collapse",
-          isMobile && "min-w-[600px]" // Largura mínima adequada para scroll horizontal
-        )}>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={cn(
-                "sticky left-0 bg-white",
-                getCategoryColumnWidth(isMobile),
-                getCategoryColumnStroke(), // Aplicar stroke na coluna inteira
-                getTableCellClass('HEADER'),
-                TABLE_Z_INDEX.STICKY_CATEGORY
-              )}>
-                Categoria
+        <TableHeader>
+          <TableRow>
+            <TableHead className={cn(
+              "sticky left-0 bg-white",
+              getCategoryColumnWidth(isMobile),
+              getCategoryColumnStroke(), // Aplicar stroke na coluna inteira
+              getTableCellClass('HEADER'),
+              TABLE_Z_INDEX.STICKY_CATEGORY
+            )}>
+              Categoria
+            </TableHead>
+            {months.map((month, index) => (
+              <TableHead 
+                key={month} 
+                className={cn(
+                  getMonthColumnWidth(isMobile),
+                  getTableCellClass('HEADER'),
+                  "text-center",
+                  getCurrentMonthColumnStyle(index === currentMonth)
+                )}
+              >
+                {month}
               </TableHead>
-              {months.map((month, index) => (
-                <TableHead 
-                  key={month} 
-                  className={cn(
-                    getMonthColumnWidth(isMobile),
-                    getTableCellClass('HEADER'),
-                    "text-center",
-                    getCurrentMonthColumnStyle(index === currentMonth)
-                  )}
-                >
-                  {month}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sections.map((sectionData) => (
-              <TableSection
-                key={sectionData.title}
-                title={sectionData.title}
-                section={sectionData.section}
-                categories={sectionData.categories}
-                bgColor={sectionData.bgColor}
-                textColor={sectionData.textColor}
-                currentMonth={currentMonth}
-                selectedCell={selectedCell}
-                isExpanded={expandedSections[sectionData.section]}
-                onToggleExpanded={() => toggleSection(sectionData.section)}
-                onAddCategory={() => onAddCategory(sectionData.section, sectionData.title)}
-                onCategoryNameChange={handlers.handleCategoryNameChange}
-                onValueChange={onValueChange}
-                onCategoryRemove={handlers.handleCategoryRemove}
-                onCategoryReorder={onCategoryReorder}
-                onCellSelect={handlers.handleCellSelect}
-                onDragStart={handlers.handleDragStart}
-                onDragMove={handlers.handleDragMove}
-                onDragEnd={handlers.handleDragEnd}
-                isInFillRange={isInFillRange}
-              />
             ))}
-            
-            <SurplusRow 
-              totals={totals}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sections.map((sectionData) => (
+            <TableSection
+              key={sectionData.title}
+              title={sectionData.title}
+              section={sectionData.section}
+              categories={sectionData.categories}
+              bgColor={sectionData.bgColor}
+              textColor={sectionData.textColor}
               currentMonth={currentMonth}
+              selectedCell={selectedCell}
+              isExpanded={expandedSections[sectionData.section]}
+              onToggleExpanded={() => toggleSection(sectionData.section)}
+              onAddCategory={() => onAddCategory(sectionData.section, sectionData.title)}
+              onCategoryNameChange={handlers.handleCategoryNameChange}
+              onValueChange={onValueChange}
+              onCategoryRemove={handlers.handleCategoryRemove}
+              onCategoryReorder={onCategoryReorder}
+              onCellSelect={handlers.handleCellSelect}
+              onDragStart={handlers.handleDragStart}
+              onDragMove={handlers.handleDragMove}
+              onDragEnd={handlers.handleDragEnd}
+              isInFillRange={isInFillRange}
             />
-          </TableBody>
-        </Table>
-      </div>
+          ))}
+          
+          <SurplusRow 
+            totals={totals}
+            currentMonth={currentMonth}
+          />
+        </TableBody>
+      </Table>
     </div>
   );
 };
