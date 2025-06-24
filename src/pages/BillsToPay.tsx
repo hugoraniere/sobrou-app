@@ -17,6 +17,12 @@ const BillsToPay = () => {
     // então não precisamos de uma função refetch explícita
   };
 
+  const handleEditBill = (bill) => {
+    // Esta função será chamada quando o usuário quiser editar uma conta
+    // Por enquanto, vamos apenas logar - você pode implementar um modal de edição aqui
+    console.log('Edit bill:', bill);
+  };
+
   if (isLoading) {
     return (
       <div className={cn(
@@ -73,7 +79,7 @@ const BillsToPay = () => {
         />
         <BillsList 
           bills={bills} 
-          onEdit={updateBill}
+          onEdit={handleEditBill}
           onDelete={deleteBill}
           onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
         />
