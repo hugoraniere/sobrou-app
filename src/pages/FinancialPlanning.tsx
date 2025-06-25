@@ -8,12 +8,11 @@ import FinancialMetrics from '@/components/financial-planning/FinancialMetrics';
 import ExpenseSimulationSection from '@/components/financial-planning/ExpenseSimulationSection';
 import RecurringTransactionsSection from '@/components/financial-planning/RecurringTransactionsSection';
 import { useExpenseSimulation } from '@/hooks/useExpenseSimulation';
-import { useResponsive } from '@/hooks/useResponsive';
-import { cn } from '@/lib/utils';
+import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
+import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 
 const FinancialPlanning = () => {
   const { t } = useTranslation();
-  const { isMobile } = useResponsive();
   const { transactionsState: transactions } = useTransactionList([]);
   
   const stats = FinancialPlanningService.calculateAvailableAmount(transactions, 0);
@@ -33,15 +32,10 @@ const FinancialPlanning = () => {
     : false;
 
   return (
-    <div className={cn(
-      "w-full",
-      isMobile ? "px-4" : "container mx-auto max-w-screen-xl"
-    )}>
-      <div className="mt-6 mb-6">
-        <h1 className="text-3xl font-bold">
-          {t('financialPlanning.title', 'Planejamento Financeiro')}
-        </h1>
-      </div>
+    <ResponsivePageContainer>
+      <ResponsivePageHeader 
+        title={t('financialPlanning.title', 'Planejamento Financeiro')}
+      />
 
       <div className="space-y-6">
         <AlertSection show={stats.hasRisk} />
@@ -61,7 +55,7 @@ const FinancialPlanning = () => {
 
         <RecurringTransactionsSection transactions={transactions} />
       </div>
-    </div>
+    </ResponsivePageContainer>
   );
 };
 

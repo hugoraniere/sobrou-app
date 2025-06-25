@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { BillsList } from '@/components/bills/BillsList';
 import { BillBalanceCard } from '@/components/bills/BillBalanceCard';
 import { useBillsData } from '@/hooks/useBillsData';
-import { useResponsive } from '@/hooks/useResponsive';
-import { cn } from '@/lib/utils';
+import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
+import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 
 const BillsToPay = () => {
   const { t } = useTranslation();
-  const { isMobile } = useResponsive();
   const { bills, isLoading, error, updateBill, deleteBill, markAsPaid, markAsUnpaid } = useBillsData();
 
   const handleRefetch = () => {
@@ -25,33 +24,27 @@ const BillsToPay = () => {
 
   if (isLoading) {
     return (
-      <div className={cn(
-        "w-full",
-        isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl"
-      )}>
+      <ResponsivePageContainer>
         <div className="flex items-center justify-center py-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">Carregando contas...</p>
           </div>
         </div>
-      </div>
+      </ResponsivePageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className={cn(
-        "w-full",
-        isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl"
-      )}>
+      <ResponsivePageContainer>
         <div className="text-center py-8">
           <p className="text-destructive mb-4">Erro ao carregar contas: {error.message}</p>
           <button onClick={handleRefetch} className="text-primary hover:underline">
             Tentar novamente
           </button>
         </div>
-      </div>
+      </ResponsivePageContainer>
     );
   }
 
@@ -61,14 +54,11 @@ const BillsToPay = () => {
   const currentBalance = totalOriginalAmount - totalTransactions;
 
   return (
-    <div className={cn(
-      "w-full",
-      isMobile ? "px-4 py-8" : "container mx-auto max-w-screen-xl"
-    )}>
-      <div className="mt-6 mb-6">
-        <h1 className="text-3xl font-bold">{t('bills.title', 'Contas a Pagar')}</h1>
-        <p className="text-gray-600">Gerencie suas contas e acompanhe os pagamentos</p>
-      </div>
+    <ResponsivePageContainer>
+      <ResponsivePageHeader 
+        title={t('bills.title', 'Contas a Pagar')}
+        description="Gerencie suas contas e acompanhe os pagamentos"
+      />
 
       <div className="space-y-6">
         <BillBalanceCard 
@@ -84,7 +74,7 @@ const BillsToPay = () => {
           onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
         />
       </div>
-    </div>
+    </ResponsivePageContainer>
   );
 };
 

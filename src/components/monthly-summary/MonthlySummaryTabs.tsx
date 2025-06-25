@@ -5,6 +5,7 @@ import { MonthlyTable } from './MonthlyTable';
 import { PlanningTable } from './PlanningTable';
 import { ComparativeTable } from './ComparativeTable';
 import { useResponsive } from '@/hooks/useResponsive';
+import { getTableScrollContainer } from '@/constants/tableStyles';
 import { cn } from '@/lib/utils';
 
 interface MonthlySummaryTabsProps {
@@ -72,27 +73,33 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         </TabsList>
 
         <TabsContent value="table" className="mt-0">
-          <div className="bg-white rounded-lg border overflow-x-auto p-4">
-            <MonthlyTable year={year} />
+          <div className="bg-white rounded-lg border p-4">
+            <div className={getTableScrollContainer(isMobile)}>
+              <MonthlyTable year={year} />
+            </div>
           </div>
         </TabsContent>
 
         <TabsContent value="planning" className="mt-0">
-          <div className="bg-white rounded-lg border overflow-x-auto p-4">
-            <PlanningTable 
-              year={year} 
-              isDetailedView={isDetailedView}
-              onToggleView={setIsDetailedView}
-            />
+          <div className="bg-white rounded-lg border p-4">
+            <div className={getTableScrollContainer(isMobile)}>
+              <PlanningTable 
+                year={year} 
+                isDetailedView={isDetailedView}
+                onToggleView={setIsDetailedView}
+              />
+            </div>
           </div>
         </TabsContent>
 
         <TabsContent value="comparative" className="mt-0">
-          <div className="bg-white rounded-lg border overflow-x-auto p-4">
-            <ComparativeTable 
-              year={year} 
-              isDetailedView={isDetailedView}
-            />
+          <div className="bg-white rounded-lg border p-4">
+            <div className={getTableScrollContainer(isMobile)}>
+              <ComparativeTable 
+                year={year} 
+                isDetailedView={isDetailedView}
+              />
+            </div>
           </div>
         </TabsContent>
       </Tabs>

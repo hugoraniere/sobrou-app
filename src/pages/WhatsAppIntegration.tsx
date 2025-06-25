@@ -6,26 +6,20 @@ import StatusCard from '@/components/whatsapp/StatusCard';
 import InstructionsCard from '@/components/whatsapp/InstructionsCard';
 import DebugCard from '@/components/whatsapp/DebugCard';
 import { useAuth } from '@/contexts/AuthContext';
-import { useResponsive } from '@/hooks/useResponsive';
-import { cn } from '@/lib/utils';
+import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
+import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 
 const WhatsAppIntegration = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { isMobile } = useResponsive();
   const isWhatsAppConnected = Boolean(user?.user_metadata?.whatsapp_number);
 
   return (
-    <div className={cn(
-      "w-full",
-      isMobile ? "px-4" : "container mx-auto max-w-screen-xl"
-    )}>
-      <div className="mt-6 mb-6">
-        <h1 className="text-2xl font-bold">{t('whatsapp.integration', 'Integração WhatsApp')}</h1>
-        <p className="text-muted-foreground">
-          {t('whatsapp.integrationDesc', 'Registre transações facilmente através do WhatsApp')}
-        </p>
-      </div>
+    <ResponsivePageContainer>
+      <ResponsivePageHeader 
+        title={t('whatsapp.integration', 'Integração WhatsApp')}
+        description={t('whatsapp.integrationDesc', 'Registre transações facilmente através do WhatsApp')}
+      />
       
       <div className="grid gap-6 md:grid-cols-2">
         <ConnectionCard />
@@ -35,7 +29,7 @@ const WhatsAppIntegration = () => {
       <StatusCard />
       
       <DebugCard />
-    </div>
+    </ResponsivePageContainer>
   );
 };
 
