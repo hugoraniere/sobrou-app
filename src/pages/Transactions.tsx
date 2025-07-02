@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import { format } from 'date-fns';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ModernTransactionList from '@/components/transactions/organisms/ModernTransactionList';
 import { Card } from '@/components/ui/card';
@@ -14,12 +15,19 @@ import ResponsiveContainer from '@/components/layout/ResponsiveContainer';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import ImportBankStatementButton from '@/components/transactions/import/ImportBankStatementButton';
+import TransactionListFilters from '@/components/transactions/molecules/TransactionListFilters';
+import ViewModeToggle, { ViewMode } from '@/components/transactions/molecules/ViewModeToggle';
 
 const Transactions = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { isMobile } = useResponsive();
   const initialFilter = location.state?.initialFilter || {};
+  
+  // Estados para filtros
+  const [viewMode, setViewMode] = useState<ViewMode>('monthly');
+  const [currentMonth, setCurrentMonth] = useState(format(new Date(), 'yyyy-MM'));
+  const [searchTerm, setSearchTerm] = useState('');
   
   const {
     transactions,
@@ -29,6 +37,33 @@ const Transactions = () => {
     handleTransactionUpdated,
     retryFetch
   } = useTransactionData();
+
+  // Filtrar transações baseado nos filtros selecionados
+  const filteredTransactions = useMemo(() => {
+    let filtered = transactions;
+
+    // Aplicar filtro de busca se houver termo de pesquisa
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(transaction => 
+        transaction.description.toLowerCase().includes(searchLower) ||
+        transaction.category.toLowerCase().includes(searchLower) ||
+        transaction.amount.toString().includes(searchLower)
+      );
+    }
+
+    // Aplicar filtro mensal se estiver no modo mensal
+    if (viewMode === 'monthly') {
+      const [year, month] = currentMonth.split('-').map(Number);
+      filtered = filtered.filter(transaction => {
+        const transactionDate = new Date(transaction.date);
+        return transactionDate.getFullYear() === year && 
+               transactionDate.getMonth() === month - 1;
+      });
+    }
+
+    return filtered;
+  }, [transactions, viewMode, currentMonth, searchTerm]);
 
   return (
     <TooltipProvider>
@@ -74,6 +109,41 @@ const Transactions = () => {
             />
           </Card>
 
+          {/* Filtros e Toggle de Visão */}
+          <div className="mt-4 space-y-3">
+            {/* Toggle para alternar entre visão mensal e todas as transações */}
+            <div className="flex justify-center">
+              <ViewModeToggle 
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+              />
+            </div>
+
+            {/* Filtros de busca e navegação mensal */}
+            {viewMode === 'monthly' ? (
+              <TransactionListFilters
+                currentMonth={currentMonth}
+                searchTerm={searchTerm}
+                onMonthChange={setCurrentMonth}
+                onSearchChange={setSearchTerm}
+              />
+            ) : (
+              <Card className={cn("shadow-sm", isMobile ? "p-3" : "p-3")}>
+                <div className="flex justify-center">
+                  <div className="w-full max-w-[320px]">
+                    <input
+                      type="text"
+                      placeholder="Buscar por descrição, valor ou categoria..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
+
           {/* Content */}
           <div className="mt-4">
             {isLoading ? (
@@ -85,9 +155,18 @@ const Transactions = () => {
               />
             ) : transactions.length === 0 ? (
               <TransactionsEmptyState onAddTransaction={() => {}} />
+            ) : filteredTransactions.length === 0 ? (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground">
+                  {searchTerm ? 
+                    `Nenhuma transação encontrada para "${searchTerm}"` : 
+                    'Nenhuma transação encontrada para este período'
+                  }
+                </p>
+              </Card>
             ) : (
               <ModernTransactionList
-                transactions={transactions}
+                transactions={filteredTransactions}
                 onTransactionUpdated={handleTransactionUpdated}
                 showCardPadding={false}
               />
