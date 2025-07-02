@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import ImportBankStatementButton from '@/components/transactions/import/ImportBankStatementButton';
 import TransactionListFilters from '@/components/transactions/molecules/TransactionListFilters';
 import ViewModeToggle, { ViewMode } from '@/components/transactions/molecules/ViewModeToggle';
+import MonthNavigator from '@/components/transactions/molecules/MonthNavigator';
+import SearchBar from '@/components/transactions/molecules/SearchBar';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -109,40 +111,47 @@ const Transactions = () => {
             />
           </Card>
 
-          {/* Filtros e Toggle de Visão */}
-          <div className="mt-4 space-y-3">
-            {/* Toggle para alternar entre visão mensal e todas as transações */}
-            <div className="flex justify-center">
-              <ViewModeToggle 
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-              />
-            </div>
-
-            {/* Filtros de busca e navegação mensal */}
-            {viewMode === 'monthly' ? (
-              <TransactionListFilters
-                currentMonth={currentMonth}
-                searchTerm={searchTerm}
-                onMonthChange={setCurrentMonth}
-                onSearchChange={setSearchTerm}
-              />
-            ) : (
-              <Card className={cn("shadow-sm", isMobile ? "p-3" : "p-3")}>
-                <div className="flex justify-center">
-                  <div className="w-full max-w-[320px]">
-                    <input
-                      type="text"
-                      placeholder="Buscar por descrição, valor ou categoria..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          {/* Filtros com Toggle integrado */}
+          <Card className={cn("shadow-sm mt-4", isMobile ? "p-3" : "p-3")}>
+            <div className={cn(
+              "flex gap-4 items-center",
+              isMobile ? "flex-col space-y-3" : "justify-between"
+            )}>
+              {/* Toggle de visão à esquerda */}
+              <div className={cn(isMobile ? "w-full flex justify-center" : "")}>
+                <ViewModeToggle 
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                />
+              </div>
+              
+              {/* Filtros à direita */}
+              <div className={cn(
+                "flex gap-3 items-center",
+                isMobile ? "w-full flex-col space-y-3" : ""
+              )}>
+                {/* Navegação de mês - apenas visível no modo mensal */}
+                {viewMode === 'monthly' && (
+                  <div className="flex items-center">
+                    <MonthNavigator 
+                      currentMonth={currentMonth} 
+                      onMonthChange={setCurrentMonth}
                     />
                   </div>
+                )}
+                
+                {/* Campo de busca - sempre visível */}
+                <div className={cn(isMobile ? "w-full" : "")}>
+                  <SearchBar 
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    placeholder={isMobile ? "Buscar..." : "Buscar por descrição, valor ou categoria..."}
+                    className={cn(isMobile ? "w-full max-w-none" : "max-w-[320px]")}
+                  />
                 </div>
-              </Card>
-            )}
-          </div>
+              </div>
+            </div>
+          </Card>
 
           {/* Content */}
           <div className="mt-4">
