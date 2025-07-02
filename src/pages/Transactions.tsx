@@ -13,6 +13,7 @@ import AIPromptInput from '@/components/AIPromptInput';
 import ResponsiveContainer from '@/components/layout/ResponsiveContainer';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
+import ImportBankStatementButton from '@/components/transactions/import/ImportBankStatementButton';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -37,18 +38,28 @@ const Transactions = () => {
       )}>
         <div>
           {/* Header */}
-          <div className="flex flex-col space-y-2 mt-6 mb-6">
-            <h1 className={cn(
-              "font-bold text-gray-900",
-              isMobile ? "text-2xl" : "text-3xl"
+          <div className="mt-6 mb-6">
+            <div className={cn(
+              "flex items-start gap-4",
+              isMobile ? "flex-col" : "justify-between"
             )}>
-              {t('transactions.title', 'Transações')}
-            </h1>
-            {!isMobile && (
-              <p className="text-gray-600 text-sm">
-                Visualize e gerencie todas as suas transações financeiras
-              </p>
-            )}
+              <div className="flex-1">
+                <h1 className={cn(
+                  "font-bold text-gray-900",
+                  isMobile ? "text-2xl" : "text-3xl"
+                )}>
+                  {t('transactions.title', 'Transações')}
+                </h1>
+                {!isMobile && (
+                  <p className="text-gray-600 text-sm mt-1">
+                    Visualize e gerencie todas as suas transações financeiras
+                  </p>
+                )}
+              </div>
+              <div className={cn(isMobile && "w-full flex justify-end")}>
+                <ImportBankStatementButton onTransactionsAdded={handleTransactionUpdated} />
+              </div>
+            </div>
           </div>
 
           {/* AIPromptInput sempre visível */}
