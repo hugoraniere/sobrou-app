@@ -1,25 +1,47 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { BillsList } from '@/components/bills/BillsList';
 import { BillBalanceCard } from '@/components/bills/BillBalanceCard';
+import { AddBillDialog } from '@/components/bills/AddBillDialog';
 import { useBillsData } from '@/hooks/useBillsData';
+import { Bill } from '@/types/bills';
 import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 
 const BillsToPay = () => {
   const { t } = useTranslation();
-  const { bills, isLoading, error, updateBill, deleteBill, markAsPaid, markAsUnpaid } = useBillsData();
+  const { bills, isLoading, error, createBill, updateBill, deleteBill, markAsPaid, markAsUnpaid, isCreating, isUpdating } = useBillsData();
+  
+  // Estados para controlar o dialog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingBill, setEditingBill] = useState<Bill | null>(null);
 
   const handleRefetch = () => {
     // As mutations do useBillsData já invalidam automaticamente as queries
     // então não precisamos de uma função refetch explícita
   };
 
-  const handleEditBill = (bill) => {
-    // Esta função será chamada quando o usuário quiser editar uma conta
-    // Por enquanto, vamos apenas logar - você pode implementar um modal de edição aqui
-    console.log('Edit bill:', bill);
+  const handleEditBill = (bill: Bill) => {
+    setEditingBill(bill);
+    setIsAddDialogOpen(true);
+  };
+
+  const handleCreateBill = (data: any) => {
+    if (editingBill) {
+      updateBill(editingBill.id, data);
+    } else {
+      createBill(data);
+    }
+    setIsAddDialogOpen(false);
+    setEditingBill(null);
+  };
+
+  const handleDialogClose = () => {
+    setIsAddDialogOpen(false);
+    setEditingBill(null);
   };
 
   if (isLoading) {
@@ -58,7 +80,12 @@ const BillsToPay = () => {
       <ResponsivePageHeader 
         title={t('bills.title', 'Contas a Pagar')}
         description="Gerencie suas contas e acompanhe os pagamentos"
-      />
+      >
+        <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Nova Conta
+        </Button>
+      </ResponsivePageHeader>
 
       <div className="space-y-6">
         <BillBalanceCard 
@@ -74,6 +101,14 @@ const BillsToPay = () => {
           onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
         />
       </div>
+
+      <AddBillDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSubmit={handleCreateBill}
+        editingBill={editingBill}
+        isSubmitting={isCreating || isUpdating}
+      />
     </ResponsivePageContainer>
   );
 };
