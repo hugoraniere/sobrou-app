@@ -130,15 +130,26 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     }
     
     try {
-      // Para prompt de texto, processar e salvar diretamente
+      console.log("Iniciando processamento do prompt:", inputValue);
       setOriginalInputText(inputValue);
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+      
+      // Aguardar o processamento completo
       await processTranscription(inputValue, formattedDate);
       
-      // Confirmar automaticamente as transações do texto
-      if (hasTransactions) {
-        await confirmAllTransactions();
-      }
+      // Aguardar um momento para garantir que o estado foi atualizado
+      setTimeout(() => {
+        console.log("Estado hasTransactions após processamento:", hasTransactions);
+        console.log("Número de transações processadas:", transactions.length);
+        
+        if (transactions.length > 0) {
+          console.log("Confirmando transações automaticamente");
+          confirmAllTransactions();
+        } else {
+          console.log("Nenhuma transação foi processada");
+          toast.error("Não foi possível processar sua entrada. Verifique o formato.");
+        }
+      }, 500);
       
     } catch (error) {
       console.error('Error processing input:', error);

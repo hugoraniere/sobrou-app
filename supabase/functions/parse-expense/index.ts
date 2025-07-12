@@ -25,12 +25,30 @@ serve(async (req) => {
     const aiResult = await aiParseTransaction(text);
     console.log("AI parsing result:", aiResult);
 
-    // If AI parsing succeeds and has valid amount, use it
-    if (aiResult && aiResult.amount && !isNaN(aiResult.amount)) {
-      return new Response(
-        JSON.stringify(aiResult),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Check if AI parsing succeeded (can be single transaction or array)
+    if (aiResult) {
+      // If it's an array, validate each transaction
+      if (Array.isArray(aiResult)) {
+        const validTransactions = aiResult.filter(transaction => 
+          transaction && transaction.amount && !isNaN(transaction.amount)
+        );
+        
+        if (validTransactions.length > 0) {
+          console.log(`Returning ${validTransactions.length} valid transactions from AI`);
+          return new Response(
+            JSON.stringify(validTransactions),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      } 
+      // If it's a single transaction, validate it
+      else if (aiResult.amount && !isNaN(aiResult.amount)) {
+        console.log("Returning single valid transaction from AI");
+        return new Response(
+          JSON.stringify(aiResult),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // Fallback to original parsing if AI fails

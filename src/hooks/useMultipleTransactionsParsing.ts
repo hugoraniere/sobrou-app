@@ -20,24 +20,34 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
     setError(null);
     
     try {
-      console.log("Processing transcription:", transcriptionText);
+      console.log("🔄 Processing transcription:", transcriptionText);
       const result = await parseExpenseService.parseExpenseText(transcriptionText);
+      console.log("📋 Raw result from parseExpenseService:", result);
       
       // Normalize to array and add IDs
       const transactionsArray = Array.isArray(result) ? result : [result];
+      console.log("📊 Transactions array:", transactionsArray);
+      
       const transactionsWithIds = transactionsArray.map((transaction, index) => ({
         ...transaction,
         date: selectedDate || transaction.date, // Use selected date if provided
         id: `temp-${Date.now()}-${index}`
       }));
       
-      console.log("Processed transactions:", transactionsWithIds);
+      console.log("✅ Final processed transactions with IDs:", transactionsWithIds);
+      console.log("📈 Number of transactions to set:", transactionsWithIds.length);
+      
       setTransactions(transactionsWithIds);
+      
+      // Log the state update
+      console.log("🔄 State updated - hasTransactions will be:", transactionsWithIds.length > 0);
+      
     } catch (error) {
-      console.error('Error processing transcription:', error);
+      console.error('❌ Error processing transcription:', error);
       setError(error instanceof Error ? error.message : 'Erro ao processar transcrição');
     } finally {
       setIsProcessing(false);
+      console.log("🏁 Processing finished");
     }
   };
 
