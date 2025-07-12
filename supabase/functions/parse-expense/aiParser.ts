@@ -16,15 +16,16 @@ export async function aiParseTransaction(text: string) {
         messages: [
           {
             role: "system",
-            content: `Você é um analista financeiro especializado em categorizar transações. Sua tarefa é extrair detalhes de uma transação financeira descrita em texto e categorizá-la corretamente.
+            content: `Você é um analista financeiro especializado em categorizar transações. Sua tarefa é extrair detalhes de transações financeiras descritas em texto e categorizá-las corretamente.
 
-              Extraia os seguintes campos:
+              IMPORTANTE: Identifique TODAS as transações mencionadas no texto.
+
+              Para cada transação, extraia os seguintes campos:
               - amount (número, obrigatório)
               - type ("expense" para despesas ou "income" para receitas)
               - category (deve ser uma destas categorias exatas: alimentacao, moradia, transporte, internet, cartao, saude, lazer, compras, investimentos, familia, doacoes)
-              - description (deve ser EXATAMENTE igual ao texto original do usuário, sem alterações)
-              - isSaving (boolean, indica se é uma economia/poupança)
-              - savingGoal (string ou null)
+              - description (descrição específica da transação)
+              - date (formato YYYY-MM-DD, use hoje se não especificada)
               
               Regras para categorização:
               - alimentacao: mercados, restaurantes, delivery, ifood, comida, refeição, fast-food, lanchonetes
@@ -41,17 +42,21 @@ export async function aiParseTransaction(text: string) {
 
               Regras importantes para TYPE:
               - Classifique como "income" (receita) se detectar palavras como: "recebi", "ganhei", "salário", "pagamento", "caiu na conta", "entrou", "faturei", "venda"
-              - Exemplos claros de RECEITAS: "Recebi R$2000 de salário", "Ganhei 50 reais com bets", "Caiu 1500 na minha conta", "Me pagaram o freela", "Vendi um celular por 800"
-              - Classifique como "expense" (despesa) apenas quando houver clara indicação de gasto ou pagamento, como: "gastei", "paguei", "comprei"
+              - Classifique como "expense" (despesa) para gastos: "gastei", "paguei", "comprei"
               
-              Outras regras importantes:
+              Formato de resposta:
+              - Se UMA transação: retorne um objeto JSON
+              - Se MÚLTIPLAS transações: retorne um array de objetos JSON
+              
+              Exemplos:
+              - "Comprei café por 5 reais" → objeto único
+              - "Comprei café por 5 reais e almoço por 15 reais" → array com 2 objetos
+              - "Gastei 20 no mercado, 10 no posto e 30 na farmácia" → array com 3 objetos
+              
+              Outras regras:
               - Se o valor contiver "k" (ex: "2k"), multiplique por 1000
               - Para moeda brasileira (R$), extraia apenas o número
-              - Detecte intenções de poupança ("poupar", "guardar", "economizar")
-              - MANTENHA O TEXT ORIGINAL EXATAMENTE IGUAL NO CAMPO DESCRIPTION. Não faça reformulações, correções ou melhorias no texto.
-              - Não mude nenhuma palavra do texto original do usuário no campo "description".
-              
-              Retorne APENAS um objeto JSON com esses campos exatos.`
+              - Use data de hoje (${new Date().toISOString().split('T')[0]}) se não especificada`
           },
           { role: "user", content: text }
         ],
@@ -67,27 +72,19 @@ export async function aiParseTransaction(text: string) {
     console.log("AI Response:", data);
     
     const parsedResult = data.choices[0].message.content;
-    const parsed = JSON.parse(parsedResult);
     
-    // Garantir que a descrição seja exatamente igual ao texto original
-    parsed.description = text;
-    
-    // Garantir que sempre temos uma categoria válida
-    if (!parsed.category) {
-      parsed.category = 'compras';
+    // Try to extract JSON from the response
+    const jsonMatch = parsedResult.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+    if (!jsonMatch) {
+      throw new Error('No valid JSON found in AI response');
     }
+    
+    const parsed = JSON.parse(jsonMatch[0]);
+    console.log("Parsed AI result:", parsed);
     
     return parsed;
   } catch (error) {
     console.error("AI parsing error:", error);
-    // Retornar um objeto com valores padrão em caso de erro
-    return {
-      amount: 0,
-      type: 'expense',
-      category: 'compras',
-      description: text, // Sempre preservar o texto original
-      isSaving: false,
-      savingGoal: null
-    };
+    return null;
   }
 }
