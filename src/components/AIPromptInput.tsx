@@ -162,32 +162,46 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     }
   };
 
-  const handleAudioTransactionConfirm = async (data: {
-    description: string;
-    amount: number;
-    category: string;
-    date: string;
-    type: 'expense' | 'income';
-  }) => {
-    try {
-      setIsProcessing(true);
-      
-      if (data.type === 'income') {
-        // Create a temporary saving goal for income
-        const goal = await SavingsService.findOrCreateSavingGoal("Receita");
-        await SavingsService.addToSavingGoal(goal.id, data.amount, data.date);
-        toast.success("Receita adicionada com sucesso!");
-        onSavingAdded?.(true);
+  const handleAudioTransactionConfirm = (data: any) => {
+    const processTransaction = async (transaction: any) => {
+      try {
+        setIsProcessing(true);
+        
+        const transactionType = transaction.type as 'expense' | 'income';
+        
+        if (transactionType === 'income') {
+          // Create a temporary saving goal for income
+          const goal = await SavingsService.findOrCreateSavingGoal("Receita");
+          await SavingsService.addToSavingGoal(goal.id, transaction.amount, transaction.date);
+          toast.success("Receita adicionada com sucesso!");
+          onSavingAdded?.(true);
+        } else {
+          await TransactionService.addTransaction({
+            description: transaction.description,
+            amount: transaction.amount,
+            category: transaction.category,
+            date: transaction.date,
+            type: transactionType,
+          });
+          toast.success("Transação adicionada com sucesso!");
+          onTransactionAdded?.(true);
+        }
+      } catch (error) {
+        console.error('Error adding audio transaction:', error);
+        toast.error("Erro ao adicionar transação");
+      }
+    };
+
+    const processAllTransactions = async () => {
+      if (Array.isArray(data)) {
+        // Process multiple transactions
+        for (const transaction of data) {
+          await processTransaction(transaction);
+        }
+        toast.success(`${data.length} transações adicionadas com sucesso!`);
       } else {
-        await TransactionService.addTransaction({
-          description: data.description,
-          amount: data.amount,
-          category: data.category,
-          date: data.date,
-          type: data.type,
-        });
-        toast.success("Transação adicionada com sucesso!");
-        onTransactionAdded?.(true);
+        // Process single transaction
+        await processTransaction(data);
       }
       
       // Reset form
@@ -195,12 +209,11 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       setDetectedCategory(null);
       setUserSelectedCategory(null);
       setSelectedDate(new Date());
-    } catch (error) {
-      console.error('Error adding audio transaction:', error);
-      toast.error("Erro ao adicionar transação");
-    } finally {
+      setAudioModalOpen(false);
       setIsProcessing(false);
-    }
+    };
+
+    processAllTransactions();
   };
 
   const handleCategorySelect = (categoryId: string) => {
