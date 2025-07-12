@@ -122,13 +122,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     };
   }, [inputValue, detectCategory]);
 
-  // Effect para mostrar a tela de revisão quando há transações
-  useEffect(() => {
-    if (hasTransactions && originalInputText) {
-      setShowReview(true);
-    }
-  }, [hasTransactions, originalInputText]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) {
@@ -137,10 +130,15 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     }
     
     try {
-      // Usar sempre a IA para detectar múltiplas transações
+      // Para prompt de texto, processar e salvar diretamente
       setOriginalInputText(inputValue);
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       await processTranscription(inputValue, formattedDate);
+      
+      // Confirmar automaticamente as transações do texto
+      if (hasTransactions) {
+        await confirmAllTransactions();
+      }
       
     } catch (error) {
       console.error('Error processing input:', error);
@@ -219,22 +217,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   };
 
   const categoryId = userSelectedCategory || detectedCategory;
-  
-  if (showReview && hasTransactions) {
-    return (
-      <div className={className}>
-        <MultipleTransactionsReview
-          transactions={transactions}
-          onUpdateTransaction={updateTransaction}
-          onRemoveTransaction={removeTransaction}
-          onConfirmAll={confirmAllTransactions}
-          onBack={handleBackFromReview}
-          transcriptionText={originalInputText}
-          onAddNewTransaction={addNewTransaction}
-        />
-      </div>
-    );
-  }
   
   return (
     <div className={className}>

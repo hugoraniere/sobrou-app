@@ -79,37 +79,6 @@ export const MultipleTransactionsReview: React.FC<MultipleTransactionsReviewProp
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Gastos</span>
-              <Badge variant="destructive">{expenseCount}</Badge>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Receitas</span>
-              <Badge variant="secondary">{incomeCount}</Badge>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Saldo</span>
-              <span className={`font-medium ${totalAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                R$ {Math.abs(totalAmount).toFixed(2)}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Transcription Preview */}
       {transcriptionText && (
