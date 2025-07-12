@@ -7,6 +7,8 @@ import { SavingsService } from '@/services/SavingsService';
 import { format } from "date-fns";
 import { getCategoryByKeyword } from '@/utils/categoryUtils';
 import { useTranslation } from 'react-i18next';
+import { AudioRecorderModal } from "@/components/audio/AudioRecorderModal";
+import { Mic } from "lucide-react";
 
 // Importing our extracted components
 import PromptInputField from './prompt/PromptInputField';
@@ -29,6 +31,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   const [detectedCategory, setDetectedCategory] = useState<string | null>(null);
   const [userSelectedCategory, setUserSelectedCategory] = useState<string | null>(null);
   const [isCategoryPopoverOpen, setIsCategoryPopoverOpen] = useState(false);
+  const [audioModalOpen, setAudioModalOpen] = useState(false);
   const inputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation();
 
@@ -159,6 +162,47 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     }
   };
 
+  const handleAudioTransactionConfirm = async (data: {
+    description: string;
+    amount: number;
+    category: string;
+    date: string;
+    type: 'expense' | 'income';
+  }) => {
+    try {
+      setIsProcessing(true);
+      
+      if (data.type === 'income') {
+        // Create a temporary saving goal for income
+        const goal = await SavingsService.findOrCreateSavingGoal("Receita");
+        await SavingsService.addToSavingGoal(goal.id, data.amount, data.date);
+        toast.success("Receita adicionada com sucesso!");
+        onSavingAdded?.(true);
+      } else {
+        await TransactionService.addTransaction({
+          description: data.description,
+          amount: data.amount,
+          category: data.category,
+          date: data.date,
+          type: data.type,
+        });
+        toast.success("Transação adicionada com sucesso!");
+        onTransactionAdded?.(true);
+      }
+      
+      // Reset form
+      setInputValue("");
+      setDetectedCategory(null);
+      setUserSelectedCategory(null);
+      setSelectedDate(new Date());
+    } catch (error) {
+      console.error('Error adding audio transaction:', error);
+      toast.error("Erro ao adicionar transação");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleCategorySelect = (categoryId: string) => {
     setUserSelectedCategory(categoryId);
     setIsCategoryPopoverOpen(false);
@@ -178,7 +222,8 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   return (
     <div className={className}>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-        <PromptInputField 
+        <div className="flex-1">
+          <PromptInputField
           inputValue={inputValue} 
           onInputChange={handleInputChange} 
           categoryId={categoryId} 
@@ -188,14 +233,36 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
           handleCategorySelect={handleCategorySelect} 
           resetCategory={resetCategory} 
           selectedDate={selectedDate} 
-          onDateChange={setSelectedDate} 
-          isProcessing={isProcessing} 
-        />
-        <Button type="submit" disabled={isProcessing} className="min-w-[100px]">
-          {isProcessing ? "Processando..." : "Adicionar"}
-        </Button>
+            onDateChange={setSelectedDate} 
+            isProcessing={isProcessing} 
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setAudioModalOpen(true)}
+            disabled={isProcessing}
+            className="shrink-0"
+          >
+            <Mic className="h-4 w-4" />
+          </Button>
+          
+          <Button type="submit" disabled={isProcessing} className="min-w-[100px]">
+            {isProcessing ? "Processando..." : "Adicionar"}
+          </Button>
+        </div>
       </form>
+      
       <PromptExampleFooter selectedDate={selectedDate} />
+
+      <AudioRecorderModal
+        open={audioModalOpen}
+        onOpenChange={setAudioModalOpen}
+        onTransactionConfirm={handleAudioTransactionConfirm}
+      />
     </div>
   );
 };
