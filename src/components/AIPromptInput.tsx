@@ -8,6 +8,8 @@ import { format } from "date-fns";
 import { getCategoryByKeyword } from '@/utils/categoryUtils';
 import { useTranslation } from 'react-i18next';
 import { AudioRecorderModal } from "@/components/audio/AudioRecorderModal";
+import { MultipleTransactionsReview } from '@/components/audio/MultipleTransactionsReview';
+import { useMultipleTransactionsParsing } from '@/hooks/useMultipleTransactionsParsing';
 import { Mic } from "lucide-react";
 
 // Importing our extracted components
@@ -26,14 +28,69 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   className
 }) => {
   const [inputValue, setInputValue] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [detectedCategory, setDetectedCategory] = useState<string | null>(null);
   const [userSelectedCategory, setUserSelectedCategory] = useState<string | null>(null);
   const [isCategoryPopoverOpen, setIsCategoryPopoverOpen] = useState(false);
   const [audioModalOpen, setAudioModalOpen] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [originalInputText, setOriginalInputText] = useState('');
   const inputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation();
+
+  // Função para confirmar transações em lote
+  const handleTransactionsBatchConfirm = useCallback((transactionsToConfirm: any[]) => {
+    const processAllTransactions = async () => {
+      for (const transaction of transactionsToConfirm) {
+        try {
+          if (transaction.isSaving && transaction.savingGoal) {
+            const goal = await SavingsService.findOrCreateSavingGoal(transaction.savingGoal);
+            await SavingsService.addToSavingGoal(goal.id, transaction.amount, transaction.date);
+          } else {
+            await TransactionService.addTransaction({
+              amount: transaction.amount,
+              description: transaction.description,
+              category: transaction.category,
+              type: transaction.type,
+              date: transaction.date
+            });
+          }
+        } catch (error) {
+          console.error('Error adding transaction:', error);
+          toast.error(`Erro ao adicionar transação: ${transaction.description}`);
+        }
+      }
+      
+      toast.success(`${transactionsToConfirm.length} transação${transactionsToConfirm.length > 1 ? 'ões' : ''} adicionada${transactionsToConfirm.length > 1 ? 's' : ''} com sucesso!`);
+      if (onTransactionAdded) {
+        onTransactionAdded(false);
+      }
+      
+      // Reset form
+      setInputValue('');
+      setUserSelectedCategory(null);
+      setShowReview(false);
+      setOriginalInputText('');
+    };
+
+    processAllTransactions();
+  }, [onTransactionAdded]);
+
+  // Hook para gerenciar múltiplas transações
+  const {
+    isProcessing,
+    transactions,
+    error: processingError,
+    processTranscription,
+    updateTransaction,
+    removeTransaction,
+    confirmAllTransactions,
+    reset: resetProcessing,
+    hasTransactions,
+    addNewTransaction
+  } = useMultipleTransactionsParsing({
+    onTransactionsConfirm: handleTransactionsBatchConfirm
+  });
 
   // Otimizado para detectar categoria com menos atraso
   const detectCategory = useCallback((text: string) => {
@@ -65,6 +122,13 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     };
   }, [inputValue, detectCategory]);
 
+  // Effect para mostrar a tela de revisão quando há transações
+  useEffect(() => {
+    if (hasTransactions && originalInputText) {
+      setShowReview(true);
+    }
+  }, [hasTransactions, originalInputText]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) {
@@ -72,101 +136,21 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       return;
     }
     
-    setIsProcessing(true);
-    
     try {
-      // Parseamento local simples para casos comuns, para ser mais rápido
-      let quickParsed = false;
-      let quickResult = null;
-      
-      // Tentar detectar um padrão simples no formato "X reais em Y"
-      const simplePattern = /(\d+)\s*reais\s*(com|em|no|na|para)\s*(.+)/i;
-      const match = inputValue.match(simplePattern);
-      
-      if (match) {
-        const amount = parseInt(match[1], 10);
-        const description = match[3];
-        const category = detectedCategory || userSelectedCategory || 'compras';
-        
-        quickResult = {
-          amount,
-          description,
-          category,
-          type: 'expense',
-          date: format(selectedDate, 'yyyy-MM-dd'),
-          isSaving: false
-        };
-        
-        quickParsed = true;
-      }
-      
-      // Se não conseguimos fazer parseamento rápido, usar a API
-      const parsedData = quickParsed ? quickResult : await TransactionService.parseExpenseText(inputValue);
-      console.log("Parsed data:", parsedData);
-
-      if (!parsedData) {
-        throw new Error("Não foi possível interpretar sua transação");
-      }
-
+      // Usar sempre a IA para detectar múltiplas transações
+      setOriginalInputText(inputValue);
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-      parsedData.date = formattedDate;
-
-      if (userSelectedCategory) {
-        parsedData.category = userSelectedCategory;
-      }
+      await processTranscription(inputValue, formattedDate);
       
-      if (!parsedData || parsedData.amount <= 0) {
-        toast.error("Não foi possível detectar um valor válido. Por favor, inclua um número na sua descrição.");
-        setIsProcessing(false);
-        return;
-      }
-
-      if (parsedData.isSaving && parsedData.savingGoal) {
-        try {
-          const goal = await SavingsService.findOrCreateSavingGoal(parsedData.savingGoal);
-          await SavingsService.addToSavingGoal(goal.id, parsedData.amount, parsedData.date);
-          toast.success(`Adicionado R$${parsedData.amount.toFixed(2)} à sua poupança ${goal.name}!`);
-          if (onSavingAdded) {
-            onSavingAdded(false); // Não fechar o formulário
-          }
-        } catch (savingError) {
-          console.error('Error processing saving:', savingError);
-          toast.error("Não foi possível adicionar à poupança. Por favor, tente novamente.");
-        }
-      } else {
-        try {
-          await TransactionService.addTransaction({
-            amount: parsedData.amount,
-            description: parsedData.description,
-            category: parsedData.category || detectedCategory || 'other',
-            type: parsedData.type as 'expense' | 'income',
-            date: parsedData.date
-          });
-          toast.success(parsedData.type === 'income' ? `Registrado receita de R$${parsedData.amount.toFixed(2)}` : `Registrado despesa de R$${parsedData.amount.toFixed(2)}`);
-          if (onTransactionAdded) {
-            onTransactionAdded(false); // Não fechar o formulário
-          }
-        } catch (transactionError) {
-          console.error('Error adding transaction:', transactionError);
-          toast.error("Não foi possível adicionar a transação. Por favor, tente novamente.");
-        }
-      }
-
-      setInputValue('');
-      setUserSelectedCategory(null);
     } catch (error) {
       console.error('Error processing input:', error);
       toast.error("Não foi possível processar sua entrada. Por favor, tente novamente.");
-    } finally {
-      setIsProcessing(false);
     }
   };
 
   const handleAudioTransactionConfirm = (data: any) => {
     const processTransaction = async (transaction: any) => {
       try {
-        setIsProcessing(true);
-        
         const transactionType = transaction.type as 'expense' | 'income';
         
         if (transactionType === 'income') {
@@ -210,7 +194,6 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       setUserSelectedCategory(null);
       setSelectedDate(new Date());
       setAudioModalOpen(false);
-      setIsProcessing(false);
     };
 
     processAllTransactions();
@@ -230,7 +213,28 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     setInputValue(e.target.value);
   };
 
+  const handleBackFromReview = () => {
+    setShowReview(false);
+    resetProcessing();
+  };
+
   const categoryId = userSelectedCategory || detectedCategory;
+  
+  if (showReview && hasTransactions) {
+    return (
+      <div className={className}>
+        <MultipleTransactionsReview
+          transactions={transactions}
+          onUpdateTransaction={updateTransaction}
+          onRemoveTransaction={removeTransaction}
+          onConfirmAll={confirmAllTransactions}
+          onBack={handleBackFromReview}
+          transcriptionText={originalInputText}
+          onAddNewTransaction={addNewTransaction}
+        />
+      </div>
+    );
+  }
   
   return (
     <div className={className}>
@@ -263,7 +267,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
             <Mic className="h-4 w-4" />
           </Button>
           
-          <Button type="submit" disabled={isProcessing} className="min-w-[100px]">
+          <Button type="submit" disabled={isProcessing} className="w-auto px-4">
             {isProcessing ? "Processando..." : "Adicionar"}
           </Button>
         </div>

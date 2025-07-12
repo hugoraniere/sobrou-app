@@ -15,7 +15,7 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
   const [transactions, setTransactions] = useState<TransactionWithId[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const processTranscription = async (transcriptionText: string) => {
+  const processTranscription = async (transcriptionText: string, selectedDate?: string) => {
     setIsProcessing(true);
     setError(null);
     
@@ -27,6 +27,7 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
       const transactionsArray = Array.isArray(result) ? result : [result];
       const transactionsWithIds = transactionsArray.map((transaction, index) => ({
         ...transaction,
+        date: selectedDate || transaction.date, // Use selected date if provided
         id: `temp-${Date.now()}-${index}`
       }));
       
@@ -60,6 +61,21 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
     reset();
   };
 
+  const addNewTransaction = (newTransaction: Partial<ParsedExpense>) => {
+    const transactionWithId: TransactionWithId = {
+      id: `temp-${Date.now()}`,
+      description: newTransaction.description || '',
+      amount: newTransaction.amount || 0,
+      category: newTransaction.category || 'compras',
+      type: newTransaction.type || 'expense',
+      date: newTransaction.date || new Date().toISOString().split('T')[0],
+      isSaving: newTransaction.isSaving || false,
+      savingGoal: newTransaction.savingGoal
+    };
+    
+    setTransactions(prev => [...prev, transactionWithId]);
+  };
+
   const reset = () => {
     setTransactions([]);
     setError(null);
@@ -74,6 +90,7 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
     updateTransaction,
     removeTransaction,
     confirmAllTransactions,
+    addNewTransaction,
     reset,
     hasTransactions: transactions.length > 0
   };

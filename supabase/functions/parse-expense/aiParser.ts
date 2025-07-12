@@ -18,7 +18,7 @@ export async function aiParseTransaction(text: string) {
             role: "system",
             content: `Você é um analista financeiro especializado em categorizar transações. Sua tarefa é extrair detalhes de transações financeiras descritas em texto e categorizá-las corretamente.
 
-              IMPORTANTE: Identifique TODAS as transações mencionadas no texto.
+              IMPORTANTE: Identifique TODAS as transações mencionadas no texto. Analise cuidadosamente para separar transações múltiplas mencionadas na mesma frase.
 
               Para cada transação, extraia os seguintes campos:
               - amount (número, obrigatório)
@@ -27,15 +27,15 @@ export async function aiParseTransaction(text: string) {
               - description (descrição específica da transação)
               - date (formato YYYY-MM-DD, use hoje se não especificada)
               
-              Regras para categorização:
-              - alimentacao: mercados, restaurantes, delivery, ifood, comida, refeição, fast-food, lanchonetes
+              Regras para categorização melhoradas:
+              - alimentacao: mercados, restaurantes, delivery, ifood, comida, refeição, fast-food, lanchonetes, hambúrguer, pizza, açaí, padaria, café, lanche
               - moradia: aluguel, condomínio, água, luz, gás, manutenção, IPTU, decoração, reforma, móveis
-              - transporte: uber, 99, combustível, passagens, metrô, ônibus, estacionamento, pedágio, manutenção de veículos
+              - transporte: uber, 99, combustível, passagens, metrô, ônibus, estacionamento, pedágio, manutenção de veículos, gasolina, posto
               - internet: internet, wifi, telefone, celular, contas de operadoras, streaming (Netflix, Spotify, etc)
               - cartao: faturas, parcelas, crédito, juros, tarifas bancárias, empréstimos
-              - saude: farmácia, médicos, hospitais, planos de saúde, exames, dentista, psicólogo
-              - lazer: netflix (quando é lazer), cinema, shows, eventos, viagens, bares, restaurantes (quando é lazer)
-              - compras: roupas, eletrônicos, produtos diversos, itens para casa, acessórios
+              - saude: farmácia, médicos, hospitais, planos de saúde, exames, dentista, psicólogo, remédio, medicamento
+              - lazer: cinema, shows, eventos, viagens, bares, restaurantes (quando é lazer), streaming de entretenimento, jogos
+              - compras: roupas, eletrônicos, produtos diversos, itens para casa, acessórios, cigarro, produtos de higiene, cosméticos
               - investimentos: aplicações, ações, previdência, rendimentos, poupança, tesouro direto
               - familia: escola, mensalidades, despesas com filhos, creche, material escolar
               - doacoes: doações, contribuições para causas, caridade, dízimo
@@ -48,15 +48,16 @@ export async function aiParseTransaction(text: string) {
               - Se UMA transação: retorne um objeto JSON
               - Se MÚLTIPLAS transações: retorne um array de objetos JSON
               
-              Exemplos:
-              - "Comprei café por 5 reais" → objeto único
+              Exemplos de múltiplas transações:
+              - "Gastei 15 com hambúrguer e 12 com cigarro" → array com 2 objetos: [{amount: 15, description: "hambúrguer", category: "alimentacao"}, {amount: 12, description: "cigarro", category: "compras"}]
               - "Comprei café por 5 reais e almoço por 15 reais" → array com 2 objetos
               - "Gastei 20 no mercado, 10 no posto e 30 na farmácia" → array com 3 objetos
               
               Outras regras:
               - Se o valor contiver "k" (ex: "2k"), multiplique por 1000
               - Para moeda brasileira (R$), extraia apenas o número
-              - Use data de hoje (${new Date().toISOString().split('T')[0]}) se não especificada`
+              - Use data de hoje (${new Date().toISOString().split('T')[0]}) se não especificada
+              - Sempre identifique transações separadas mesmo quando mencionadas em uma frase com "e"`
           },
           { role: "user", content: text }
         ],

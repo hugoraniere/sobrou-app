@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle, AlertCircle, ArrowLeft, Plus } from 'lucide-react';
 import { EditableTransactionRow } from './EditableTransactionRow';
 import { ParsedExpense } from '@/services/transactions/types';
 
@@ -17,6 +17,7 @@ interface MultipleTransactionsReviewProps {
   onConfirmAll: () => void;
   onBack: () => void;
   transcriptionText?: string;
+  onAddNewTransaction?: (transaction: Partial<ParsedExpense>) => void;
 }
 
 export const MultipleTransactionsReview: React.FC<MultipleTransactionsReviewProps> = ({
@@ -25,7 +26,8 @@ export const MultipleTransactionsReview: React.FC<MultipleTransactionsReviewProp
   onRemoveTransaction,
   onConfirmAll,
   onBack,
-  transcriptionText
+  transcriptionText,
+  onAddNewTransaction
 }) => {
   const totalAmount = transactions.reduce((sum, transaction) => {
     return sum + (transaction.type === 'expense' ? -transaction.amount : transaction.amount);
@@ -39,6 +41,18 @@ export const MultipleTransactionsReview: React.FC<MultipleTransactionsReviewProp
   };
 
   const allTransactionsValid = transactions.every(isValidTransaction);
+
+  const handleAddNewTransaction = () => {
+    if (onAddNewTransaction) {
+      onAddNewTransaction({
+        description: '',
+        amount: 0,
+        category: 'compras',
+        type: 'expense',
+        date: new Date().toISOString().split('T')[0]
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -111,7 +125,15 @@ export const MultipleTransactionsReview: React.FC<MultipleTransactionsReviewProp
 
       {/* Transactions List */}
       <div className="space-y-4">
-        <h4 className="font-medium">Editar Transações</h4>
+        <div className="flex items-center justify-between">
+          <h4 className="font-medium">Editar Transações</h4>
+          {onAddNewTransaction && (
+            <Button variant="outline" size="sm" onClick={handleAddNewTransaction}>
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Transação
+            </Button>
+          )}
+        </div>
         
         {/* Headers (Desktop only) */}
         <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground border-b">
@@ -138,15 +160,15 @@ export const MultipleTransactionsReview: React.FC<MultipleTransactionsReviewProp
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-        <Button variant="outline" onClick={onBack} className="flex-1 sm:flex-none">
-          Gravar Novamente
+      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t justify-end">
+        <Button variant="outline" onClick={onBack} className="w-auto px-4">
+          Voltar
         </Button>
         
         <Button 
           onClick={onConfirmAll}
           disabled={!allTransactionsValid || transactions.length === 0}
-          className="flex-1"
+          className="w-auto px-4"
         >
           Salvar {transactions.length} Transação{transactions.length !== 1 ? 'ões' : ''}
         </Button>
