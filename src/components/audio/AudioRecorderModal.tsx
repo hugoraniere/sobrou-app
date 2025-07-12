@@ -70,11 +70,13 @@ export const AudioRecorderModal: React.FC<AudioRecorderModalProps> = ({
     }
   };
 
-  const handleStopRecording = async () => {
+  const handleStopRecording = () => {
     stopRecording();
+  };
+
+  const handleProcessRecording = async () => {
     if (!audioBlob) return;
 
-    // Auto-process after recording stops
     try {
       // Convert audio to base64
       const arrayBuffer = await audioBlob.arrayBuffer();
@@ -205,6 +207,12 @@ export const AudioRecorderModal: React.FC<AudioRecorderModalProps> = ({
                       </p>
                     </div>
                     <div className="flex justify-center gap-4">
+                      <Button
+                        onClick={handleProcessRecording}
+                        className="px-6"
+                      >
+                        Processar Transações
+                      </Button>
                       <Button
                         variant="outline"
                         onClick={handlePlay}
