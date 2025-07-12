@@ -143,91 +143,112 @@ export const AudioRecorderModal: React.FC<AudioRecorderModalProps> = ({
           {currentStep === 'recording' && (
             <>
               {/* Recording Section */}
-              <div className="text-center space-y-4">
-                <div className="flex justify-center">
-                  {!audioBlob ? (
-                    <Button
-                      size="lg"
-                      variant={isRecording ? "destructive" : "default"}
-                      onClick={isRecording ? handleStopRecording : startRecording}
-                      className="rounded-full w-20 h-20"
-                      disabled={isProcessing}
-                    >
-                      {isRecording ? (
-                        <MicOff className="h-8 w-8" />
-                      ) : (
-                        <Mic className="h-8 w-8" />
-                      )}
-                    </Button>
-                  ) : (
-                    <div className="space-y-4">
+              <div className="text-center space-y-6">
+                {!isRecording && !audioBlob && !isProcessing && (
+                  <div className="space-y-4">
+                    <div className="text-center space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        Clique no botão abaixo para gravar suas transações
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Fale sobre várias transações em uma gravação
+                      </p>
+                    </div>
+                    <div className="flex justify-center">
                       <Button
-                        variant="outline"
-                        onClick={handlePlay}
-                        className="rounded-full w-16 h-16"
+                        size="lg"
+                        onClick={startRecording}
+                        disabled={isProcessing}
+                        className="px-8 py-3"
                       >
-                        {isPlaying ? (
-                          <Pause className="h-6 w-6" />
-                        ) : (
-                          <Play className="h-6 w-6" />
-                        )}
+                        <Mic className="h-5 w-5 mr-2" />
+                        Gravar
                       </Button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {isRecording && (
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Gravando...</p>
-                    <p className="text-lg font-mono">{formatDuration(duration)}</p>
-                  </div>
-                )}
-
-                {isProcessing && (
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Processando transcrição...</p>
-                  </div>
-                )}
-
-                {!isRecording && !audioBlob && !isProcessing && (
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      Toque para gravar suas transações
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Fale sobre várias transações em uma gravação
-                    </p>
+                  <div className="space-y-4">
+                    <div className="text-center space-y-2">
+                      <p className="text-sm text-muted-foreground">Gravando...</p>
+                      <p className="text-2xl font-mono font-semibold text-primary">
+                        {formatDuration(duration)}
+                      </p>
+                    </div>
+                    <div className="flex justify-center gap-4">
+                      <Button
+                        variant="destructive"
+                        onClick={handleStopRecording}
+                        disabled={isProcessing}
+                        className="px-6"
+                      >
+                        <MicOff className="h-5 w-5 mr-2" />
+                        Parar {formatDuration(duration)}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleReset}
+                        disabled={isProcessing}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
                   </div>
                 )}
 
                 {audioBlob && !isProcessing && (
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Gravação concluída ({formatDuration(duration)})
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleReset}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Gravar Novamente
-                    </Button>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Gravação concluída ({formatDuration(duration)})
+                      </p>
+                    </div>
+                    <div className="flex justify-center gap-4">
+                      <Button
+                        variant="outline"
+                        onClick={handlePlay}
+                        className="px-6"
+                      >
+                        {isPlaying ? (
+                          <>
+                            <Pause className="h-4 w-4 mr-2" />
+                            Pausar
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-4 w-4 mr-2" />
+                            Reproduzir
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleReset}
+                      >
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Gravar Novamente
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {isProcessing && (
+                  <div className="text-center space-y-2">
+                    <p className="text-sm text-muted-foreground">Processando transcrição...</p>
+                    <div className="animate-pulse">
+                      <div className="h-2 bg-muted rounded w-1/2 mx-auto"></div>
+                    </div>
                   </div>
                 )}
 
                 {processingError && (
-                  <p className="text-sm text-destructive">
-                    {processingError}
-                  </p>
+                  <div className="text-center">
+                    <p className="text-sm text-destructive">
+                      {processingError}
+                    </p>
+                  </div>
                 )}
-              </div>
-
-              {/* Action Buttons for Recording Step */}
-              <div className="flex gap-3 pt-4 border-t">
-                <Button variant="outline" onClick={handleClose} className="flex-1">
-                  Cancelar
-                </Button>
               </div>
             </>
           )}
