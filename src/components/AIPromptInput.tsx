@@ -38,45 +38,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   const inputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation();
 
-  // Função para confirmar transações em lote
-  const handleTransactionsBatchConfirm = useCallback((transactionsToConfirm: any[]) => {
-    const processAllTransactions = async () => {
-      for (const transaction of transactionsToConfirm) {
-        try {
-          if (transaction.isSaving && transaction.savingGoal) {
-            const goal = await SavingsService.findOrCreateSavingGoal(transaction.savingGoal);
-            await SavingsService.addToSavingGoal(goal.id, transaction.amount, transaction.date);
-          } else {
-            await TransactionService.addTransaction({
-              amount: transaction.amount,
-              description: transaction.description,
-              category: transaction.category,
-              type: transaction.type,
-              date: transaction.date
-            });
-          }
-        } catch (error) {
-          console.error('Error adding transaction:', error);
-          toast.error(`Erro ao adicionar transação: ${transaction.description}`);
-        }
-      }
-      
-      toast.success(`${transactionsToConfirm.length} transação${transactionsToConfirm.length > 1 ? 'ões' : ''} adicionada${transactionsToConfirm.length > 1 ? 's' : ''} com sucesso!`);
-      if (onTransactionAdded) {
-        onTransactionAdded(false);
-      }
-      
-      // Reset form
-      setInputValue('');
-      setUserSelectedCategory(null);
-      setShowReview(false);
-      setOriginalInputText('');
-    };
-
-    processAllTransactions();
-  }, [onTransactionAdded]);
-
-  // Hook para gerenciar múltiplas transações
+  // Hook para gerenciar múltiplas transações (declarado primeiro)
   const {
     isProcessing,
     transactions,
@@ -89,7 +51,46 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     hasTransactions,
     addNewTransaction
   } = useMultipleTransactionsParsing({
-    onTransactionsConfirm: handleTransactionsBatchConfirm
+    onTransactionsConfirm: (transactionsToConfirm: any[]) => {
+      const processAllTransactions = async () => {
+        for (const transaction of transactionsToConfirm) {
+          try {
+            if (transaction.isSaving && transaction.savingGoal) {
+              const goal = await SavingsService.findOrCreateSavingGoal(transaction.savingGoal);
+              await SavingsService.addToSavingGoal(goal.id, transaction.amount, transaction.date);
+            } else {
+              await TransactionService.addTransaction({
+                amount: transaction.amount,
+                description: transaction.description,
+                category: transaction.category,
+                type: transaction.type,
+                date: transaction.date
+              });
+            }
+          } catch (error) {
+            console.error('Error adding transaction:', error);
+            toast.error(`Erro ao adicionar transação: ${transaction.description}`);
+            return; // Parar se houver erro
+          }
+        }
+        
+        toast.success(`${transactionsToConfirm.length} transação${transactionsToConfirm.length > 1 ? 'ões' : ''} adicionada${transactionsToConfirm.length > 1 ? 's' : ''} com sucesso!`);
+        if (onTransactionAdded) {
+          onTransactionAdded(false);
+        }
+        
+        // Reset form após sucesso
+        console.log("🧹 Limpando formulário após salvamento bem-sucedido");
+        setInputValue('');
+        setUserSelectedCategory(null);
+        setDetectedCategory(null);
+        setShowReview(false);
+        setOriginalInputText('');
+        resetProcessing(); // Limpar estado do hook também
+      };
+
+      processAllTransactions();
+    }
   });
 
   // Otimizado para detectar categoria com menos atraso
@@ -130,32 +131,28 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     }
     
     try {
-      console.log("Iniciando processamento do prompt:", inputValue);
+      console.log("🚀 Iniciando processamento do prompt:", inputValue);
       setOriginalInputText(inputValue);
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       
       // Aguardar o processamento completo
       await processTranscription(inputValue, formattedDate);
       
-      // Aguardar um momento para garantir que o estado foi atualizado
-      setTimeout(() => {
-        console.log("Estado hasTransactions após processamento:", hasTransactions);
-        console.log("Número de transações processadas:", transactions.length);
-        
-        if (transactions.length > 0) {
-          console.log("Confirmando transações automaticamente");
-          confirmAllTransactions();
-        } else {
-          console.log("Nenhuma transação foi processada");
-          toast.error("Não foi possível processar sua entrada. Verifique o formato.");
-        }
-      }, 500);
-      
     } catch (error) {
-      console.error('Error processing input:', error);
+      console.error('❌ Error processing input:', error);
       toast.error("Não foi possível processar sua entrada. Por favor, tente novamente.");
     }
   };
+
+  // UseEffect para monitorar mudanças nas transações e confirmar automaticamente
+  useEffect(() => {
+    console.log("🔍 Verificando transações no useEffect:", transactions.length);
+    
+    if (transactions.length > 0 && !isProcessing) {
+      console.log("✅ Confirmando transações automaticamente");
+      confirmAllTransactions();
+    }
+  }, [transactions, isProcessing, confirmAllTransactions]);
 
   const handleAudioTransactionConfirm = (data: any) => {
     const processTransaction = async (transaction: any) => {

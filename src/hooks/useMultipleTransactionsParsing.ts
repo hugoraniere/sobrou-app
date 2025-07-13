@@ -66,9 +66,10 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
   };
 
   const confirmAllTransactions = () => {
+    console.log("💾 Confirmando transações:", transactions.length);
     const transactionsToSave = transactions.map(({ id, ...transaction }) => transaction);
     onTransactionsConfirm(transactionsToSave);
-    reset();
+    // Não fazer reset aqui - será feito após o salvamento bem-sucedido
   };
 
   const addNewTransaction = (newTransaction: Partial<ParsedExpense>) => {
