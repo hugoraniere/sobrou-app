@@ -1,10 +1,12 @@
 
-// Implementação simplificada do hook use-i18n
-// Como estamos apenas usando português, este hook retorna valores fixos
+import { useTranslation } from 'react-i18next';
 
 export const useI18n = () => {
+  const { t, i18n } = useTranslation();
+  
   return {
-    locale: 'pt-BR',
-    t: (key: string) => key // Função simples para compatibilidade
+    locale: i18n.language,
+    t,
+    changeLanguage: i18n.changeLanguage
   };
 };

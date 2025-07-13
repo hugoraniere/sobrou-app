@@ -5,11 +5,13 @@ import { Settings, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useNavigationPages } from '@/hooks/useNavigationPages';
+import { useI18n } from '@/hooks/use-i18n';
 
 export function AppSidebar() {
   const location = useLocation();
   const { state, toggleSidebar } = useSidebar();
   const { visiblePages } = useNavigationPages();
+  const { t } = useI18n();
   const isExpanded = state === 'expanded';
 
   const isActivePath = (path: string) => {
@@ -38,7 +40,7 @@ export function AppSidebar() {
           <ChevronRight className={cn("h-4 w-4 text-gray-500", isExpanded && "rotate-180")} />
           {isExpanded && (
             <span className="ml-2 text-sm text-gray-600 whitespace-nowrap">
-              Recolher menu
+              {t('common.collapseMenu', 'Recolher menu')}
             </span>
           )}
         </button>
@@ -93,19 +95,19 @@ export function AppSidebar() {
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             )}
-            title={!isExpanded ? 'Configurações' : undefined}
+            title={!isExpanded ? t('common.settings') : undefined}
           >
             <Settings className={cn("h-5 w-5 flex-shrink-0", isExpanded && "mr-3")} />
             {isExpanded && (
               <span className="font-medium text-sm whitespace-nowrap">
-                Configurações
+                {t('common.settings')}
               </span>
             )}
             
             {/* Tooltip for collapsed state */}
             {!isExpanded && (
               <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                Configurações
+                {t('common.settings')}
               </div>
             )}
           </Link>

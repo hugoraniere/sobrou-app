@@ -10,6 +10,7 @@ import { useAIChat } from '@/contexts/AIChatContext';
 import { useWhatsAppButton } from '@/contexts/WhatsAppButtonContext';
 import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
 import ResetAccountDataDialog from '@/components/settings/ResetAccountDataDialog';
+import { LanguageSelector } from '@/components/settings/LanguageSelector';
 import { SETTINGS_TEXT } from '@/constants/text/settings';
 
 const PreferencesTab = () => {
@@ -20,6 +21,19 @@ const PreferencesTab = () => {
 
   return (
     <div className="grid gap-6">
+      {/* Language Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('settings.language')}</CardTitle>
+          <CardDescription>
+            {t('settings.languageDesc', 'Escolha o idioma da aplicação')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LanguageSelector />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
