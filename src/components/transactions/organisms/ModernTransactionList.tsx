@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Transaction } from '@/services/transactions';
 import TransactionListContent from '@/components/transactions/molecules/TransactionListContent';
+import EditTransactionDialog from '@/components/transactions/EditTransactionDialog';
+import DeleteTransactionDialog from '@/components/transactions/DeleteTransactionDialog';
 
 interface ModernTransactionListProps {
   transactions: Transaction[];
@@ -16,15 +18,19 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
   className = "",
   showCardPadding = false
 }) => {
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   const handleTransactionEdit = (transaction: Transaction) => {
-    // Implementation for editing
-    console.log('Edit transaction:', transaction);
+    setEditingTransaction(transaction);
+    setIsEditDialogOpen(true);
   };
 
   const handleTransactionDelete = (id: string) => {
-    // Implementation for deleting
-    console.log('Delete transaction:', id);
-    onTransactionUpdated();
+    setDeletingTransactionId(id);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -36,6 +42,24 @@ const ModernTransactionList: React.FC<ModernTransactionListProps> = ({
         isEmpty={transactions.length === 0}
         showCardPadding={showCardPadding}
       />
+      
+      {editingTransaction && (
+        <EditTransactionDialog
+          transaction={editingTransaction}
+          isOpen={isEditDialogOpen}
+          setIsOpen={setIsEditDialogOpen}
+          onTransactionUpdated={onTransactionUpdated}
+        />
+      )}
+      
+      {deletingTransactionId && (
+        <DeleteTransactionDialog
+          transactionId={deletingTransactionId}
+          isOpen={isDeleteDialogOpen}
+          setIsOpen={setIsDeleteDialogOpen}
+          onTransactionUpdated={onTransactionUpdated}
+        />
+      )}
     </div>
   );
 };
