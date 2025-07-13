@@ -27,15 +27,15 @@ export function AppSidebar() {
       )}
     >
       {/* Toggle button */}
-      <div className="flex justify-end border-b border-gray-100 h-12">
+      <div className="border-b border-gray-100 h-12">
         <button
           onClick={toggleSidebar}
           className={cn(
             "flex items-center h-full hover:bg-gray-100 transition-colors",
-            isExpanded ? "px-4 rotate-180" : "px-4"
+            isExpanded ? "w-full px-4" : "w-full px-4 justify-center"
           )}
         >
-          <ChevronRight className="h-4 w-4 text-gray-500" />
+          <ChevronRight className={cn("h-4 w-4 text-gray-500", isExpanded && "rotate-180")} />
           {isExpanded && (
             <span className="ml-2 text-sm text-gray-600 whitespace-nowrap">
               Recolher menu
