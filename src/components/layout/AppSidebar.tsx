@@ -27,21 +27,26 @@ export function AppSidebar() {
       )}
     >
       {/* Toggle button */}
-      <div className="flex justify-end p-2 border-b border-gray-100">
+      <div className="flex justify-end border-b border-gray-100 h-12">
         <button
           onClick={toggleSidebar}
           className={cn(
-            "p-2 rounded-lg hover:bg-gray-100 transition-colors",
-            isExpanded && "rotate-180"
+            "flex items-center h-full hover:bg-gray-100 transition-colors",
+            isExpanded ? "px-4 rotate-180" : "px-4"
           )}
         >
           <ChevronRight className="h-4 w-4 text-gray-500" />
+          {isExpanded && (
+            <span className="ml-2 text-sm text-gray-600 whitespace-nowrap">
+              Recolher menu
+            </span>
+          )}
         </button>
       </div>
 
       {/* Menu items */}
-      <nav className="flex-1 px-2 py-4">
-        <div className="space-y-2">
+      <nav className="flex-1">
+        <div className="space-y-1 py-2">
           {visiblePages.map((item) => {
             const isActive = isActivePath(item.url);
             return (
@@ -49,8 +54,8 @@ export function AppSidebar() {
                 key={item.title}
                 to={item.url}
                 className={cn(
-                  "flex items-center rounded-xl transition-all duration-200 group relative",
-                  isExpanded ? "px-3 py-3" : "px-3 py-3 justify-center",
+                  "flex items-center transition-all duration-200 group relative mx-1",
+                  isExpanded ? "px-3 py-3 rounded-xl" : "px-3 py-3 justify-center rounded-xl",
                   isActive 
                     ? "bg-primary text-white shadow-sm" 
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -76,14 +81,14 @@ export function AppSidebar() {
         </div>
       </nav>
 
-      {/* Settings at bottom with increased spacing */}
-      <div className="px-2 pb-4 border-t border-gray-100 mt-auto">
-        <div className="pt-4">
+      {/* Settings at bottom */}
+      <div className="border-t border-gray-100 mt-auto">
+        <div className="py-2">
           <Link
             to="/settings"
             className={cn(
-              "flex items-center rounded-xl transition-all duration-200 group relative",
-              isExpanded ? "px-3 py-3" : "px-3 py-3 justify-center",
+              "flex items-center transition-all duration-200 group relative mx-1",
+              isExpanded ? "px-3 py-3 rounded-xl" : "px-3 py-3 justify-center rounded-xl",
               isActivePath('/settings')
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
