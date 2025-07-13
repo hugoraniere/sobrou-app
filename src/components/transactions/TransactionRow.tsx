@@ -319,7 +319,12 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
         )}>
           {transaction.type === 'income' ? '+' : '-'}
-          {`R$${transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          {transaction.amount.toLocaleString('pt-BR', { 
+            style: 'currency', 
+            currency: 'BRL',
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+          })}
         </div>
       </TableCell>
     );

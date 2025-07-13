@@ -1,9 +1,11 @@
 
 export const formatCurrency = (amount: number) => {
-  return `R$ ${amount.toLocaleString('pt-BR', { 
-    minimumFractionDigits: 2, 
-    maximumFractionDigits: 2 
-  })}`;
+  return amount.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 };
 
 export const capitalizeFirstLetter = (text: string) => {

@@ -53,7 +53,7 @@ export const BillBalanceCard: React.FC<BillBalanceCardProps> = ({
               transactionsTotal > 0 ? 'text-green-600' : 'text-gray-500'
             }`}>
               {transactionsTotal !== 0 && (transactionsTotal > 0 ? '+' : '')}
-              {hasTransactions ? formatCurrency(Math.abs(transactionsTotal)) : 'R$ 0,00'}
+              {hasTransactions ? formatCurrency(Math.abs(transactionsTotal)) : formatCurrency(0)}
             </div>
           </div>
 
