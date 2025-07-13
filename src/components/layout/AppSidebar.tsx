@@ -22,7 +22,7 @@ export function AppSidebar() {
   return (
     <div 
       className={cn(
-        "fixed left-0 top-0 h-screen z-50 bg-white shadow-lg border-r border-gray-100 transition-all duration-300 ease-in-out flex flex-col",
+        "fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 bg-white shadow-lg border-r border-gray-100 transition-all duration-300 ease-in-out flex flex-col",
         isExpanded ? "w-64" : "w-16"
       )}
     >

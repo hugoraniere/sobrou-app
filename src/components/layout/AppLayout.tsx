@@ -33,8 +33,8 @@ const AppLayoutContent: React.FC<AppLayoutContentProps> = ({ children }) => {
         {/* Top navbar */}
         <MainNavbar />
         
-        {/* Main content */}
-        <main className="flex-1 w-full">
+        {/* Main content with top padding to account for fixed navbar */}
+        <main className="flex-1 w-full pt-16">
           <div className="w-full mx-auto">
             {children}
           </div>
