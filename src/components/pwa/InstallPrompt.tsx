@@ -13,7 +13,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-const InstallPrompt = () => {
+const InstallPrompt: React.FC = () => {
   const { t } = useI18n();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
