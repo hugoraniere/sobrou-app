@@ -155,8 +155,8 @@ const App = () => {
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                         
-            <WhatsAppChatButton />
-            <InstallPrompt />
+                        <WhatsAppChatButton />
+                        <InstallPrompt />
                       </div>
                     </NavigationProvider>
                   </WhatsAppButtonProvider>
