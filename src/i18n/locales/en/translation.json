@@ -180,5 +180,12 @@
     "confirmLogout": "Confirm Logout",
     "logoutConfirmation": "Are you sure you want to logout? Your session will be ended.",
     "logout": "Logout"
+  },
+  "pwa": {
+    "install": {
+      "title": "Install Sobrou",
+      "description": "Get quick access and offline features by installing the app.",
+      "button": "Install"
+    }
   }
 }

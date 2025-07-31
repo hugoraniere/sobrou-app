@@ -180,5 +180,12 @@
     "confirmLogout": "Confirmar Saída",
     "logoutConfirmation": "Tem certeza que deseja sair? Sua sessão será encerrada.",
     "logout": "Sair"
+  },
+  "pwa": {
+    "install": {
+      "title": "Instalar Sobrou",
+      "description": "Tenha acesso rápido e funcionalidades offline instalando o app.",
+      "button": "Instalar"
+    }
   }
 }

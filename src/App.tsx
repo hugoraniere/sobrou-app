@@ -27,6 +27,7 @@ import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
 import { NavigationProvider } from '@/contexts/NavigationContext';
+import InstallPrompt from './components/pwa/InstallPrompt';
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -154,7 +155,8 @@ const App = () => {
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                         
-                        <WhatsAppChatButton />
+            <WhatsAppChatButton />
+            <InstallPrompt />
                       </div>
                     </NavigationProvider>
                   </WhatsAppButtonProvider>
