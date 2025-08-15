@@ -5,11 +5,25 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section id="hero" className="w-full min-h-screen bg-green-50/30 scroll-mt-16 flex items-center">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+    <section id="hero" className="relative w-full min-h-[100svh] bg-green-50/30 scroll-mt-16 flex items-center overflow-hidden">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        {/* Imagem absoluta para desktop */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[60vw] xl:w-[55vw] max-w-[1040px] pointer-events-none z-0 hidden lg:block">
+          <div className="absolute inset-0 rounded-2xl bg-primary/5 translate-x-8 translate-y-8 -z-10" />
+          <img
+            src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
+            alt="Dashboard do Sobrou mostrando controle financeiro completo"
+            className="rounded-2xl shadow-2xl w-full h-auto"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            sizes="(min-width: 1024px) 55vw, 90vw"
+          />
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
           {/* Texto / CTA */}
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center lg:pr-24 xl:pr-32">
             <h1 className="font-alliance-n2 text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Organize suas finanças,<br />
               é só digitar
@@ -31,19 +45,16 @@ const HeroSection: React.FC = () => {
             </div>
           </div>
           
-          {/* Imagem */}
-          <div className="relative flex justify-center lg:justify-end">
-            <div className="relative z-10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-2xl">
-              <img
-                src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
-                alt="Dashboard do Sobrou mostrando controle financeiro completo"
-                className="rounded-2xl w-full h-auto"
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-              />
-            </div>
-            <div className="absolute inset-0 bg-primary/5 rounded-2xl transform translate-x-6 translate-y-6 -z-10 pointer-events-none hidden lg:block" />
+          {/* Imagem responsiva para mobile/tablet */}
+          <div className="mt-8 flex justify-center lg:hidden">
+            <img
+              src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
+              alt="Dashboard do Sobrou mostrando controle financeiro completo"
+              className="w-full max-w-md sm:max-w-lg rounded-2xl shadow-2xl"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+            />
           </div>
         </div>
       </div>
