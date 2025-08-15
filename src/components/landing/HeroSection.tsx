@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section id="hero" className="relative w-full bg-green-50/30 scroll-mt-16 lg:h-[calc(100vh-64px)]">
+    <section id="hero" className="relative w-full lg:h-[calc(100vh-64px)]">
       {/* Imagem absoluta para desktop - estende até a borda direita */}
       <div className="hidden lg:block lg:absolute top-16 bottom-8 right-0 w-[47%] z-0 pointer-events-none">
         <img
