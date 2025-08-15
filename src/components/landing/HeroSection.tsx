@@ -14,7 +14,7 @@ const HeroSection: React.FC = () => {
         <div className="flex flex-col lg:flex-row items-center lg:items-stretch">
           {/* Coluna de texto - 50% no desktop */}
           <div className="flex flex-col justify-center text-center lg:text-left lg:basis-1/2 py-16 lg:py-0 lg:pr-6">
-            <h1 className="font-alliance-n2 text-6xl lg:text-[3.5625rem] font-bold leading-tight mb-6 md:text-5xl">
+            <h1 className="font-alliance-n2 text-6xl lg:text-[3.384375rem] font-semibold leading-tight mb-6 md:text-5xl">
               Organize suas finanças,<br />
               é só digitar
             </h1>
