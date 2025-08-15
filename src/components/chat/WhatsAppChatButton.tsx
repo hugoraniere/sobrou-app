@@ -20,11 +20,6 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Don't show on public landing page
-  if (location.pathname === '/') {
-    return null;
-  }
-
   // Usando variável de ambiente para o número do WhatsApp
   const WHATSAPP_PHONE_NUMBER_ID = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID || '';
 
@@ -57,6 +52,11 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
 
     checkWhatsAppConnection();
   }, [user]);
+
+  // Don't show on public landing page - moved after all hooks
+  if (location.pathname === '/') {
+    return null;
+  }
 
   const handleClick = () => {
     if (!user) {
