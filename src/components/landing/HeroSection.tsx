@@ -39,10 +39,12 @@ const HeroSection: React.FC = () => {
           <div className="relative flex justify-center">
             <div className="relative z-10 rounded-lg shadow-2xl overflow-hidden max-w-lg w-full">
               <img
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=900"
-                alt="Sobrou App Interface"
+                src="/lovable-uploads/99c07f63-fffe-4761-a8d8-35c85d058c3a.png"
+                alt="Sobrou App Dashboard Interface"
                 className="rounded-lg w-full h-auto"
-                loading="lazy"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
               />
             </div>
             <div className="absolute inset-0 bg-primary/5 rounded-lg transform translate-x-4 translate-y-4 -z-10 pointer-events-none hidden sm:block" />
