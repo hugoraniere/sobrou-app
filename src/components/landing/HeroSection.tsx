@@ -39,8 +39,8 @@ const HeroSection: React.FC = () => {
           <div className="relative flex justify-center">
             <div className="relative z-10 rounded-lg shadow-2xl overflow-hidden max-w-lg w-full">
               <img
-                src="/lovable-uploads/99c07f63-fffe-4761-a8d8-35c85d058c3a.png"
-                alt="Sobrou App Dashboard Interface"
+                src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
+                alt="Dashboard do Sobrou mostrando controle financeiro completo"
                 className="rounded-lg w-full h-auto"
                 loading="eager"
                 fetchPriority="high"
