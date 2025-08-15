@@ -7,7 +7,7 @@ const HeroSection: React.FC = () => {
   return (
     <section id="hero" className="relative w-full bg-green-50/30 scroll-mt-16">
       {/* Imagem absoluta para desktop - estende até a borda direita */}
-      <div className="hidden lg:block absolute top-16 bottom-8 right-0 w-1/2 z-0 pointer-events-none">
+      <div className="hidden lg:block absolute top-16 bottom-8 right-0 w-[45%] z-0 pointer-events-none">
         <img
           src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
           alt="Dashboard do Sobrou mostrando controle financeiro completo"
@@ -50,7 +50,7 @@ const HeroSection: React.FC = () => {
             <img
               src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
               alt="Dashboard do Sobrou mostrando controle financeiro completo"
-              className="w-full max-w-sm h-auto rounded-2xl shadow-2xl"
+              className="w-full h-auto rounded-2xl shadow-2xl"
               loading="eager"
               fetchPriority="high"
               decoding="async"
