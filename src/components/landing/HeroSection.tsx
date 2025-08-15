@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 const HeroSection: React.FC = () => {
-  return <section id="hero" className="relative w-full h-[85vh] flex items-center">
+  return <section id="hero" className="relative w-full h-[85vh] flex items-center bg-green-50/30">
       {/* Imagem absoluta para desktop - estende até a borda direita */}
       <div className="hidden lg:block lg:absolute top-16 bottom-8 right-0 w-[45%] z-0 pointer-events-none">
         <img src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" alt="Dashboard do Sobrou mostrando controle financeiro completo" className="w-full h-full object-cover object-left shadow-2xl rounded-l-2xl" loading="eager" fetchPriority="high" decoding="async" aria-hidden="true" />
@@ -14,7 +14,7 @@ const HeroSection: React.FC = () => {
         <div className="flex flex-col lg:flex-row items-center lg:items-stretch w-full">
           {/* Coluna de texto - 50% no desktop */}
           <div className="flex flex-col justify-center text-center lg:text-left lg:basis-1/2 py-8 lg:py-0 lg:pr-6">
-            <h1 className="font-alliance-n2 text-6xl lg:text-[3.384375rem] font-semibold leading-[1.3] mb-6 md:text-5xl">
+            <h1 className="font-alliance-n2 text-6xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl">
               Organize suas finanças,<br />
               <span className="text-primary">é só digitar</span>
             </h1>
