@@ -3,13 +3,13 @@ import { Shield, Lock, Eye, Server } from 'lucide-react';
 
 const SecurityPrivacySection: React.FC = () => {
   return (
-    <section id="seguranca-privacidade" className="w-full py-16 sm:py-20 lg:py-24 scroll-mt-24">
+    <section id="seguranca-privacidade" className="w-full py-16 sm:py-20 lg:py-24 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="font-montserrat text-3xl md:text-4xl font-bold text-text-primary mb-4">
+        <div className="max-w-4xl mx-auto text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Seus dados protegidos e privados
           </h2>
-          <p className="text-text-secondary max-w-2xl mx-auto text-lg">
+          <p className="text-lg max-w-2xl mx-auto">
             Segurança bancária e privacidade total. Seus dados financeiros ficam apenas com você.
           </p>
         </div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { getHeaderSpacing, getResponsiveTitle, getDescriptionClasses } from '@/constants/layoutTokens';
+import { getStandardTitle, getStandardDescription } from '@/constants/layoutTokens';
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface ResponsivePageHeaderProps {
@@ -17,14 +17,14 @@ const ResponsivePageHeader: React.FC<ResponsivePageHeaderProps> = ({
   const { isMobile } = useResponsive();
 
   return (
-    <div className={getHeaderSpacing()}>
+    <div className="mb-12 sm:mb-16">
       <div className="flex justify-between items-start">
         <div className="flex-1">
-          <h1 className={getResponsiveTitle(isMobile)}>
+          <h1 className={getStandardTitle()}>
             {title}
           </h1>
           {description && !isMobile && (
-            <p className={getDescriptionClasses("mt-1")}>
+            <p className={getStandardDescription("mt-1")}>
               {description}
             </p>
           )}

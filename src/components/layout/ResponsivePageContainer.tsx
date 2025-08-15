@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { getResponsiveContainer } from '@/constants/layoutTokens';
+import { getSectionContainer } from '@/constants/layoutTokens';
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface ResponsivePageContainerProps {
@@ -15,7 +15,7 @@ const ResponsivePageContainer: React.FC<ResponsivePageContainerProps> = ({
   const { isMobile } = useResponsive();
 
   return (
-    <div className={`${getResponsiveContainer(isMobile)} ${className}`}>
+    <div className={`${getSectionContainer()} ${className}`}>
       {children}
     </div>
   );

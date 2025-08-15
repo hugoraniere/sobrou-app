@@ -43,16 +43,17 @@ const FAQSection: React.FC = () => {
   ];
 
   return (
-    <section id="faq" className="w-full py-16 sm:py-20 lg:py-24 bg-card scroll-mt-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="font-montserrat text-3xl md:text-4xl font-bold text-text-primary mb-4">
-            Perguntas Frequentes
-          </h2>
-          <p className="text-text-secondary max-w-2xl mx-auto text-lg">
-            Tire suas dúvidas sobre o Sobrou e descubra como transformar seu controle financeiro
-          </p>
-        </div>
+    <section id="faq" className="w-full py-16 sm:py-20 lg:py-24 bg-card scroll-mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Perguntas Frequentes
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto">
+              Tire suas dúvidas sobre o Sobrou e descubra como transformar seu controle financeiro
+            </p>
+          </div>
 
         <Accordion type="single" collapsible className="w-full space-y-4">
           {faqs.map((faq, index) => (
@@ -81,6 +82,7 @@ const FAQSection: React.FC = () => {
           >
             Entre em contato conosco →
           </a>
+          </div>
         </div>
       </div>
     </section>

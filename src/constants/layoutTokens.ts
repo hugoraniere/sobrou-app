@@ -1,67 +1,62 @@
 
 import { cn } from '@/lib/utils';
 
-// Design tokens para padronização de layout
+// Design tokens para padronização universal da landing page
 export const LAYOUT_TOKENS = {
-  // Container padrão responsivo
-  CONTAINER: {
-    DESKTOP: 'container mx-auto max-w-screen-xl',
-    MOBILE: 'px-4',
-    FULL_WIDTH: 'w-full'
+  // Container padrão para todas as seções
+  SECTION: {
+    CONTAINER: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+    PADDING: 'py-16 sm:py-20 lg:py-24',
+    SCROLL_OFFSET: 'scroll-mt-16'
   },
   
-  // Header spacing padrão
-  HEADER: {
-    SPACING: 'mt-6 mb-6',
-    MOBILE_SPACING: 'mt-6 mb-6' // Mantém consistência
+  // Header interno para conteúdo mais estreito
+  CONTENT: {
+    NARROW: 'max-w-4xl mx-auto text-center',
+    HEADER_SPACING: 'mb-12 sm:mb-16'
   },
   
-  // Títulos responsivos
+  // Títulos padronizados
   TITLE: {
-    DESKTOP: 'text-3xl',
-    MOBILE: 'text-2xl',
-    BASE_CLASSES: 'font-bold text-gray-900'
+    CLASSES: 'text-3xl md:text-4xl font-bold',
+    DESCRIPTION: 'text-lg max-w-2xl mx-auto'
   },
   
-  // Descrições padrão
-  DESCRIPTION: {
-    BASE_CLASSES: 'text-gray-600'
-  },
-  
-  // Breakpoints otimizados
-  BREAKPOINTS: {
-    MOBILE_MAX: 768,
-    TABLET_MAX: 1024
+  // Grid padronizado
+  GRID: {
+    SPACING: 'gap-6 lg:gap-8'
   }
 } as const;
 
-// Função helper para container responsivo universal
-export const getResponsiveContainer = (isMobile?: boolean) => {
+// Função helper para seção padrão
+export const getStandardSection = (additionalClasses?: string) => {
   return cn(
-    LAYOUT_TOKENS.CONTAINER.FULL_WIDTH,
-    isMobile 
-      ? LAYOUT_TOKENS.CONTAINER.MOBILE 
-      : LAYOUT_TOKENS.CONTAINER.DESKTOP
-  );
-};
-
-// Função helper para título responsivo universal
-export const getResponsiveTitle = (isMobile?: boolean, additionalClasses?: string) => {
-  return cn(
-    LAYOUT_TOKENS.TITLE.BASE_CLASSES,
-    isMobile 
-      ? LAYOUT_TOKENS.TITLE.MOBILE 
-      : LAYOUT_TOKENS.TITLE.DESKTOP,
+    'w-full',
+    LAYOUT_TOKENS.SECTION.PADDING,
+    LAYOUT_TOKENS.SECTION.SCROLL_OFFSET,
     additionalClasses
   );
 };
 
-// Função helper para header spacing
-export const getHeaderSpacing = () => {
-  return LAYOUT_TOKENS.HEADER.SPACING;
+// Função helper para container de seção
+export const getSectionContainer = () => {
+  return LAYOUT_TOKENS.SECTION.CONTAINER;
 };
 
-// Função helper para descrição padrão
-export const getDescriptionClasses = (additionalClasses?: string) => {
-  return cn(LAYOUT_TOKENS.DESCRIPTION.BASE_CLASSES, additionalClasses);
+// Função helper para header de conteúdo
+export const getContentHeader = () => {
+  return cn(
+    LAYOUT_TOKENS.CONTENT.NARROW,
+    LAYOUT_TOKENS.CONTENT.HEADER_SPACING
+  );
+};
+
+// Função helper para título padronizado
+export const getStandardTitle = (additionalClasses?: string) => {
+  return cn(LAYOUT_TOKENS.TITLE.CLASSES, additionalClasses);
+};
+
+// Função helper para descrição padronizada
+export const getStandardDescription = (additionalClasses?: string) => {
+  return cn(LAYOUT_TOKENS.TITLE.DESCRIPTION, additionalClasses);
 };
