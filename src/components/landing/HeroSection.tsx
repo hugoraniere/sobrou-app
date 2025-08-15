@@ -33,18 +33,21 @@ const HeroSection: React.FC = () => {
           </div>
           
           {/* Coluna de imagem - 50% no desktop, sangra para a direita */}
-          <div className="relative lg:basis-1/2 flex items-center justify-center p-4 lg:p-8 lg:-mr-[calc((100vw-100%)/2)]">
-            {/* Elemento decorativo apenas no desktop */}
-            <div className="hidden lg:block absolute inset-4 rounded-2xl bg-primary/5 translate-x-4 translate-y-4 -z-10 lg:rounded-r-none" />
-            <img
-              src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
-              alt="Dashboard do Sobrou mostrando controle financeiro completo"
-              className="w-full max-w-md lg:max-w-none lg:w-full lg:h-full h-auto rounded-2xl shadow-2xl lg:object-cover lg:object-right lg:rounded-r-none lg:shadow-none"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              sizes="(min-width: 1024px) 50vw, 90vw"
-            />
+          <div className="relative lg:basis-1/2 flex items-center justify-center p-4 lg:pl-8 lg:pr-0 lg:mr-0">
+            {/* Container da imagem que sangra para a direita */}
+            <div className="relative w-full lg:w-[calc(100%+((100vw-100%)/2)+2rem)] lg:-mr-[calc((100vw-100%)/2)+2rem]">
+              {/* Elemento decorativo apenas no desktop */}
+              <div className="hidden lg:block absolute inset-4 rounded-2xl bg-primary/5 translate-x-4 translate-y-4 -z-10 lg:rounded-r-none lg:right-0" />
+              <img
+                src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
+                alt="Dashboard do Sobrou mostrando controle financeiro completo"
+                className="w-full max-w-md lg:max-w-none lg:w-full lg:h-full h-auto rounded-2xl shadow-2xl lg:object-cover lg:object-right lg:rounded-r-none lg:shadow-none"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                sizes="(min-width: 1024px) 50vw, 90vw"
+              />
+            </div>
           </div>
         </div>
       </div>
