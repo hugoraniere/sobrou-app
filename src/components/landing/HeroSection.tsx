@@ -23,7 +23,7 @@ const HeroSection: React.FC = () => {
         {/* Layout flex responsivo */}
         <div className="flex flex-col lg:flex-row items-stretch min-h-[80vh] lg:h-full">
           {/* Coluna de texto - 50% no desktop */}
-          <div className="flex flex-col justify-center text-center lg:text-left lg:basis-1/2 py-16 lg:py-0 lg:pr-8">
+          <div className="flex flex-col justify-center text-center lg:text-left lg:basis-1/2 py-16 lg:py-0 lg:pr-6">
             <h1 className="font-alliance-n2 text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Organize suas finanças,<br />
               é só digitar
