@@ -10,7 +10,7 @@ const TransparentHeader = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 0);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -25,7 +25,7 @@ const TransparentHeader = () => {
       )}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-14 md:h-16">
           <Link to="/" className="flex items-center">
             <Logo size="sm" className="h-8" />
           </Link>

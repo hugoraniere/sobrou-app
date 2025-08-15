@@ -1,5 +1,6 @@
 import React from 'react';
 import TransparentHeader from '../components/header/TransparentHeader';
+import { useSmoothScroll } from '../hooks/useSmoothScroll';
 import HeroSection from '../components/landing/HeroSection';
 import FeaturesSection from '../components/landing/FeaturesSection';
 import HowItWorksSection from '../components/landing/HowItWorksSection';
@@ -14,11 +15,13 @@ import CtaSection from '../components/landing/CtaSection';
 import Footer from '../components/landing/Footer';
 
 const PublicLanding: React.FC = () => {
+  useSmoothScroll();
+  
   return (
     <div className="bg-background min-h-screen">
       <TransparentHeader />
 
-      <main className="pt-20 md:pt-24">
+      <main className="pt-14 md:pt-16">
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />
