@@ -24,16 +24,16 @@ const HeroSection: React.FC = () => {
         <div className="flex flex-col lg:flex-row items-stretch min-h-[80vh] lg:h-full">
           {/* Coluna de texto - 50% no desktop */}
           <div className="flex flex-col justify-center text-center lg:text-left lg:basis-1/2 py-16 lg:py-0 lg:pr-6">
-            <h1 className="font-alliance-n2 text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+            <h1 className="font-outfit text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Organize suas finanças,<br />
               é só digitar
             </h1>
-            <p className="font-alliance text-xl text-gray-600 mb-8 max-w-2xl lg:max-w-none">
+            <p className="font-outfit text-xl text-gray-600 mb-8 max-w-2xl lg:max-w-none">
               Chega de planilhas complexas. Digite seus gastos em linguagem natural e deixe nossa IA organizar tudo automaticamente.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link to="/auth">
-                <Button size="lg" className="bg-primary hover:bg-primary-hover text-white font-alliance-n2 text-lg px-4 w-full sm:w-auto">
+                <Button size="lg" className="bg-primary hover:bg-primary-hover text-white font-outfit text-lg px-4 w-full sm:w-auto">
                   Começar agora
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -41,7 +41,7 @@ const HeroSection: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 mt-6 text-gray-600 justify-center lg:justify-start">
               <CheckCircle2 className="text-primary h-5 w-5" />
-              <span className="font-alliance">Comece em menos de 2 minutos</span>
+              <span className="font-outfit">Comece em menos de 2 minutos</span>
             </div>
           </div>
           

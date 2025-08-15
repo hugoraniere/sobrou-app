@@ -30,7 +30,7 @@ const TransparentHeader = () => {
             <Logo size="sm" className="h-8" />
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-8 font-alliance text-sm">
+          <nav className="hidden md:flex items-center space-x-8 font-outfit text-sm">
             <Link to="#features" className="text-gray-700 hover:text-primary transition-colors">
               Funcionalidades
             </Link>
@@ -44,12 +44,12 @@ const TransparentHeader = () => {
 
           <div className="flex items-center space-x-4">
             <Link to="/auth">
-              <Button variant="ghost" className="font-alliance text-sm text-gray-700 hover:text-primary">
+              <Button variant="ghost" className="font-outfit text-sm text-gray-700 hover:text-primary">
                 Entrar
               </Button>
             </Link>
             <Link to="/auth?tab=signup">
-              <Button className="bg-primary hover:bg-primary-hover text-white font-alliance text-sm">
+              <Button className="bg-primary hover:bg-primary-hover text-white font-outfit text-sm">
                 Criar conta grátis
               </Button>
             </Link>

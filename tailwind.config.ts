@@ -133,10 +133,8 @@ export default {
         'scanning': 'scanning 2s ease-in-out infinite'
       },
       fontFamily: {
-        inter: ['Inter', 'sans-serif'],
-        montserrat: ['Montserrat', 'sans-serif'],
-        alliance: ['Alliance N1', 'sans-serif'],
-        'alliance-n2': ['Alliance N2', 'sans-serif'],
+        outfit: ['Outfit', 'sans-serif'],
+        'chakra-petch': ['Chakra Petch', 'monospace'],
       }
     }
   },

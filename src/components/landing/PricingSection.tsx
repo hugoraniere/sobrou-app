@@ -109,10 +109,10 @@ const PricingSection: React.FC = () => {
             <Star className="h-4 w-4 mr-2" />
             Em breve - Lista de espera
           </Badge>
-          <h2 className="font-alliance-n2 text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
             Planos que crescem com você
           </h2>
-          <p className="font-alliance text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+          <p className="font-outfit text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Comece grátis e evolua conforme suas necessidades. Nossos planos premium estarão disponíveis em breve com recursos avançados de IA e automação.
           </p>
         </div>
@@ -121,17 +121,17 @@ const PricingSection: React.FC = () => {
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           <div className="text-center p-6 rounded-lg bg-card border">
             <Users className="h-8 w-8 text-primary mx-auto mb-4" />
-            <h3 className="font-alliance-n2 text-lg font-semibold mb-2">+10.000 usuários</h3>
+            <h3 className="font-outfit text-lg font-semibold mb-2">+10.000 usuários</h3>
             <p className="text-sm text-muted-foreground">já organizaram suas finanças</p>
           </div>
           <div className="text-center p-6 rounded-lg bg-card border">
             <TrendingUp className="h-8 w-8 text-primary mx-auto mb-4" />
-            <h3 className="font-alliance-n2 text-lg font-semibold mb-2">87% economizam mais</h3>
+            <h3 className="font-outfit text-lg font-semibold mb-2">87% economizam mais</h3>
             <p className="text-sm text-muted-foreground">após 30 dias de uso</p>
           </div>
           <div className="text-center p-6 rounded-lg bg-card border">
             <Clock className="h-8 w-8 text-primary mx-auto mb-4" />
-            <h3 className="font-alliance-n2 text-lg font-semibold mb-2">5 horas/mês</h3>
+            <h3 className="font-outfit text-lg font-semibold mb-2">5 horas/mês</h3>
             <p className="text-sm text-muted-foreground">economizadas em controle financeiro</p>
           </div>
         </div>
@@ -146,12 +146,12 @@ const PricingSection: React.FC = () => {
                 </Badge>
               )}
               <CardHeader className="text-center pb-8">
-                <CardTitle className="font-alliance-n2 text-xl mb-2">{plan.name}</CardTitle>
+                <CardTitle className="font-outfit text-xl mb-2">{plan.name}</CardTitle>
                 <div className="mb-4">
                   <span className="text-3xl font-bold">{plan.price}</span>
                   <span className="text-muted-foreground">{plan.period}</span>
                 </div>
-                <CardDescription className="font-alliance">{plan.description}</CardDescription>
+                <CardDescription className="font-outfit">{plan.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3 mb-8">
@@ -176,7 +176,7 @@ const PricingSection: React.FC = () => {
 
         {/* Add-ons */}
         <div className="mb-16">
-          <h3 className="font-alliance-n2 text-2xl font-bold text-center mb-8">Serviços Adicionais</h3>
+          <h3 className="font-outfit text-2xl font-bold text-center mb-8">Serviços Adicionais</h3>
           <div className="grid md:grid-cols-3 gap-6">
             {addOns.map((addon, index) => (
               <Card key={index} className="p-6">
@@ -185,7 +185,7 @@ const PricingSection: React.FC = () => {
                     {addon.icon}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-alliance-n2 font-semibold mb-1">{addon.name}</h4>
+                    <h4 className="font-outfit font-semibold mb-1">{addon.name}</h4>
                     <p className="text-sm text-muted-foreground mb-2">{addon.description}</p>
                     <p className="font-semibold text-primary">{addon.price}</p>
                   </div>
@@ -199,7 +199,7 @@ const PricingSection: React.FC = () => {
         <div className="max-w-2xl mx-auto text-center">
           <div className="bg-card border rounded-2xl p-8">
             <Building2 className="h-12 w-12 text-primary mx-auto mb-6" />
-            <h3 className="font-alliance-n2 text-2xl font-bold mb-4">
+            <h3 className="font-outfit text-2xl font-bold mb-4">
               Seja o primeiro a saber quando lançarmos
             </h3>
             <p className="text-muted-foreground mb-6">

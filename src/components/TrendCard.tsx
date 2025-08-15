@@ -50,7 +50,7 @@ const TrendCard = ({ name, growthData, competition, isHot = false, onSelect }: T
       )}
       
       <div className="flex justify-between items-start mb-4">
-        <h3 className="font-montserrat font-semibold text-lg">{name}</h3>
+        <h3 className="font-outfit font-semibold text-lg">{name}</h3>
         <div className="flex items-center gap-1">
           <TrendingUp size={16} className="text-trend-blue" />
           <span className="text-sm font-medium text-trend-blue">+{Math.floor(Math.random() * 70) + 30}%</span>

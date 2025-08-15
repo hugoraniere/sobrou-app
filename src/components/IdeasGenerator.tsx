@@ -16,14 +16,14 @@ const IdeasGenerator = ({ trend, contentIdeas, aiPrompts }: IdeasGeneratorProps)
 
   return (
     <div className="bg-white rounded-lg p-6 border border-border shadow-sm">
-      <h3 className="font-montserrat font-semibold text-xl mb-6 flex items-center gap-2">
+      <h3 className="font-outfit font-semibold text-xl mb-6 flex items-center gap-2">
         <Lightbulb size={20} className="text-trend-orange" />
         <span>Ideias para: <span className="text-trend-blue">{trend}</span></span>
       </h3>
       
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <h4 className="font-montserrat font-medium text-lg mb-3">Sugestões de Conteúdo</h4>
+          <h4 className="font-outfit font-medium text-lg mb-3">Sugestões de Conteúdo</h4>
           
           {contentIdeas.map((idea, index) => (
             <div key={index} className="ai-suggestion flex justify-between items-start gap-3">
@@ -41,7 +41,7 @@ const IdeasGenerator = ({ trend, contentIdeas, aiPrompts }: IdeasGeneratorProps)
         </div>
         
         <div className="space-y-4">
-          <h4 className="font-montserrat font-medium text-lg mb-3 flex items-center gap-2">
+          <h4 className="font-outfit font-medium text-lg mb-3 flex items-center gap-2">
             <span>Prompts para IA</span>
             <Sparkles size={16} className="text-trend-blue" />
           </h4>

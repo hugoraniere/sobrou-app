@@ -23,7 +23,7 @@ const allCategories = [
 const CategoryFilter = ({ activeCategory, setActiveCategory }: CategoryProps) => {
   return (
     <aside className="w-full md:w-64 p-4 shrink-0">
-      <h3 className="font-montserrat font-semibold text-lg mb-4">Categorias</h3>
+      <h3 className="font-outfit font-semibold text-lg mb-4">Categorias</h3>
       
       <div className="space-y-2">
         {allCategories.map((category) => (
