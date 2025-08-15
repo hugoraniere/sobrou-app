@@ -23,8 +23,8 @@ const HeroSection: React.FC = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         {/* Layout para desktop */}
         <div className="hidden lg:grid grid-cols-12 items-center gap-12 lg:gap-16 h-full min-h-[100svh]">
-          {/* Texto / CTA - 8 colunas */}
-          <div className="col-span-8 flex flex-col justify-center px-4 text-left">
+          {/* Texto / CTA - 6 colunas */}
+          <div className="col-span-6 flex flex-col justify-center px-4 text-left">
             <h1 className="font-alliance-n2 text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Organize suas finanças,<br />
               é só digitar
@@ -46,8 +46,8 @@ const HeroSection: React.FC = () => {
             </div>
           </div>
           
-          {/* Espaçador para desktop - 4 colunas reservadas para imagem absoluta */}
-          <div className="col-span-4"></div>
+          {/* Espaçador para desktop - 6 colunas reservadas para imagem absoluta */}
+          <div className="col-span-6"></div>
         </div>
         
         {/* Layout para mobile/tablet - conteúdo centralizado */}
