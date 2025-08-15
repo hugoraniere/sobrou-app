@@ -46,7 +46,7 @@ const HeroSection: React.FC = () => {
           </div>
           
           {/* Coluna de imagem - apenas mobile */}
-          <div className="lg:hidden flex items-center justify-center p-4">
+          <div className="lg:hidden flex items-center justify-center p-4 relative">
             <img
               src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
               alt="Dashboard do Sobrou mostrando controle financeiro completo"
