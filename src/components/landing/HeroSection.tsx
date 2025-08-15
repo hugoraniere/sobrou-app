@@ -5,8 +5,21 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section id="hero" className="relative w-full bg-green-50/30 scroll-mt-16 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="hero" className="relative w-full bg-green-50/30 scroll-mt-16">
+      {/* Imagem absoluta para desktop - estende até a borda direita */}
+      <div className="hidden lg:block absolute inset-y-0 right-0 w-1/2 z-0 pointer-events-none">
+        <img
+          src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
+          alt="Dashboard do Sobrou mostrando controle financeiro completo"
+          className="w-full h-full object-cover object-right"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          aria-hidden="true"
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Layout flex responsivo */}
         <div className="flex flex-col lg:flex-row items-stretch min-h-[80vh] lg:h-[100svh]">
           {/* Coluna de texto - 50% no desktop */}
@@ -32,22 +45,17 @@ const HeroSection: React.FC = () => {
             </div>
           </div>
           
-          {/* Coluna de imagem - 50% no desktop, sangra para a direita */}
-          <div className="relative lg:basis-1/2 flex items-center justify-center p-4 lg:pl-8 lg:pr-0 lg:mr-0">
-            {/* Container da imagem que sangra para a direita */}
-            <div className="relative w-full lg:w-[calc(100%+((100vw-100%)/2)+2rem)] lg:-mr-[calc((100vw-100%)/2)+2rem]">
-              {/* Elemento decorativo apenas no desktop */}
-              <div className="hidden lg:block absolute inset-4 rounded-2xl bg-primary/5 translate-x-4 translate-y-4 -z-10 lg:rounded-r-none lg:right-0" />
-              <img
-                src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
-                alt="Dashboard do Sobrou mostrando controle financeiro completo"
-                className="w-full max-w-md lg:max-w-none lg:w-full lg:h-full h-auto rounded-2xl shadow-2xl lg:object-cover lg:object-right lg:rounded-r-none lg:shadow-none"
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-                sizes="(min-width: 1024px) 50vw, 90vw"
-              />
-            </div>
+          {/* Coluna de imagem - apenas mobile */}
+          <div className="lg:hidden flex items-center justify-center p-4">
+            <img
+              src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
+              alt="Dashboard do Sobrou mostrando controle financeiro completo"
+              className="w-full max-w-md h-auto rounded-2xl shadow-2xl"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              sizes="90vw"
+            />
           </div>
         </div>
       </div>
