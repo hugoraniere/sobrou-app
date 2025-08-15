@@ -7,11 +7,11 @@ const HeroSection: React.FC = () => {
   return (
     <section id="hero" className="relative w-full bg-green-50/30 scroll-mt-16">
       {/* Imagem absoluta para desktop - estende até a borda direita */}
-      <div className="hidden lg:block absolute inset-y-0 right-0 w-1/2 z-0 pointer-events-none">
+      <div className="hidden lg:block absolute inset-y-8 right-0 w-1/2 z-0 pointer-events-none">
         <img
           src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png"
           alt="Dashboard do Sobrou mostrando controle financeiro completo"
-          className="w-full h-full object-cover object-right"
+          className="w-full h-full object-cover object-left"
           loading="eager"
           fetchPriority="high"
           decoding="async"
