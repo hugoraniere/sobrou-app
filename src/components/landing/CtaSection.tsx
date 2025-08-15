@@ -5,7 +5,7 @@ import { CheckCircle2 } from 'lucide-react';
 
 const CtaSection: React.FC = () => {
   return (
-    <section className="w-full bg-primary py-12 sm:py-16 lg:py-20 text-white rounded-2xl mt-8 mb-8 sm:mb-12">
+    <section id="pricing" className="w-full bg-primary py-16 sm:py-20 lg:py-24 text-white rounded-2xl mt-8 mb-8 sm:mb-12 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="font-alliance-n2 text-3xl md:text-4xl font-bold mb-6">

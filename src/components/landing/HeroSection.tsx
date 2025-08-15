@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="w-full py-12 sm:py-16 lg:py-24 bg-transparent">
+    <section id="hero" className="w-full py-16 sm:py-20 lg:py-24 bg-transparent scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 lg:gap-16">
           {/* Texto / CTA */}
@@ -42,6 +42,7 @@ const HeroSection: React.FC = () => {
                 src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=900"
                 alt="Sobrou App Interface"
                 className="rounded-lg w-full h-auto"
+                loading="lazy"
               />
             </div>
             <div className="absolute inset-0 bg-primary/5 rounded-lg transform translate-x-4 translate-y-4 -z-10 pointer-events-none hidden sm:block" />

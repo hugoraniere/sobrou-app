@@ -34,7 +34,7 @@ const TransparentHeader = () => {
             <Link to="#features" className="text-gray-700 hover:text-primary transition-colors">
               Funcionalidades
             </Link>
-            <Link to="#how-it-works" className="text-gray-700 hover:text-primary transition-colors">
+            <Link to="#como-funciona" className="text-gray-700 hover:text-primary transition-colors">
               Como funciona
             </Link>
             <Link to="#pricing" className="text-gray-700 hover:text-primary transition-colors">
