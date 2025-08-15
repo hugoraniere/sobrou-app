@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useWhatsAppButton } from '@/contexts/WhatsAppButtonContext';
 
 interface WhatsAppChatButtonProps {
@@ -18,6 +18,12 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({ className }) =>
   const [hasWhatsApp, setHasWhatsApp] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Don't show on public landing page
+  if (location.pathname === '/') {
+    return null;
+  }
 
   // Usando variável de ambiente para o número do WhatsApp
   const WHATSAPP_PHONE_NUMBER_ID = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID || '';
