@@ -6,7 +6,7 @@ export const useSmoothScroll = () => {
     const lenis = new Lenis({
       duration: 0.1,
       easing: (t) => t,
-      smoothWheel: true,
+      smoothWheel: false,
       wheelMultiplier: 1,
     });
 
