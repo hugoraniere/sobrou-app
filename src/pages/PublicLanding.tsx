@@ -9,6 +9,7 @@ import StatementImportSection from '../components/landing/StatementImportSection
 import AutomationAISection from '../components/landing/AutomationAISection';
 import SecurityPrivacySection from '../components/landing/SecurityPrivacySection';
 import FAQSection from '../components/landing/FAQSection';
+import PricingSection from '../components/landing/PricingSection';
 import CtaSection from '../components/landing/CtaSection';
 import Footer from '../components/landing/Footer';
 
@@ -27,6 +28,7 @@ const PublicLanding: React.FC = () => {
         <AutomationAISection />
         <SecurityPrivacySection />
         <FAQSection />
+        <PricingSection />
         <CtaSection />
       </main>
 
