@@ -16,7 +16,7 @@ const HeroSection: React.FC = () => {
           <div className="flex flex-col justify-center text-center lg:text-left lg:basis-1/2 py-16 lg:py-0 lg:pr-6">
             <h1 className="font-alliance-n2 text-6xl lg:text-[3.384375rem] font-semibold leading-tight mb-6 md:text-5xl">
               Organize suas finanças,<br />
-              é só digitar
+              <span className="text-primary">é só digitar</span>
             </h1>
             <p className="font-alliance text-gray-600 mb-8 max-w-2xl lg:max-w-none text-lg font-light">
               Chega de planilhas complexas. Digite seus gastos em linguagem natural e deixe nossa IA organizar tudo automaticamente.
