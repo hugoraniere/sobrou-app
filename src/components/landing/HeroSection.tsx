@@ -6,8 +6,8 @@ import { getSectionContainer } from '@/constants/layoutTokens';
 
 const HeroSection: React.FC = () => {
   return (
-    <section id="hero" className="w-full h-[90vh] py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center">
-      <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-10">
+    <section id="hero" className="w-full h-[90vh] py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center relative">
+      <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-10 overflow-visible">
         {/* Div 1 - Conteúdo */}
         <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start">
           <div className="max-w-2xl mx-auto lg:mx-0">
@@ -53,19 +53,29 @@ const HeroSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Div 2 - Imagem */}
-        <div className="h-full relative">
-          <div className="h-full w-[120vw] absolute -right-[20vw] top-0">
-            <img 
-              src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
-              alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-              className="w-full h-full object-cover object-left shadow-2xl"
-              loading="eager" 
-              fetchPriority="high" 
-              decoding="async" 
-            />
-          </div>
+        {/* Div 2 - Imagem - Normal em mobile */}
+        <div className="h-full relative lg:hidden">
+          <img 
+            src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
+            alt="Dashboard do Sobrou mostrando controle financeiro completo" 
+            className="w-full h-full object-cover object-center shadow-2xl rounded-lg"
+            loading="eager" 
+            fetchPriority="high" 
+            decoding="async" 
+          />
         </div>
+      </div>
+
+      {/* Imagem sangrando para a direita - Apenas desktop */}
+      <div className="hidden lg:block absolute inset-y-0 right-0 w-[120vw] h-full pointer-events-none" style={{ left: '50%' }}>
+        <img 
+          src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
+          alt="Dashboard do Sobrou mostrando controle financeiro completo" 
+          className="w-full h-full object-cover object-left shadow-2xl"
+          loading="eager" 
+          fetchPriority="high" 
+          decoding="async" 
+        />
       </div>
     </section>
   );
