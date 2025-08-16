@@ -7,9 +7,9 @@ import { getSectionContainer } from '@/constants/layoutTokens';
 const HeroSection: React.FC = () => {
   return (
     <section id="hero" className="w-full min-h-screen py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center">
-      <div className="h-full grid grid-cols-1 lg:grid-cols-2">
+      <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center">
         {/* Div 1 - Conteúdo */}
-        <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start">
           <div className="max-w-2xl mx-auto lg:mx-0">
             <h1 className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl">
               Organize suas finanças,<br />
