@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 const HeroSection: React.FC = () => {
-  return <section id="hero" className="w-full py-16 sm:py-20 lg:py-24 bg-green-50/30 scroll-mt-16">
+  return <section id="hero" className="relative w-full h-[85vh] flex items-center bg-green-50/30">
       {/* Imagem absoluta para desktop - estende até a borda direita */}
-      <div className="hidden lg:block lg:absolute inset-y-0 right-0 w-[45%] z-0 pointer-events-none">
+      <div className="hidden lg:block lg:absolute inset-y-0 right-0 w-[80%] z-0 pointer-events-none">
         <img src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" alt="Dashboard do Sobrou mostrando controle financeiro completo" className="w-full h-full object-cover object-left shadow-2xl rounded-l-2xl" loading="eager" fetchPriority="high" decoding="async" aria-hidden="true" />
       </div>
 
