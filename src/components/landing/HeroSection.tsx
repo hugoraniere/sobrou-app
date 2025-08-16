@@ -6,7 +6,7 @@ import { getSectionContainer } from '@/constants/layoutTokens';
 
 const HeroSection: React.FC = () => {
   return (
-    <section id="hero" className="w-full h-[90vh] py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center">
+    <section id="hero" className="w-full h-[90vh] py-12 bg-green-50/30 overflow-x-hidden flex items-center justify-center">
       <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-10">
         {/* Div 1 - Conteúdo */}
         <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start">
@@ -54,8 +54,8 @@ const HeroSection: React.FC = () => {
         </div>
 
         {/* Div 2 - Imagem */}
-        <div className="h-full relative">
-          <div className="h-full w-[150vw] absolute left-0 top-0">
+        <div className="h-full relative overflow-hidden">
+          <div className="h-full w-[150vw] lg:w-[120vw] absolute left-0 top-0">
             <img 
               src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
               alt="Dashboard do Sobrou mostrando controle financeiro completo" 

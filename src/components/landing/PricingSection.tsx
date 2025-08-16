@@ -83,7 +83,7 @@ const PricingSection: React.FC = () => {
 
         {/* Pricing Plans */}
         <div className="grid lg:grid-cols-3 gap-8 mb-16">
-          {plans.map((plan, index) => <Card key={index} className={`relative ${plan.popular ? 'border-primary shadow-lg scale-105' : 'border-border'}`}>
+          {plans.map((plan, index) => <Card key={index} className={`relative ${plan.popular ? 'border-primary shadow-lg lg:scale-105' : 'border-border'}`}>
               {plan.popular && <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
                   Mais popular
                 </Badge>}
