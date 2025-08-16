@@ -46,57 +46,49 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
   return (
     <div className={cn(
       "grid",
-      isMobile ? "grid-cols-1 gap-6 px-4" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      isMobile ? "grid-cols-1 gap-6" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
     )}>
-      <div className={isMobile ? "w-[88%] mx-auto" : "w-full"}>
-        <BigNumberCard
-          title={TEXT.common.income}
-          value={totalIncome}
-          icon={TrendingUp}
-          color="#22c55e"
-          trend={{ value: 5, isPositive: true }}
-          tooltip={TEXT.dashboard.bigNumbers.monthlyIncomeTooltip}
-          onClick={navigateToIncome}
-          hideIconOnMobile={true}
-        />
-      </div>
+      <BigNumberCard
+        title={TEXT.common.income}
+        value={totalIncome}
+        icon={TrendingUp}
+        color="#22c55e"
+        trend={{ value: 5, isPositive: true }}
+        tooltip={TEXT.dashboard.bigNumbers.monthlyIncomeTooltip}
+        onClick={navigateToIncome}
+        hideIconOnMobile={true}
+      />
       
-      <div className={isMobile ? "w-[88%] mx-auto" : "w-full"}>
-        <BigNumberCard
-          title={TEXT.common.expense}
-          value={totalExpenses}
-          icon={TrendingDown}
-          color="#ef4444"
-          trend={{ value: 3, isPositive: false }}
-          tooltip={TEXT.dashboard.bigNumbers.monthlyExpensesTooltip}
-          onClick={navigateToExpenses}
-          hideIconOnMobile={true}
-        />
-      </div>
+      <BigNumberCard
+        title={TEXT.common.expense}
+        value={totalExpenses}
+        icon={TrendingDown}
+        color="#ef4444"
+        trend={{ value: 3, isPositive: false }}
+        tooltip={TEXT.dashboard.bigNumbers.monthlyExpensesTooltip}
+        onClick={navigateToExpenses}
+        hideIconOnMobile={true}
+      />
       
-      <div className={isMobile ? "w-[88%] mx-auto" : "w-full"}>
-        <BigNumberCard
-          title={TEXT.common.balance}
-          value={balance}
-          icon={DollarSign}
-          color="#3b82f6"
-          trend={{ value: 8, isPositive: true }}
-          tooltip={TEXT.dashboard.bigNumbers.availableBalanceTooltip}
-          hideIconOnMobile={true}
-        />
-      </div>
+      <BigNumberCard
+        title={TEXT.common.balance}
+        value={balance}
+        icon={DollarSign}
+        color="#3b82f6"
+        trend={{ value: 8, isPositive: true }}
+        tooltip={TEXT.dashboard.bigNumbers.availableBalanceTooltip}
+        hideIconOnMobile={true}
+      />
       
-      <div className={isMobile ? "w-[88%] mx-auto" : "w-full"}>
-        <BigNumberCard
-          title={TEXT.common.savings}
-          value={totalSavings}
-          icon={Wallet}
-          color="#8b5cf6"
-          trend={{ value: 4, isPositive: true }}
-          tooltip={TEXT.dashboard.bigNumbers.totalSavingsTooltip}
-          hideIconOnMobile={true}
-        />
-      </div>
+      <BigNumberCard
+        title={TEXT.common.savings}
+        value={totalSavings}
+        icon={Wallet}
+        color="#8b5cf6"
+        trend={{ value: 4, isPositive: true }}
+        tooltip={TEXT.dashboard.bigNumbers.totalSavingsTooltip}
+        hideIconOnMobile={true}
+      />
     </div>
   );
 };
