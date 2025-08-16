@@ -114,7 +114,9 @@
     "allTransactions": "Todas as Transações",
     "pageDescription": "Visualize, edite e gerencie suas transações",
     "fetchError": "Erro ao carregar transações",
-    "addRecurring": "Adicionar Recorrente"
+    "addRecurring": "Adicionar Recorrente",
+    "importStatement": "Importar Extrato",
+    "importStatementShort": "Importar."
   },
   "whatsapp": {
     "connection": "Conexão WhatsApp",

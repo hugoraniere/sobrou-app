@@ -69,10 +69,11 @@ const Transactions = () => {
 
   return (
     <TooltipProvider>
-      <ResponsivePageContainer>
+      <ResponsivePageContainer className="overflow-x-hidden">
         <ResponsivePageHeader 
           title={t('transactions.title')}
           description={t('transactions.subtitle')}
+          stackOnMobile={true}
         >
           <ImportBankStatementButton onTransactionsAdded={handleTransactionUpdated} />
         </ResponsivePageHeader>

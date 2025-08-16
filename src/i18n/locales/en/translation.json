@@ -114,7 +114,9 @@
     "allTransactions": "All Transactions",
     "pageDescription": "View, edit and manage your transactions",
     "fetchError": "Error loading transactions",
-    "addRecurring": "Add Recurring"
+    "addRecurring": "Add Recurring",
+    "importStatement": "Import Statement",
+    "importStatementShort": "Import"
   },
   "whatsapp": {
     "connection": "WhatsApp Connection",

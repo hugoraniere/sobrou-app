@@ -7,18 +7,20 @@ interface ResponsivePageHeaderProps {
   title: string;
   description?: string;
   children?: React.ReactNode;
+  stackOnMobile?: boolean;
 }
 
 const ResponsivePageHeader: React.FC<ResponsivePageHeaderProps> = ({
   title,
   description,
-  children
+  children,
+  stackOnMobile = false
 }) => {
   const { isMobile } = useResponsive();
 
   return (
     <div className={`${getEdgeTopSpacing()} mb-12 sm:mb-16`}>
-      <div className="flex justify-between items-start">
+      <div className={stackOnMobile && isMobile ? "space-y-4" : "flex justify-between items-start"}>
         <div className="flex-1">
           <h1 className={getStandardTitle()}>
             {title}
@@ -30,7 +32,7 @@ const ResponsivePageHeader: React.FC<ResponsivePageHeaderProps> = ({
           )}
         </div>
         {children && (
-          <div className="ml-4">
+          <div className={stackOnMobile && isMobile ? "" : "ml-4"}>
             {children}
           </div>
         )}

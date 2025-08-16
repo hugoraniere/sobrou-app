@@ -9,6 +9,7 @@ import { FileExtractor } from './FileExtractor';
 import ImportDialog from './ImportDialog';
 import { usePdfExtractor } from '@/hooks/usePdfExtractor';
 import { FileProcessor } from './FileProcessor';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface ImportBankStatementButtonProps {
   onTransactionsAdded: () => void;
@@ -18,6 +19,7 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
   onTransactionsAdded 
 }) => {
   const { t } = useTranslation();
+  const { isMobile } = useResponsive();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isUploading, setIsUploading] = useState(false);
@@ -191,7 +193,10 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         ) : (
           <>
             <Upload className="h-4 w-4 mr-2" />
-            {t('transactions.importStatement', 'Importar Extrato')}
+            {isMobile 
+              ? t('transactions.importStatementShort', 'Importar.')
+              : t('transactions.importStatement', 'Importar Extrato')
+            }
           </>
         )}
       </Button>
