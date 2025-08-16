@@ -6,7 +6,7 @@ import { getSectionContainer } from '@/constants/layoutTokens';
 
 const HeroSection: React.FC = () => {
   return (
-    <section id="hero" className="w-full min-h-screen py-12 bg-green-50/30 overflow-x-visible">
+    <section id="hero" className="w-full min-h-screen py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center">
       <div className="h-full grid grid-cols-1 lg:grid-cols-2">
         {/* Div 1 - Conteúdo */}
         <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start px-4 sm:px-6 lg:px-8">
