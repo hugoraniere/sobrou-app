@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
 import { TEXT } from '@/constants/text';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface BigNumberCardProps {
   title: string;
@@ -20,6 +21,7 @@ interface BigNumberCardProps {
   className?: string;
   simulatedValue?: number;
   onClick?: () => void;
+  hideIconOnMobile?: boolean;
 }
 
 const BigNumberCard: React.FC<BigNumberCardProps> = ({
@@ -32,8 +34,11 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
   trend,
   className,
   simulatedValue,
-  onClick
+  onClick,
+  hideIconOnMobile = false
 }) => {
+  const { isMobile } = useResponsive();
+  
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -66,9 +71,11 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
             </div>
           )}
         </div>
-        <div className="rounded-full p-2 shrink-0" style={{ backgroundColor: `${color}20` }}>
-          <Icon className="h-6 w-6" style={{ color }} />
-        </div>
+        {!(hideIconOnMobile && isMobile) && (
+          <div className="rounded-full p-2 shrink-0" style={{ backgroundColor: `${color}20` }}>
+            <Icon className="h-6 w-6" style={{ color }} />
+          </div>
+        )}
       </div>
     </CardContent>
   );
@@ -78,7 +85,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
       <HoverCardTrigger asChild>
         <Card 
           style={{ borderColor: color }} 
-          className={`min-w-[240px] flex-1 bg-white ${className} ${onClick ? 'cursor-pointer' : ''}`}
+          className={`${isMobile ? 'min-w-0' : 'min-w-[240px]'} flex-1 bg-white ${className} ${onClick ? 'cursor-pointer' : ''}`}
           onClick={onClick}
         >
           {cardContent}
