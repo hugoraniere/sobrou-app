@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,13 +10,11 @@ import Logo from '../components/brand/Logo';
 import { toast } from 'sonner';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from 'lucide-react';
+
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
   const navigate = useNavigate();
-  const {
-    user,
-    isLoading
-  } = useAuth();
+  const { user, isLoading } = useAuth();
   const [searchParams] = useSearchParams();
 
   // Check for verification parameter in URL
@@ -27,7 +26,7 @@ const Auth = () => {
         duration: 5000
       });
     }
-
+    
     // Check for tab parameter in URL
     const tab = searchParams.get('tab');
     if (tab === 'signup') {
@@ -36,12 +35,15 @@ const Auth = () => {
       setActiveTab('login');
     }
   }, [searchParams]);
+
   useEffect(() => {
     if (!isLoading && user) {
       navigate('/dashboard');
     }
   }, [user, isLoading, navigate]);
-  return <div className="min-h-screen bg-gray-50">
+
+  return (
+    <div className="min-h-screen bg-gray-50">
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
@@ -51,16 +53,21 @@ const Auth = () => {
             <p className="text-gray-600 mt-2">Seu assistente financeiro pessoal</p>
           </div>
           
-          {searchParams.get('verification') === 'success' && <Alert className="mb-6 bg-green-50 border-green-200">
+          {searchParams.get('verification') === 'success' && (
+            <Alert className="mb-6 bg-green-50 border-green-200">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
               <AlertTitle>Email verificado!</AlertTitle>
               <AlertDescription>
                 Sua conta foi verificada com sucesso. Agora você pode fazer login.
               </AlertDescription>
-            </Alert>}
+            </Alert>
+          )}
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            
+            <TabsList className="grid grid-cols-2 mb-8">
+              <TabsTrigger value="login">Entrar</TabsTrigger>
+              <TabsTrigger value="signup">Criar Conta</TabsTrigger>
+            </TabsList>
             
             <TabsContent value="login">
               <Card>
@@ -92,6 +99,8 @@ const Auth = () => {
           </Tabs>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Auth;

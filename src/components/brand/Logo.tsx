@@ -9,10 +9,10 @@ interface LogoProps {
 
 const Logo = React.forwardRef<HTMLImageElement, LogoProps>(({ className, size = 'md' }, ref) => {
   const sizeClasses = {
-    xs: 'h-4',
-    sm: 'h-6',
-    md: 'h-8',
-    lg: 'h-16'
+    xs: 'h-5',
+    sm: 'h-7',
+    md: 'h-10',
+    lg: 'h-20'
   };
 
   return (
