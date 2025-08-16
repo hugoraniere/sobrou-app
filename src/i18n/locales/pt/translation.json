@@ -182,6 +182,14 @@
     "logoutConfirmation": "Tem certeza que deseja sair? Sua sessão será encerrada.",
     "logout": "Sair"
   },
+  "monthlySummary": {
+    "title": "Resumo Mensal",
+    "subtitle": "Visualize, planeje e compare seu orçamento financeiro"
+  },
+  "goals": {
+    "title": "Metas de Economia",
+    "subtitle": "Defina e acompanhe suas metas financeiras"
+  },
   "pwa": {
     "install": {
       "title": "Instalar Sobrou",

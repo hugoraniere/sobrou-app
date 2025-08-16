@@ -11,14 +11,14 @@ import { TransactionsLoadingState } from '@/components/transactions/states/Trans
 import { TransactionsErrorState } from '@/components/transactions/states/TransactionsErrorState';
 import { TransactionsEmptyState } from '@/components/transactions/states/TransactionsEmptyState';
 import AIPromptInput from '@/components/AIPromptInput';
-import ResponsiveContainer from '@/components/layout/ResponsiveContainer';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import ImportBankStatementButton from '@/components/transactions/import/ImportBankStatementButton';
-import TransactionListFilters from '@/components/transactions/molecules/TransactionListFilters';
 import ViewModeToggle, { ViewMode } from '@/components/transactions/molecules/ViewModeToggle';
 import MonthNavigator from '@/components/transactions/molecules/MonthNavigator';
 import SearchBar from '@/components/transactions/molecules/SearchBar';
+import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
+import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -69,41 +69,17 @@ const Transactions = () => {
 
   return (
     <TooltipProvider>
-      <div className={cn(
-        "w-full overflow-hidden",
-        isMobile ? "px-4" : "container mx-auto max-w-screen-xl"
-      )}>
-        <div>
-          {/* Header */}
-          <div className="mt-6 mb-6">
-            <div className={cn(
-              "flex items-start gap-4",
-              isMobile ? "flex-col" : "justify-between"
-            )}>
-              <div className="flex-1">
-                <h1 className={cn(
-                  "font-bold text-gray-900",
-                  isMobile ? "text-2xl" : "text-3xl"
-                )}>
-                  {t('transactions.title', 'Transações')}
-                </h1>
-                {!isMobile && (
-                  <p className="text-gray-600 text-sm mt-1">
-                    Visualize e gerencie todas as suas transações financeiras
-                  </p>
-                )}
-              </div>
-              <div className={cn(isMobile && "w-full flex justify-end")}>
-                <ImportBankStatementButton onTransactionsAdded={handleTransactionUpdated} />
-              </div>
-            </div>
-          </div>
-
-          {/* AIPromptInput sempre visível */}
-          <Card className={cn(
-            "shadow-sm mt-4",
-            isMobile ? "p-4" : "p-6"
-          )}>
+      <ResponsivePageContainer>
+        <ResponsivePageHeader 
+          title={t('transactions.title')}
+          description={t('transactions.subtitle')}
+        >
+          <ImportBankStatementButton onTransactionsAdded={handleTransactionUpdated} />
+        </ResponsivePageHeader>
+        
+        <div className="space-y-6">
+          {/* AIPromptInput */}
+          <Card className="p-4 sm:p-6">
             <AIPromptInput 
               onTransactionAdded={handleTransactionUpdated}
               onSavingAdded={handleTransactionUpdated}
@@ -111,13 +87,12 @@ const Transactions = () => {
             />
           </Card>
 
-          {/* Filtros com Toggle integrado */}
-          <Card className={cn("shadow-sm mt-4", isMobile ? "p-3" : "p-3")}>
+          {/* Filtros */}
+          <Card className="p-3">
             <div className={cn(
               "flex gap-4 items-center",
               isMobile ? "flex-col space-y-3" : "justify-between"
             )}>
-              {/* Toggle de visão à esquerda */}
               <div className={cn(isMobile ? "w-full flex justify-center" : "")}>
                 <ViewModeToggle 
                   viewMode={viewMode}
@@ -125,12 +100,10 @@ const Transactions = () => {
                 />
               </div>
               
-              {/* Filtros à direita */}
               <div className={cn(
                 "flex gap-3 items-center",
                 isMobile ? "w-full flex-col space-y-3" : ""
               )}>
-                {/* Navegação de mês - apenas visível no modo mensal */}
                 {viewMode === 'monthly' && (
                   <div className="flex items-center">
                     <MonthNavigator 
@@ -140,7 +113,6 @@ const Transactions = () => {
                   </div>
                 )}
                 
-                {/* Campo de busca - sempre visível */}
                 <div className={cn(isMobile ? "w-full" : "")}>
                   <SearchBar 
                     searchTerm={searchTerm}
@@ -153,8 +125,8 @@ const Transactions = () => {
             </div>
           </Card>
 
-          {/* Content */}
-          <div className="mt-4">
+          {/* Lista de Transações */}
+          <div>
             {isLoading ? (
               <TransactionsLoadingState timeout={15000} />
             ) : hasError ? (
@@ -182,7 +154,7 @@ const Transactions = () => {
             )}
           </div>
         </div>
-      </div>
+      </ResponsivePageContainer>
     </TooltipProvider>
   );
 };
