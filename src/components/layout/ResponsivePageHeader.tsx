@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { getStandardTitle, getStandardDescription } from '@/constants/layoutTokens';
+import { getStandardTitle, getStandardDescription, getEdgeTopSpacing } from '@/constants/layoutTokens';
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface ResponsivePageHeaderProps {
@@ -17,7 +17,7 @@ const ResponsivePageHeader: React.FC<ResponsivePageHeaderProps> = ({
   const { isMobile } = useResponsive();
 
   return (
-    <div className="mb-12 sm:mb-16">
+    <div className={`${getEdgeTopSpacing()} mb-12 sm:mb-16`}>
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <h1 className={getStandardTitle()}>

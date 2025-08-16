@@ -25,6 +25,11 @@ export const LAYOUT_TOKENS = {
   // Grid padronizado
   GRID: {
     SPACING: 'gap-6 lg:gap-8'
+  },
+  
+  // Espaçamento das bordas
+  EDGE: {
+    TOP_INSET: 'mt-4 sm:mt-6 lg:mt-8'
   }
 } as const;
 
@@ -59,4 +64,9 @@ export const getStandardTitle = (additionalClasses?: string) => {
 // Função helper para descrição padronizada
 export const getStandardDescription = (additionalClasses?: string) => {
   return cn(LAYOUT_TOKENS.TITLE.DESCRIPTION, additionalClasses);
+};
+
+// Função helper para espaçamento superior
+export const getEdgeTopSpacing = () => {
+  return LAYOUT_TOKENS.EDGE.TOP_INSET;
 };
