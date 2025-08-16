@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%; /* Cinza mais neutro */
+    --background: 135 67% 97%;
     --foreground: 210 11% 15%;
 
     --card: 0 0% 100%;
