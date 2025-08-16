@@ -24,7 +24,7 @@ const ResponsivePageHeader: React.FC<ResponsivePageHeaderProps> = ({
             {title}
           </h1>
           {description && !isMobile && (
-            <p className={getStandardDescription("mt-1")}>
+            <p className={getStandardDescription("mt-1 mx-0 text-left")}>
               {description}
             </p>
           )}
