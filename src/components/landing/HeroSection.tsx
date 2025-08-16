@@ -6,7 +6,7 @@ import { getSectionContainer } from '@/constants/layoutTokens';
 
 const HeroSection: React.FC = () => {
   return (
-    <section id="hero" className="w-full h-screen bg-green-50/30 overflow-x-visible">
+    <section id="hero" className="w-full min-h-screen py-12 bg-green-50/30 overflow-x-visible">
       <div className="h-full grid grid-cols-1 lg:grid-cols-2">
         {/* Div 1 - Conteúdo */}
         <div className="flex flex-col justify-center text-center lg:text-left px-4 sm:px-6 lg:px-8">
@@ -34,11 +34,11 @@ const HeroSection: React.FC = () => {
         </div>
 
         {/* Div 2 - Imagem */}
-        <div className="flex items-center justify-start">
+        <div className="flex items-center justify-start h-full">
           <img 
             src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
             alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-            className="w-full lg:w-[120%] max-w-none h-auto lg:h-full object-contain object-left shadow-2xl" 
+            className="w-full lg:w-[120%] max-w-none h-auto max-h-full object-contain object-left shadow-2xl" 
             loading="eager" 
             fetchPriority="high" 
             decoding="async" 
