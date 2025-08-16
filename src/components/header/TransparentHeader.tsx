@@ -18,12 +18,7 @@ const TransparentHeader = () => {
   }, []);
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled ? "backdrop-blur-sm shadow-sm" : ""
-      )}
-    >
+    <header className="w-full">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 md:h-16">
           <Link to="/" className="flex items-center">

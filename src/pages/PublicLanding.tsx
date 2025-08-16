@@ -21,7 +21,7 @@ const PublicLanding: React.FC = () => {
     <div className="bg-background min-h-screen">
       <TransparentHeader />
 
-      <main className="pt-14 md:pt-16">
+      <main>
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />
