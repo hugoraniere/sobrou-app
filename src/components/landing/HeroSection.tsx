@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Shield, Smartphone } from 'lucide-react';
 import { getSectionContainer } from '@/constants/layoutTokens';
 
 const HeroSection: React.FC = () => {
@@ -29,6 +29,26 @@ const HeroSection: React.FC = () => {
             <div className="flex items-center gap-2 mt-6 text-gray-600 justify-center lg:justify-start">
               <CheckCircle2 className="text-primary h-5 w-5" />
               <span className="font-alliance">Comece em menos de 2 minutos</span>
+            </div>
+            
+            {/* Benefícios */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 w-full">
+              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-green-100">
+                <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-primary" />
+                </div>
+                <span className="font-alliance text-sm text-gray-700">
+                  Segurança dos seus dados em primeiro lugar
+                </span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-green-100">
+                <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Smartphone className="h-5 w-5 text-primary" />
+                </div>
+                <span className="font-alliance text-sm text-gray-700">
+                  Acesse quando quiser, no celular ou computador
+                </span>
+              </div>
             </div>
           </div>
         </div>
