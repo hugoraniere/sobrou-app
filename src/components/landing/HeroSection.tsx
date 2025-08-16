@@ -54,12 +54,12 @@ const HeroSection: React.FC = () => {
         </div>
 
         {/* Div 2 - Imagem */}
-        <div className="h-full">
-          <div className="h-full">
+        <div className="h-full overflow-hidden">
+          <div className="h-full w-[120%] -mr-[20%]">
             <img 
               src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
               alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-              className="w-full h-full object-cover object-left shadow-2xl" 
+              className="w-full h-full object-cover object-left shadow-2xl"
               loading="eager" 
               fetchPriority="high" 
               decoding="async" 
