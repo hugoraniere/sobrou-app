@@ -7,7 +7,7 @@ import { getSectionContainer } from '@/constants/layoutTokens';
 const HeroSection: React.FC = () => {
   return (
     <section id="hero" className="w-full h-[90vh] py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center relative">
-      <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-10 overflow-visible">
+      <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-16 overflow-visible">
         {/* Div 1 - Conteúdo */}
         <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start">
           <div className="max-w-2xl mx-auto lg:mx-0">
@@ -67,7 +67,7 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Imagem sangrando para a direita - Apenas desktop */}
-      <div className="hidden lg:block absolute inset-y-0 right-0 w-[120vw] h-full pointer-events-none" style={{ left: '50%' }}>
+      <div className="hidden lg:block absolute right-0 w-[120vw] pointer-events-none" style={{ left: '50%', top: '10%', bottom: '10%' }}>
         <img 
           src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
           alt="Dashboard do Sobrou mostrando controle financeiro completo" 
