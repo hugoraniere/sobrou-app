@@ -54,7 +54,7 @@ const HeroSection: React.FC = () => {
         </div>
 
         {/* Div 2 - Imagem */}
-        <div className="h-full relative overflow-hidden">
+        <div className="h-full relative">
           <div className="h-full w-[120vw] absolute -right-[20vw] top-0">
             <img 
               src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
