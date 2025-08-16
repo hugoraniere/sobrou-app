@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useResponsive } from '@/hooks/useResponsive';
 import { BillsList } from '@/components/bills/BillsList';
 import { BillBalanceCard } from '@/components/bills/BillBalanceCard';
 import { AddBillDialog } from '@/components/bills/AddBillDialog';
@@ -13,6 +14,7 @@ import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 
 const BillsToPay = () => {
   const { t } = useTranslation();
+  const { isMobile } = useResponsive();
   const { bills, isLoading, error, createBill, updateBill, deleteBill, markAsPaid, markAsUnpaid, isCreating, isUpdating } = useBillsData();
   
   // Estados para controlar o dialog
@@ -81,10 +83,20 @@ const BillsToPay = () => {
         title={t('bills.title', 'Contas a Pagar')}
         description="Gerencie suas contas e acompanhe os pagamentos"
       >
-        <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Conta
-        </Button>
+        {isMobile ? (
+          <Button 
+            onClick={() => setIsAddDialogOpen(true)} 
+            size="icon"
+            className="rounded-full"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Nova Conta
+          </Button>
+        )}
       </ResponsivePageHeader>
 
       <div className="space-y-6">
