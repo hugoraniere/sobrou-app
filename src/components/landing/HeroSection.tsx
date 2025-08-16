@@ -71,7 +71,7 @@ const HeroSection: React.FC = () => {
         <img 
           src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
           alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-          className="w-full h-full object-cover object-left shadow-2xl"
+          className="h-full w-auto object-cover object-left shadow-2xl"
           loading="eager" 
           fetchPriority="high" 
           decoding="async" 
