@@ -79,23 +79,7 @@ const PricingSection: React.FC = () => {
         </div>
 
         {/* Marketing Triggers */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
-          <div className="text-center p-6 rounded-lg bg-card border">
-            <Users className="h-8 w-8 text-primary mx-auto mb-4" />
-            <h3 className="font-outfit text-lg font-semibold mb-2">+10.000 usuários</h3>
-            <p className="text-sm text-muted-foreground">já organizaram suas finanças</p>
-          </div>
-          <div className="text-center p-6 rounded-lg bg-card border">
-            <TrendingUp className="h-8 w-8 text-primary mx-auto mb-4" />
-            <h3 className="font-outfit text-lg font-semibold mb-2">87% economizam mais</h3>
-            <p className="text-sm text-muted-foreground">após 30 dias de uso</p>
-          </div>
-          <div className="text-center p-6 rounded-lg bg-card border">
-            <Clock className="h-8 w-8 text-primary mx-auto mb-4" />
-            <h3 className="font-outfit text-lg font-semibold mb-2">5 horas/mês</h3>
-            <p className="text-sm text-muted-foreground">economizadas em controle financeiro</p>
-          </div>
-        </div>
+        
 
         {/* Pricing Plans */}
         <div className="grid lg:grid-cols-3 gap-8 mb-16">
