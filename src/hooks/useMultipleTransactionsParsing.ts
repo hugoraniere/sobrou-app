@@ -137,7 +137,7 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
       id: `temp-${Date.now()}`,
       description: newTransaction.description || '',
       amount: newTransaction.amount || 0,
-      category: newTransaction.category || 'other',
+      category: newTransaction.category || 'outros',
       type: newTransaction.type || 'expense',
       date: newTransaction.date || new Date().toISOString().split('T')[0],
       isSaving: newTransaction.isSaving || false,

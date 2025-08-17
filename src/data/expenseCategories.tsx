@@ -117,15 +117,6 @@ export const expenseCategories: CategoryType[] = [
     icon: Gift
   },
   { 
-    id: 'other',
-    name: 'Outros', 
-    value: 'other',
-    type: 'expense',
-    label: 'Outros',
-    color: 'bg-[#CFCFCF]',
-    icon: HelpCircle
-  },
-  { 
     id: 'outros',
     name: 'Outros', 
     value: 'outros',

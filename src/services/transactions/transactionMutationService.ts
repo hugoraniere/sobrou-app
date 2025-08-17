@@ -19,10 +19,30 @@ export const transactionMutationService = {
       // Preservar o texto original da descrição
       const originalDescription = transactionData.description;
 
+      // SAFEGUARD: Normalizar categoria para garantir compatibilidade com DB
+      const validCategories = [
+        'alimentacao', 'moradia', 'transporte', 'internet', 'cartao',
+        'saude', 'lazer', 'compras', 'investimentos', 'familia', 'doacoes', 'outros'
+      ];
+      
+      let normalizedCategory = transactionData.category?.toLowerCase() || 'outros';
+      
+      // Mapear "other" para "outros"
+      if (normalizedCategory === 'other') {
+        normalizedCategory = 'outros';
+      }
+      
+      // Se não for uma categoria válida, usar "outros"
+      if (!validCategories.includes(normalizedCategory)) {
+        normalizedCategory = 'outros';
+      }
+      
+      console.log(`Final category before insertion: ${normalizedCategory} (original: ${transactionData.category})`);
+
       const newTransaction = {
         user_id: user.id,
         amount: transactionData.amount,
-        category: transactionData.category,
+        category: normalizedCategory, // Usar categoria normalizada
         description: originalDescription, // Garantindo que o texto original é salvo
         type: transactionData.type,
         date: transactionData.date || new Date().toISOString().split('T')[0],
