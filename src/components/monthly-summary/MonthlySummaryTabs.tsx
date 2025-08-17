@@ -32,7 +32,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
           "w-full mb-4 grid grid-cols-3",
-          isMobile ? "h-9 p-0.5" : "h-10"
+          isMobile ? "h-9 p-0.5 max-w-full overflow-hidden" : "h-10"
         )}>
           <TabsTrigger 
             value="table" 

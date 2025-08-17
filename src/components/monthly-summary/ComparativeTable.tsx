@@ -94,7 +94,7 @@ export const ComparativeTable: React.FC<ComparativeTableProps> = ({
       </CardHeader>
       
       <div className="overflow-x-auto">
-        <div className={cn(isMobile ? "min-w-[480px]" : "min-w-[900px]")}>
+        <div className={cn("min-w-[900px]", isMobile && "min-w-[400px]")}>
           <Table className="w-full border-collapse">
             <ComparativeTableHeader 
               months={months} 

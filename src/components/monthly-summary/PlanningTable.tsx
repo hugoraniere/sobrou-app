@@ -130,7 +130,7 @@ export const PlanningTable: React.FC<PlanningTableProps> = ({
         
         {isDetailedView ? (
           <div className="overflow-x-auto">
-            <div className={cn(isMobile ? "min-w-[480px]" : "min-w-[800px]")}>
+            <div className={cn("min-w-[800px]", isMobile && "min-w-[400px]")}>
               <Table className="w-full border-collapse">
                 <TableHeader>
                   <TableRow>

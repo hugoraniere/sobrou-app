@@ -81,7 +81,7 @@ export const MonthlyTable: React.FC<MonthlyTableProps> = ({ year }) => {
           </CardDescription>
         </CardHeader>
         <div className="overflow-x-auto">
-          <div className={cn(isMobile ? "min-w-[480px]" : "min-w-[800px]")}>
+          <div className={cn("min-w-[800px]", isMobile && "min-w-[400px]")}>
             <MonthlyTableContent
               data={data}
               totals={totals}
