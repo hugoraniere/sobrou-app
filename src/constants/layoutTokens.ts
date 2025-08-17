@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 export const LAYOUT_TOKENS = {
   // Container padrão para todas as seções
   SECTION: {
-    CONTAINER: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+    CONTAINER: 'w-full max-w-full md:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
     PADDING: 'py-16 sm:py-20 lg:py-24',
     SCROLL_OFFSET: 'scroll-mt-16'
   },
