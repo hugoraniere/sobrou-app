@@ -55,15 +55,17 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       const processAllTransactions = async () => {
         for (const transaction of transactionsToConfirm) {
           try {
+            // Corrigir: apenas adicionar a poupança se explicitamente marcado como isSaving
             if (transaction.isSaving && transaction.savingGoal) {
               const goal = await SavingsService.findOrCreateSavingGoal(transaction.savingGoal);
               await SavingsService.addToSavingGoal(goal.id, transaction.amount, transaction.date);
             } else {
+              // Tanto receitas quanto despesas vão para transações
               await TransactionService.addTransaction({
                 amount: transaction.amount,
                 description: transaction.description,
                 category: transaction.category,
-                type: transaction.type,
+                type: transaction.type, // Agora já normalizado pelo hook
                 date: transaction.date
               });
             }
@@ -159,13 +161,15 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
       try {
         const transactionType = transaction.type as 'expense' | 'income';
         
-        if (transactionType === 'income') {
-          // Create a temporary saving goal for income
-          const goal = await SavingsService.findOrCreateSavingGoal("Receita");
+        // Corrigir: receitas devem ser adicionadas como transações, não como poupança
+        // a menos que explicitamente marcadas como isSaving
+        if (transaction.isSaving && transaction.savingGoal) {
+          const goal = await SavingsService.findOrCreateSavingGoal(transaction.savingGoal);
           await SavingsService.addToSavingGoal(goal.id, transaction.amount, transaction.date);
-          toast.success("Receita adicionada com sucesso!");
+          toast.success("Valor adicionado à meta de economia!");
           onSavingAdded?.(true);
         } else {
+          // Tanto receitas quanto despesas vão para transações
           await TransactionService.addTransaction({
             description: transaction.description,
             amount: transaction.amount,
@@ -173,7 +177,8 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
             date: transaction.date,
             type: transactionType,
           });
-          toast.success("Transação adicionada com sucesso!");
+          const typeText = transactionType === 'income' ? 'Receita' : 'Despesa';
+          toast.success(`${typeText} adicionada com sucesso!`);
           onTransactionAdded?.(true);
         }
       } catch (error) {

@@ -2,6 +2,58 @@ import { useState } from 'react';
 import { parseExpenseService } from '@/services/transactions/parseExpenseService';
 import { ParsedExpense } from '@/services/transactions/types';
 
+// Normalizador determinístico para garantir classificação correta
+const EXPENSE_TRIGGERS = [
+  'gastei', 'gasto', 'paguei', 'pago', 'comprei', 'compro',
+  'saiu', 'sai', 'debito', 'débito', 'perdi', 'perco',
+  'gastando', 'pagando', 'comprando', 'perdendo',
+  'foi gasto', 'foi pago', 'foi comprado',
+  'vou gastar', 'vou pagar', 'vou comprar',
+  'conta de', 'fatura', 'boleto', 'parcela', 'prestação',
+  'multa', 'taxa', 'juros', 'despesa', 'custo'
+];
+
+const INCOME_TRIGGERS = [
+  'recebi', 'recebo', 'ganhei', 'ganho', 'entrou',
+  'entrada', 'crédito', 'deposito', 'depósito',
+  'recebendo', 'ganhando', 'foi recebido', 'foi depositado',
+  'vou receber', 'vou ganhar', 'caiu na conta',
+  'salário', 'salario', 'pagamento', 'freelancer', 'freela',
+  'bônus', 'bonus', 'comissão', 'comissao', 'prêmio', 'premio',
+  'restituição', 'restituicao', 'cashback', 'dividendos',
+  'aluguel recebido', 'venda', 'faturei', 'lucro', 'rendimento'
+];
+
+function normalizeTransactionType(originalText: string, aiType?: string): 'expense' | 'income' {
+  const lowerText = originalText.toLowerCase();
+  
+  // Verificar triggers de despesa primeiro (mais específicos)
+  const hasExpenseTrigger = EXPENSE_TRIGGERS.some(trigger => 
+    lowerText.includes(trigger)
+  );
+  
+  if (hasExpenseTrigger) {
+    return 'expense';
+  }
+  
+  // Verificar triggers de receita
+  const hasIncomeTrigger = INCOME_TRIGGERS.some(trigger => 
+    lowerText.includes(trigger)
+  );
+  
+  if (hasIncomeTrigger) {
+    return 'income';
+  }
+  
+  // Se não houver triggers claros, usar resultado da IA ou padrão
+  if (aiType === 'income' || aiType === 'receita') {
+    return 'income';
+  }
+  
+  // Padrão: despesa (mais comum)
+  return 'expense';
+}
+
 interface TransactionWithId extends ParsedExpense {
   id: string;
 }
@@ -31,6 +83,7 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
       const transactionsWithIds = transactionsArray.map((transaction, index) => ({
         ...transaction,
         date: selectedDate || transaction.date, // Use selected date if provided
+        type: normalizeTransactionType(transcriptionText, transaction.type), // Normalizar tipo
         id: `temp-${Date.now()}-${index}`
       }));
       

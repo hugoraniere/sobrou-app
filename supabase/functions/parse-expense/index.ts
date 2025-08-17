@@ -4,6 +4,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { corsHeaders } from './cors.ts';
 import { aiParseTransaction } from './aiParser.ts';
 import { parseExpenseText } from './keywordParser.ts';
+import { normalizeTransactionType } from './typeNormalizer.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -31,7 +32,10 @@ serve(async (req) => {
       if (Array.isArray(aiResult)) {
         const validTransactions = aiResult.filter(transaction => 
           transaction && transaction.amount && !isNaN(transaction.amount)
-        );
+        ).map(transaction => ({
+          ...transaction,
+          type: normalizeTransactionType(text, transaction.type)
+        }));
         
         if (validTransactions.length > 0) {
           console.log(`Returning ${validTransactions.length} valid transactions from AI`);
@@ -43,9 +47,13 @@ serve(async (req) => {
       } 
       // If it's a single transaction, validate it
       else if (aiResult.amount && !isNaN(aiResult.amount)) {
+        const normalizedTransaction = {
+          ...aiResult,
+          type: normalizeTransactionType(text, aiResult.type)
+        };
         console.log("Returning single valid transaction from AI");
         return new Response(
-          JSON.stringify(aiResult),
+          JSON.stringify(normalizedTransaction),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
