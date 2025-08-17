@@ -15,7 +15,7 @@ const ResponsivePageContainer: React.FC<ResponsivePageContainerProps> = ({
   const { isMobile } = useResponsive();
 
   return (
-    <div className={`${getSectionContainer()} ${isMobile ? 'w-screen max-w-full' : ''} ${className}`}>
+    <div className={`${getSectionContainer()} ${isMobile ? 'max-w-full overflow-hidden' : ''} ${className}`}>
       {children}
     </div>
   );
