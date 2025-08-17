@@ -60,17 +60,34 @@ export function parseExpenseText(text: string): ParsedExpense {
     date = lastMonth.toISOString().split('T')[0];
   }
   
-  // Determine category
+  // Determine category with better matching logic
   let category = "other";
+  let bestMatch = "";
+  let bestCategory = "";
 
+  // Helper function to remove accents
+  function removeAccents(str: string): string {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  const normalizedText = removeAccents(text.toLowerCase());
+
+  // Look for the longest/most specific match first
   for (const [cat, keywords] of Object.entries(CATEGORY_MAPPING)) {
     for (const keyword of keywords) {
-      if (text.includes(keyword)) {
-        category = cat;
-        break;
+      const normalizedKeyword = removeAccents(keyword.toLowerCase());
+      if (normalizedText.includes(normalizedKeyword)) {
+        // Prioritize longer matches (more specific)
+        if (normalizedKeyword.length > bestMatch.length) {
+          bestMatch = normalizedKeyword;
+          bestCategory = cat;
+        }
       }
     }
-    if (category !== "other") break;
+  }
+
+  if (bestCategory) {
+    category = bestCategory;
   }
 
   // If it's food-related, default to 'alimentacao'

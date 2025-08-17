@@ -21,11 +21,24 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
   if (exactMatch) return { id: exactMatch.id, name: exactMatch.name };
   
   // Segunda tentativa: verificar palavras-chave detalhadas no mapeamento de categorias
+  // Priorizar matches mais longos/específicos
+  let bestMatch = { categoryId: '', matchLength: 0 };
+  
   for (const [categoryId, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some(keyword => textLower.includes(removeAccents(keyword.toLowerCase())))) {
-      const category = transactionCategories.find(cat => cat.id === categoryId);
-      if (category) return { id: category.id, name: category.name };
+    for (const keyword of keywords) {
+      const normalizedKeyword = removeAccents(keyword.toLowerCase());
+      if (textLower.includes(normalizedKeyword)) {
+        // Priorizar keywords mais longas (mais específicas)
+        if (normalizedKeyword.length > bestMatch.matchLength) {
+          bestMatch = { categoryId, matchLength: normalizedKeyword.length };
+        }
+      }
     }
+  }
+  
+  if (bestMatch.categoryId) {
+    const category = transactionCategories.find(cat => cat.id === bestMatch.categoryId);
+    if (category) return { id: category.id, name: category.name };
   }
   
   // Terceira tentativa: mapeamento de sinônimos comuns (accent insensitive)
@@ -120,11 +133,15 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
     'fibra': 'internet',
     'banda larga': 'internet',
     'tv': 'internet',
-    'netflix': 'internet',
-    'prime': 'internet',
-    'spotify': 'internet',
-    'disney': 'internet',
-    'assinatura': 'internet',
+     'netflix': 'internet',
+     'amazon prime': 'internet',
+     'prime video': 'internet',
+     'spotify': 'internet',
+     'disney': 'internet',
+     'hbo': 'internet',
+     'globoplay': 'internet',
+     'youtube premium': 'internet',
+     'assinatura': 'internet',
     
     // Lazer
     'cinema': 'lazer',
@@ -168,26 +185,53 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
     'reforma': 'moradia',
     'portaria': 'moradia',
     
-    // Compras
-    'shopping': 'compras',
-    'loja': 'compras',
-    'roupa': 'compras',
-    'calçado': 'compras',
-    'calcado': 'compras',
-    'sapato': 'compras',
-    'móveis': 'compras',
-    'moveis': 'compras',
-    'eletrodoméstico': 'compras',
-    'eletrodomestico': 'compras',
-    'eletrônico': 'compras',
-    'eletronico': 'compras',
-    // 'celular' já definido em 'internet'
-    'computador': 'compras',
-    'notebook': 'compras',
-    'mercado livre': 'compras',
-    'amazon': 'compras',
-    'magazine': 'compras',
-    'americanas': 'compras',
+     // Compras
+     'comprei': 'compras',
+     'compra': 'compras',
+     'compras': 'compras',
+     'comprando': 'compras',
+     'adquiri': 'compras',
+     'shopping': 'compras',
+     'loja': 'compras',
+     'roupa': 'compras',
+     'roupas': 'compras',
+     'calçado': 'compras',
+     'calcado': 'compras',
+     'sapato': 'compras',
+     'tênis': 'compras',
+     'tenis': 'compras',
+     'joia': 'compras',
+     'joias': 'compras',
+     'relógio': 'compras',
+     'relogio': 'compras',
+     'óculos': 'compras',
+     'oculos': 'compras',
+     'bolsa': 'compras',
+     'perfume': 'compras',
+     'cosméticos': 'compras',
+     'cosmeticos': 'compras',
+     'maquiagem': 'compras',
+     'móveis': 'compras',
+     'moveis': 'compras',
+     'eletrodoméstico': 'compras',
+     'eletrodomestico': 'compras',
+     'eletrônico': 'compras',
+     'eletronico': 'compras',
+     'eletrônicos': 'compras',
+     'eletronicos': 'compras',
+     'computador': 'compras',
+     'notebook': 'compras',
+     'gadget': 'compras',
+     'mercado livre': 'compras',
+     'mercadolivre': 'compras',
+     'aliexpress': 'compras',
+     'shopee': 'compras',
+     'shein': 'compras',
+     'magazine': 'compras',
+     'americanas': 'compras',
+     'casas bahia': 'compras',
+     'presente': 'compras',
+     'mimo': 'compras',
     
     // Investimentos
     'investimento': 'investimentos',

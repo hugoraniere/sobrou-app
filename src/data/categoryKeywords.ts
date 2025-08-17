@@ -6,8 +6,9 @@ export const categoryKeywords: Record<string, string[]> = {
   'alimentacao': [
     'restaurante', 'lanchonete', 'bar', 'pizzaria', 'hambúrguer', 'hamburger',
     'fast food', 'churrascaria', 'sushi', 'comida', 'almoço', 'jantar', 'café',
-    'padaria', 'supermercado', 'mercado', 'hortifruti', 'feira', 'delivery', 'ifood',
-    'rappi', 'uber eats', 'james', 'food', 'bistro', 'snack', 'cantina'
+    'padaria', 'supermercado', 'mercado extra', 'mercado carrefour', 'pão de açúcar',
+    'hortifruti', 'feira', 'delivery', 'ifood', 'rappi', 'uber eats', 'james', 'food', 
+    'bistro', 'snack', 'cantina', 'açougue', 'acougue', 'peixaria', 'quitanda'
   ],
   
   // Moradia
@@ -30,7 +31,7 @@ export const categoryKeywords: Record<string, string[]> = {
   'internet': [
     'internet', 'wifi', 'fibra', 'banda larga', 'net', 'vivo', 'claro', 'oi', 'tim',
     'operadora', 'telefone', 'celular', 'plano', 'dados', 'móvel', 'movel', 'tv',
-    'streaming', 'netflix', 'amazon', 'prime', 'disney', 'hbo', 'spotify', 'deezer',
+    'streaming', 'netflix', 'amazon prime', 'prime video', 'disney', 'hbo', 'spotify', 'deezer',
     'youtube premium', 'globoplay', 'telecomunicações', 'telecomunicacoes'
   ],
   
@@ -60,10 +61,21 @@ export const categoryKeywords: Record<string, string[]> = {
   
   // Compras
   'compras': [
-    'loja', 'shopping', 'magazine', 'americanas', 'amazon', 'mercado livre', 'aliexpress',
-    'shein', 'roupas', 'calçados', 'calcados', 'sapatos', 'tênis', 'tenis', 'vestuário',
-    'vestuario', 'eletrônico', 'eletronico', 'celular', 'computador', 'notebook', 'gadget',
-    'móveis', 'moveis', 'decoração', 'decoracao', 'utensílios', 'utensilios'
+    'comprei', 'compra', 'compras', 'comprando', 'comprou', 'adquiri', 'aquisição', 'aquisicao',
+    'loja', 'shopping', 'magazine', 'americanas', 'amazon', 'mercado livre', 'mercadolivre',
+    'aliexpress', 'shopee', 'shein', 'submarino', 'casas bahia', 'extra', 'carrefour', 'walmart',
+    'ponto frio', 'fast shop', 'ricardo eletro', 'e-commerce', 'ecommerce', 'online',
+    'roupas', 'roupa', 'vestuário', 'vestuario', 'calçados', 'calcados', 'sapatos', 'tênis', 'tenis',
+    'sandália', 'sandalia', 'bota', 'chinelo', 'joia', 'joias', 'relógio', 'relogio', 'óculos', 'oculos',
+    'bolsa', 'carteira', 'mochila', 'mala', 'perfume', 'colônia', 'cosméticos', 'cosmeticos',
+    'maquiagem', 'shampoo', 'condicionador', 'produto de beleza', 'eletrônico', 'eletronico',
+    'eletrônicos', 'eletronicos', 'celular', 'smartphone', 'computador', 'notebook', 'tablet',
+    'fone', 'headphone', 'carregador', 'cabo', 'gadget', 'acessório', 'acessorio',
+    'móveis', 'moveis', 'sofá', 'sofa', 'mesa', 'cadeira', 'cama', 'guarda-roupa',
+    'decoração', 'decoracao', 'quadro', 'vaso', 'almofada', 'cortina', 'tapete',
+    'utensílios', 'utensilios', 'panela', 'frigideira', 'prato', 'copo', 'talher',
+    'produto', 'produtos', 'item', 'itens', 'objeto', 'objetos', 'mercadoria',
+    'presente', 'mimo', 'lembrança', 'lembranca', 'brinde'
   ],
   
   // Investimentos

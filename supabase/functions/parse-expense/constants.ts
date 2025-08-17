@@ -44,8 +44,15 @@ export const CATEGORY_MAPPING: Record<string, string[]> = {
     "festa", "jogos", "netflix", "spotify"
   ],
   "compras": [
-    "roupa", "shopping", "loja", "compra", "presente", 
-    "eletrônico", "eletronico"
+    "comprei", "compra", "compras", "comprando", "shopping", "loja", "roupa", "roupas", 
+    "presente", "eletrônico", "eletronico", "celular", "computador", "notebook",
+    "amazon", "mercado livre", "mercadolivre", "aliexpress", "shopee", "shein", 
+    "americanas", "magazine", "casas bahia", "extra", "carrefour", "walmart",
+    "sapatos", "tênis", "tenis", "calçados", "calcados", "joia", "joias", 
+    "relógio", "relogio", "óculos", "oculos", "bolsa", "mochila", "perfume",
+    "cosméticos", "cosmeticos", "maquiagem", "produto", "produtos", "gadget",
+    "eletrônicos", "eletronicos", "móveis", "moveis", "decoração", "decoracao",
+    "utensílios", "utensilios", "objeto", "objetos", "item", "itens"
   ],
   "investimentos": [
     "investimento", "ação", "acao", "bolsa", "tesouro", "cdb", 
