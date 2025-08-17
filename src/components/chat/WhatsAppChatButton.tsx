@@ -50,8 +50,9 @@ const WhatsAppChatButton: React.FC<WhatsAppChatButtonProps> = ({
     checkWhatsAppConnection();
   }, [user]);
 
-  // Don't show on public landing page - moved after all hooks
-  if (location.pathname === '/') {
+  // Don't show on public pages - moved after all hooks
+  const publicRoutes = ['/', '/auth', '/verify', '/reset-password'];
+  if (publicRoutes.includes(location.pathname)) {
     return null;
   }
   const handleClick = () => {
