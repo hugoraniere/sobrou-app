@@ -35,7 +35,14 @@ export const INCOME_TRIGGERS = [
 export function normalizeTransactionType(text: string, aiType?: string): 'expense' | 'income' {
   const lowerText = text.toLowerCase();
   
-  // Verificar triggers de despesa primeiro (mais específicos)
+  // 1. Prioridade máxima: detectar sinal explícito +/-
+  const signMatch = text.match(/([+-])\s*(?:r\$|\$)?\s*\d+(?:[.,]\d+)?/i);
+  if (signMatch) {
+    const sign = signMatch[1];
+    return sign === '+' ? 'income' : 'expense';
+  }
+  
+  // 2. Verificar triggers de despesa (mais específicos)
   const hasExpenseTrigger = EXPENSE_TRIGGERS.some(trigger => 
     lowerText.includes(trigger)
   );
@@ -44,7 +51,7 @@ export function normalizeTransactionType(text: string, aiType?: string): 'expens
     return 'expense';
   }
   
-  // Verificar triggers de receita
+  // 3. Verificar triggers de receita
   const hasIncomeTrigger = INCOME_TRIGGERS.some(trigger => 
     lowerText.includes(trigger)
   );
@@ -53,11 +60,11 @@ export function normalizeTransactionType(text: string, aiType?: string): 'expens
     return 'income';
   }
   
-  // Se não houver triggers claros, usar resultado da IA ou padrão
+  // 4. Se não houver triggers claros, usar resultado da IA
   if (aiType === 'income' || aiType === 'receita') {
     return 'income';
   }
   
-  // Padrão: despesa (mais comum)
+  // 5. Padrão: despesa (mais comum)
   return 'expense';
 }

@@ -27,7 +27,14 @@ const INCOME_TRIGGERS = [
 function normalizeTransactionType(originalText: string, aiType?: string): 'expense' | 'income' {
   const lowerText = originalText.toLowerCase();
   
-  // Verificar triggers de despesa primeiro (mais específicos)
+  // 1. Prioridade máxima: detectar sinal explícito +/-
+  const signMatch = originalText.match(/([+-])\s*(?:r\$|\$)?\s*\d+(?:[.,]\d+)?/i);
+  if (signMatch) {
+    const sign = signMatch[1];
+    return sign === '+' ? 'income' : 'expense';
+  }
+  
+  // 2. Verificar triggers de despesa primeiro (mais específicos)
   const hasExpenseTrigger = EXPENSE_TRIGGERS.some(trigger => 
     lowerText.includes(trigger)
   );
@@ -36,7 +43,7 @@ function normalizeTransactionType(originalText: string, aiType?: string): 'expen
     return 'expense';
   }
   
-  // Verificar triggers de receita
+  // 3. Verificar triggers de receita
   const hasIncomeTrigger = INCOME_TRIGGERS.some(trigger => 
     lowerText.includes(trigger)
   );
@@ -45,12 +52,12 @@ function normalizeTransactionType(originalText: string, aiType?: string): 'expen
     return 'income';
   }
   
-  // Se não houver triggers claros, usar resultado da IA ou padrão
+  // 4. Se não houver triggers claros, usar resultado da IA ou padrão
   if (aiType === 'income' || aiType === 'receita') {
     return 'income';
   }
   
-  // Padrão: despesa (mais comum)
+  // 5. Padrão: despesa (mais comum)
   return 'expense';
 }
 
@@ -130,7 +137,7 @@ export const useMultipleTransactionsParsing = ({ onTransactionsConfirm }: UseMul
       id: `temp-${Date.now()}`,
       description: newTransaction.description || '',
       amount: newTransaction.amount || 0,
-      category: newTransaction.category || 'compras',
+      category: newTransaction.category || 'other',
       type: newTransaction.type || 'expense',
       date: newTransaction.date || new Date().toISOString().split('T')[0],
       isSaving: newTransaction.isSaving || false,

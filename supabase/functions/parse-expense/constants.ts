@@ -6,7 +6,7 @@ export const INCOME_KEYWORDS = [
   "fiz um freela", "lucro", "rendimento", "ganho", "comissão",
   "entrada", "receita", "transferência", "transferencia", "depósito",
   "deposito", "cashback", "restituição", "restituicao", "premio",
-  "prêmio", "dividendos", "aluguel", "recebido"
+  "prêmio", "dividendos", "aluguel recebido", "recebido"
 ];
 
 export const SAVING_KEYWORDS = [

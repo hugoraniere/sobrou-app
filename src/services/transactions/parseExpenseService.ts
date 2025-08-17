@@ -31,10 +31,12 @@ export const parseExpenseService = {
       // Process each transaction
       const processedTransactions = transactions.map(transaction => {
         // Try to determine category based on keywords if not provided
-        if (!transaction.category || transaction.category === 'Other') {
+        if (!transaction.category || transaction.category === 'Other' || transaction.category === 'outros') {
           const detectedCategory = getCategoryByKeyword(transaction.description);
           if (detectedCategory) {
             transaction.category = detectedCategory.id;
+          } else {
+            transaction.category = 'other';
           }
         }
         return transaction;

@@ -2,27 +2,33 @@
 import { transactionCategories } from '@/data/categories';
 import { categoryKeywords } from '@/data/categoryKeywords';
 
+// Helper function to remove accents for better matching
+const removeAccents = (str: string): string => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
 export const getCategoryByKeyword = (text: string): { id: string, name: string } | null => {
   if (!text) return null;
   
-  const textLower = text.toLowerCase();
+  const textLower = removeAccents(text.toLowerCase());
   
-  // Primeira tentativa: correspondência exata com o nome
-  const exactMatch = transactionCategories.find(
-    cat => cat.name.toLowerCase() === textLower || textLower.includes(cat.name.toLowerCase())
-  );
+  // Primeira tentativa: correspondência exata com o nome (accent insensitive)
+  const exactMatch = transactionCategories.find(cat => {
+    const catNameNormalized = removeAccents(cat.name.toLowerCase());
+    return catNameNormalized === textLower || textLower.includes(catNameNormalized);
+  });
   
   if (exactMatch) return { id: exactMatch.id, name: exactMatch.name };
   
   // Segunda tentativa: verificar palavras-chave detalhadas no mapeamento de categorias
   for (const [categoryId, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some(keyword => textLower.includes(keyword))) {
+    if (keywords.some(keyword => textLower.includes(removeAccents(keyword.toLowerCase())))) {
       const category = transactionCategories.find(cat => cat.id === categoryId);
       if (category) return { id: category.id, name: category.name };
     }
   }
   
-  // Terceira tentativa: mapeamento de sinônimos comuns
+  // Terceira tentativa: mapeamento de sinônimos comuns (accent insensitive)
   const synonymMap: Record<string, string> = {
     // Saúde
     'farmacia': 'saude',
@@ -243,7 +249,8 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
   };
   
   for (const [synonym, categoryId] of Object.entries(synonymMap)) {
-    if (textLower.includes(synonym)) {
+    const normalizedSynonym = removeAccents(synonym.toLowerCase());
+    if (textLower.includes(normalizedSynonym)) {
       const category = transactionCategories.find(cat => cat.id === categoryId);
       if (category) return { id: category.id, name: category.name };
     }
@@ -293,30 +300,14 @@ export const formatCurrencyInput = (value: string): string => {
 
 // Função melhorada para determinar categorias a partir do texto
 export const determineBestCategory = (description: string, amount: number, type: string): string => {
-  // Primeiro, tente usar o mapeamento de palavras-chave
-  const keywordMatch = getCategoryByKeyword(description);
-  if (keywordMatch) {
-    return keywordMatch.id;
+  if (!description) return 'other';
+  
+  // First try to get category by keyword
+  const keywordResult = getCategoryByKeyword(description);
+  if (keywordResult) {
+    return keywordResult.id;
   }
   
-  // Heurísticas baseadas em valores e tipos
-  if (type === 'income') {
-    // Rendas geralmente são salário ou investimentos
-    if (amount > 1000) {
-      return 'investimentos'; // Provavelmente salário ou grandes rendimentos
-    }
-    return 'compras'; // Valor padrão para rendas menores
-  } else {
-    // Despesas têm categorização mais específica
-    if (amount > 1000) {
-      // Valores altos provavelmente são moradia ou cartão
-      return 'moradia';
-    } else if (amount < 20) {
-      // Valores muito pequenos geralmente são despesas de alimentação ou transporte
-      return 'alimentacao';
-    }
-  }
-  
-  // Categoria padrão como fallback
-  return 'compras';
+  // If no category found, default to 'other'
+  return 'other';
 };

@@ -61,7 +61,7 @@ export function parseExpenseText(text: string): ParsedExpense {
   }
   
   // Determine category
-  let category = "compras";
+  let category = "other";
 
   for (const [cat, keywords] of Object.entries(CATEGORY_MAPPING)) {
     for (const keyword of keywords) {
@@ -70,7 +70,7 @@ export function parseExpenseText(text: string): ParsedExpense {
         break;
       }
     }
-    if (category !== "compras") break;
+    if (category !== "other") break;
   }
 
   // If it's food-related, default to 'alimentacao'

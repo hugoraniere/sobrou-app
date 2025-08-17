@@ -28,44 +28,38 @@ serve(async (req) => {
 
     // Check if AI parsing succeeded (can be single transaction or array)
     if (aiResult) {
-      // If it's an array, validate each transaction
-      if (Array.isArray(aiResult)) {
-        const validTransactions = aiResult.filter(transaction => 
-          transaction && transaction.amount && !isNaN(transaction.amount)
-        ).map(transaction => ({
-          ...transaction,
-          type: normalizeTransactionType(text, transaction.type)
-        }));
-        
-        if (validTransactions.length > 0) {
-          console.log(`Returning ${validTransactions.length} valid transactions from AI`);
-          return new Response(
-            JSON.stringify(validTransactions),
-            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-      } 
-      // If it's a single transaction, validate it
-      else if (aiResult.amount && !isNaN(aiResult.amount)) {
-        const normalizedTransaction = {
-          ...aiResult,
-          type: normalizeTransactionType(text, aiResult.type)
-        };
-        console.log("Returning single valid transaction from AI");
-        return new Response(
-          JSON.stringify(normalizedTransaction),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      console.log("Using AI parsing result");
+      
+      // Handle both single transaction and array of transactions
+      const transactions = Array.isArray(aiResult) ? aiResult : [aiResult];
+      
+      const processedTransactions = transactions.map(transaction => ({
+        ...transaction,
+        type: normalizeTransactionType(text, transaction.type),
+        category: transaction.category || 'other'
+      }));
+      
+      console.log("Final AI result:", processedTransactions);
+      
+      return new Response(
+        JSON.stringify(processedTransactions.length === 1 ? processedTransactions[0] : processedTransactions),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    // Fallback to original parsing if AI fails
+    // Fallback to rule-based parsing
     console.log("Falling back to rule-based parsing");
-    const parsedData = parseExpenseText(text);
+    const parsed = parseExpenseText(text);
+    
+    // Apply type normalization to fallback result too
+    parsed.type = normalizeTransactionType(text, parsed.type);
+    parsed.category = parsed.category || 'other';
+    
+    console.log("Final fallback result:", parsed);
     
     return new Response(
-      JSON.stringify(parsedData),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify(parsed),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in parse-expense function:", error);
