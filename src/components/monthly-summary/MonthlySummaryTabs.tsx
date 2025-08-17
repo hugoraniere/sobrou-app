@@ -28,7 +28,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
   }, [isDetailedView]);
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full", isMobile && "max-w-full overflow-hidden")}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
           "w-full mb-4 grid grid-cols-3",
@@ -73,7 +73,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         </TabsList>
 
         <TabsContent value="table" className="mt-0">
-          <div className="bg-white rounded-lg border p-4">
+          <div className={cn("bg-white rounded-lg border p-4", isMobile && "w-full max-w-full")}>
             <div className={getTableScrollContainer(isMobile)}>
               <MonthlyTable year={year} />
             </div>
@@ -81,7 +81,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         </TabsContent>
 
         <TabsContent value="planning" className="mt-0">
-          <div className="bg-white rounded-lg border p-4">
+          <div className={cn("bg-white rounded-lg border p-4", isMobile && "w-full max-w-full")}>
             <div className={getTableScrollContainer(isMobile)}>
               <PlanningTable 
                 year={year} 
@@ -93,7 +93,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         </TabsContent>
 
         <TabsContent value="comparative" className="mt-0">
-          <div className="bg-white rounded-lg border p-4">
+          <div className={cn("bg-white rounded-lg border p-4", isMobile && "w-full max-w-full")}>
             <div className={getTableScrollContainer(isMobile)}>
               <ComparativeTable 
                 year={year} 

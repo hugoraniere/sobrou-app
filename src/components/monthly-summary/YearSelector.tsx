@@ -35,8 +35,8 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
 
   return (
     <div className={cn(
-      "flex items-center shrink-0",
-      isMobile ? "gap-1" : "gap-4",
+      "flex items-center",
+      isMobile ? "gap-1" : "gap-4 shrink-0",
       className
     )}>
       <Button
