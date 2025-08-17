@@ -35,6 +35,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   const [audioModalOpen, setAudioModalOpen] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [originalInputText, setOriginalInputText] = useState('');
+  const [hasConfirmedCurrentBatch, setHasConfirmedCurrentBatch] = useState(false);
   const inputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation();
 
@@ -51,8 +52,10 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     hasTransactions,
     addNewTransaction
   } = useMultipleTransactionsParsing({
-    onTransactionsConfirm: (transactionsToConfirm: any[]) => {
-      const processAllTransactions = async () => {
+    onTransactionsConfirm: async (transactionsToConfirm: any[]) => {
+      console.log("🎯 Processando lote de transações:", transactionsToConfirm.length);
+      
+      try {
         for (const transaction of transactionsToConfirm) {
           try {
             // Corrigir: apenas adicionar a poupança se explicitamente marcado como isSaving
@@ -69,10 +72,11 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
                 date: transaction.date
               });
             }
-          } catch (error) {
-            console.error('Error adding transaction:', error);
-            toast.error(`Erro ao adicionar transação: ${transaction.description}`);
-            return; // Parar se houver erro
+          } catch (error: any) {
+            console.error('❌ Error adding transaction:', error);
+            const errorMessage = error?.message || 'Erro desconhecido';
+            toast.error(`Erro ao adicionar "${transaction.description}": ${errorMessage}`);
+            throw error; // Re-throw to stop the whole process
           }
         }
         
@@ -81,17 +85,19 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
           onTransactionAdded(false);
         }
         
-        // Reset form após sucesso
-        console.log("🧹 Limpando formulário após salvamento bem-sucedido");
+      } catch (error) {
+        console.error("❌ Falha no processamento do lote:", error);
+      } finally {
+        // SEMPRE limpar o estado, independentemente de sucesso ou falha
+        console.log("🧹 Limpando formulário (sucesso ou falha)");
         setInputValue('');
         setUserSelectedCategory(null);
         setDetectedCategory(null);
         setShowReview(false);
         setOriginalInputText('');
-        resetProcessing(); // Limpar estado do hook também
-      };
-
-      processAllTransactions();
+        setHasConfirmedCurrentBatch(false);
+        resetProcessing();
+      }
     }
   });
 
@@ -135,26 +141,37 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
     try {
       console.log("🚀 Iniciando processamento do prompt:", inputValue);
       setOriginalInputText(inputValue);
+      setHasConfirmedCurrentBatch(false); // Reset do flag ao iniciar novo processamento
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       
       // Aguardar o processamento completo
       await processTranscription(inputValue, formattedDate);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error processing input:', error);
-      toast.error("Não foi possível processar sua entrada. Por favor, tente novamente.");
+      const errorMessage = error?.message || 'Erro desconhecido';
+      toast.error(`Não foi possível processar sua entrada: ${errorMessage}`);
+      
+      // Reset em caso de erro também
+      setHasConfirmedCurrentBatch(false);
     }
   };
 
   // UseEffect para monitorar mudanças nas transações e confirmar automaticamente
   useEffect(() => {
-    console.log("🔍 Verificando transações no useEffect:", transactions.length);
+    console.log("🔍 Verificando transações no useEffect:", {
+      transactionsCount: transactions.length,
+      isProcessing,
+      hasConfirmedCurrentBatch
+    });
     
-    if (transactions.length > 0 && !isProcessing) {
+    // Só confirmar se temos transações, não estamos processando e ainda não confirmamos este lote
+    if (transactions.length > 0 && !isProcessing && !hasConfirmedCurrentBatch) {
       console.log("✅ Confirmando transações automaticamente");
+      setHasConfirmedCurrentBatch(true); // Marcar como confirmado ANTES de chamar
       confirmAllTransactions();
     }
-  }, [transactions, isProcessing, confirmAllTransactions]);
+  }, [transactions, isProcessing, hasConfirmedCurrentBatch, confirmAllTransactions]);
 
   const handleAudioTransactionConfirm = (data: any) => {
     const processTransaction = async (transaction: any) => {
