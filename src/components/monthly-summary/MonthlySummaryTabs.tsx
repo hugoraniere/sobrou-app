@@ -28,18 +28,18 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
   }, [isDetailedView]);
 
   return (
-    <div className={cn("w-full", isMobile && "w-[100vw] max-w-[100vw] overflow-x-hidden")}>
+    <div className={cn("w-full", isMobile && "max-w-full overflow-x-hidden")}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
-          "w-full mb-4 grid grid-cols-3",
+          "w-full mb-4 flex",
           isMobile ? "h-9 p-0.5 max-w-full overflow-hidden" : "h-10"
         )}>
           <TabsTrigger 
             value="table" 
             className={cn(
-              "flex items-center justify-center flex-1 text-center text-sm",
+              "flex items-center justify-center text-center text-sm",
               "!whitespace-normal truncate", // Override whitespace-nowrap
-              isMobile ? "px-1 py-1.5 min-w-0" : ""
+              isMobile ? "flex-1 basis-1/3 min-w-0 px-1 py-1.5" : "flex-1"
             )}
           >
             <span className="truncate">
@@ -49,9 +49,9 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           <TabsTrigger 
             value="planning" 
             className={cn(
-              "flex items-center justify-center flex-1 text-center text-sm",
+              "flex items-center justify-center text-center text-sm",
               "!whitespace-normal truncate", // Override whitespace-nowrap
-              isMobile ? "px-1 py-1.5 min-w-0" : ""
+              isMobile ? "flex-1 basis-1/3 min-w-0 px-1 py-1.5" : "flex-1"
             )}
           >
             <span className="truncate">
@@ -61,9 +61,9 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
           <TabsTrigger 
             value="comparative" 
             className={cn(
-              "flex items-center justify-center flex-1 text-center text-sm",
+              "flex items-center justify-center text-center text-sm",
               "!whitespace-normal truncate", // Override whitespace-nowrap
-              isMobile ? "px-1 py-1.5 min-w-0" : ""
+              isMobile ? "flex-1 basis-1/3 min-w-0 px-1 py-1.5" : "flex-1"
             )}
           >
             <span className="truncate">
