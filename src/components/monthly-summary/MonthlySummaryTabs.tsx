@@ -28,7 +28,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
   }, [isDetailedView]);
 
   return (
-    <div className={cn("w-full", isMobile && "max-w-full overflow-hidden")}>
+    <div className={cn("w-full", isMobile && "w-screen max-w-full overflow-hidden")}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
           "w-full mb-4 grid grid-cols-3",
