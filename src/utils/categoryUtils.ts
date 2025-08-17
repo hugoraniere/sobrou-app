@@ -344,7 +344,7 @@ export const formatCurrencyInput = (value: string): string => {
 
 // Função melhorada para determinar categorias a partir do texto
 export const determineBestCategory = (description: string, amount: number, type: string): string => {
-  if (!description) return 'other';
+  if (!description) return 'outros';
   
   // First try to get category by keyword
   const keywordResult = getCategoryByKeyword(description);
@@ -352,6 +352,6 @@ export const determineBestCategory = (description: string, amount: number, type:
     return keywordResult.id;
   }
   
-  // If no category found, default to 'other'
-  return 'other';
+  // If no category found, default to 'outros'
+  return 'outros';
 };

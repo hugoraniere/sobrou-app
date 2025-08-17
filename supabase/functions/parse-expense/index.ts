@@ -71,16 +71,16 @@ const CATEGORY_NORMALIZATION: Record<string, string> = {
   'combustível': 'transporte',
   'combustivel': 'transporte',
   
-  // Other normalizations
-  'outros': 'other',
-  'outros gastos': 'other',
-  'diverso': 'other',
-  'various': 'other',
-  'miscellaneous': 'other'
+  // Other normalizations - keep as 'outros' for database constraint
+  'other': 'outros',
+  'outros gastos': 'outros',
+  'diverso': 'outros',
+  'various': 'outros',
+  'miscellaneous': 'outros'
 };
 
 function normalizeCategory(category: string): string {
-  if (!category) return 'other';
+  if (!category) return 'outros';
   
   const lowerCategory = category.toLowerCase();
   
@@ -92,15 +92,15 @@ function normalizeCategory(category: string): string {
   // Check if it's already a valid category ID
   const validCategories = [
     'alimentacao', 'moradia', 'transporte', 'internet', 'cartao',
-    'saude', 'lazer', 'compras', 'investimentos', 'familia', 'doacoes', 'other'
+    'saude', 'lazer', 'compras', 'investimentos', 'familia', 'doacoes', 'outros'
   ];
   
   if (validCategories.includes(lowerCategory)) {
     return lowerCategory;
   }
   
-  // Default to 'other' for unrecognized categories
-  return 'other';
+  // Default to 'outros' for unrecognized categories
+  return 'outros';
 }
 
 serve(async (req) => {

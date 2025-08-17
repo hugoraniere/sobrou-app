@@ -40,8 +40,8 @@ export const parseExpenseService = {
           'mercado livre': 'compras',
           'netflix': 'internet',
           'spotify': 'internet',
-          'outros': 'other',
-          'Other': 'other'
+          'other': 'outros',
+          'Other': 'outros'
         };
         
         if (categoryMapping[normalizedCategory]) {
@@ -54,7 +54,7 @@ export const parseExpenseService = {
           if (detectedCategory) {
             normalizedCategory = detectedCategory.id;
           } else {
-            normalizedCategory = 'other';
+            normalizedCategory = 'outros';
           }
         }
         

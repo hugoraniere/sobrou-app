@@ -61,7 +61,7 @@ export function parseExpenseText(text: string): ParsedExpense {
   }
   
   // Determine category with better matching logic
-  let category = "other";
+  let category = "outros";
   let bestMatch = "";
   let bestCategory = "";
 
