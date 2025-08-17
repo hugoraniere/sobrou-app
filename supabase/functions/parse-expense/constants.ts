@@ -29,7 +29,8 @@ export const CATEGORY_MAPPING: Record<string, string[]> = {
   ],
   "internet": [
     "internet", "wifi", "telefone", "celular", "tim", "vivo", 
-    "claro", "oi"
+    "claro", "oi", "netflix", "spotify", "amazon prime", "prime video",
+    "disney", "hbo", "globoplay", "youtube premium", "assinatura"
   ],
   "cartao": [
     "cartão", "cartao", "fatura", "crédito", "credito", "nubank", 
@@ -37,7 +38,9 @@ export const CATEGORY_MAPPING: Record<string, string[]> = {
   ],
   "saude": [
     "médico", "medico", "hospital", "remédio", "remedio", 
-    "consulta", "exame", "farmácia", "farmacia"
+    "consulta", "exame", "farmácia", "farmacia", "academia", 
+    "gym", "fitness", "treino", "musculação", "musculacao",
+    "exercício", "exercicio", "dentista", "clínica", "clinica"
   ],
   "lazer": [
     "cinema", "show", "teatro", "viagem", "passeio", "bar", 
@@ -52,7 +55,8 @@ export const CATEGORY_MAPPING: Record<string, string[]> = {
     "relógio", "relogio", "óculos", "oculos", "bolsa", "mochila", "perfume",
     "cosméticos", "cosmeticos", "maquiagem", "produto", "produtos", "gadget",
     "eletrônicos", "eletronicos", "móveis", "moveis", "decoração", "decoracao",
-    "utensílios", "utensilios", "objeto", "objetos", "item", "itens"
+    "utensílios", "utensilios", "objeto", "objetos", "item", "itens",
+    "magazine luiza"
   ],
   "investimentos": [
     "investimento", "ação", "acao", "bolsa", "tesouro", "cdb", 

@@ -6,6 +6,103 @@ import { aiParseTransaction } from './aiParser.ts';
 import { parseExpenseText } from './keywordParser.ts';
 import { normalizeTransactionType } from './typeNormalizer.ts';
 
+// Category normalization mapping for AI-returned categories
+const CATEGORY_NORMALIZATION: Record<string, string> = {
+  // AI common returns to valid categories
+  'academia': 'saude',
+  'gym': 'saude',
+  'fitness': 'saude',
+  'exercício': 'saude',
+  'exercicio': 'saude',
+  'treino': 'saude',
+  'musculação': 'saude',
+  'musculacao': 'saude',
+  
+  // Streaming and subscriptions
+  'netflix': 'internet',
+  'spotify': 'internet',
+  'amazon prime': 'internet',
+  'prime video': 'internet',
+  'disney': 'internet',
+  'hbo': 'internet',
+  'globoplay': 'internet',
+  'youtube premium': 'internet',
+  'assinatura': 'internet',
+  'subscription': 'internet',
+  
+  // Shopping platforms
+  'amazon': 'compras',
+  'mercado livre': 'compras',
+  'mercadolivre': 'compras',
+  'aliexpress': 'compras',
+  'shopee': 'compras',
+  'shein': 'compras',
+  'magazine luiza': 'compras',
+  'americanas': 'compras',
+  'casas bahia': 'compras',
+  'shopping': 'compras',
+  
+  // Health
+  'hospital': 'saude',
+  'farmacia': 'saude',
+  'farmácia': 'saude',
+  'médico': 'saude',
+  'medico': 'saude',
+  'consulta': 'saude',
+  'exame': 'saude',
+  'dentista': 'saude',
+  'clínica': 'saude',
+  'clinica': 'saude',
+  
+  // Food
+  'restaurante': 'alimentacao',
+  'mercado': 'alimentacao',
+  'supermercado': 'alimentacao',
+  'ifood': 'alimentacao',
+  'delivery': 'alimentacao',
+  'padaria': 'alimentacao',
+  'lanchonete': 'alimentacao',
+  
+  // Transport
+  'uber': 'transporte',
+  'taxi': 'transporte',
+  '99': 'transporte',
+  'gasolina': 'transporte',
+  'combustível': 'transporte',
+  'combustivel': 'transporte',
+  
+  // Other normalizations
+  'outros': 'other',
+  'outros gastos': 'other',
+  'diverso': 'other',
+  'various': 'other',
+  'miscellaneous': 'other'
+};
+
+function normalizeCategory(category: string): string {
+  if (!category) return 'other';
+  
+  const lowerCategory = category.toLowerCase();
+  
+  // Direct mapping from normalization table
+  if (CATEGORY_NORMALIZATION[lowerCategory]) {
+    return CATEGORY_NORMALIZATION[lowerCategory];
+  }
+  
+  // Check if it's already a valid category ID
+  const validCategories = [
+    'alimentacao', 'moradia', 'transporte', 'internet', 'cartao',
+    'saude', 'lazer', 'compras', 'investimentos', 'familia', 'doacoes', 'other'
+  ];
+  
+  if (validCategories.includes(lowerCategory)) {
+    return lowerCategory;
+  }
+  
+  // Default to 'other' for unrecognized categories
+  return 'other';
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -36,7 +133,7 @@ serve(async (req) => {
       const processedTransactions = transactions.map(transaction => ({
         ...transaction,
         type: normalizeTransactionType(text, transaction.type),
-        category: transaction.category || 'other'
+        category: normalizeCategory(transaction.category)
       }));
       
       console.log("Final AI result:", processedTransactions);
@@ -53,7 +150,7 @@ serve(async (req) => {
     
     // Apply type normalization to fallback result too
     parsed.type = normalizeTransactionType(text, parsed.type);
-    parsed.category = parsed.category || 'other';
+    parsed.category = normalizeCategory(parsed.category);
     
     console.log("Final fallback result:", parsed);
     

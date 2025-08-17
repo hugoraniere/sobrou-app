@@ -152,7 +152,7 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
     'bar': 'lazer',
     'balada': 'lazer',
     'festa': 'lazer',
-    'academia': 'lazer',
+    'academia': 'saude',
     'parque': 'lazer',
     'clube': 'lazer',
     'esporte': 'lazer',

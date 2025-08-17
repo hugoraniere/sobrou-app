@@ -28,16 +28,40 @@ export const parseExpenseService = {
       
       // Process each transaction
       const processedTransactions = transactions.map(transaction => {
-        // Try to determine category based on keywords if not provided
-        if (!transaction.category || transaction.category === 'Other' || transaction.category === 'outros') {
+        // Normalize category first
+        let normalizedCategory = transaction.category;
+        
+        // Handle common AI-returned categories that need normalization
+        const categoryMapping: Record<string, string> = {
+          'academia': 'saude',
+          'gym': 'saude',
+          'fitness': 'saude',
+          'amazon': 'compras',
+          'mercado livre': 'compras',
+          'netflix': 'internet',
+          'spotify': 'internet',
+          'outros': 'other',
+          'Other': 'other'
+        };
+        
+        if (categoryMapping[normalizedCategory]) {
+          normalizedCategory = categoryMapping[normalizedCategory];
+        }
+        
+        // Try to determine category based on keywords if not provided or invalid
+        if (!normalizedCategory || normalizedCategory === 'Other' || normalizedCategory === 'outros') {
           const detectedCategory = getCategoryByKeyword(transaction.description);
           if (detectedCategory) {
-            transaction.category = detectedCategory.id;
+            normalizedCategory = detectedCategory.id;
           } else {
-            transaction.category = 'other';
+            normalizedCategory = 'other';
           }
         }
-        return transaction;
+        
+        return {
+          ...transaction,
+          category: normalizedCategory
+        };
       });
       
       // Return in original format (single or array)
