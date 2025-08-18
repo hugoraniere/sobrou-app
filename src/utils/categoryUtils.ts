@@ -81,6 +81,9 @@ export const getCategoryByKeyword = (text: string): { id: string, name: string }
     'sacolao': 'alimentacao',
     
     // Transporte
+    'transporte': 'transporte',
+    'transporte público': 'transporte',
+    'transporte urbano': 'transporte',
     'uber': 'transporte',
     'taxi': 'transporte',
     '99': 'transporte',

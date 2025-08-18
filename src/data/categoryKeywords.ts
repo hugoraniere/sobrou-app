@@ -21,7 +21,7 @@ export const categoryKeywords: Record<string, string[]> = {
   
   // Transporte
   'transporte': [
-    'uber', '99', 'taxi', 'cabify', 'gasolina', 'combustível', 'combustivel', 'álcool',
+    'transporte', 'transporte público', 'transporte urbano', 'uber', '99', 'taxi', 'cabify', 'gasolina', 'combustível', 'combustivel', 'álcool',
     'alcool', 'etanol', 'diesel', 'estacionamento', 'pedágio', 'pedagio', 'metrô', 'metro',
     'ônibus', 'onibus', 'trem', 'passagem', 'bilhete', 'carro', 'moto', 'seguro auto',
     'mecânico', 'mecanico', 'oficina', 'revisão', 'revisao', 'pneu', 'peças', 'pecas'

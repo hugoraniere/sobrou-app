@@ -24,8 +24,8 @@ export const CATEGORY_MAPPING: Record<string, string[]> = {
     "energia", "gás", "gas", "iptu"
   ],
   "transporte": [
-    "uber", "99", "taxi", "ônibus", "onibus", "metrô", "metro", 
-    "gasolina", "combustível", "combustivel"
+    "transporte", "transporte público", "uber", "99", "taxi", "ônibus", "onibus", "metrô", "metro", 
+    "gasolina", "combustível", "combustivel", "estacionamento", "pedágio", "pedagio", "passagem"
   ],
   "internet": [
     "internet", "wifi", "telefone", "celular", "tim", "vivo", 
