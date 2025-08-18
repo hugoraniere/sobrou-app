@@ -40,6 +40,10 @@ export const parseExpenseService = {
           'mercado livre': 'compras',
           'netflix': 'internet',
           'spotify': 'internet',
+          'cashback': 'outros',
+          'freelancer': 'outros',
+          'freelance': 'outros',
+          'renda extra': 'outros',
           'other': 'outros',
           'Other': 'outros'
         };

@@ -6,7 +6,7 @@ export type SortConfig = {
   direction: 'asc' | 'desc';
 };
 
-export const useTransactionSorter = (initialSortKey: keyof Transaction = 'date', initialDirection: 'asc' | 'desc' = 'desc') => {
+export const useTransactionSorter = (initialSortKey: keyof Transaction = 'created_at', initialDirection: 'asc' | 'desc' = 'desc') => {
   const [sortConfig, setSortConfig] = useState<SortConfig>({ 
     key: initialSortKey, 
     direction: initialDirection 

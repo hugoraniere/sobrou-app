@@ -27,7 +27,7 @@ export const useTransactionForm = (onSuccess?: () => void) => {
     defaultValues: {
       description: '',
       amount: '',
-      category: 'other',
+      category: 'outros',
       date: new Date(),
       type: 'expense'
     },
