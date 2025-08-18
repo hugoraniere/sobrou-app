@@ -4,6 +4,8 @@ import { Transaction } from '@/services/transactions';
 import DashboardBigNumbers from './DashboardBigNumbers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subDays } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface DashboardOverviewCardProps {
   transactions: Transaction[];
@@ -24,36 +26,60 @@ const DashboardOverviewCard: React.FC<DashboardOverviewCardProps> = ({
     filterTransactionsByPeriod(activePeriod);
   }, [transactions, activePeriod]);
   
+  // Helper para converter data string para Date local
+  const parseDateLocal = (dateStr: string | Date): Date => {
+    // Se já é um objeto Date, retorna como está
+    if (typeof dateStr === 'object' && dateStr instanceof Date) return dateStr;
+    
+    // Parse da string de data considerando timezone local
+    if (typeof dateStr === 'string') {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      }
+    }
+    
+    // Fallback para o parse padrão
+    return new Date(dateStr);
+  };
+
   // Filtrar transações com base no período selecionado
   const filterTransactionsByPeriod = (period: PeriodFilter) => {
     const now = new Date();
-    let startDate = new Date();
+    let start: Date;
+    let end: Date;
     
-    // Definir a data de início com base no período selecionado
+    // Definir as datas de início e fim com base no período selecionado
     switch (period) {
       case 'today':
-        startDate.setHours(0, 0, 0, 0);
+        start = startOfDay(now);
+        end = endOfDay(now);
         break;
       case 'this-week':
-        const day = startDate.getDay() || 7; // Considerando a semana começando no domingo (0) até sábado (6)
-        startDate.setDate(startDate.getDate() - day + 1); // Primeiro dia da semana (segunda-feira)
-        startDate.setHours(0, 0, 0, 0);
+        start = startOfWeek(now, { locale: ptBR }); // Segunda-feira no Brasil
+        end = endOfWeek(now, { locale: ptBR });
         break;
       case 'this-month':
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        start = startOfMonth(now);
+        end = endOfMonth(now);
         break;
       case 'last-30-days':
-        startDate.setDate(startDate.getDate() - 30);
+        start = startOfDay(subDays(now, 30));
+        end = endOfDay(now);
         break;
       case 'this-year':
-        startDate = new Date(now.getFullYear(), 0, 1);
+        start = startOfYear(now);
+        end = endOfYear(now);
         break;
+      default:
+        start = startOfMonth(now);
+        end = endOfMonth(now);
     }
     
-    // Filtrar transações entre a data de início e agora
+    // Filtrar transações entre as datas de início e fim (inclusive)
     const filtered = transactions.filter(transaction => {
-      const transactionDate = new Date(transaction.date);
-      return transactionDate >= startDate && transactionDate <= now;
+      const transactionDate = parseDateLocal(transaction.date);
+      return transactionDate >= start && transactionDate <= end;
     });
     
     setFilteredTransactions(filtered);
