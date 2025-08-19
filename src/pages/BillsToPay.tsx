@@ -12,17 +12,16 @@ import { Bill } from '@/types/bills';
 import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 import { notificationsService } from '@/services/notificationsService';
-import { useNotifications } from '@/hooks/useNotifications';
 
 const BillsToPay = () => {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
-  const { preferences } = useNotifications();
   const { bills, isLoading, error, createBill, updateBill, deleteBill, markAsPaid, markAsUnpaid, isCreating, isUpdating } = useBillsData();
   
   // Estados para controlar o dialog
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
+  const [notificationPreferences, setNotificationPreferences] = useState({ bill_due: true });
 
   const handleRefetch = () => {
     // As mutations do useBillsData já invalidam automaticamente as queries
@@ -83,7 +82,7 @@ const BillsToPay = () => {
   // Create notifications for bills due today
   useEffect(() => {
     const createBillNotifications = async () => {
-      if (!bills || !preferences.bill_due) return;
+      if (!bills || !notificationPreferences.bill_due) return;
 
       const today = new Date().toISOString().split('T')[0];
       const billsDueToday = bills.filter(bill => 
@@ -100,7 +99,21 @@ const BillsToPay = () => {
     };
 
     createBillNotifications();
-  }, [bills, preferences.bill_due]);
+  }, [bills, notificationPreferences.bill_due]);
+
+  // Load notification preferences
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const prefs = await notificationsService.getPreferences();
+        setNotificationPreferences(prefs);
+      } catch (error) {
+        console.error('Error loading notification preferences:', error);
+      }
+    };
+
+    loadPreferences();
+  }, []);
 
   return (
     <ResponsivePageContainer>
