@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,13 @@ import { useBillsData } from '@/hooks/useBillsData';
 import { Bill } from '@/types/bills';
 import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
+import { notificationsService } from '@/services/notificationsService';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const BillsToPay = () => {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
+  const { preferences } = useNotifications();
   const { bills, isLoading, error, createBill, updateBill, deleteBill, markAsPaid, markAsUnpaid, isCreating, isUpdating } = useBillsData();
   
   // Estados para controlar o dialog
@@ -76,6 +79,28 @@ const BillsToPay = () => {
   const totalOriginalAmount = bills.reduce((sum, bill) => sum + bill.amount, 0);
   const totalTransactions = 0; // Por enquanto 0, pois não temos transações implementadas
   const currentBalance = totalOriginalAmount - totalTransactions;
+
+  // Create notifications for bills due today
+  useEffect(() => {
+    const createBillNotifications = async () => {
+      if (!bills || !preferences.bill_due) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const billsDueToday = bills.filter(bill => 
+        !bill.is_paid && bill.due_date === today
+      );
+
+      for (const bill of billsDueToday) {
+        try {
+          await notificationsService.createBillDueNotificationIfNeeded(bill);
+        } catch (error) {
+          console.error('Error creating bill notification:', error);
+        }
+      }
+    };
+
+    createBillNotifications();
+  }, [bills, preferences.bill_due]);
 
   return (
     <ResponsivePageContainer>

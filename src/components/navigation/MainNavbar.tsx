@@ -12,6 +12,7 @@ import { useAvatar } from '@/contexts/AvatarContext';
 import MobileNavigation from './MobileNavigation';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
+import { NotificationBell } from '../notifications/NotificationBell';
 const MainNavbar: React.FC = () => {
   const {
     t
@@ -68,8 +69,12 @@ const MainNavbar: React.FC = () => {
               {/* Mobile menu - positioned on the right */}
               {isMobile && <MobileNavigation />}
               
-              {/* User Menu - Hidden on mobile since it's in the side menu */}
-              {!isMobile && <DropdownMenu>
+              {/* Notification Bell and User Menu - Hidden on mobile since it's in the side menu */}
+              {!isMobile && (
+                <div className="flex items-center space-x-2">
+                  <NotificationBell />
+                  
+                  <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="focus:outline-none">
                       <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
@@ -96,7 +101,9 @@ const MainNavbar: React.FC = () => {
                       {t('auth.logout', 'Sair')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>}
+                </DropdownMenu>
+                </div>
+              )}
             </>}
         </div>
       </div>

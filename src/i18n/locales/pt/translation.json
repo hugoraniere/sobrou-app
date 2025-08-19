@@ -177,7 +177,41 @@
     "resetAccount": "Redefinir Conta",
     "resetAccountDescription": "Apaga todos os dados da conta permanentemente",
     "dangerZone": "Zona Perigosa",
-    "pages": "Páginas"
+    "pages": "Páginas",
+    "notifications": {
+      "title": "Notificações",
+      "unread": "Não lidas",
+      "read": "Lidas",
+      "empty": "Nenhuma notificação encontrada",
+      "markAllAsRead": "Marcar todas como lidas",
+      "spendingAlerts": "Alertas de gastos",
+      "spendingAlertsDesc": "Receba notificações sobre gastos altos",
+      "goalAchieved": "Metas alcançadas",
+      "goalAchievedDesc": "Receba notificações quando atingir suas metas",
+      "autoSuggestions": "Sugestões automáticas",
+      "autoSuggestionsDesc": "Receba sugestões automáticas de economia",
+      "billDue": "Lembrete de contas",
+      "billDueDesc": "Receba lembretes no dia do vencimento das contas",
+      "updated": "Preferências de notificação atualizadas com sucesso!"
+    },
+    "tabs": {
+      "profile": "Perfil",
+      "preferences": "Preferências",
+      "whatsapp": "WhatsApp",
+      "pages": "Páginas"
+    }
+  },
+  "notifications": {
+    "title": "Notificações",
+    "unread": "Não lidas",  
+    "read": "Lidas",
+    "empty": "Nenhuma notificação encontrada",
+    "markAllAsRead": "Marcar todas como lidas",
+    "billDue": {
+      "title": "Conta vencendo hoje",
+      "body": "A conta \"{title}\" de R$ {amount} vence hoje."
+    },
+    "updated": "Preferências de notificação atualizadas com sucesso!"
   },
   "auth": {
     "confirmLogout": "Confirmar Saída",

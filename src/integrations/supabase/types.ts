@@ -220,6 +220,48 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          day_bucket: string
+          id: string
+          metadata: Json | null
+          read_at: string | null
+          source_id: string | null
+          source_table: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          day_bucket?: string
+          id?: string
+          metadata?: Json | null
+          read_at?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          day_bucket?: string
+          id?: string
+          metadata?: Json | null
+          read_at?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -358,6 +400,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          notification_settings: Json | null
           optional_pages: Json | null
           updated_at: string | null
           user_id: string
@@ -365,6 +408,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          notification_settings?: Json | null
           optional_pages?: Json | null
           updated_at?: string | null
           user_id: string
@@ -372,6 +416,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          notification_settings?: Json | null
           optional_pages?: Json | null
           updated_at?: string | null
           user_id?: string
