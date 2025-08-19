@@ -5,7 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationsModal } from './NotificationsModal';
 
-export const NotificationBell: React.FC = () => {
+interface NotificationBellProps {
+  className?: string;
+}
+
+export const NotificationBell: React.FC<NotificationBellProps> = ({ className = "" }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { unreadCount } = useNotifications();
 
@@ -15,7 +19,7 @@ export const NotificationBell: React.FC = () => {
 
   return (
     <>
-      <div className="relative">
+      <div className={`relative ${className}`}>
         <Button
           variant="ghost"
           size="sm"

@@ -69,11 +69,11 @@ const MainNavbar: React.FC = () => {
               {/* Mobile menu - positioned on the right */}
               {isMobile && <MobileNavigation />}
               
-              {/* Notification Bell and User Menu - Hidden on mobile since it's in the side menu */}
-              {!isMobile && (
-                <div className="flex items-center space-x-2">
-                  <NotificationBell />
-                  
+              {/* Notification Bell and User Menu */}
+              <div className="flex items-center space-x-2">
+                <NotificationBell className={isMobile ? 'hidden' : ''} />
+                
+                {!isMobile && (
                   <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="focus:outline-none">
@@ -102,8 +102,8 @@ const MainNavbar: React.FC = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                </div>
-              )}
+                )}
+              </div>
             </>}
         </div>
       </div>
