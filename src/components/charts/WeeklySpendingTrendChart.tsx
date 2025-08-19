@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Transaction } from '@/services/transactions';
@@ -8,61 +7,58 @@ import { useWeeklySpendingData } from '@/hooks/useWeeklySpendingData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePeriodFilter, PERIOD_OPTIONS, PeriodOption } from '@/hooks/usePeriodFilter';
 import { useResponsive } from '@/hooks/useResponsive';
-
 interface WeeklySpendingTrendChartProps {
   transactions: Transaction[];
   chartConfig: any;
 }
-
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label
+}: any) => {
   if (!active || !payload || !payload.length) return null;
-  
   const data = payload[0];
   const value = data.value;
-  
-  return (
-    <div className="bg-white p-3 border rounded shadow-lg text-sm">
+  return <div className="bg-white p-3 border rounded shadow-lg text-sm">
       <p className="font-medium mb-1">Dia: {label}</p>
       <p className="text-red-600">
         Gasto médio: {formatCurrencyNoDecimals(value)}
       </p>
-    </div>
-  );
+    </div>;
 };
-
-const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({ 
+const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
   transactions,
   chartConfig
 }) => {
-  const { isMobile } = useResponsive();
+  const {
+    isMobile
+  } = useResponsive();
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('this-month');
-  const { filteredTransactions } = usePeriodFilter(transactions, selectedPeriod);
-  const { weeklyData, insights } = useWeeklySpendingData(filteredTransactions);
-  
+  const {
+    filteredTransactions
+  } = usePeriodFilter(transactions, selectedPeriod);
+  const {
+    weeklyData,
+    insights
+  } = useWeeklySpendingData(filteredTransactions);
+
   // Create chart data with appropriate day names based on device
   const chartData = weeklyData.map(day => ({
     ...day,
     displayName: isMobile ? day.dayNameMobile : day.dayName
   }));
-  
   if (weeklyData.length === 0 || !insights) {
-    return (
-      <div className="h-full w-full flex flex-col">
+    return <div className="h-full w-full flex flex-col">
         {/* Period Filter */}
         <div className="mb-4">
-          <Select
-            value={selectedPeriod}
-            onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}
-          >
+          <Select value={selectedPeriod} onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}>
             <SelectTrigger className="w-[180px] h-8 text-sm">
               <SelectValue placeholder="Selecione o período" />
             </SelectTrigger>
             <SelectContent>
-              {PERIOD_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
+              {PERIOD_OPTIONS.map(option => <SelectItem key={option.value} value={option.value}>
                   {option.label}
-                </SelectItem>
-              ))}
+                </SelectItem>)}
             </SelectContent>
           </Select>
         </div>
@@ -72,30 +68,22 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
             <p>Sem dados de despesas para exibir no período selecionado.</p>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
-  
+
   // Create insight message
   const insightMessage = `Você gasta mais nas ${insights.highestSpendingDay.toLowerCase()}s (${formatCurrencyNoDecimals(insights.highestAmount)} em média).`;
-  
-  return (
-    <div className="h-full w-full flex flex-col">
+  return <div className="h-full w-full flex flex-col">
       {/* Period Filter */}
       <div className="mb-4">
-        <Select
-          value={selectedPeriod}
-          onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}
-        >
+        <Select value={selectedPeriod} onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}>
           <SelectTrigger className="w-[180px] h-8 text-sm">
             <SelectValue placeholder="Selecione o período" />
           </SelectTrigger>
           <SelectContent>
-            {PERIOD_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+            {PERIOD_OPTIONS.map(option => <SelectItem key={option.value} value={option.value}>
                 {option.label}
-              </SelectItem>
-            ))}
+              </SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -108,49 +96,27 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
       {/* Chart */}
       <div className="flex-1 min-h-0">
         <ChartContainer config={chartConfig} className="w-full h-full">
-          <BarChart
-            data={chartData}
-            margin={{ top: 10, right: 15, left: 10, bottom: 25 }}
-            barGap={8}
-          >
+          <BarChart data={chartData} margin={{
+          top: 10,
+          right: 15,
+          left: 10,
+          bottom: 25
+        }} barGap={8}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-            <XAxis 
-              dataKey="displayName"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: isMobile ? 10 : 11 }}
-              height={25}
-              interval={0}
-            />
-            <YAxis 
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 10 }}
-              tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-              width={60}
-            />
+            <XAxis dataKey="displayName" axisLine={false} tickLine={false} tick={{
+            fontSize: isMobile ? 10 : 11
+          }} height={25} interval={0} />
+            <YAxis axisLine={false} tickLine={false} tick={{
+            fontSize: 10
+          }} tickFormatter={value => formatCurrencyNoDecimals(value)} width={60} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar 
-              dataKey="averageSpending" 
-              name="Gasto médio" 
-              fill="#E15759" 
-              radius={[4, 4, 0, 0]}
-              animationDuration={300}
-              maxBarSize={50}
-            />
+            <Bar dataKey="averageSpending" name="Gasto médio" fill="#E15759" radius={[4, 4, 0, 0]} animationDuration={300} maxBarSize={50} />
           </BarChart>
         </ChartContainer>
       </div>
       
       {/* Legend */}
-      <div className="flex justify-center mt-4">
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-sm bg-[#E15759]" />
-          <span className="text-sm font-medium">Gasto médio</span>
-        </div>
-      </div>
-    </div>
-  );
+      
+    </div>;
 };
-
 export default WeeklySpendingTrendChart;
