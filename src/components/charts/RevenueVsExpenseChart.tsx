@@ -6,7 +6,7 @@ import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { formatCurrencyNoDecimals } from '@/utils/currencyUtils';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addMonths, format, startOfMonth, endOfMonth, subMonths, eachDayOfInterval, parseISO } from 'date-fns';
+import { addMonths, format, startOfMonth, endOfMonth, subMonths, eachDayOfInterval, parseISO, getDaysInMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface RevenueVsExpenseChartProps {
@@ -120,6 +120,59 @@ const processMonthlyData = (transactions: Transaction[], period: string) => {
   });
 
   return Array.from(monthlyData.values());
+};
+
+// Process daily data for chart by specific month
+const processDailyDataByMonth = (transactions: Transaction[], monthKey: string) => {
+  // Parse month key (format: 'yyyy-MM')
+  const [year, month] = monthKey.split('-').map(Number);
+  const monthDate = new Date(year, month - 1, 1);
+  
+  const startDate = startOfMonth(monthDate);
+  const endDate = endOfMonth(monthDate);
+  
+  const filteredTransactions = filterTransactionsByDateRange(
+    transactions,
+    startDate,
+    endDate
+  );
+  
+  // Get total days in the month
+  const daysInMonth = getDaysInMonth(monthDate);
+  
+  // Initialize daily data for all days of the month
+  const dailyData = Array.from({ length: daysInMonth }, (_, index) => {
+    const day = index + 1;
+    const date = new Date(year, month - 1, day);
+    const dayKey = format(date, 'yyyy-MM-dd');
+    const dayLabel = format(date, 'dd');
+    
+    return {
+      day: dayLabel,
+      dayKey,
+      income: 0,
+      expense: 0
+    };
+  });
+  
+  // Populate with actual transaction data
+  filteredTransactions.forEach(transaction => {
+    const transactionDate = new Date(transaction.date);
+    const dayKey = format(transactionDate, 'yyyy-MM-dd');
+    
+    // Find the corresponding day in our data array
+    const dayIndex = dailyData.findIndex(item => item.dayKey === dayKey);
+    
+    if (dayIndex !== -1) {
+      if (transaction.type === 'income') {
+        dailyData[dayIndex].income += transaction.amount;
+      } else if (transaction.type === 'expense') {
+        dailyData[dayIndex].expense += transaction.amount;
+      }
+    }
+  });
+  
+  return dailyData;
 };
 
 // Process daily data for chart (limited to 30 days)
@@ -237,15 +290,38 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
 }) => {
   const [period, setPeriod] = useState('this-month');
   const [viewMode, setViewMode] = useState('monthly');
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    // Default to current month
+    return format(new Date(), 'yyyy-MM');
+  });
+  
+  // Generate month options (last 12 months in Portuguese)
+  const monthOptions = useMemo(() => {
+    const options = [];
+    const now = new Date();
+    
+    for (let i = 0; i < 12; i++) {
+      const monthDate = subMonths(now, i);
+      const monthKey = format(monthDate, 'yyyy-MM');
+      const monthLabel = format(monthDate, 'MMMM yyyy', { locale: ptBR });
+      
+      options.push({
+        value: monthKey,
+        label: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)
+      });
+    }
+    
+    return options;
+  }, []);
   
   // Process data for the chart based on selected period and view mode
   const chartData = useMemo(() => {
     if (viewMode === 'monthly') {
       return processMonthlyData(transactions, period);
     } else {
-      return processDailyData(transactions, period);
+      return processDailyDataByMonth(transactions, selectedMonth);
     }
-  }, [transactions, period, viewMode]);
+  }, [transactions, period, viewMode, selectedMonth]);
   
   // Calculate insights
   const insights = useMemo(() => {
@@ -287,24 +363,43 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
-      {/* Controle de período */}
+      {/* Controles de período/mês */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <Select
-          defaultValue={period}
-          value={period}
-          onValueChange={setPeriod}
-        >
-          <SelectTrigger className="w-[180px] h-8 text-sm">
-            <SelectValue placeholder="Selecione o período" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="this-month">Este mês</SelectItem>
-            <SelectItem value="last-month">Mês passado</SelectItem>
-            <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
-            <SelectItem value="last-6-months">Últimos 6 meses</SelectItem>
-            <SelectItem value="this-year">Este ano</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Seletor de período para visão mensal ou seletor de mês para visão diária */}
+        {viewMode === 'monthly' ? (
+          <Select
+            defaultValue={period}
+            value={period}
+            onValueChange={setPeriod}
+          >
+            <SelectTrigger className="w-[180px] h-8 text-sm">
+              <SelectValue placeholder="Selecione o período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="this-month">Este mês</SelectItem>
+              <SelectItem value="last-month">Mês passado</SelectItem>
+              <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
+              <SelectItem value="last-6-months">Últimos 6 meses</SelectItem>
+              <SelectItem value="this-year">Este ano</SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          <Select
+            value={selectedMonth}
+            onValueChange={setSelectedMonth}
+          >
+            <SelectTrigger className="w-[180px] h-8 text-sm">
+              <SelectValue placeholder="Selecione o mês" />
+            </SelectTrigger>
+            <SelectContent>
+              {monthOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         
         <div className="flex ml-auto">
           <Button
