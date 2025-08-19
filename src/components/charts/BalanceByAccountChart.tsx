@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/chart";
 import {
   Pie,
-  ResponsiveContainer,
   PieChart,
   Cell,
   Legend
@@ -74,36 +73,34 @@ const BalanceByAccountChart: React.FC<BalanceByAccountChartProps> = ({
   };
 
   return (
-    <div className="h-[300px] w-full max-w-full overflow-hidden flex justify-center items-center p-2 sm:p-3 md:p-4">
+    <div className="h-full w-full flex justify-center items-center">
       {balanceByAccount.length > 0 ? (
-        <ChartContainer className="h-[300px] w-full max-w-full" config={chartConfig}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={balanceByAccount}
-                cx="50%"
-                cy="50%"
-                labelLine={true}
-                outerRadius={70}
-                fill="#8884d8"
-                dataKey="value"
-                label={renderCustomizedLabel}
-              >
-                {balanceByAccount.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend layout="horizontal" verticalAlign="bottom" align="center" />
-              <ChartTooltip
-                content={({ active, payload }) => active && payload && payload.length ? (
-                  <ChartTooltipContent payload={payload} />
-                ) : null}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+        <ChartContainer className="w-full h-full" config={chartConfig}>
+          <PieChart>
+            <Pie
+              data={balanceByAccount}
+              cx="50%"
+              cy="50%"
+              labelLine={true}
+              outerRadius={70}
+              fill="#8884d8"
+              dataKey="value"
+              label={renderCustomizedLabel}
+            >
+              {balanceByAccount.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Legend layout="horizontal" verticalAlign="bottom" align="center" />
+            <ChartTooltip
+              content={({ active, payload }) => active && payload && payload.length ? (
+                <ChartTooltipContent payload={payload} />
+              ) : null}
+            />
+          </PieChart>
         </ChartContainer>
       ) : (
-        <div className="h-[300px] flex items-center justify-center text-gray-400">
+        <div className="w-full h-full flex items-center justify-center text-gray-400">
           {t('dashboard.charts.noData')}
         </div>
       )}

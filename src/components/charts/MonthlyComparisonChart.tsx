@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer } from '@/components/ui/chart';
 import {
   BarChart,
   Bar,
@@ -7,7 +8,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
@@ -105,48 +105,46 @@ const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
       </CardHeader>
       <CardContent className="h-[320px]">
         {data.length > 0 ? (
-          <div className="h-[300px] w-full max-w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => `R$${value}`}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="expenses" 
-                  name="Despesas" 
-                  fill="#FF8042" 
-                  radius={[4, 4, 0, 0]} 
-                />
-                <Bar 
-                  dataKey="income" 
-                  name="Receitas" 
-                  fill="#00C49F" 
-                  radius={[4, 4, 0, 0]} 
-                />
-                <Bar 
-                  dataKey="balance" 
-                  name="Saldo" 
-                  fill="#0088FE" 
-                  radius={[4, 4, 0, 0]} 
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <ChartContainer config={chartConfig} className="w-full h-full">
+            <BarChart
+              data={data}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                tickFormatter={(value) => `R$${value}`}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar 
+                dataKey="expenses" 
+                name="Despesas" 
+                fill="#FF8042" 
+                radius={[4, 4, 0, 0]} 
+              />
+              <Bar 
+                dataKey="income" 
+                name="Receitas" 
+                fill="#00C49F" 
+                radius={[4, 4, 0, 0]} 
+              />
+              <Bar 
+                dataKey="balance" 
+                name="Saldo" 
+                fill="#0088FE" 
+                radius={[4, 4, 0, 0]} 
+              />
+            </BarChart>
+          </ChartContainer>
         ) : (
           <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
         )}

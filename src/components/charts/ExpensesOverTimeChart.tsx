@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer } from '@/components/ui/chart';
 import {
   LineChart,
   Line,
@@ -7,7 +8,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import EmptyStateMessage from '../dashboard/EmptyStateMessage';
@@ -126,43 +126,41 @@ const ExpensesOverTimeChart: React.FC<ExpensesOverTimeChartProps> = ({
       </CardHeader>
       <CardContent>
         {data.length > 0 ? (
-          <div className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={data}
-                margin={{
-                  top: 10,
-                  right: 10,
-                  left: 10,
-                  bottom: 20,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  tickFormatter={formatXAxis}
-                  tick={{ fontSize: 11 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={50}
-                />
-                <YAxis 
-                  tick={{ fontSize: 11 }}
-                  tickFormatter={(value) => formatCurrency(value)}
-                  width={60}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Line
-                  type="monotone"
-                  dataKey="amount"
-                  stroke="#ef4444"
-                  strokeWidth={2}
-                  activeDot={{ r: 6 }}
-                  name="Despesas"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <ChartContainer config={chartConfig} className="w-full h-[250px]">
+            <LineChart
+              data={data}
+              margin={{
+                top: 10,
+                right: 10,
+                left: 10,
+                bottom: 20,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis 
+                dataKey="date" 
+                tickFormatter={formatXAxis}
+                tick={{ fontSize: 11 }}
+                angle={-45}
+                textAnchor="end"
+                height={50}
+              />
+              <YAxis 
+                tick={{ fontSize: 11 }}
+                tickFormatter={(value) => formatCurrency(value)}
+                width={60}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Line
+                type="monotone"
+                dataKey="amount"
+                stroke="#ef4444"
+                strokeWidth={2}
+                activeDot={{ r: 6 }}
+                name="Despesas"
+              />
+            </LineChart>
+          </ChartContainer>
         ) : (
           <EmptyStateMessage message={TEXT.dashboard.charts.noData || 'Sem dados para exibir'} />
         )}

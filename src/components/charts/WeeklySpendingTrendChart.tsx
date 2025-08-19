@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import { ChartContainer } from '@/components/ui/chart';
 import { formatCurrencyNoDecimals } from '@/utils/currencyUtils';
@@ -107,40 +107,38 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
       
       {/* Chart */}
       <div className="flex-1 min-h-0">
-        <ChartContainer config={chartConfig}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              margin={{ top: 10, right: 15, left: 10, bottom: 25 }}
-              barGap={8}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-              <XAxis 
-                dataKey="displayName"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: isMobile ? 10 : 11 }}
-                height={25}
-                interval={0}
-              />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10 }}
-                tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-                width={60}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey="averageSpending" 
-                name="Gasto médio" 
-                fill="#E15759" 
-                radius={[4, 4, 0, 0]}
-                animationDuration={300}
-                maxBarSize={50}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+        <ChartContainer config={chartConfig} className="w-full h-full">
+          <BarChart
+            data={chartData}
+            margin={{ top: 10, right: 15, left: 10, bottom: 25 }}
+            barGap={8}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+            <XAxis 
+              dataKey="displayName"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: isMobile ? 10 : 11 }}
+              height={25}
+              interval={0}
+            />
+            <YAxis 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10 }}
+              tickFormatter={(value) => formatCurrencyNoDecimals(value)}
+              width={60}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar 
+              dataKey="averageSpending" 
+              name="Gasto médio" 
+              fill="#E15759" 
+              radius={[4, 4, 0, 0]}
+              animationDuration={300}
+              maxBarSize={50}
+            />
+          </BarChart>
         </ChartContainer>
       </div>
       

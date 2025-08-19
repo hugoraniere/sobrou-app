@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import { transactionCategories } from '@/data/categories';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
@@ -215,44 +215,42 @@ const ExpensesByCategoryChart: React.FC<ExpensesByCategoryChartProps> = ({
             className="h-full w-full"
             config={chartConfig}
           >
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                <Pie
-                  data={data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  innerRadius={30}
-                  fill="#8884d8"
-                  dataKey="value"
-                  nameKey="name"
-                  minAngle={3}
-                >
-                  {data.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={entry.color}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  content={
-                    <ChartTooltipContent 
-                      formatter={(value: number, name: string, entry: any) => {
-                        return [
-                          <>
-                            <span>R$ {Math.round(value)}</span>
-                            <span className="block text-xs text-gray-400">({entry.payload.percentage.toFixed(1)}%)</span>
-                          </>,
-                          name
-                        ];
-                      }}
-                    />
-                  } 
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                innerRadius={30}
+                fill="#8884d8"
+                dataKey="value"
+                nameKey="name"
+                minAngle={3}
+              >
+                {data.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.color}
+                  />
+                ))}
+              </Pie>
+              <Tooltip 
+                content={
+                  <ChartTooltipContent 
+                    formatter={(value: number, name: string, entry: any) => {
+                      return [
+                        <>
+                          <span>R$ {Math.round(value)}</span>
+                          <span className="block text-xs text-gray-400">({entry.payload.percentage.toFixed(1)}%)</span>
+                        </>,
+                        name
+                      ];
+                    }}
+                  />
+                } 
+              />
+            </PieChart>
           </ChartContainer>
         </div>
         

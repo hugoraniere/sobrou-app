@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Transaction } from '@/services/transactions';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { formatCurrencyNoDecimals } from '@/utils/currencyUtils';
@@ -336,54 +336,52 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
       {/* Gráfico */}
       <div className="flex-1 min-h-0 overflow-hidden">
         <div className={`w-full h-full ${needsHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : ''}`}>
-          <ChartContainer config={chartConfig}>
-            <ResponsiveContainer width={chartWidth} height="100%">
-              <BarChart
-                data={chartData}
-                margin={{ 
-                  top: 10, 
-                  right: 15, 
-                  left: 10, 
-                  bottom: viewMode === 'daily' ? 40 : 25 
-                }}
-                barGap={2}
-                maxBarSize={calculateBarSize()}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-                <XAxis 
-                  dataKey={viewMode === 'monthly' ? "month" : "day"}
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 10 }}
-                  angle={viewMode === 'daily' ? -45 : 0}
-                  textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
-                  height={viewMode === 'daily' ? 40 : 25}
-                  interval={0}
-                />
-                <YAxis 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 10 }}
-                  tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-                  width={60}
-                />
-                <Tooltip content={<EnhancedTooltip viewMode={viewMode} />} />
-                <Bar 
-                  dataKey="income" 
-                  name="income" 
-                  fill="#22c55e" 
-                  radius={[2, 2, 0, 0]}
-                  animationDuration={300}
-                />
-                <Bar 
-                  dataKey="expense" 
-                  name="expense" 
-                  fill="#ef4444" 
-                  radius={[2, 2, 0, 0]}
-                  animationDuration={300}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+          <ChartContainer config={chartConfig} className="w-full h-full" style={{ width: chartWidth }}>
+            <BarChart
+              data={chartData}
+              margin={{ 
+                top: 10, 
+                right: 15, 
+                left: 10, 
+                bottom: viewMode === 'daily' ? 40 : 25 
+              }}
+              barGap={2}
+              maxBarSize={calculateBarSize()}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+              <XAxis 
+                dataKey={viewMode === 'monthly' ? "month" : "day"}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10 }}
+                angle={viewMode === 'daily' ? -45 : 0}
+                textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
+                height={viewMode === 'daily' ? 40 : 25}
+                interval={0}
+              />
+              <YAxis 
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10 }}
+                tickFormatter={(value) => formatCurrencyNoDecimals(value)}
+                width={60}
+              />
+              <Tooltip content={<EnhancedTooltip viewMode={viewMode} />} />
+              <Bar 
+                dataKey="income" 
+                name="income" 
+                fill="#22c55e" 
+                radius={[2, 2, 0, 0]}
+                animationDuration={300}
+              />
+              <Bar 
+                dataKey="expense" 
+                name="expense" 
+                fill="#ef4444" 
+                radius={[2, 2, 0, 0]}
+                animationDuration={300}
+              />
+            </BarChart>
           </ChartContainer>
         </div>
       </div>
