@@ -4,11 +4,10 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Check, CheckCheck, Bell } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,14 +15,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Notification } from '@/services/notificationsService';
 
-interface NotificationsModalProps {
+interface NotificationsDropdownProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  trigger: React.ReactNode;
 }
 
-export const NotificationsModal: React.FC<NotificationsModalProps> = ({
+export const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
   open,
   onOpenChange,
+  trigger,
 }) => {
   const { t } = useTranslation();
   const { 
@@ -99,9 +100,9 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
 
     if (!hasNotifications) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Bell className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium text-muted-foreground">
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <Bell className="h-8 w-8 text-muted-foreground mb-3" />
+          <h3 className="text-sm font-medium text-muted-foreground">
             {t('notifications.empty', 'Nenhuma notificação')}
           </h3>
         </div>
@@ -120,45 +121,50 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+    <Popover open={open} onOpenChange={onOpenChange}>
+      <PopoverTrigger asChild>
+        {trigger}
+      </PopoverTrigger>
+      <PopoverContent className="w-96 p-0 bg-popover border shadow-lg z-50" align="end">
+        <div className="p-4 border-b">
           <div className="flex items-center justify-between">
-            <DialogTitle>{t('notifications.title', 'Notificações')}</DialogTitle>
+            <h3 className="font-semibold">{t('notifications.title', 'Notificações')}</h3>
             {unreadNotifications.length > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleMarkAllAsRead}
-                className="text-xs"
+                className="text-xs h-8"
               >
                 <CheckCheck className="h-4 w-4 mr-1" />
                 {t('notifications.markAllAsRead', 'Marcar todas como lidas')}
               </Button>
             )}
           </div>
-        </DialogHeader>
+        </div>
 
         <Tabs defaultValue="unread" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="unread" className="relative">
-              {t('notifications.unread', 'Não lidas')}
-              {unreadNotifications.length > 0 && (
-                <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
-                  {unreadNotifications.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="read">
-              {t('notifications.read', 'Lidas')}
-            </TabsTrigger>
-          </TabsList>
+          <div className="px-4 pt-2">
+            <TabsList className="grid w-full grid-cols-2 h-8">
+              <TabsTrigger value="unread" className="relative text-xs">
+                {t('notifications.unread', 'Não lidas')}
+                {unreadNotifications.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-4 px-1.5 text-xs">
+                    {unreadNotifications.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="read" className="text-xs">
+                {t('notifications.read', 'Lidas')}
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="unread" className="mt-4">
-            <ScrollArea className="h-[400px] pr-4">
+          <TabsContent value="unread" className="mt-2 p-4 pt-2">
+            <ScrollArea className="h-80">
               {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                 </div>
               ) : (
                 renderNotifications(unreadGrouped, true)
@@ -166,11 +172,11 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="read" className="mt-4">
-            <ScrollArea className="h-[400px] pr-4">
+          <TabsContent value="read" className="mt-2 p-4 pt-2">
+            <ScrollArea className="h-80">
               {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                 </div>
               ) : (
                 renderNotifications(readGrouped, false)
@@ -178,7 +184,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             </ScrollArea>
           </TabsContent>
         </Tabs>
-      </DialogContent>
-    </Dialog>
+      </PopoverContent>
+    </Popover>
   );
 };

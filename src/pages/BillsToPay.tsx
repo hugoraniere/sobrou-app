@@ -23,6 +23,42 @@ const BillsToPay = () => {
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [notificationPreferences, setNotificationPreferences] = useState({ bill_due: true });
 
+  // Create notifications for bills due today
+  useEffect(() => {
+    const createBillNotifications = async () => {
+      if (!bills || !notificationPreferences.bill_due) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const billsDueToday = bills.filter(bill => 
+        !bill.is_paid && bill.due_date === today
+      );
+
+      for (const bill of billsDueToday) {
+        try {
+          await notificationsService.createBillDueNotificationIfNeeded(bill);
+        } catch (error) {
+          console.error('Error creating bill notification:', error);
+        }
+      }
+    };
+
+    createBillNotifications();
+  }, [bills, notificationPreferences.bill_due]);
+
+  // Load notification preferences
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const prefs = await notificationsService.getPreferences();
+        setNotificationPreferences(prefs);
+      } catch (error) {
+        console.error('Error loading notification preferences:', error);
+      }
+    };
+
+    loadPreferences();
+  }, []);
+
   const handleRefetch = () => {
     // As mutations do useBillsData já invalidam automaticamente as queries
     // então não precisamos de uma função refetch explícita
@@ -78,42 +114,6 @@ const BillsToPay = () => {
   const totalOriginalAmount = bills.reduce((sum, bill) => sum + bill.amount, 0);
   const totalTransactions = 0; // Por enquanto 0, pois não temos transações implementadas
   const currentBalance = totalOriginalAmount - totalTransactions;
-
-  // Create notifications for bills due today
-  useEffect(() => {
-    const createBillNotifications = async () => {
-      if (!bills || !notificationPreferences.bill_due) return;
-
-      const today = new Date().toISOString().split('T')[0];
-      const billsDueToday = bills.filter(bill => 
-        !bill.is_paid && bill.due_date === today
-      );
-
-      for (const bill of billsDueToday) {
-        try {
-          await notificationsService.createBillDueNotificationIfNeeded(bill);
-        } catch (error) {
-          console.error('Error creating bill notification:', error);
-        }
-      }
-    };
-
-    createBillNotifications();
-  }, [bills, notificationPreferences.bill_due]);
-
-  // Load notification preferences
-  useEffect(() => {
-    const loadPreferences = async () => {
-      try {
-        const prefs = await notificationsService.getPreferences();
-        setNotificationPreferences(prefs);
-      } catch (error) {
-        console.error('Error loading notification preferences:', error);
-      }
-    };
-
-    loadPreferences();
-  }, []);
 
   return (
     <ResponsivePageContainer>
