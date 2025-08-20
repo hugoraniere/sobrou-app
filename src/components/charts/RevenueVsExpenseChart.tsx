@@ -349,17 +349,13 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
     return <div className="text-center text-gray-500">Sem dados para exibir.</div>;
   }
 
-  // Calculate dynamic bar size based on data length and view mode
+  // Calculate dynamic bar size for monthly view only
   const calculateBarSize = () => {
-    if (viewMode === 'daily') {
-      return Math.min(14, Math.max(6, 200 / chartData.length));
+    if (viewMode === 'monthly') {
+      return Math.min(35, Math.max(15, 250 / chartData.length));
     }
-    return Math.min(35, Math.max(15, 250 / chartData.length));
+    return undefined; // Let daily view use full width
   };
-
-  // Calculate if we need horizontal scroll for daily view
-  const needsHorizontalScroll = viewMode === 'daily' && chartData.length > 12;
-  const chartWidth = needsHorizontalScroll ? Math.max(500, chartData.length * 18) : '100%';
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
@@ -430,55 +426,56 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
       
       {/* Gráfico */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        <div className={`w-full h-full ${needsHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : ''}`}>
-          <ChartContainer config={chartConfig} className="w-full h-full" style={{ width: chartWidth }}>
-            <BarChart
-              data={chartData}
-              margin={{ 
-                top: 10, 
-                right: 15, 
-                left: 10, 
-                bottom: viewMode === 'daily' ? 40 : 25 
-              }}
-              barGap={2}
-              maxBarSize={calculateBarSize()}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-              <XAxis 
-                dataKey={viewMode === 'monthly' ? "month" : "day"}
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10 }}
-                angle={viewMode === 'daily' ? -45 : 0}
-                textAnchor={viewMode === 'daily' ? 'end' : 'middle'}
-                height={viewMode === 'daily' ? 40 : 25}
-                interval={0}
-              />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10 }}
-                tickFormatter={(value) => formatCurrencyNoDecimals(value)}
-                width={60}
-              />
-              <Tooltip content={<EnhancedTooltip viewMode={viewMode} />} />
-              <Bar 
-                dataKey="income" 
-                name="income" 
-                fill="#22c55e" 
-                radius={[2, 2, 0, 0]}
-                animationDuration={300}
-              />
-              <Bar 
-                dataKey="expense" 
-                name="expense" 
-                fill="#ef4444" 
-                radius={[2, 2, 0, 0]}
-                animationDuration={300}
-              />
-            </BarChart>
-          </ChartContainer>
-        </div>
+        <ChartContainer config={chartConfig} className="w-full h-full">
+          <BarChart
+            data={chartData}
+            margin={{ 
+              top: 10, 
+              right: 15, 
+              left: 10, 
+              bottom: viewMode === 'daily' ? 40 : 25 
+            }}
+            barGap={2}
+            barCategoryGap={viewMode === 'daily' ? '25%' : '30%'}
+            maxBarSize={calculateBarSize()}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+            <XAxis 
+              dataKey={viewMode === 'monthly' ? "month" : "day"}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10 }}
+              angle={viewMode === 'daily' ? 0 : 0}
+              textAnchor="middle"
+              height={viewMode === 'daily' ? 30 : 25}
+              interval={viewMode === 'daily' ? 'preserveEnd' : 0}
+              minTickGap={viewMode === 'daily' ? 10 : undefined}
+              padding={viewMode === 'daily' ? { left: 8, right: 8 } : undefined}
+            />
+            <YAxis 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10 }}
+              tickFormatter={(value) => formatCurrencyNoDecimals(value)}
+              width={60}
+            />
+            <Tooltip content={<EnhancedTooltip viewMode={viewMode} />} />
+            <Bar 
+              dataKey="income" 
+              name="income" 
+              fill="#22c55e" 
+              radius={[2, 2, 0, 0]}
+              animationDuration={300}
+            />
+            <Bar 
+              dataKey="expense" 
+              name="expense" 
+              fill="#ef4444" 
+              radius={[2, 2, 0, 0]}
+              animationDuration={300}
+            />
+          </BarChart>
+        </ChartContainer>
       </div>
       
       {/* Legenda movida para baixo */}
