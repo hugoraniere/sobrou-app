@@ -19,6 +19,10 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useBillsData } from '@/hooks/useBillsData';
+import { format, isAfter, isBefore, addDays, startOfMonth, endOfMonth } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Loader2, CreditCard } from 'lucide-react';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -31,6 +35,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 }) => {
   const { isMobile } = useResponsive();
   const navigate = useNavigate();
+  const { bills, isLoading: billsLoading } = useBillsData();
   
   // Inicializa filteredTransactions com todas as transações
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
@@ -97,6 +102,54 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   const handleViewAllTransactions = () => {
     navigate('/transactions');
   };
+
+  const handleNavigateToGoals = () => {
+    navigate('/goals');
+  };
+
+  const handleNavigateToBills = () => {
+    navigate('/bills-to-pay');
+  };
+
+  // Calculate bills summary
+  const billsSummary = React.useMemo(() => {
+    if (!bills.length) return null;
+
+    const now = new Date();
+    const startOfThisMonth = startOfMonth(now);
+    const endOfThisMonth = endOfMonth(now);
+    const next7Days = addDays(now, 7);
+
+    const unpaidBills = bills.filter(bill => !bill.is_paid);
+    
+    // Bills in this month
+    const thisMonthBills = unpaidBills.filter(bill => {
+      const dueDate = new Date(bill.due_date);
+      return dueDate >= startOfThisMonth && dueDate <= endOfThisMonth;
+    });
+
+    // Overdue bills
+    const overdueBills = unpaidBills.filter(bill => {
+      const dueDate = new Date(bill.due_date);
+      return isBefore(dueDate, now);
+    });
+
+    // Bills in next 7 days
+    const upcoming7Days = unpaidBills.filter(bill => {
+      const dueDate = new Date(bill.due_date);
+      return dueDate >= now && dueDate <= next7Days;
+    });
+
+    const thisMonthTotal = thisMonthBills.reduce((sum, bill) => sum + bill.amount, 0);
+    const overdueTotal = overdueBills.reduce((sum, bill) => sum + bill.amount, 0);
+    const upcoming7DaysTotal = upcoming7Days.reduce((sum, bill) => sum + bill.amount, 0);
+
+    return {
+      thisMonth: { count: thisMonthBills.length, total: thisMonthTotal },
+      overdue: { count: overdueBills.length, total: overdueTotal },
+      upcoming7Days: { count: upcoming7Days.length, total: upcoming7DaysTotal }
+    };
+  }, [bills]);
 
   return (
     <div className="space-y-6 w-full max-w-full">
@@ -182,8 +235,15 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
         {/* Metas Financeiras */}
         <Card className="w-full">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleNavigateToGoals}
+            >
+              Ir para Metas
+            </Button>
           </CardHeader>
           <CardContent className={cn(
             isMobile ? "min-h-[300px]" : "h-[400px]"
@@ -192,6 +252,79 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               <FinancialGoalsProgress savingGoals={savingGoals} chartConfig={chartConfig} />
             ) : (
               <EmptyStateMessage message={TEXT.dashboard.charts.noGoals} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Contas a Pagar */}
+        <Card className="w-full">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Contas a Pagar
+            </CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleNavigateToBills}
+            >
+              Ir para Contas
+            </Button>
+          </CardHeader>
+          <CardContent className={cn(
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
+            {billsLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+              </div>
+            ) : billsSummary ? (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h3 className="font-medium text-blue-900 mb-2">Total a pagar neste mês</h3>
+                  <p className="text-2xl font-bold text-blue-700">
+                    R$ {billsSummary.thisMonth.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-sm text-blue-600">
+                    {billsSummary.thisMonth.count} {billsSummary.thisMonth.count === 1 ? 'conta' : 'contas'}
+                  </p>
+                </div>
+
+                {billsSummary.overdue.count > 0 && (
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <h3 className="font-medium text-red-900 mb-2">Vencidas</h3>
+                    <p className="text-xl font-bold text-red-700">
+                      {billsSummary.overdue.count} {billsSummary.overdue.count === 1 ? 'conta' : 'contas'}
+                    </p>
+                    <p className="text-sm text-red-600">
+                      R$ {billsSummary.overdue.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                )}
+
+                {billsSummary.upcoming7Days.count > 0 && (
+                  <div className="p-4 bg-yellow-50 rounded-lg">
+                    <h3 className="font-medium text-yellow-900 mb-2">Próximos 7 dias</h3>
+                    <p className="text-xl font-bold text-yellow-700">
+                      {billsSummary.upcoming7Days.count} {billsSummary.upcoming7Days.count === 1 ? 'conta' : 'contas'}
+                    </p>
+                    <p className="text-sm text-yellow-600">
+                      R$ {billsSummary.upcoming7Days.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                )}
+
+                {billsSummary.thisMonth.count === 0 && billsSummary.overdue.count === 0 && (
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <h3 className="font-medium text-green-900 mb-2">Tudo em dia!</h3>
+                    <p className="text-sm text-green-600">
+                      Não há contas pendentes neste período.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <EmptyStateMessage message="Nenhuma conta cadastrada" />
             )}
           </CardContent>
         </Card>
