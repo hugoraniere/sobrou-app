@@ -35,19 +35,10 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
 }) => {
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      {/* Visão Geral */}
-      <div>
-        <DashboardOverview 
-          transactions={transactions} 
-          savingGoals={savingGoals} 
-        />
-      </div>
-      
-      {/* Insights */}
-      <div className="bg-white rounded-lg border p-4 mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Insights</h2>
-        <DashboardInsights transactions={transactions} />
-      </div>
+      <DashboardOverview 
+        transactions={transactions} 
+        savingGoals={savingGoals} 
+      />
     </div>
   );
 };

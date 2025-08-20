@@ -23,6 +23,7 @@ import { useBillsData } from '@/hooks/useBillsData';
 import { format, isAfter, isBefore, addDays, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Loader2, CreditCard } from 'lucide-react';
+import DashboardInsights from './tabs/DashboardInsights';
 
 interface OverviewDashboardProps {
   transactions: Transaction[];
@@ -233,6 +234,23 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </CardContent>
         </Card>
 
+
+        {/* Fontes de Receita */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
+          </CardHeader>
+          <CardContent className={cn(
+            isMobile ? "min-h-[300px]" : "h-[400px]"
+          )}>
+            {hasTransactions ? (
+              <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
+            ) : (
+              <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
+            )}
+          </CardContent>
+        </Card>
+
         {/* Metas Financeiras */}
         <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -280,37 +298,89 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               </div>
             ) : billsSummary ? (
               <div className="space-y-4">
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h3 className="font-medium text-blue-900 mb-2">Total a pagar neste mês</h3>
-                  <p className="text-2xl font-bold text-blue-700">
-                    R$ {billsSummary.thisMonth.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
-                  <p className="text-sm text-blue-600">
-                    {billsSummary.thisMonth.count} {billsSummary.thisMonth.count === 1 ? 'conta' : 'contas'}
-                  </p>
-                </div>
-
-                {billsSummary.overdue.count > 0 && (
-                  <div className="p-4 bg-red-50 rounded-lg">
-                    <h3 className="font-medium text-red-900 mb-2">Vencidas</h3>
-                    <p className="text-xl font-bold text-red-700">
-                      {billsSummary.overdue.count} {billsSummary.overdue.count === 1 ? 'conta' : 'contas'}
+                {/* Summary Section */}
+                <div className="space-y-3">
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <h3 className="font-medium text-blue-900 mb-1 text-sm">Total a pagar neste mês</h3>
+                    <p className="text-xl font-bold text-blue-700">
+                      R$ {billsSummary.thisMonth.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
-                    <p className="text-sm text-red-600">
-                      R$ {billsSummary.overdue.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    <p className="text-xs text-blue-600">
+                      {billsSummary.thisMonth.count} {billsSummary.thisMonth.count === 1 ? 'conta' : 'contas'}
                     </p>
                   </div>
-                )}
 
-                {billsSummary.upcoming7Days.count > 0 && (
-                  <div className="p-4 bg-yellow-50 rounded-lg">
-                    <h3 className="font-medium text-yellow-900 mb-2">Próximos 7 dias</h3>
-                    <p className="text-xl font-bold text-yellow-700">
-                      {billsSummary.upcoming7Days.count} {billsSummary.upcoming7Days.count === 1 ? 'conta' : 'contas'}
-                    </p>
-                    <p className="text-sm text-yellow-600">
-                      R$ {billsSummary.upcoming7Days.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
+                  {billsSummary.overdue.count > 0 && (
+                    <div className="p-3 bg-red-50 rounded-lg">
+                      <h3 className="font-medium text-red-900 mb-1 text-sm">Vencidas</h3>
+                      <p className="text-lg font-bold text-red-700">
+                        {billsSummary.overdue.count} {billsSummary.overdue.count === 1 ? 'conta' : 'contas'}
+                      </p>
+                      <p className="text-xs text-red-600">
+                        R$ {billsSummary.overdue.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  )}
+
+                  {billsSummary.upcoming7Days.count > 0 && (
+                    <div className="p-3 bg-yellow-50 rounded-lg">
+                      <h3 className="font-medium text-yellow-900 mb-1 text-sm">Próximos 7 dias</h3>
+                      <p className="text-lg font-bold text-yellow-700">
+                        {billsSummary.upcoming7Days.count} {billsSummary.upcoming7Days.count === 1 ? 'conta' : 'contas'}
+                      </p>
+                      <p className="text-xs text-yellow-600">
+                        R$ {billsSummary.upcoming7Days.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Individual Bills List */}
+                {bills.filter(bill => !bill.is_paid).length > 0 && (
+                  <div className="border-t pt-3">
+                    <h4 className="font-medium text-sm mb-2 text-gray-700">Contas individuais</h4>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {bills
+                        .filter(bill => !bill.is_paid)
+                        .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+                        .slice(0, 5)
+                        .map(bill => {
+                          const dueDate = new Date(bill.due_date);
+                          const isOverdue = isBefore(dueDate, new Date());
+                          const isUpcoming = dueDate <= addDays(new Date(), 7) && dueDate >= new Date();
+                          
+                          return (
+                            <div key={bill.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{bill.title}</p>
+                                <p className="text-gray-600 text-xs">
+                                  {format(dueDate, "dd/MM/yyyy", { locale: ptBR })}
+                                </p>
+                              </div>
+                              <div className="text-right ml-2">
+                                <p className="font-semibold">
+                                  R$ {bill.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </p>
+                                {isOverdue && (
+                                  <span className="inline-block px-1.5 py-0.5 text-xs bg-red-100 text-red-700 rounded">
+                                    Vencida
+                                  </span>
+                                )}
+                                {isUpcoming && !isOverdue && (
+                                  <span className="inline-block px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded">
+                                    Em breve
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      {bills.filter(bill => !bill.is_paid).length > 5 && (
+                        <p className="text-xs text-gray-500 text-center">
+                          +{bills.filter(bill => !bill.is_paid).length - 5} contas adicionais
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -328,17 +398,17 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             )}
           </CardContent>
         </Card>
-        
-        {/* Fontes de Receita */}
+
+        {/* Insights */}
         <Card className="w-full">
           <CardHeader>
-            <CardTitle className="text-xl">{TEXT.dashboard.charts.incomeByType}</CardTitle>
+            <CardTitle className="text-xl">Insights</CardTitle>
           </CardHeader>
           <CardContent className={cn(
             isMobile ? "min-h-[300px]" : "h-[400px]"
           )}>
             {hasTransactions ? (
-              <IncomeByTypeChart incomes={filteredTransactions} chartConfig={chartConfig} />
+              <DashboardInsights transactions={filteredTransactions} />
             ) : (
               <EmptyStateMessage message={TEXT.dashboard.charts.noData} />
             )}
