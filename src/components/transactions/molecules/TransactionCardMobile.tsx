@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Transaction } from '@/services/transactions';
-import { Edit, Trash2, MoreVertical, ArrowUp, ArrowDown } from 'lucide-react';
+import { Edit, Trash2, MoreVertical, ArrowUp, ArrowDown, Repeat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -38,6 +38,14 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
 
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
+  };
+
+  // Generate installment display text
+  const getInstallmentDisplay = () => {
+    if (transaction.installment_total && transaction.installment_index) {
+      return `${transaction.installment_index}/${transaction.installment_total}`;
+    }
+    return null;
   };
 
   const CategoryChip = () => (
@@ -154,6 +162,18 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
         <div className="flex items-center gap-2">
           <CategoryChip />
           <TransactionStatusChip />
+          
+          {/* Recurring indicator */}
+          {transaction.is_recurring && (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100">
+              <Repeat className="h-3 w-3 text-blue-600" />
+              {getInstallmentDisplay() && (
+                <span className="text-xs text-blue-600 font-medium">
+                  {getInstallmentDisplay()}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

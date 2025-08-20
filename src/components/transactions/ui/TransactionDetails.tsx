@@ -76,8 +76,15 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
       <RecurrenceControls
         isRecurring={Boolean(transaction.is_recurring)}
         frequency={transaction.recurrence_frequency || 'monthly'}
+        endDate={transaction.recurrence_end_date ? new Date(transaction.recurrence_end_date) : undefined}
+        installmentTotal={transaction.installment_total}
         onIsRecurringChange={(value) => handleSelectChange('is_recurring', value)}
         onFrequencyChange={(value) => handleSelectChange('recurrence_frequency', value)}
+        onEndDateChange={(date) => {
+          const formattedDate = date ? date.toISOString().split('T')[0] : undefined;
+          handleSelectChange('recurrence_end_date', formattedDate || '');
+        }}
+        onInstallmentTotalChange={(total) => handleSelectChange('installment_total', total?.toString() || '')}
       />
     </div>
   );

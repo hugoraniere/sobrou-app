@@ -35,9 +35,17 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   const handleSelectChange = (name: string, value: string | boolean) => {
     setEditedTransaction(prev => ({
       ...prev,
-      [name]: value,
+      [name]: name === 'installment_total' 
+        ? (value ? parseInt(value as string) : undefined)
+        : value,
       ...(name === 'is_recurring' && value === false 
-        ? { recurrence_frequency: undefined, next_due_date: undefined }
+        ? { 
+            recurrence_frequency: undefined, 
+            next_due_date: undefined,
+            recurrence_end_date: undefined,
+            installment_total: undefined,
+            installment_index: undefined
+          }
         : {}),
       ...(name === 'is_recurring' && value === true
         ? { recurrence_frequency: prev.recurrence_frequency || 'monthly' }

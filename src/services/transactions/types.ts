@@ -13,6 +13,9 @@ export type Transaction = {
   created_at: string;
   next_due_date?: string;
   recurrence_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurrence_end_date?: string;
+  installment_total?: number;
+  installment_index?: number;
 };
 
 export interface ParsedExpense {
