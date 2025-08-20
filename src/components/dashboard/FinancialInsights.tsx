@@ -7,9 +7,10 @@ import InsightList from '../insights/InsightList';
 
 interface FinancialInsightsProps {
   transactions: Transaction[];
+  showMetrics?: boolean;
 }
 
-const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) => {
+const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions, showMetrics = true }) => {
   // Calculate metrics using utility functions
   const { totalExpenses, totalIncome, balance } = calculateInsightMetrics(transactions);
   
@@ -58,15 +59,17 @@ const FinancialInsights: React.FC<FinancialInsightsProps> = ({ transactions }) =
 
   return (
     <div className="space-y-6">
+      {showMetrics && (
+        <div className="bg-white p-4 rounded-lg border">
+          <FinancialMetricsCard
+            totalExpenses={totalExpenses}
+            totalIncome={totalIncome}
+            balance={balance}
+          />
+        </div>
+      )}
       <div className="bg-white p-4 rounded-lg border">
-        <FinancialMetricsCard
-          totalExpenses={totalExpenses}
-          totalIncome={totalIncome}
-          balance={balance}
-        />
-      </div>
-      <div className="bg-white p-4 rounded-lg border">
-        <h3 className="text-lg font-semibold mb-3">Insights</h3>
+        <h3 className="text-lg font-semibold mb-3">Seus insights</h3>
         <InsightList insights={insights} />
       </div>
     </div>

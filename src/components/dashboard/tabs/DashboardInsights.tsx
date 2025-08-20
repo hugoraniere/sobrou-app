@@ -27,8 +27,8 @@ const DashboardInsights: React.FC<DashboardInsightsProps> = ({
             <InsightsList insights={insights} isLoading={isLoading} onRefresh={refreshInsights} />
           </div>
           <div className="lg:col-span-1">
-            {/* Traditional insights with metrics */}
-            <FinancialInsights transactions={transactions} />
+            {/* Traditional insights without metrics */}
+            <FinancialInsights transactions={transactions} showMetrics={false} />
           </div>
         </div>
       </div>

@@ -298,48 +298,60 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               </div>
             ) : billsSummary ? (
               <div className="space-y-4">
-                {/* Summary Section */}
-                <div className="space-y-3">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <h3 className="font-medium text-blue-900 mb-1 text-sm">Total a pagar neste mês</h3>
-                    <p className="text-xl font-bold text-blue-700">
-                      R$ {billsSummary.thisMonth.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                {/* Summary Section - Smaller boxes side by side */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-2 bg-blue-50 rounded-lg text-center">
+                    <h3 className="font-medium text-blue-900 mb-0.5 text-xs">Este mês</h3>
+                    <p className="text-sm font-bold text-blue-700">
+                      R$ {billsSummary.thisMonth.total.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
                     </p>
                     <p className="text-xs text-blue-600">
                       {billsSummary.thisMonth.count} {billsSummary.thisMonth.count === 1 ? 'conta' : 'contas'}
                     </p>
                   </div>
 
-                  {billsSummary.overdue.count > 0 && (
-                    <div className="p-3 bg-red-50 rounded-lg">
-                      <h3 className="font-medium text-red-900 mb-1 text-sm">Vencidas</h3>
-                      <p className="text-lg font-bold text-red-700">
-                        {billsSummary.overdue.count} {billsSummary.overdue.count === 1 ? 'conta' : 'contas'}
+                  {billsSummary.overdue.count > 0 ? (
+                    <div className="p-2 bg-red-50 rounded-lg text-center">
+                      <h3 className="font-medium text-red-900 mb-0.5 text-xs">Vencidas</h3>
+                      <p className="text-sm font-bold text-red-700">
+                        {billsSummary.overdue.count}
                       </p>
                       <p className="text-xs text-red-600">
-                        R$ {billsSummary.overdue.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {billsSummary.overdue.total.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
                       </p>
+                    </div>
+                  ) : (
+                    <div className="p-2 bg-green-50 rounded-lg text-center">
+                      <h3 className="font-medium text-green-900 mb-0.5 text-xs">Vencidas</h3>
+                      <p className="text-sm font-bold text-green-700">0</p>
+                      <p className="text-xs text-green-600">Em dia</p>
                     </div>
                   )}
 
-                  {billsSummary.upcoming7Days.count > 0 && (
-                    <div className="p-3 bg-yellow-50 rounded-lg">
-                      <h3 className="font-medium text-yellow-900 mb-1 text-sm">Próximos 7 dias</h3>
-                      <p className="text-lg font-bold text-yellow-700">
-                        {billsSummary.upcoming7Days.count} {billsSummary.upcoming7Days.count === 1 ? 'conta' : 'contas'}
+                  {billsSummary.upcoming7Days.count > 0 ? (
+                    <div className="p-2 bg-yellow-50 rounded-lg text-center">
+                      <h3 className="font-medium text-yellow-900 mb-0.5 text-xs">7 dias</h3>
+                      <p className="text-sm font-bold text-yellow-700">
+                        {billsSummary.upcoming7Days.count}
                       </p>
                       <p className="text-xs text-yellow-600">
-                        R$ {billsSummary.upcoming7Days.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {billsSummary.upcoming7Days.total.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
                       </p>
+                    </div>
+                  ) : (
+                    <div className="p-2 bg-gray-50 rounded-lg text-center">
+                      <h3 className="font-medium text-gray-700 mb-0.5 text-xs">7 dias</h3>
+                      <p className="text-sm font-bold text-gray-600">0</p>
+                      <p className="text-xs text-gray-500">-</p>
                     </div>
                   )}
                 </div>
 
-                {/* Individual Bills List */}
+                {/* Individual Bills List - More space */}
                 {bills.filter(bill => !bill.is_paid).length > 0 && (
                   <div className="border-t pt-3">
-                    <h4 className="font-medium text-sm mb-2 text-gray-700">Contas individuais</h4>
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                    <h4 className="font-medium text-sm mb-3 text-gray-700">Suas contas</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
                       {bills
                         .filter(bill => !bill.is_paid)
                         .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
