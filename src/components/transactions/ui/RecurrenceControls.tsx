@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { format, addDays, addWeeks, addMonths, addYears } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -150,8 +151,76 @@ const RecurrenceControls: React.FC<RecurrenceControlsProps> = ({
           </div>
 
           <div className="space-y-4">
+            {/* Horizontal layout for date and repetitions */}
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              {/* Repetir até */}
+              <div className="flex-1 space-y-2">
+                <Label>{t('transactions.repeatUntil', 'Repetir até')}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      disabled={repeatForever}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !endDate && "text-muted-foreground",
+                        repeatForever && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "dd/MM/yyyy") : t('transactions.selectEndDate', 'Selecionar data final')}
+                    </Button>
+                  </PopoverTrigger>
+                  {!repeatForever && (
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={handleEndDateChange}
+                        disabled={(date) => !transactionDate || date < transactionDate}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  )}
+                </Popover>
+              </div>
+
+              {/* "ou" separator */}
+              <div className="flex items-center justify-center pb-2">
+                <span className="text-sm text-muted-foreground">{t('transactions.or', 'ou')}</span>
+              </div>
+
+              {/* Repetir por */}
+              <div className="flex-1 space-y-2">
+                <Label>{t('transactions.repeatFor', 'Repetir por')}</Label>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    min="1"
+                    max="999"
+                    disabled={repeatForever}
+                    placeholder={t('transactions.repetitionsPlaceholder', 'Ex: 12')}
+                    value={installmentTotal || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleInstallmentTotalChange(value ? parseInt(value) : undefined);
+                    }}
+                    className={cn(
+                      "pr-12",
+                      repeatForever && "opacity-50 cursor-not-allowed"
+                    )}
+                  />
+                  <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+                    {t('transactions.times', 'vezes')}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Repetir para sempre checkbox */}
             <div className="flex items-center space-x-2">
-              <Switch
+              <Checkbox
                 id="repeat-forever"
                 checked={repeatForever}
                 onCheckedChange={handleRepeatForeverChange}
@@ -160,53 +229,6 @@ const RecurrenceControls: React.FC<RecurrenceControlsProps> = ({
                 {t('transactions.repeatForever', 'Repetir para sempre')}
               </Label>
             </div>
-
-            {!repeatForever && (
-              <div className="space-y-2">
-                <Label>{t('transactions.repeatUntil', 'Repetir até')}</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !endDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "dd/MM/yyyy") : t('transactions.selectEndDate', 'Selecionar data final')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={handleEndDateChange}
-                      disabled={(date) => !transactionDate || date < transactionDate}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            )}
-
-            {!repeatForever && (
-              <div className="space-y-2">
-                <Label>{t('transactions.totalRepetitions', 'Total de repetições')}</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  max="999"
-                  placeholder={t('transactions.repetitionsPlaceholder', 'Ex: 12')}
-                  value={installmentTotal || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    handleInstallmentTotalChange(value ? parseInt(value) : undefined);
-                  }}
-                />
-              </div>
-            )}
           </div>
         </div>
       )}

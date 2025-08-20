@@ -116,7 +116,15 @@
     "fetchError": "Erro ao carregar transações",
     "addRecurring": "Adicionar Recorrente",
     "importStatement": "Importar Extrato",
-    "importStatementShort": "Importar."
+    "importStatementShort": "Importar.",
+    "repeatUntil": "Repetir até",
+    "or": "ou",
+    "repeatFor": "Repetir por",
+    "times": "vezes",
+    "selectEndDate": "Selecionar data final",
+    "totalRepetitions": "Total de repetições",
+    "repetitionsPlaceholder": "Ex: 12",
+    "repeatForever": "Repetir para sempre"
   },
   "whatsapp": {
     "connection": "Conexão WhatsApp",
