@@ -79,7 +79,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         endDate={transaction.recurrence_end_date ? new Date(transaction.recurrence_end_date) : undefined}
         installmentTotal={transaction.installment_total}
         transactionDate={transaction.date ? new Date(transaction.date) : new Date()}
-        repeatForever={!transaction.recurrence_end_date && !transaction.installment_total && Boolean(transaction.is_recurring)}
+        repeatForever={Boolean(transaction.repeat_forever)}
         onIsRecurringChange={(value) => handleSelectChange('is_recurring', value)}
         onFrequencyChange={(value) => handleSelectChange('recurrence_frequency', value)}
         onEndDateChange={(date) => {
@@ -88,6 +88,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         }}
         onInstallmentTotalChange={(total) => handleSelectChange('installment_total', total?.toString() || '')}
         onRepeatForeverChange={(forever) => {
+          handleSelectChange('repeat_forever', forever);
           if (forever) {
             handleSelectChange('recurrence_end_date', '');
             handleSelectChange('installment_total', '');

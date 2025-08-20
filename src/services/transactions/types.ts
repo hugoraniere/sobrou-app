@@ -16,6 +16,7 @@ export type Transaction = {
   recurrence_end_date?: string;
   installment_total?: number;
   installment_index?: number;
+  repeat_forever?: boolean;
 };
 
 export interface ParsedExpense {

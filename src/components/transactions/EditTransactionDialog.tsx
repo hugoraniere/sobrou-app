@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Transaction, TransactionService } from '@/services/transactions';
 import { toast } from "sonner";
 import { useTranslation } from 'react-i18next';
@@ -21,8 +21,22 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   onTransactionUpdated,
   className
 }) => {
-  const [editedTransaction, setEditedTransaction] = useState<Transaction>({...transaction});
+  // Initialize repeat_forever based on existing transaction state
+  const initialTransaction = {
+    ...transaction,
+    repeat_forever: Boolean(transaction.is_recurring && !transaction.recurrence_end_date && !transaction.installment_total)
+  };
+  const [editedTransaction, setEditedTransaction] = useState<Transaction>(initialTransaction);
   const { t } = useTranslation();
+
+  // Reset edited transaction when transaction prop changes
+  useEffect(() => {
+    const newTransaction = {
+      ...transaction,
+      repeat_forever: Boolean(transaction.is_recurring && !transaction.recurrence_end_date && !transaction.installment_total)
+    };
+    setEditedTransaction(newTransaction);
+  }, [transaction]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,11 +58,15 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             next_due_date: undefined,
             recurrence_end_date: undefined,
             installment_total: undefined,
-            installment_index: undefined
+            installment_index: undefined,
+            repeat_forever: false
           }
         : {}),
       ...(name === 'is_recurring' && value === true
         ? { recurrence_frequency: prev.recurrence_frequency || 'monthly' }
+        : {}),
+      ...(name === 'repeat_forever' && value === false
+        ? {}
         : {})
     }));
   };
