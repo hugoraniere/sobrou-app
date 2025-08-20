@@ -2,6 +2,32 @@
 import { Transaction } from './types';
 import { supabase } from '@/integrations/supabase/client';
 
+// Sanitize transaction data before sending to Supabase
+const sanitizeTransactionData = (transactionData: Partial<Transaction>): any => {
+  const sanitized: any = { ...transactionData };
+  
+  // Remove UI-only fields that don't exist in Supabase
+  delete sanitized.repeat_forever;
+  
+  // Convert empty strings to null for database fields
+  Object.keys(sanitized).forEach(key => {
+    if (sanitized[key] === '') {
+      sanitized[key] = null;
+    }
+  });
+  
+  // If is_recurring is false, clear all recurrence-related fields
+  if (sanitized.is_recurring === false) {
+    sanitized.recurrence_frequency = null;
+    sanitized.next_due_date = null;
+    sanitized.recurrence_end_date = null;
+    sanitized.installment_total = null;
+    sanitized.installment_index = null;
+  }
+  
+  return sanitized;
+};
+
 export const transactionMutationService = {
   async addTransaction(transactionData: Partial<Transaction>): Promise<Transaction> {
     try {
@@ -77,7 +103,7 @@ export const transactionMutationService = {
       }
 
       // Sanitize data before sending to Supabase
-      const sanitizedData = this.sanitizeTransactionData(transactionData);
+      const sanitizedData = sanitizeTransactionData(transactionData);
       
       const { data, error } = await supabase
         .from('transactions')
@@ -93,32 +119,6 @@ export const transactionMutationService = {
       console.error('Error updating transaction:', error);
       throw error;
     }
-  },
-
-  // Sanitize transaction data before sending to Supabase
-  sanitizeTransactionData(transactionData: Partial<Transaction>): any {
-    const sanitized: any = { ...transactionData };
-    
-    // Remove UI-only fields that don't exist in Supabase
-    delete sanitized.repeat_forever;
-    
-    // Convert empty strings to null for database fields
-    Object.keys(sanitized).forEach(key => {
-      if (sanitized[key] === '') {
-        sanitized[key] = null;
-      }
-    });
-    
-    // If is_recurring is false, clear all recurrence-related fields
-    if (sanitized.is_recurring === false) {
-      sanitized.recurrence_frequency = null;
-      sanitized.next_due_date = null;
-      sanitized.recurrence_end_date = null;
-      sanitized.installment_total = null;
-      sanitized.installment_index = null;
-    }
-    
-    return sanitized;
   },
 
   async deleteTransaction(id: string): Promise<void> {
