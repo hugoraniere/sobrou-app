@@ -208,7 +208,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardTitle className="text-xl">Receita vs Despesa</CardTitle>
           </CardHeader>
           <CardContent className={cn(
-            isMobile ? "min-h-[300px]" : "h-[400px]"
+            isMobile ? "h-[320px]" : "h-[400px]"
           )}>
             {hasTransactions ? (
               <RevenueVsExpenseChart transactions={filteredTransactions} chartConfig={chartConfig} />
@@ -224,7 +224,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <CardTitle className="text-xl">{DASHBOARD_TEXT.charts.weeklySpendingTrend}</CardTitle>
           </CardHeader>
           <CardContent className={cn(
-            isMobile ? "min-h-[300px]" : "h-[400px]"
+            isMobile ? "h-[320px]" : "h-[400px]"
           )}>
             {hasTransactions ? (
               <WeeklySpendingTrendChart transactions={filteredTransactions} chartConfig={chartConfig} />

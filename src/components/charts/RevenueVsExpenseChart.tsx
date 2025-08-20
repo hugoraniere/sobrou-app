@@ -425,7 +425,7 @@ const RevenueVsExpenseChart: React.FC<RevenueVsExpenseChartProps> = ({
       )}
       
       {/* Gráfico */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="h-full overflow-hidden">
         <ChartContainer config={chartConfig} className="w-full h-full">
           <BarChart
             data={chartData}

@@ -94,7 +94,7 @@ const WeeklySpendingTrendChart: React.FC<WeeklySpendingTrendChartProps> = ({
       </div>
       
       {/* Chart */}
-      <div className="flex-1 min-h-0">
+      <div className="h-full">
         <ChartContainer config={chartConfig} className="w-full h-full">
           <BarChart data={chartData} margin={{
           top: 10,
