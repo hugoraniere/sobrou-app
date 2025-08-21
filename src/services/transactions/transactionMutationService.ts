@@ -74,7 +74,10 @@ export const transactionMutationService = {
         date: transactionData.date || new Date().toISOString().split('T')[0],
         is_recurring: transactionData.is_recurring || false,
         recurrence_frequency: transactionData.recurrence_frequency,
-        next_due_date: transactionData.next_due_date
+        recurrence_end_date: transactionData.recurrence_end_date,
+        next_due_date: transactionData.next_due_date,
+        installment_total: transactionData.installment_total,
+        installment_index: transactionData.installment_index
       };
       
       const { data, error } = await supabase
