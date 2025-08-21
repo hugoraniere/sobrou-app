@@ -40,12 +40,12 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
     return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
   };
 
-  // Generate installment display text
-  const getInstallmentDisplay = () => {
+  // Generate installment display text for title
+  const getInstallmentSuffix = () => {
     if (transaction.installment_total && transaction.installment_index) {
-      return `${transaction.installment_index}/${transaction.installment_total}`;
+      return ` (${transaction.installment_index} de ${transaction.installment_total})`;
     }
-    return null;
+    return '';
   };
 
   const CategoryChip = () => (
@@ -105,11 +105,11 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
                   }}
                   title={transaction.description}
                 >
-                  {capitalizeFirstLetter(transaction.description)}
+                  {capitalizeFirstLetter(transaction.description)}{getInstallmentSuffix()}
                 </h4>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{capitalizeFirstLetter(transaction.description)}</p>
+                <p>{capitalizeFirstLetter(transaction.description)}{getInstallmentSuffix()}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -167,11 +167,7 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
           {transaction.is_recurring && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100">
               <Repeat className="h-3 w-3 text-blue-600" />
-              {getInstallmentDisplay() && (
-                <span className="text-xs text-blue-600 font-medium">
-                  {getInstallmentDisplay()}
-                </span>
-              )}
+              <span className="text-xs text-blue-600 font-medium">Recorrente</span>
             </div>
           )}
         </div>

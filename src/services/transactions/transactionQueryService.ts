@@ -31,6 +31,9 @@ const mapToTransaction = (rawData: any): Transaction => {
       is_recurring: Boolean(rawData.is_recurring),
       recurrence_frequency: rawData.recurrence_frequency || undefined,
       next_due_date: rawData.next_due_date || undefined,
+      recurrence_end_date: rawData.recurrence_end_date || undefined,
+      installment_total: rawData.installment_total ? parseInt(rawData.installment_total) : undefined,
+      installment_index: rawData.installment_index ? parseInt(rawData.installment_index) : undefined,
       user_id: rawData.user_id,
       created_at: rawData.created_at
     };
