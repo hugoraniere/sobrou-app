@@ -17,6 +17,7 @@ import { getCategoryIcon } from '@/utils/categoryIcons';
 import { getCategoryColor } from '@/constants/categoryColors';
 import { formatCurrency, capitalizeFirstLetter } from './TransactionCardFormatters';
 import TransactionStatusChip from './TransactionStatusChip';
+import { calculateInstallments } from '@/utils/recurrenceUtils';
 
 interface TransactionCardMobileProps {
   transaction: Transaction;
@@ -42,8 +43,14 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
 
   // Generate installment display text for title
   const getInstallmentSuffix = () => {
-    if (transaction.installment_total && transaction.installment_index) {
-      return ` (${transaction.installment_index} de ${transaction.installment_total})`;
+    const total = transaction.installment_total || 
+      (transaction.is_recurring && transaction.recurrence_end_date && transaction.recurrence_frequency && transaction.date
+        ? calculateInstallments(new Date(transaction.date), new Date(transaction.recurrence_end_date), transaction.recurrence_frequency)
+        : undefined);
+    
+    if (total && total > 1) {
+      const index = transaction.installment_index || 1;
+      return ` (${index} de ${total})`;
     }
     return '';
   };
