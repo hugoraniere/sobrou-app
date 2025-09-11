@@ -60,7 +60,8 @@ const App = () => {
                           <Route path="/blog/post/:id" element={<BlogPostLegacyRedirect />} />
                           
                           {/* Admin routes */}
-                          <Route path="/admin-blog" element={<AdminBlog />} />
+                          <Route path="/admin" element={<AdminBlog />} />
+                          <Route path="/admin-blog" element={<Navigate to="/admin" replace />} />
                           
                           {/* Protected routes */}
                           <Route

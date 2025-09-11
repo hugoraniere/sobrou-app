@@ -906,6 +906,22 @@ export type Database = {
           total_users: number
         }[]
       }
+      get_user_metrics_by_dates: {
+        Args: {
+          comparison_end_date: string
+          comparison_start_date: string
+          end_date: string
+          start_date: string
+        }
+        Returns: {
+          active_users: number
+          prev_active_users: number
+          prev_subscribers: number
+          prev_total_users: number
+          subscribers: number
+          total_users: number
+        }[]
+      }
       get_user_retention_cohorts: {
         Args: { weeks_back?: number }
         Returns: {

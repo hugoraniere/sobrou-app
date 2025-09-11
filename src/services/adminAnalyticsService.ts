@@ -161,6 +161,38 @@ export class AdminAnalyticsService {
     };
   }
 
+  static async getUserMetricsByMonth(monthYear: string): Promise<UserMetrics> {
+    // Parse month (format: YYYY-MM)
+    const [year, month] = monthYear.split('-').map(Number);
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+    
+    // Calculate previous month for comparison
+    const prevMonthDate = new Date(year, month - 2, 1);
+    const prevMonthEnd = new Date(year, month - 1, 0);
+
+    const { data, error } = await supabase.rpc('get_user_metrics_by_dates', {
+      start_date: startDate.toISOString().split('T')[0],
+      end_date: endDate.toISOString().split('T')[0],
+      comparison_start_date: prevMonthDate.toISOString().split('T')[0],
+      comparison_end_date: prevMonthEnd.toISOString().split('T')[0]
+    });
+
+    if (error) {
+      console.error('Error fetching user metrics by month:', error);
+      throw error;
+    }
+
+    return data?.[0] || {
+      total_users: 0,
+      active_users: 0,
+      subscribers: 0,
+      prev_total_users: 0,
+      prev_active_users: 0,
+      prev_subscribers: 0
+    };
+  }
+
   static async trackAppEvent(eventType: string, eventData: any = {}) {
     const { error } = await supabase
       .from('app_events')
