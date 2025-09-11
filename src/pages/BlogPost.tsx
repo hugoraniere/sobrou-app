@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 
 const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -204,7 +205,12 @@ const BlogPost: React.FC = () => {
               <CardContent className="p-8">
                 <div 
                   className="prose max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: DOMPurify.sanitize(post.content, {
+                      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'pre', 'code'],
+                      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel', 'class']
+                    })
+                  }}
                 />
               </CardContent>
             </Card>
