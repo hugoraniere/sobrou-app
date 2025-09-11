@@ -258,7 +258,7 @@ const Blog: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       <TransparentHeader />
-      <div className="container mx-auto px-4 py-8 pt-24">
+      <div className="container mx-auto px-4 py-8 pt-16">
         {/* Breadcrumb */}
         <div className="mb-6">
           <BlogBreadcrumb category={selectedCategory} />
