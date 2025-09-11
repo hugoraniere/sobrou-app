@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BlogService } from '@/services/blogService';
+import { AdminAnalyticsService, DetailedUserStats } from '@/services/adminAnalyticsService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,7 @@ const UserManager = () => {
   const [managingUser, setManagingUser] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userStats, setUserStats] = useState<any>(null);
+  const [detailedStats, setDetailedStats] = useState<DetailedUserStats | null>(null);
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [loadingStats, setLoadingStats] = useState(false);
 
@@ -74,8 +76,12 @@ const UserManager = () => {
     setLoadingStats(true);
     
     try {
-      const stats = await BlogService.getUserBlogStats(user.id);
-      setUserStats(stats);
+      const [blogStatsData, detailedStatsData] = await Promise.all([
+        BlogService.getUserBlogStats(user.id),
+        AdminAnalyticsService.getDetailedUserStats(user.id)
+      ]);
+      setUserStats(blogStatsData);
+      setDetailedStats(detailedStatsData);
     } catch (error) {
       console.error('Error loading user stats:', error);
       toast({
@@ -170,7 +176,7 @@ const UserManager = () => {
                         user.roles.map((role) => (
                           <Badge 
                             key={role} 
-                            variant={getRoleBadgeVariant(role)}
+                            variant={getRoleBadgeVariant(role) as any}
                             className="flex items-center gap-1"
                           >
                             {getRoleIcon(role)}
@@ -261,118 +267,161 @@ const UserManager = () => {
 
       {/* User Details Modal */}
       <Dialog open={showUserDetails} onOpenChange={setShowUserDetails}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5" />
-              Detalhes do Usuário
+              Detalhes do Usuário: {selectedUser?.full_name || selectedUser?.email}
             </DialogTitle>
           </DialogHeader>
           
           {selectedUser && (
             <div className="space-y-6">
-              {/* User Info */}
-              <div className="space-y-2">
-                <h3 className="font-semibold">Informações Básicas</h3>
-                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Nome</p>
-                    <p className="font-medium">{selectedUser.full_name || 'Não informado'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">{selectedUser.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Criado em</p>
-                    <p className="font-medium">{format(new Date(selectedUser.created_at), 'dd/MM/yyyy')}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Roles</p>
-                    <div className="flex gap-1">
-                      {selectedUser.roles.includes('admin') && (
-                        <Badge variant="destructive" className="text-xs">
-                          <Shield className="w-3 h-3 mr-1" />
-                          Admin
-                        </Badge>
-                      )}
-                      {selectedUser.roles.includes('editor') && (
-                        <Badge variant="secondary" className="text-xs">
-                          <Edit3 className="w-3 h-3 mr-1" />
-                          Editor
-                        </Badge>
-                      )}
-                      {selectedUser.roles.length === 0 && (
-                        <span className="text-sm text-muted-foreground">Nenhuma role</span>
-                      )}
+              {/* User Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Visão Geral do Usuário</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <span className="font-medium">Email:</span> {selectedUser.email}
                     </div>
-                  </div>
-                </div>
+                    <div>
+                      <span className="font-medium">Nome:</span> {selectedUser.full_name || 'Não informado'}
+                    </div>
+                    <div>
+                      <span className="font-medium">Data de Cadastro:</span> {' '}
+                      {detailedStats?.join_date ? new Date(detailedStats.join_date).toLocaleDateString('pt-BR') : 'Não disponível'}
+                    </div>
+                    <div>
+                      <span className="font-medium">Último Acesso:</span> {' '}
+                      {detailedStats?.last_access ? new Date(detailedStats.last_access).toLocaleDateString('pt-BR') : 'Nunca'}
+                    </div>
+                    <div>
+                      <span className="font-medium">Roles:</span> {' '}
+                      {selectedUser.roles?.length > 0 ? selectedUser.roles.join(', ') : 'Nenhuma'}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Atividade de Uso do Site</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {loadingStats ? (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                      </div>
+                    ) : detailedStats ? (
+                      <div className="space-y-2">
+                        <div>
+                          <span className="font-medium">Visualizações de Conteúdo:</span> {detailedStats.content_views}
+                        </div>
+                        <div>
+                          <span className="font-medium">Receitas Salvas:</span> {detailedStats.saved_dishes}
+                        </div>
+                        <div>
+                          <span className="font-medium">Listas de Compras:</span> {detailedStats.shopping_lists_count}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Erro ao carregar estatísticas</p>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
 
-              {/* Blog Statistics */}
-              <div className="space-y-4">
-                <h3 className="font-semibold">Estatísticas do Blog</h3>
-                {loadingStats ? (
-                  <div className="flex items-center justify-center p-8">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                  </div>
-                ) : userStats ? (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Posts Criados</p>
-                            <p className="text-xl font-bold">{userStats.total_posts}</p>
-                          </div>
+              {/* Content Contribution */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Contribuição de Conteúdo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {loadingStats ? (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                      </div>
+                    ) : detailedStats ? (
+                      <div className="space-y-2">
+                        <div>
+                          <span className="font-medium">Posts Criados:</span> {detailedStats.posts_created}
                         </div>
-                      </CardContent>
-                    </Card>
+                        <div>
+                          <span className="font-medium">Total de Visualizações:</span> {detailedStats.total_post_views}
+                        </div>
+                        <div>
+                          <span className="font-medium">Total de Comentários:</span> {detailedStats.total_post_comments}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Erro ao carregar estatísticas</p>
+                    )}
+                  </CardContent>
+                </Card>
 
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Total Visualizações</p>
-                            <p className="text-xl font-bold">{userStats.total_views}</p>
-                          </div>
+                {/* Blog Statistics */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Estatísticas Detalhadas do Blog</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {loadingStats ? (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                      </div>
+                    ) : userStats ? (
+                      <div className="space-y-2">
+                        <div>
+                          <span className="font-medium">Posts Publicados:</span> {userStats.total_posts}
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Média Views/Post</p>
-                            <p className="text-xl font-bold">{userStats.avg_views_per_post}</p>
-                          </div>
+                        <div>
+                          <span className="font-medium">Views Únicos:</span> {userStats.total_views}
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                          <MessageCircle className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Total Comentários</p>
-                            <p className="text-xl font-bold">{userStats.total_comments}</p>
-                          </div>
+                        <div>
+                          <span className="font-medium">Média de Views por Post:</span> {userStats.avg_views_per_post}
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                ) : (
-                  <p className="text-center text-muted-foreground py-4">
-                    Erro ao carregar estatísticas
-                  </p>
-                )}
+                        <div>
+                          <span className="font-medium">Comentários Recebidos:</span> {userStats.total_comments}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Erro ao carregar estatísticas do blog</p>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
+
+              {/* Role Management */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Gerenciar Roles</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRoleChange(selectedUser.id, 'admin', 
+                        selectedUser.roles?.includes('admin') ? 'remove' : 'add')}
+                      disabled={managingUser === selectedUser.id}
+                    >
+                      {selectedUser.roles?.includes('admin') ? 'Remover Admin' : 'Tornar Admin'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRoleChange(selectedUser.id, 'editor', 
+                        selectedUser.roles?.includes('editor') ? 'remove' : 'add')}
+                      disabled={managingUser === selectedUser.id}
+                    >
+                      {selectedUser.roles?.includes('editor') ? 'Remover Editor' : 'Tornar Editor'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </DialogContent>

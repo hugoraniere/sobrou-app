@@ -9,7 +9,7 @@ import { Spinner } from '@/components/ui/spinner';
 import PostsList from '@/components/blog/PostsList';
 import PostForm from '@/components/blog/PostForm';
 import UserManager from '@/components/blog/UserManager';
-import AdminDashboard from '@/components/blog/AdminDashboard';
+import SobrouDashboard from '@/components/dashboard/SobrouDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -198,7 +198,7 @@ const AdminBlog = () => {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <AdminDashboard />
+            <SobrouDashboard />
           </TabsContent>
 
           <TabsContent value="content">
