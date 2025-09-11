@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import Logo from '../brand/Logo';
+import LogoWithAlphaBadge from '../brand/LogoWithAlphaBadge';
 
 const TransparentHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -22,7 +22,7 @@ const TransparentHeader = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 md:h-16">
           <Link to="/" className="flex items-center">
-            <Logo size="sm" className="h-8" />
+            <LogoWithAlphaBadge size="sm" className="h-8" />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8 font-outfit text-sm">

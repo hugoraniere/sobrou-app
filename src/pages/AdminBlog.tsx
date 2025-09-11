@@ -13,8 +13,7 @@ import SobrouDashboard from '@/components/dashboard/SobrouDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
 import { User, LogOut, Users, FileText, Lock, AlertCircle, BarChart3 } from 'lucide-react';
 
 const AdminBlog = () => {
@@ -170,20 +169,7 @@ const AdminBlog = () => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold">Admin</h1>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-700 hover:bg-orange-200">
-                    Alpha
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">
-                    Estamos em período de testes, crie sua conta gratuitamente e faça parte dos nossos 100 primeiros usuários gratuitos.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <LogoWithAlphaBadge size="xs" />
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
