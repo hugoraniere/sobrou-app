@@ -26,13 +26,13 @@ const TransparentHeader = () => {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8 font-outfit text-sm">
-            <Link to="#features" className="text-gray-700 hover:text-primary transition-colors">
+            <Link to="/#features" className="text-gray-700 hover:text-primary transition-colors">
               Funcionalidades
             </Link>
-            <Link to="#como-funciona" className="text-gray-700 hover:text-primary transition-colors">
+            <Link to="/#como-funciona" className="text-gray-700 hover:text-primary transition-colors">
               Como funciona
             </Link>
-            <Link to="#pricing" className="text-gray-700 hover:text-primary transition-colors">
+            <Link to="/#pricing" className="text-gray-700 hover:text-primary transition-colors">
               Preços
             </Link>
             <Link to="/blog" className="text-gray-700 hover:text-primary transition-colors">

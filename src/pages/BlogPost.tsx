@@ -12,7 +12,7 @@ import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 const BlogPost: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
   const [liking, setLiking] = useState(false);
@@ -23,23 +23,26 @@ const BlogPost: React.FC = () => {
   const blogService = new BlogService();
 
   useEffect(() => {
-    if (id) {
+    if (slug) {
       loadPost();
     }
-  }, [id]);
+  }, [slug]);
 
   const loadPost = async () => {
-    if (!id) return;
+    if (!slug) return;
 
     setLoading(true);
     try {
-      const postData = await blogService.getPublicBlogPost(id);
+      const postData = await blogService.getPublicBlogPostBySlug(slug);
       if (postData) {
         setPost(postData);
         setLikeCount((postData as any).like_count || 0);
         
+        // Set document title for SEO
+        document.title = `${postData.title} - Sobrou`;
+        
         // Record page view
-        await blogService.recordBlogPostView(id, user?.id);
+        await blogService.recordBlogPostView(postData.id, user?.id);
       }
     } catch (error) {
       console.error('Erro ao carregar post:', error);
