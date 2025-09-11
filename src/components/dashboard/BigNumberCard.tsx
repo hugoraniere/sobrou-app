@@ -107,5 +107,4 @@ const BigNumberCard: React.FC<BigNumberCardProps> = memo(({
 
 BigNumberCard.displayName = 'BigNumberCard';
 
-export { BigNumberCard };
 export default BigNumberCard;

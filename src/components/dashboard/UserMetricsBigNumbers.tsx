@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminAnalyticsService, UserMetrics } from '@/services/adminAnalyticsService';
-import { BigNumberCard } from './BigNumberCard';
+import BigNumberCard from './BigNumberCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
