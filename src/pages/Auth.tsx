@@ -8,7 +8,8 @@ import SignupForm from '../components/auth/SignupForm';
 import Logo from '../components/brand/Logo';
 import { toast } from 'sonner';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
   const navigate = useNavigate();
@@ -42,6 +43,19 @@ const Auth = () => {
     }
   }, [user, isLoading, navigate]);
   return <div className="min-h-screen bg-gray-50">
+      {/* Back button */}
+      <div className="absolute top-4 left-4 z-10">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 hover:bg-gray-100"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </Button>
+      </div>
+
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">

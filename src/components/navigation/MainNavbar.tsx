@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { LogOut, Plus, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import Logo from '@/components/brand/Logo';
+import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
@@ -50,7 +50,7 @@ const MainNavbar: React.FC = () => {
         {/* Left side: Logo */}
         <div className="flex items-center space-x-3">
           <Link to={user ? "/" : "/"} className="flex items-center">
-            <Logo className="h-7" size="sm" />
+            <LogoWithAlphaBadge className="h-7" size="sm" />
           </Link>
         </div>
 

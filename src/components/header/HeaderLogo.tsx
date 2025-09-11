@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import Logo from '../brand/Logo';
+import LogoWithAlphaBadge from '../brand/LogoWithAlphaBadge';
 
 const HeaderLogo: React.FC = () => {
   const { user } = useAuth();
@@ -10,7 +10,7 @@ const HeaderLogo: React.FC = () => {
   return (
     <div className="flex items-center">
       <Link to={user ? "/dashboard" : "/"} className="flex items-center">
-        <Logo size="md" />
+        <LogoWithAlphaBadge size="md" />
       </Link>
     </div>
   );
