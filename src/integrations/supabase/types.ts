@@ -166,6 +166,53 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_featured_posts: {
+        Row: {
+          created_at: string | null
+          cta_text: string | null
+          cta_url: string | null
+          display_order: number | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          post_id: string
+          start_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cta_text?: string | null
+          cta_url?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          post_id: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cta_text?: string | null
+          cta_url?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          post_id?: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_featured_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_post_likes: {
         Row: {
           created_at: string
@@ -772,6 +819,21 @@ export type Database = {
       generate_slug: {
         Args: { title: string }
         Returns: string
+      }
+      get_active_featured_post: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          cta_text: string
+          cta_url: string
+          id: string
+          post_content: string
+          post_cover_image_url: string
+          post_id: string
+          post_published_at: string
+          post_slug: string
+          post_subtitle: string
+          post_title: string
+        }[]
       }
       get_active_users_stats: {
         Args: { period_days?: number }

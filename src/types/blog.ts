@@ -35,3 +35,25 @@ export interface CreateBlogPostData {
 export interface UpdateBlogPostData extends Partial<CreateBlogPostData> {
   id: string;
 }
+
+export interface FeaturedPost {
+  id: string;
+  post_id: string;
+  cta_text?: string;
+  cta_url?: string;
+  post_title: string;
+  post_subtitle?: string;
+  post_content: string;
+  post_cover_image_url?: string;
+  post_slug: string;
+  post_published_at: string;
+}
+
+export interface CreateFeaturedPostData {
+  post_id: string;
+  cta_text?: string;
+  cta_url?: string;
+  display_order?: number;
+  start_date?: string;
+  end_date?: string;
+}

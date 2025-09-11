@@ -491,4 +491,124 @@ export class BlogService {
       throw error;
     }
   }
+
+  // Featured Posts Management
+  static async getActiveFeaturedPost(): Promise<any | null> {
+    const { data, error } = await supabase
+      .rpc('get_active_featured_post');
+
+    if (error) {
+      console.error('Error fetching featured post:', error);
+      return null;
+    }
+
+    return data?.[0] || null;
+  }
+
+  static async createFeaturedPost(featuredPostData: any): Promise<any> {
+    const { data, error } = await supabase
+      .from('blog_featured_posts')
+      .insert(featuredPostData)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateFeaturedPost(id: string, updateData: any): Promise<any> {
+    const { data, error } = await supabase
+      .from('blog_featured_posts')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteFeaturedPost(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('blog_featured_posts')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  static async getFeaturedPosts(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('blog_featured_posts')
+      .select(`
+        *,
+        blog_posts (
+          title,
+          subtitle,
+          slug,
+          cover_image_url,
+          published_at
+        )
+      `)
+      .order('display_order', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  // Enhanced public methods with category support
+  async getPublicBlogPostsByCategory(category?: string, pageSize: number = 10, pageOffset: number = 0): Promise<BlogPost[]> {
+    console.log('[BlogService] Fetching posts by category:', { category, pageSize, pageOffset });
+    
+    try {
+      let query = supabase
+        .rpc('get_public_blog_posts', {
+          search_term: '',
+          page_size: pageSize,
+          page_offset: pageOffset
+        });
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('[BlogService] Error fetching posts by category:', error);
+        throw error;
+      }
+
+      // Filter by category if provided (client-side filtering for now)
+      let filteredData = data;
+      if (category) {
+        filteredData = data.filter((post: any) => 
+          post.tags && post.tags.some((tag: any) => tag.name === category)
+        );
+      }
+
+      return filteredData.map((post: any) => ({
+        ...post,
+        tags: Array.isArray(post.tags) ? post.tags.filter((tag: any) => tag && tag.id).map((tag: any) => ({
+          id: tag.id,
+          name: tag.name,
+          created_at: tag.created_at || new Date().toISOString()
+        })) : []
+      }));
+    } catch (error) {
+      console.error('[BlogService] Error fetching posts by category:', error);
+      throw error;
+    }
+  }
+
+  async getAllTags(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('blog_tags')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('[BlogService] Error fetching tags:', error);
+      return [];
+    }
+  }
 }

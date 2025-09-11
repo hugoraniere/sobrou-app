@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
+import BlogBreadcrumb from '@/components/blog/BlogBreadcrumb';
 
 const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -115,9 +116,23 @@ const BlogPost: React.FC = () => {
   }
 
   if (!post) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-        <div className="container mx-auto px-4 py-8">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <BlogBreadcrumb 
+            category={post.tags && post.tags.length > 0 ? post.tags[0].name : undefined}
+            postTitle={post.title} 
+          />
+        </div>
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <BlogBreadcrumb 
+            category={post.tags && post.tags.length > 0 ? post.tags[0].name : undefined}
+            postTitle={post.title} 
+          />
+        </div>
           <div className="text-center py-12">
             <h1 className="text-2xl font-semibold text-foreground mb-4">
               Artigo não encontrado

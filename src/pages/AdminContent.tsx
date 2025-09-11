@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostsList from '@/components/blog/PostsList';
 import PostForm from '@/components/blog/PostForm';
+import FeaturedPostManager from '@/components/blog/FeaturedPostManager';
 
 const AdminContent = () => {
   return (
@@ -16,6 +17,7 @@ const AdminContent = () => {
           <TabsList className="mb-6">
             <TabsTrigger value="posts">Posts Existentes</TabsTrigger>
             <TabsTrigger value="new-post">Criar Novo Post</TabsTrigger>
+            <TabsTrigger value="featured">Posts em Destaque</TabsTrigger>
           </TabsList>
           
           <TabsContent value="posts">
@@ -24,6 +26,10 @@ const AdminContent = () => {
           
           <TabsContent value="new-post">
             <PostForm />
+          </TabsContent>
+          
+          <TabsContent value="featured">
+            <FeaturedPostManager />
           </TabsContent>
         </Tabs>
       </main>
