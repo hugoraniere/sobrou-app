@@ -10,12 +10,22 @@ import {
   Share, 
   TrendingUp,
   Calendar,
-  ChefHat
+  ChefHat,
+  AlertCircle
 } from 'lucide-react';
 import { AdminAnalyticsService, ActiveUsersData, RetentionCohort, AppInteractionTotals, BlogViewsData } from '@/services/adminAnalyticsService';
 import { useToast } from "@/hooks/use-toast";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { PeriodSelector, AdminPeriodOption, getPeriodDays } from '@/components/admin/PeriodSelector';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const ADMIN_PERIOD_OPTIONS: Array<{ value: AdminPeriodOption; label: string }> = [
+  { value: '7-days', label: 'Últimos 7 dias' },
+  { value: '30-days', label: 'Últimos 30 dias' },
+  { value: '90-days', label: 'Últimos 90 dias' },
+  { value: '1-year', label: 'Último ano' }
+];
 
 const SobrouDashboard: React.FC = () => {
   const [activeUsersData, setActiveUsersData] = useState<ActiveUsersData[]>([]);
@@ -28,32 +38,84 @@ const SobrouDashboard: React.FC = () => {
   const [blogViewsData, setBlogViewsData] = useState<BlogViewsData[]>([]);
   const [blogEngagement, setBlogEngagement] = useState({ total_comments: 0, total_shares: 0 });
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState<AdminPeriodOption>('30-days');
+  const [loadingErrors, setLoadingErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   useEffect(() => {
     loadDashboardData();
-  }, []);
+  }, [selectedPeriod]);
 
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      const [activeUsers, retention, totals, blogViews, engagement] = await Promise.all([
-        AdminAnalyticsService.getActiveUsersStats(30),
-        AdminAnalyticsService.getRetentionCohorts(8),
+      setLoadingErrors({});
+      const periodDays = getPeriodDays(selectedPeriod);
+      const weeksBack = Math.ceil(periodDays / 7);
+
+      // Load data with individual error handling
+      const results = await Promise.allSettled([
+        AdminAnalyticsService.getActiveUsersStats(periodDays),
+        AdminAnalyticsService.getRetentionCohorts(weeksBack),
         AdminAnalyticsService.getAppInteractionTotals(),
-        AdminAnalyticsService.getBlogViewsOverTime(30),
+        AdminAnalyticsService.getBlogViewsOverTime(periodDays),
         AdminAnalyticsService.getBlogEngagementStats()
       ]);
 
-      setActiveUsersData(activeUsers);
-      setRetentionData(retention);
-      setAppTotals(totals);
-      setBlogViewsData(blogViews);
-      setBlogEngagement(engagement);
+      const errors: Record<string, string> = {};
+
+      // Process active users data
+      if (results[0].status === 'fulfilled') {
+        setActiveUsersData(results[0].value);
+      } else {
+        errors.activeUsers = 'Falha ao carregar dados de usuários ativos';
+        console.error('Active users error:', results[0].reason);
+      }
+
+      // Process retention data
+      if (results[1].status === 'fulfilled') {
+        setRetentionData(results[1].value);
+      } else {
+        errors.retention = 'Falha ao carregar dados de retenção';
+        console.error('Retention error:', results[1].reason);
+      }
+
+      // Process app totals
+      if (results[2].status === 'fulfilled') {
+        setAppTotals(results[2].value);
+      } else {
+        errors.appTotals = 'Falha ao carregar totais do app';
+        console.error('App totals error:', results[2].reason);
+      }
+
+      // Process blog views
+      if (results[3].status === 'fulfilled') {
+        setBlogViewsData(results[3].value);
+      } else {
+        errors.blogViews = 'Falha ao carregar visualizações do blog';
+        console.error('Blog views error:', results[3].reason);
+      }
+
+      // Process blog engagement
+      if (results[4].status === 'fulfilled') {
+        setBlogEngagement(results[4].value);
+      } else {
+        errors.blogEngagement = 'Falha ao carregar engajamento do blog';
+        console.error('Blog engagement error:', results[4].reason);
+      }
+
+      setLoadingErrors(errors);
+
+      // Show toast only if all requests failed
+      if (Object.keys(errors).length === 5) {
+        toast({
+          message: "Falha ao carregar todos os dados do dashboard"
+        });
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       toast({
-        message: "Falha ao carregar dados do dashboard"
+        message: "Erro inesperado ao carregar dados do dashboard"
       });
     } finally {
       setIsLoading(false);
@@ -90,10 +152,26 @@ const SobrouDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Dashboard do Sobrou</h2>
-        <p className="text-muted-foreground">Visão geral das métricas do aplicativo e do blog</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Dashboard do Sobrou</h2>
+          <p className="text-muted-foreground">Visão geral das métricas do aplicativo e do blog</p>
+        </div>
+        <PeriodSelector 
+          value={selectedPeriod} 
+          onValueChange={setSelectedPeriod}
+        />
       </div>
+
+      {/* Show loading errors if any */}
+      {Object.keys(loadingErrors).length > 0 && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Algumas métricas falharam ao carregar: {Object.values(loadingErrors).join(', ')}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* App User Metrics */}
       <div className="space-y-4">
@@ -137,11 +215,16 @@ const SobrouDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              Usuários Ativos (Últimos 30 dias)
+              Usuários Ativos ({getPeriodDays(selectedPeriod)} dias)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {activeUsersData.length > 0 ? (
+            {loadingErrors.activeUsers ? (
+              <div className="text-center py-8 text-red-600">
+                <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                <p>{loadingErrors.activeUsers}</p>
+              </div>
+            ) : activeUsersData.length > 0 ? (
               <ChartContainer config={chartConfig} className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={activeUsersData}>
@@ -184,7 +267,12 @@ const SobrouDashboard: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {retentionData.length > 0 ? (
+            {loadingErrors.retention ? (
+              <div className="text-center py-8 text-red-600">
+                <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                <p>{loadingErrors.retention}</p>
+              </div>
+            ) : retentionData.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -252,11 +340,16 @@ const SobrouDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Visualizações do Blog (Últimos 30 dias)
+              Visualizações do Blog ({getPeriodDays(selectedPeriod)} dias)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {blogViewsData.length > 0 ? (
+            {loadingErrors.blogViews ? (
+              <div className="text-center py-8 text-red-600">
+                <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                <p>{loadingErrors.blogViews}</p>
+              </div>
+            ) : blogViewsData.length > 0 ? (
               <ChartContainer config={chartConfig} className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={blogViewsData}>

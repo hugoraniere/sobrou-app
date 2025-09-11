@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
 import { User, LogOut, Users, FileText, Lock, AlertCircle, BarChart3, ArrowLeft } from 'lucide-react';
+import { UserAvatar } from '@/components/admin/UserAvatar';
 
 const AdminBlog = () => {
   const { user, isAuthenticated, logout, login } = useAuth();
@@ -186,10 +187,7 @@ const AdminBlog = () => {
               <ArrowLeft className="h-4 w-4" />
               Ir para o App
             </Button>
-            <Button variant="outline" onClick={logout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
-            </Button>
+            <UserAvatar showSettings={false} />
           </div>
         </div>
 
