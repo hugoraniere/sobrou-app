@@ -43,7 +43,7 @@ const MainNavbar: React.FC<{ isAdminContext?: boolean }> = ({ isAdminContext = f
         {/* Left side: Logo */}
         <div className="flex items-center space-x-3">
           <Link to={user ? "/" : "/"} className="flex items-center">
-            <LogoWithAlphaBadge className="h-7" size="sm" />
+            <LogoWithAlphaBadge className="h-7" size="sm" isAdminContext={isAdminContext} />
           </Link>
         </div>
 

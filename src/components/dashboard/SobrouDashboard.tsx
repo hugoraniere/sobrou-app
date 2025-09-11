@@ -19,6 +19,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { PeriodSelector, AdminPeriodOption, getPeriodDays } from '@/components/admin/PeriodSelector';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import UserMetricsBigNumbers from './UserMetricsBigNumbers';
 
 const ADMIN_PERIOD_OPTIONS: Array<{ value: AdminPeriodOption; label: string }> = [
   { value: '7-days', label: 'Últimos 7 dias' },
@@ -172,6 +173,9 @@ const SobrouDashboard: React.FC = () => {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* User Metrics Big Numbers */}
+      <UserMetricsBigNumbers />
 
       {/* App User Metrics */}
       <div className="space-y-4">

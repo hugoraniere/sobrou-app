@@ -7,10 +7,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 interface LogoWithAlphaBadgeProps {
   className?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg';
+  isAdminContext?: boolean;
 }
 
 const LogoWithAlphaBadge = React.forwardRef<HTMLDivElement, LogoWithAlphaBadgeProps>(
-  ({ className, size = 'md' }, ref) => {
+  ({ className, size = 'md', isAdminContext = false }, ref) => {
     return (
       <div ref={ref} className={cn("flex items-center gap-2", className)}>
         <Logo size={size} />
@@ -20,15 +21,21 @@ const LogoWithAlphaBadge = React.forwardRef<HTMLDivElement, LogoWithAlphaBadgePr
               <div className="cursor-default">
                 <Badge 
                   variant="secondary" 
-                  className="bg-orange-100 text-orange-700 hover:bg-orange-200 text-xs pointer-events-none"
+                  className={isAdminContext 
+                    ? "bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs pointer-events-none"
+                    : "bg-orange-100 text-orange-700 hover:bg-orange-200 text-xs pointer-events-none"
+                  }
                 >
-                  Alpha
+                  {isAdminContext ? 'Admin' : 'Alpha'}
                 </Badge>
               </div>
             </TooltipTrigger>
             <TooltipContent>
               <p className="max-w-xs">
-                Estamos em período de testes, crie sua conta gratuitamente e faça parte dos nossos 100 primeiros usuários gratuitos.
+                {isAdminContext 
+                  ? 'Você está no painel administrativo do Sobrou'
+                  : 'Estamos em período de testes, crie sua conta gratuitamente e faça parte dos nossos 100 primeiros usuários gratuitos.'
+                }
               </p>
             </TooltipContent>
           </Tooltip>
