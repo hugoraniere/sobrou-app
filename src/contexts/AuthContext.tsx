@@ -20,7 +20,7 @@ type AuthContextType = {
   session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, redirectTo?: string) => Promise<void>;
   signup: (fullName: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
@@ -115,7 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [isAuthenticated, isLoading, location.pathname, navigate]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, redirectTo?: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -129,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(error.message);
       }
 
-      navigate('/dashboard');
+      navigate(redirectTo || '/dashboard');
       return;
     } catch (error: any) {
       console.error('Login failed:', error);

@@ -47,7 +47,7 @@ const AdminBlog: React.FC = () => {
     setIsLoggingIn(true);
 
     try {
-      await login(loginForm.email, loginForm.password);
+      await login(loginForm.email, loginForm.password, '/admin-blog');
       toast({
         message: 'Login realizado com sucesso!',
         type: 'success'
