@@ -106,6 +106,42 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_comments: {
+        Row: {
+          author_email: string | null
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          author_email?: string | null
+          author_name: string
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          author_email?: string | null
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blog_post_tags: {
         Row: {
           id: string
@@ -127,6 +163,13 @@ export type Database = {
             foreignKeyName: "fk_blog_post_tags_post_id"
             columns: ["post_id"]
             isOneToOne: false
+            referencedRelation: "blog_post_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_blog_post_tags_post_id"
+            columns: ["post_id"]
+            isOneToOne: false
             referencedRelation: "blog_posts"
             referencedColumns: ["id"]
           },
@@ -138,6 +181,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      blog_post_views: {
+        Row: {
+          id: string
+          ip_address: string | null
+          post_id: string
+          user_agent: string | null
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          post_id: string
+          user_agent?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          post_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: []
       }
       blog_posts: {
         Row: {
@@ -539,9 +609,37 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      blog_overall_stats: {
+        Row: {
+          total_comments: number | null
+          total_posts: number | null
+          total_views: number | null
+        }
+        Relationships: []
+      }
+      blog_post_stats: {
+        Row: {
+          author_id: string | null
+          comment_count: number | null
+          created_at: string | null
+          id: string | null
+          published_at: string | null
+          title: string | null
+          view_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_user_blog_stats: {
+        Args: { target_user_id: string }
+        Returns: {
+          avg_views_per_post: number
+          total_comments: number
+          total_posts: number
+          total_views: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
