@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminAnalyticsService, UserMetrics } from '@/services/adminAnalyticsService';
-import BigNumberCard from './BigNumberCard';
+import { BigNumberCard } from './BigNumberCard';
 import { Button } from '@/components/ui/button';
 import { Users, UserCheck, Crown, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';

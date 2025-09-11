@@ -99,4 +99,5 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
   );
 };
 
+export { BigNumberCard };
 export default BigNumberCard;
