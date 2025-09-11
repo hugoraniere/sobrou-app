@@ -553,6 +553,28 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_editor: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      manage_user_role: {
+        Args: {
+          action: string
+          target_role: Database["public"]["Enums"]["app_role"]
+          target_user_id: string
+        }
+        Returns: boolean
+      }
+      search_users: {
+        Args: { search_term: string }
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          roles: string[]
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "editor"

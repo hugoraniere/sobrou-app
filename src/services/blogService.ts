@@ -186,10 +186,55 @@ export class BlogService {
     return publicUrl.publicUrl;
   }
 
-  // Admin check
+  // Role checks
   static async isAdmin(): Promise<boolean> {
     const { data, error } = await supabase
       .rpc('is_admin');
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async isEditor(): Promise<boolean> {
+    const { data, error } = await supabase
+      .rpc('is_editor');
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async canAccessAdmin(): Promise<boolean> {
+    try {
+      const [isAdmin, isEditor] = await Promise.all([
+        this.isAdmin(),
+        this.isEditor()
+      ]);
+      return isAdmin || isEditor;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // User management (admin only)
+  static async searchUsers(searchTerm: string = ''): Promise<any[]> {
+    const { data, error } = await supabase
+      .rpc('search_users', { search_term: searchTerm });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async manageUserRole(
+    userId: string, 
+    role: 'admin' | 'editor', 
+    action: 'add' | 'remove'
+  ): Promise<boolean> {
+    const { data, error } = await supabase
+      .rpc('manage_user_role', {
+        target_user_id: userId,
+        target_role: role,
+        action: action
+      });
 
     if (error) throw error;
     return data;

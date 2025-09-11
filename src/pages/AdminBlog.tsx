@@ -1,46 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { BlogService } from '@/services/blogService';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, Lock, Plus, List } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import PostForm from '@/components/blog/PostForm';
+import { Spinner } from '@/components/ui/spinner';
 import PostsList from '@/components/blog/PostsList';
+import PostForm from '@/components/blog/PostForm';
+import UserManager from '@/components/blog/UserManager';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { User, LogOut, Users, FileText, Lock, AlertCircle } from 'lucide-react';
 
-const AdminBlog: React.FC = () => {
-  const { user, login, isAuthenticated, isLoading } = useAuth();
+const AdminBlog = () => {
+  const { user, isAuthenticated, logout, login } = useAuth();
   const { toast } = useToast();
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [adminLoading, setAdminLoading] = useState(true);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [canAccess, setCanAccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showLoginForm, setShowLoginForm] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  useEffect(() => {
-    checkAdminStatus();
-  }, [user]);
+  const [loginForm, setLoginForm] = useState({
+    email: '',
+    password: ''
+  });
 
   const checkAdminStatus = async () => {
-    if (!user) {
+    if (!isAuthenticated || !user) {
       setIsAdmin(false);
-      setAdminLoading(false);
+      setCanAccess(false);
+      setIsLoading(false);
       return;
     }
 
     try {
-      const adminStatus = await BlogService.isAdmin();
+      const [adminStatus, accessStatus] = await Promise.all([
+        BlogService.isAdmin(),
+        BlogService.canAccessAdmin()
+      ]);
       setIsAdmin(adminStatus);
+      setCanAccess(accessStatus);
     } catch (error) {
       console.error('Error checking admin status:', error);
       setIsAdmin(false);
+      setCanAccess(false);
     } finally {
-      setAdminLoading(false);
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    checkAdminStatus();
+  }, [isAuthenticated, user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,16 +75,16 @@ const AdminBlog: React.FC = () => {
     }
   };
 
-  // Loading state
-  if (isLoading || adminLoading) {
+  // Show loading spinner while checking authentication
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <Spinner />
       </div>
     );
   }
 
-  // Not authenticated - show login form
+  // Show login form if user is not authenticated
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -81,9 +94,6 @@ const AdminBlog: React.FC = () => {
               <Lock className="h-5 w-5 text-primary" />
               <CardTitle>Admin do Blog</CardTitle>
             </div>
-            <CardDescription>
-              Faça login com suas credenciais de administrador
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
@@ -117,65 +127,93 @@ const AdminBlog: React.FC = () => {
     );
   }
 
-  // Authenticated but not admin
-  if (!isAdmin) {
+  // Show access denied if user is logged in but doesn't have access
+  if (isAuthenticated && !canAccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <div className="flex items-center gap-2 justify-center text-destructive">
+            <CardTitle className="text-center text-destructive flex items-center justify-center gap-2">
               <AlertCircle className="h-5 w-5" />
-              <CardTitle>Acesso Negado</CardTitle>
-            </div>
+              Acesso Negado
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Você não tem permissões de administrador para acessar esta área.
-                Entre em contato com um administrador para obter acesso.
+                Você não tem permissões para acessar esta área.
               </AlertDescription>
             </Alert>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                Logado como: {user?.email}
+              </span>
+              <Button variant="outline" onClick={logout} size="sm">
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Admin interface
+  // Main admin interface
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <h1 className="text-xl font-semibold">Gerenciamento do Blog</h1>
-            <div className="text-sm text-muted-foreground">
-              Logado como: {user?.email}
-            </div>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">Admin</h1>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              <User className="inline h-4 w-4 mr-1" />
+              {user?.email}
+            </span>
+            <Button variant="outline" onClick={logout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="posts" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="posts" className="flex items-center gap-2">
-              <List className="h-4 w-4" />
-              Posts
+        <Tabs defaultValue="content" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Gerenciador de Conteúdo
             </TabsTrigger>
-            <TabsTrigger value="new-post" className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Novo Post
-            </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="users" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Gerenciador de Usuários
+              </TabsTrigger>
+            )}
           </TabsList>
 
-          <TabsContent value="posts">
-            <PostsList />
+          <TabsContent value="content">
+            <Tabs defaultValue="posts" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="posts">Posts Existentes</TabsTrigger>
+                <TabsTrigger value="create">Criar Post</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="posts">
+                <PostsList />
+              </TabsContent>
+
+              <TabsContent value="create">
+                <PostForm />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="new-post">
-            <PostForm />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="users">
+              <UserManager />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
