@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
 import { useResponsive } from '@/hooks/useResponsive';
+import { formatCurrency } from '@/utils/currencyUtils';
 
 interface BigNumberCardProps {
   title: string;
@@ -21,6 +22,7 @@ interface BigNumberCardProps {
   simulatedValue?: number;
   onClick?: () => void;
   hideIconOnMobile?: boolean;
+  isCurrency?: boolean;
 }
 
 const BigNumberCard: React.FC<BigNumberCardProps> = ({
@@ -34,11 +36,15 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
   className,
   simulatedValue,
   onClick,
-  hideIconOnMobile = false
+  hideIconOnMobile = false,
+  isCurrency = false
 }) => {
   const { isMobile } = useResponsive();
   
   const formatValue = (amount: number) => {
+    if (isCurrency) {
+      return formatCurrency(amount);
+    }
     return new Intl.NumberFormat('pt-BR').format(amount);
   };
 

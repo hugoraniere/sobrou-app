@@ -57,6 +57,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
         tooltip={TEXT.dashboard.bigNumbers.monthlyIncomeTooltip}
         onClick={navigateToIncome}
         hideIconOnMobile={true}
+        isCurrency={true}
       />
       
       <BigNumberCard
@@ -68,6 +69,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
         tooltip={TEXT.dashboard.bigNumbers.monthlyExpensesTooltip}
         onClick={navigateToExpenses}
         hideIconOnMobile={true}
+        isCurrency={true}
       />
       
       <BigNumberCard
@@ -78,6 +80,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
         trend={{ value: 8, isPositive: true }}
         tooltip={TEXT.dashboard.bigNumbers.availableBalanceTooltip}
         hideIconOnMobile={true}
+        isCurrency={true}
       />
       
       <BigNumberCard
@@ -88,6 +91,7 @@ const DashboardBigNumbers: React.FC<DashboardBigNumbersProps> = ({
         trend={{ value: 4, isPositive: true }}
         tooltip={TEXT.dashboard.bigNumbers.totalSavingsTooltip}
         hideIconOnMobile={true}
+        isCurrency={true}
       />
     </div>
   );

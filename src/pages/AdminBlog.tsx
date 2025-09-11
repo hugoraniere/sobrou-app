@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { BlogService } from '@/services/blogService';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,11 +15,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
-import { User, LogOut, Users, FileText, Lock, AlertCircle, BarChart3 } from 'lucide-react';
+import { User, LogOut, Users, FileText, Lock, AlertCircle, BarChart3, ArrowLeft } from 'lucide-react';
 
 const AdminBlog = () => {
   const { user, isAuthenticated, logout, login } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [canAccess, setCanAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -176,6 +178,14 @@ const AdminBlog = () => {
               <User className="inline h-4 w-4 mr-1" />
               {user?.email}
             </span>
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Ir para o App
+            </Button>
             <Button variant="outline" onClick={logout}>
               <LogOut className="h-4 w-4 mr-2" />
               Sair

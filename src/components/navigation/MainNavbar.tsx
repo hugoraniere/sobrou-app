@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LogOut, Plus, Settings } from 'lucide-react';
+import { LogOut, Plus, Settings, Shield } from 'lucide-react';
+import { BlogService } from '@/services/blogService';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
@@ -21,7 +22,9 @@ const MainNavbar: React.FC = () => {
     user,
     logout
   } = useAuth();
+  const navigate = useNavigate();
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const [canAccessAdmin, setCanAccessAdmin] = useState(false);
   const {
     avatarUrl
   } = useAvatar();
@@ -44,6 +47,24 @@ const MainNavbar: React.FC = () => {
     }
     return names[0][0].toUpperCase();
   };
+
+  // Check admin access when user changes
+  useEffect(() => {
+    const checkAdminAccess = async () => {
+      if (user) {
+        try {
+          const hasAccess = await BlogService.canAccessAdmin();
+          setCanAccessAdmin(hasAccess);
+        } catch (error) {
+          setCanAccessAdmin(false);
+        }
+      } else {
+        setCanAccessAdmin(false);
+      }
+    };
+
+    checkAdminAccess();
+  }, [user]);
   return <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background-base border-b border-border-subtle shadow-sm h-16">
       <div className="flex justify-between items-center h-full px-4 md:px-6">
         
@@ -72,6 +93,19 @@ const MainNavbar: React.FC = () => {
               {/* Notification Bell and User Menu */}
               <div className="flex items-center space-x-2">
                 <NotificationBell className={isMobile ? 'hidden' : ''} />
+                
+                {/* Admin Button - Only show if user has admin access */}
+                {!isMobile && canAccessAdmin && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/admin')}
+                    className="flex items-center gap-2"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Button>
+                )}
                 
                 {!isMobile && (
                   <DropdownMenu>
