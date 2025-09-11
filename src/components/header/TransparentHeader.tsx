@@ -35,6 +35,9 @@ const TransparentHeader = () => {
             <Link to="#pricing" className="text-gray-700 hover:text-primary transition-colors">
               Preços
             </Link>
+            <Link to="/blog" className="text-gray-700 hover:text-primary transition-colors">
+              Blog
+            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
