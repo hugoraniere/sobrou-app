@@ -192,56 +192,53 @@ export class BlogService {
 
   // Analytics methods
   static async getBlogOverallStats(): Promise<{ total_posts: number; total_views: number; total_comments: number }> {
-    const { data, error } = await supabase
-      .from('blog_overall_stats')
-      .select('*')
-      .single();
+    const { data, error } = await supabase.rpc('get_blog_overall_stats');
 
     if (error) {
       throw new Error(`Failed to fetch overall blog stats: ${error.message}`);
     }
 
+    const stats = data?.[0] || { total_posts: 0, total_views: 0, total_comments: 0 };
+
     return {
-      total_posts: Number(data.total_posts) || 0,
-      total_views: Number(data.total_views) || 0,
-      total_comments: Number(data.total_comments) || 0
+      total_posts: Number(stats.total_posts) || 0,
+      total_views: Number(stats.total_views) || 0,
+      total_comments: Number(stats.total_comments) || 0
     };
   }
 
   static async getTopViewedPosts(limit: number = 5): Promise<Array<{ id: string; title: string; view_count: number }>> {
-    const { data, error } = await supabase
-      .from('blog_post_stats')
-      .select('id, title, view_count')
-      .order('view_count', { ascending: false })
-      .limit(limit);
+    const { data, error } = await supabase.rpc('get_blog_post_stats');
 
     if (error) {
       throw new Error(`Failed to fetch top viewed posts: ${error.message}`);
     }
 
-    return data.map(post => ({
-      id: post.id,
-      title: post.title,
-      view_count: Number(post.view_count) || 0
-    }));
+    return (data || [])
+      .sort((a: any, b: any) => Number(b.view_count) - Number(a.view_count))
+      .slice(0, limit)
+      .map((post: any) => ({
+        id: post.id,
+        title: post.title,
+        view_count: Number(post.view_count) || 0
+      }));
   }
 
   static async getTopCommentedPosts(limit: number = 5): Promise<Array<{ id: string; title: string; comment_count: number }>> {
-    const { data, error } = await supabase
-      .from('blog_post_stats')
-      .select('id, title, comment_count')
-      .order('comment_count', { ascending: false })
-      .limit(limit);
+    const { data, error } = await supabase.rpc('get_blog_post_stats');
 
     if (error) {
       throw new Error(`Failed to fetch top commented posts: ${error.message}`);
     }
 
-    return data.map(post => ({
-      id: post.id,
-      title: post.title,
-      comment_count: Number(post.comment_count) || 0
-    }));
+    return (data || [])
+      .sort((a: any, b: any) => Number(b.comment_count) - Number(a.comment_count))
+      .slice(0, limit)
+      .map((post: any) => ({
+        id: post.id,
+        title: post.title,
+        comment_count: Number(post.comment_count) || 0
+      }));
   }
 
   static async getUserBlogStats(userId: string): Promise<{

@@ -235,13 +235,6 @@ export type Database = {
             foreignKeyName: "fk_blog_post_tags_post_id"
             columns: ["post_id"]
             isOneToOne: false
-            referencedRelation: "blog_post_stats"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_blog_post_tags_post_id"
-            columns: ["post_id"]
-            isOneToOne: false
             referencedRelation: "blog_posts"
             referencedColumns: ["id"]
           },
@@ -773,26 +766,7 @@ export type Database = {
       }
     }
     Views: {
-      blog_overall_stats: {
-        Row: {
-          total_comments: number | null
-          total_posts: number | null
-          total_views: number | null
-        }
-        Relationships: []
-      }
-      blog_post_stats: {
-        Row: {
-          author_id: string | null
-          comment_count: number | null
-          created_at: string | null
-          id: string | null
-          published_at: string | null
-          title: string | null
-          view_count: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       generate_slug: {
@@ -813,6 +787,26 @@ export type Database = {
           total_saved_dishes: number
           total_shopping_lists: number
           total_transactions: number
+        }[]
+      }
+      get_blog_overall_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_comments: number
+          total_posts: number
+          total_views: number
+        }[]
+      }
+      get_blog_post_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          author_id: string
+          comment_count: number
+          created_at: string
+          id: string
+          published_at: string
+          title: string
+          view_count: number
         }[]
       }
       get_blog_views_over_time: {
