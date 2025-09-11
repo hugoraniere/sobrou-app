@@ -394,6 +394,29 @@ export class BlogService {
     }
   }
 
+  // Secure method to get public blog comments with masked emails
+  async getPublicBlogComments(postId?: string): Promise<any[]> {
+    console.log('[BlogService] Fetching public blog comments:', { postId });
+
+    try {
+      const { data, error } = await supabase
+        .rpc('get_public_blog_comments', {
+          target_post_id: postId || null
+        });
+
+      if (error) {
+        console.error('[BlogService] Error fetching public blog comments:', error);
+        throw error;
+      }
+
+      console.log('[BlogService] Blog comments fetched successfully:', data?.length || 0);
+      return data || [];
+    } catch (error) {
+      console.error('[BlogService] Error fetching public blog comments:', error);
+      throw error;
+    }
+  }
+
   async getPublicBlogPostBySlug(slug: string): Promise<BlogPost | null> {
     console.log('[BlogService] Fetching public blog post by slug:', slug);
     
