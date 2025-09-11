@@ -26,6 +26,7 @@ import FinancialPlanning from "./pages/FinancialPlanning";
 import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
+import AdminBlog from "./pages/AdminBlog";
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import InstallPrompt from './components/pwa/InstallPrompt';
 
@@ -51,6 +52,9 @@ const App = () => {
                           <Route path="/auth" element={<Auth />} />
                           <Route path="/verify" element={<EmailVerification />} />
                           <Route path="/reset-password" element={<PasswordReset />} />
+                          
+                          {/* Admin routes */}
+                          <Route path="/admin-blog" element={<AdminBlog />} />
                           
                           {/* Protected routes */}
                           <Route

@@ -89,3 +89,38 @@
     @apply bg-background-surface p-4 rounded-lg border-l-4 border-primary;
   }
 }
+
+/* React Quill Editor Styles */
+.ql-editor {
+  min-height: 200px;
+  font-family: inherit;
+}
+
+.ql-toolbar {
+  border-top: 1px solid hsl(var(--border));
+  border-left: 1px solid hsl(var(--border));
+  border-right: 1px solid hsl(var(--border));
+  border-bottom: none;
+  border-radius: 0.375rem 0.375rem 0 0;
+  background-color: hsl(var(--card));
+}
+
+.ql-container {
+  border-bottom: 1px solid hsl(var(--border));
+  border-left: 1px solid hsl(var(--border));
+  border-right: 1px solid hsl(var(--border));
+  border-top: none;
+  border-radius: 0 0 0.375rem 0.375rem;
+  background-color: hsl(var(--background));
+}
+
+.ql-snow .ql-tooltip {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.ql-snow .ql-picker-options {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+}
