@@ -46,7 +46,7 @@ const TransparentHeader = () => {
             {user ? (
               <>
                 <Link to="/dashboard">
-                  <Button variant="ghost" className="font-outfit text-sm text-gray-700 hover:text-primary">
+                  <Button className="bg-primary hover:bg-primary-hover text-white font-outfit text-sm">
                     Ir para o app
                   </Button>
                 </Link>
