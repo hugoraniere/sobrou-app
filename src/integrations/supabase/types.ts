@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_events: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bill_transactions: {
         Row: {
           amount: number
@@ -138,6 +162,30 @@ export type Database = {
           post_id?: string
           status?: string
           updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      blog_post_shares: {
+        Row: {
+          id: string
+          post_id: string
+          share_type: string | null
+          shared_at: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          share_type?: string | null
+          shared_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          share_type?: string | null
+          shared_at?: string
           user_id?: string | null
         }
         Relationships: []
@@ -511,6 +559,65 @@ export type Database = {
           },
         ]
       }
+      shopping_list_items: {
+        Row: {
+          created_at: string
+          id: string
+          is_checked: boolean | null
+          name: string
+          quantity: number | null
+          shopping_list_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_checked?: boolean | null
+          name: string
+          quantity?: number | null
+          shopping_list_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_checked?: boolean | null
+          name?: string
+          quantity?: number | null
+          shopping_list_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_items_shopping_list_id_fkey"
+            columns: ["shopping_list_id"]
+            isOneToOne: false
+            referencedRelation: "shopping_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopping_lists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -631,6 +738,42 @@ export type Database = {
       }
     }
     Functions: {
+      get_active_users_stats: {
+        Args: { period_days?: number }
+        Returns: {
+          daily_active_users: number
+          date: string
+          weekly_active_users: number
+        }[]
+      }
+      get_app_interaction_totals: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_saved_dishes: number
+          total_shopping_lists: number
+          total_transactions: number
+        }[]
+      }
+      get_blog_views_over_time: {
+        Args: { days_back?: number }
+        Returns: {
+          date: string
+          views_count: number
+        }[]
+      }
+      get_detailed_user_stats: {
+        Args: { target_user_id: string }
+        Returns: {
+          content_views: number
+          join_date: string
+          last_access: string
+          posts_created: number
+          saved_dishes: number
+          shopping_lists_count: number
+          total_post_comments: number
+          total_post_views: number
+        }[]
+      }
       get_user_blog_stats: {
         Args: { target_user_id: string }
         Returns: {
@@ -638,6 +781,18 @@ export type Database = {
           total_comments: number
           total_posts: number
           total_views: number
+        }[]
+      }
+      get_user_retention_cohorts: {
+        Args: { weeks_back?: number }
+        Returns: {
+          cohort_week: string
+          users_count: number
+          week_0: number
+          week_1: number
+          week_2: number
+          week_3: number
+          week_4: number
         }[]
       }
       has_role: {
