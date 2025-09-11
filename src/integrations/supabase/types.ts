@@ -288,6 +288,7 @@ export type Database = {
           created_at: string
           id: string
           published_at: string
+          slug: string
           subtitle: string | null
           title: string
           updated_at: string
@@ -299,6 +300,7 @@ export type Database = {
           created_at?: string
           id?: string
           published_at?: string
+          slug: string
           subtitle?: string | null
           title: string
           updated_at?: string
@@ -310,6 +312,7 @@ export type Database = {
           created_at?: string
           id?: string
           published_at?: string
+          slug?: string
           subtitle?: string | null
           title?: string
           updated_at?: string
@@ -762,6 +765,10 @@ export type Database = {
       }
     }
     Functions: {
+      generate_slug: {
+        Args: { title: string }
+        Returns: string
+      }
       get_active_users_stats: {
         Args: { period_days?: number }
         Returns: {
@@ -807,6 +814,24 @@ export type Database = {
           id: string
           like_count: number
           published_at: string
+          slug: string
+          subtitle: string
+          tags: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
+      get_public_blog_post_by_slug: {
+        Args: { target_slug: string }
+        Returns: {
+          content: string
+          cover_image_url: string
+          created_at: string
+          id: string
+          like_count: number
+          published_at: string
+          slug: string
           subtitle: string
           tags: Json
           title: string
@@ -823,6 +848,7 @@ export type Database = {
           id: string
           like_count: number
           published_at: string
+          slug: string
           subtitle: string
           tags: Json
           title: string
@@ -891,6 +917,14 @@ export type Database = {
           user_id_param?: string
         }
         Returns: boolean
+      }
+      unaccent: {
+        Args: { "": string }
+        Returns: string
+      }
+      unaccent_init: {
+        Args: { "": unknown }
+        Returns: unknown
       }
     }
     Enums: {
