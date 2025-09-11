@@ -16,13 +16,15 @@ const LogoWithAlphaBadge = React.forwardRef<HTMLDivElement, LogoWithAlphaBadgePr
         <Logo size={size} />
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge 
-                variant="secondary" 
-                className="bg-orange-100 text-orange-700 hover:bg-orange-200 text-xs"
-              >
-                Alpha
-              </Badge>
+            <TooltipTrigger>
+              <div className="cursor-default">
+                <Badge 
+                  variant="secondary" 
+                  className="bg-orange-100 text-orange-700 hover:bg-orange-200 text-xs pointer-events-none"
+                >
+                  Alpha
+                </Badge>
+              </div>
             </TooltipTrigger>
             <TooltipContent>
               <p className="max-w-xs">
