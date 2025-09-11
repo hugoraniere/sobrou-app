@@ -166,6 +166,30 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          post_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          post_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          post_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blog_post_shares: {
         Row: {
           id: string
@@ -774,6 +798,38 @@ export type Database = {
           total_post_views: number
         }[]
       }
+      get_public_blog_post: {
+        Args: { target_post_id: string }
+        Returns: {
+          content: string
+          cover_image_url: string
+          created_at: string
+          id: string
+          like_count: number
+          published_at: string
+          subtitle: string
+          tags: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
+      get_public_blog_posts: {
+        Args: { page_offset?: number; page_size?: number; search_term?: string }
+        Returns: {
+          content: string
+          cover_image_url: string
+          created_at: string
+          id: string
+          like_count: number
+          published_at: string
+          subtitle: string
+          tags: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_user_blog_stats: {
         Args: { target_user_id: string }
         Returns: {
@@ -827,6 +883,14 @@ export type Database = {
           id: string
           roles: string[]
         }[]
+      }
+      toggle_blog_post_like: {
+        Args: {
+          ip_address_param?: string
+          target_post_id: string
+          user_id_param?: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
