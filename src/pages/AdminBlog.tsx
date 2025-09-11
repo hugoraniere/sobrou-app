@@ -9,10 +9,11 @@ import { Spinner } from '@/components/ui/spinner';
 import PostsList from '@/components/blog/PostsList';
 import PostForm from '@/components/blog/PostForm';
 import UserManager from '@/components/blog/UserManager';
+import AdminDashboard from '@/components/blog/AdminDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { User, LogOut, Users, FileText, Lock, AlertCircle } from 'lucide-react';
+import { User, LogOut, Users, FileText, Lock, AlertCircle, BarChart3 } from 'lucide-react';
 
 const AdminBlog = () => {
   const { user, isAuthenticated, logout, login } = useAuth();
@@ -178,8 +179,12 @@ const AdminBlog = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="content" className="space-y-6">
+        <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Dashboard
+            </TabsTrigger>
             <TabsTrigger value="content" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Gerenciador de Conteúdo
@@ -191,6 +196,10 @@ const AdminBlog = () => {
               </TabsTrigger>
             )}
           </TabsList>
+
+          <TabsContent value="dashboard">
+            <AdminDashboard />
+          </TabsContent>
 
           <TabsContent value="content">
             <Tabs defaultValue="posts" className="space-y-4">

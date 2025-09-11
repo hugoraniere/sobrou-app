@@ -186,6 +186,82 @@ export class BlogService {
     return publicUrl.publicUrl;
   }
 
+  // Analytics methods
+  static async getBlogOverallStats(): Promise<{ total_posts: number; total_views: number; total_comments: number }> {
+    const { data, error } = await supabase
+      .from('blog_overall_stats')
+      .select('*')
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to fetch overall blog stats: ${error.message}`);
+    }
+
+    return {
+      total_posts: Number(data.total_posts) || 0,
+      total_views: Number(data.total_views) || 0,
+      total_comments: Number(data.total_comments) || 0
+    };
+  }
+
+  static async getTopViewedPosts(limit: number = 5): Promise<Array<{ id: string; title: string; view_count: number }>> {
+    const { data, error } = await supabase
+      .from('blog_post_stats')
+      .select('id, title, view_count')
+      .order('view_count', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      throw new Error(`Failed to fetch top viewed posts: ${error.message}`);
+    }
+
+    return data.map(post => ({
+      id: post.id,
+      title: post.title,
+      view_count: Number(post.view_count) || 0
+    }));
+  }
+
+  static async getTopCommentedPosts(limit: number = 5): Promise<Array<{ id: string; title: string; comment_count: number }>> {
+    const { data, error } = await supabase
+      .from('blog_post_stats')
+      .select('id, title, comment_count')
+      .order('comment_count', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      throw new Error(`Failed to fetch top commented posts: ${error.message}`);
+    }
+
+    return data.map(post => ({
+      id: post.id,
+      title: post.title,
+      comment_count: Number(post.comment_count) || 0
+    }));
+  }
+
+  static async getUserBlogStats(userId: string): Promise<{
+    total_posts: number;
+    total_views: number;
+    avg_views_per_post: number;
+    total_comments: number;
+  }> {
+    const { data, error } = await supabase
+      .rpc('get_user_blog_stats', { target_user_id: userId });
+
+    if (error) {
+      throw new Error(`Failed to fetch user blog stats: ${error.message}`);
+    }
+
+    const stats = Array.isArray(data) && data.length > 0 ? data[0] : { total_posts: 0, total_views: 0, avg_views_per_post: 0, total_comments: 0 };
+    return {
+      total_posts: Number(stats.total_posts) || 0,
+      total_views: Number(stats.total_views) || 0,
+      avg_views_per_post: Number(stats.avg_views_per_post) || 0,
+      total_comments: Number(stats.total_comments) || 0
+    };
+  }
+
   // Role checks
   static async isAdmin(): Promise<boolean> {
     const { data, error } = await supabase
