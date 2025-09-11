@@ -38,6 +38,15 @@ export interface DetailedUserStats {
   total_post_comments: number;
 }
 
+export interface UserMetrics {
+  total_users: number;
+  active_users: number;
+  subscribers: number;
+  prev_total_users: number;
+  prev_active_users: number;
+  prev_subscribers: number;
+}
+
 export class AdminAnalyticsService {
   static async getActiveUsersStats(periodDays: number = 30): Promise<ActiveUsersData[]> {
     const { data, error } = await supabase.rpc('get_active_users_stats', {
@@ -129,6 +138,26 @@ export class AdminAnalyticsService {
     return {
       total_comments: commentsData?.length || 0,
       total_shares: sharesData?.length || 0
+    };
+  }
+
+  static async getUserMetrics(periodDays: number = 30): Promise<UserMetrics> {
+    const { data, error } = await supabase.rpc('get_user_metrics', {
+      period_days: periodDays
+    });
+
+    if (error) {
+      console.error('Error fetching user metrics:', error);
+      throw error;
+    }
+
+    return data?.[0] || {
+      total_users: 0,
+      active_users: 0,
+      subscribers: 0,
+      prev_total_users: 0,
+      prev_active_users: 0,
+      prev_subscribers: 0
     };
   }
 

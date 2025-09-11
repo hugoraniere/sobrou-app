@@ -4,7 +4,6 @@ import { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
-import { TEXT } from '@/constants/text';
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface BigNumberCardProps {
@@ -39,11 +38,8 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
 }) => {
   const { isMobile } = useResponsive();
   
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(amount);
+  const formatValue = (amount: number) => {
+    return new Intl.NumberFormat('pt-BR').format(amount);
   };
 
   const cardContent = (
@@ -52,10 +48,10 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
         <div className="space-y-1 min-w-0">
           <p className="text-sm font-medium text-muted-foreground truncate">{title}</p>
           <h2 className="text-2xl font-bold truncate">
-            {formatCurrency(value)}
+            {formatValue(value)}
             {simulatedValue !== undefined && (
               <span className="ml-2 text-sm font-normal text-muted-foreground">
-                → {formatCurrency(simulatedValue)}
+                → {formatValue(simulatedValue)}
               </span>
             )}
           </h2>
@@ -66,7 +62,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
                 <span>{trend.isPositive ? '↑' : '↓'}</span> {trend.value}%
               </Badge>
               <span className="text-xs text-muted-foreground truncate">
-                {TEXT.dashboard.fromLastMonth}
+                vs período anterior
               </span>
             </div>
           )}

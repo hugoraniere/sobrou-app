@@ -296,9 +296,19 @@ export class BlogService {
   }
 
   // User management (admin only)
-  static async searchUsers(searchTerm: string = ''): Promise<any[]> {
+  static async searchUsers(
+    searchTerm: string = '',
+    roleFilter: string = 'all',
+    sortBy: string = 'created_at',
+    sortOrder: string = 'DESC'
+  ): Promise<any[]> {
     const { data, error } = await supabase
-      .rpc('search_users', { search_term: searchTerm });
+      .rpc('search_users', { 
+        search_term: searchTerm,
+        role_filter: roleFilter,
+        sort_by: sortBy,
+        sort_order: sortOrder
+      });
 
     if (error) throw error;
     return data || [];

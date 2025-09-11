@@ -645,6 +645,36 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -865,6 +895,17 @@ export type Database = {
           total_views: number
         }[]
       }
+      get_user_metrics: {
+        Args: { period_days?: number }
+        Returns: {
+          active_users: number
+          prev_active_users: number
+          prev_subscribers: number
+          prev_total_users: number
+          subscribers: number
+          total_users: number
+        }[]
+      }
       get_user_retention_cohorts: {
         Args: { weeks_back?: number }
         Returns: {
@@ -901,7 +942,14 @@ export type Database = {
         Returns: boolean
       }
       search_users: {
-        Args: { search_term: string }
+        Args:
+          | {
+              role_filter?: string
+              search_term?: string
+              sort_by?: string
+              sort_order?: string
+            }
+          | { search_term: string }
         Returns: {
           created_at: string
           email: string

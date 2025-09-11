@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { BlogService } from '@/services/blogService';
 import { AdminAnalyticsService, DetailedUserStats } from '@/services/adminAnalyticsService';
+import UserMetricsBigNumbers from '@/components/dashboard/UserMetricsBigNumbers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
-import { Search, UserCheck, UserX, Shield, Edit3, Eye, FileText, MessageCircle, TrendingUp } from 'lucide-react';
+import { Search, UserCheck, UserX, Shield, Edit3, Eye, FileText, MessageCircle, TrendingUp, ArrowUpDown, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface User {
@@ -17,12 +19,16 @@ interface User {
   full_name: string;
   created_at: string;
   roles: string[];
+  last_access?: string;
 }
 
 const UserManager = () => {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState('DESC');
   const [isLoading, setIsLoading] = useState(false);
   const [managingUser, setManagingUser] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -34,7 +40,7 @@ const UserManager = () => {
   const searchUsers = async () => {
     setIsLoading(true);
     try {
-      const results = await BlogService.searchUsers(searchTerm);
+      const results = await BlogService.searchUsers(searchTerm, roleFilter, sortBy, sortOrder);
       setUsers(results);
     } catch (error) {
       console.error('Error searching users:', error);
@@ -121,10 +127,13 @@ const UserManager = () => {
 
   useEffect(() => {
     searchUsers();
-  }, []);
+  }, [roleFilter, sortBy, sortOrder]);
 
   return (
     <div className="space-y-6">
+      {/* User Metrics */}
+      <UserMetricsBigNumbers />
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -133,17 +142,55 @@ const UserManager = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
+          {/* Search and Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
             <Input
               placeholder="Buscar por email ou nome..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
-              className="flex-1"
+              className="md:col-span-2"
             />
+            
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filtrar por role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="admin">Administrador</SelectItem>
+                <SelectItem value="editor">Editor</SelectItem>
+                <SelectItem value="standard">Usuário Padrão</SelectItem>
+              </SelectContent>
+            </Select>
+
             <Button onClick={searchUsers} disabled={isLoading}>
               {isLoading ? <Spinner className="h-4 w-4" /> : <Search className="h-4 w-4" />}
               Buscar
+            </Button>
+          </div>
+
+          {/* Sort Options */}
+          <div className="flex flex-wrap gap-2">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Ordenar por" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="created_at">Data de Cadastro</SelectItem>
+                <SelectItem value="last_access">Último Acesso</SelectItem>
+                <SelectItem value="email">Email</SelectItem>
+                <SelectItem value="full_name">Nome</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC')}
+            >
+              <ArrowUpDown className="h-4 w-4 mr-2" />
+              {sortOrder === 'ASC' ? 'Crescente' : 'Decrescente'}
             </Button>
           </div>
 
@@ -164,10 +211,20 @@ const UserManager = () => {
                         <span className="text-muted-foreground">({user.full_name})</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
-                        Cadastrado em: {format(new Date(user.created_at), 'dd/MM/yyyy')}
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>
+                        Cadastrado: {format(new Date(user.created_at), 'dd/MM/yyyy')}
                       </span>
+                      {user.last_access && (
+                        <span className="ml-4">
+                          Último acesso: {format(new Date(user.last_access), 'dd/MM/yyyy HH:mm')}
+                        </span>
+                      )}
+                      {!user.last_access && (
+                        <span className="ml-4 text-muted-foreground/70">
+                          Último acesso: Nunca
+                        </span>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       {user.roles.length === 0 ? (

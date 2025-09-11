@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { AdminAnalyticsService } from '../services/adminAnalyticsService';
 
 export interface UserProfile {
   id: string;
@@ -128,6 +129,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         throw new Error(error.message);
       }
+
+      // Track login event for analytics
+      setTimeout(() => {
+        AdminAnalyticsService.trackAppEvent('login', { timestamp: new Date().toISOString() });
+      }, 0);
 
       navigate(redirectTo || '/dashboard');
       return;
