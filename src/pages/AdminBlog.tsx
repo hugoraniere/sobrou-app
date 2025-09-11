@@ -63,7 +63,7 @@ const AdminBlog = () => {
     setIsLoggingIn(true);
 
     try {
-      await login(loginForm.email, loginForm.password, '/admin-blog');
+      await login(loginForm.email, loginForm.password, '/admin');
       toast({
         message: 'Login realizado com sucesso!',
         type: 'success'
