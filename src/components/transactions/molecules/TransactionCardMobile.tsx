@@ -27,7 +27,7 @@ interface TransactionCardMobileProps {
   showCardPadding?: boolean;
 }
 
-const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
+const TransactionCardMobile: React.FC<TransactionCardMobileProps> = React.memo(({
   transaction,
   onEdit,
   onDelete,
@@ -181,6 +181,8 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = ({
       </div>
     </div>
   );
-};
+});
+
+TransactionCardMobile.displayName = 'TransactionCardMobile';
 
 export default TransactionCardMobile;

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Transaction } from '@/services/transactions';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -14,7 +14,7 @@ interface TransactionCardProps {
   showCardPadding?: boolean;
 }
 
-const TransactionCard: React.FC<TransactionCardProps> = ({
+const TransactionCard: React.FC<TransactionCardProps> = memo(({
   transaction,
   onEdit,
   onDelete,
@@ -43,6 +43,8 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
       )}
     </TooltipProvider>
   );
-};
+});
+
+TransactionCard.displayName = 'TransactionCard';
 
 export default TransactionCard;

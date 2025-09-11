@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -25,7 +25,7 @@ interface BigNumberCardProps {
   isCurrency?: boolean;
 }
 
-const BigNumberCard: React.FC<BigNumberCardProps> = ({
+const BigNumberCard: React.FC<BigNumberCardProps> = memo(({
   title,
   value,
   icon: Icon,
@@ -103,7 +103,9 @@ const BigNumberCard: React.FC<BigNumberCardProps> = ({
       )}
     </HoverCard>
   );
-};
+});
+
+BigNumberCard.displayName = 'BigNumberCard';
 
 export { BigNumberCard };
 export default BigNumberCard;
