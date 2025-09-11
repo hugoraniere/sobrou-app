@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LogOut, Plus, Settings, Shield } from 'lucide-react';
+import { LogOut, Plus, Settings, Shield, LayoutDashboard } from 'lucide-react';
 import { BlogService } from '@/services/blogService';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '../notifications/NotificationBell';
 import { UserAvatar } from '@/components/admin/UserAvatar';
-const MainNavbar: React.FC = () => {
+const MainNavbar: React.FC<{ isAdminContext?: boolean }> = ({ isAdminContext = false }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -66,17 +66,31 @@ const MainNavbar: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <NotificationBell className={isMobile ? 'hidden' : ''} />
                 
-                {/* Admin Button - Only show if user has admin access */}
+                {/* Admin/Go to App Button */}
                 {!isMobile && canAccessAdmin && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/admin')}
-                    className="flex items-center gap-2"
-                  >
-                    <Shield className="h-4 w-4" />
-                    Admin
-                  </Button>
+                  <>
+                    {isAdminContext ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/dashboard')}
+                        className="flex items-center gap-2"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Ir para o App
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/admin')}
+                        className="flex items-center gap-2"
+                      >
+                        <Shield className="h-4 w-4" />
+                        Admin
+                      </Button>
+                    )}
+                  </>
                 )}
                 
                 {!isMobile && <UserAvatar />}

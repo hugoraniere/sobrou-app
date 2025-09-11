@@ -22,6 +22,10 @@ import BlogPost from './pages/BlogPost';
 import BlogPostLegacyRedirect from './components/blog/BlogPostLegacyRedirect';
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminContent from "./pages/AdminContent";
+import AdminUsers from "./pages/AdminUsers";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
@@ -29,7 +33,6 @@ import FinancialPlanning from "./pages/FinancialPlanning";
 import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
-import AdminBlog from "./pages/AdminBlog";
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import InstallPrompt from './components/pwa/InstallPrompt';
 
@@ -60,8 +63,38 @@ const App = () => {
                           <Route path="/blog/post/:id" element={<BlogPostLegacyRedirect />} />
                           
                           {/* Admin routes */}
-                          <Route path="/admin" element={<AdminBlog />} />
-                          <Route path="/admin-blog" element={<Navigate to="/admin" replace />} />
+                          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+                          <Route path="/admin-blog" element={<Navigate to="/admin/dashboard" replace />} />
+                          <Route 
+                            path="/admin/dashboard" 
+                            element={
+                              <ProtectedRoute>
+                                <AdminLayout>
+                                  <AdminDashboard />
+                                </AdminLayout>
+                              </ProtectedRoute>
+                            } 
+                          />
+                          <Route 
+                            path="/admin/content" 
+                            element={
+                              <ProtectedRoute>
+                                <AdminLayout>
+                                  <AdminContent />
+                                </AdminLayout>
+                              </ProtectedRoute>
+                            } 
+                          />
+                          <Route 
+                            path="/admin/users" 
+                            element={
+                              <ProtectedRoute>
+                                <AdminLayout>
+                                  <AdminUsers />
+                                </AdminLayout>
+                              </ProtectedRoute>
+                            } 
+                          />
                           
                           {/* Protected routes */}
                           <Route
