@@ -835,6 +835,20 @@ export type Database = {
           total_post_views: number
         }[]
       }
+      get_public_blog_comments: {
+        Args: { target_post_id?: string }
+        Returns: {
+          author_email: string
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_public_blog_post: {
         Args: { target_post_id: string }
         Returns: {
@@ -956,6 +970,10 @@ export type Database = {
           target_user_id: string
         }
         Returns: boolean
+      }
+      mask_email: {
+        Args: { email: string; show_full?: boolean }
+        Returns: string
       }
       search_users: {
         Args:
