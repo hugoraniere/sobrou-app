@@ -15,10 +15,19 @@ import { Badge } from '@/components/ui/badge';
 import { X, Upload, Save, Plus } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 
+// Utility function to strip HTML tags for validation
+const stripHtml = (html: string): string => {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || '';
+};
+
 const postSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório'),
   subtitle: z.string().optional(),
-  content: z.string().min(1, 'Conteúdo é obrigatório'),
+  content: z.string().refine((val) => {
+    const textContent = stripHtml(val).trim();
+    return textContent.length > 0;
+  }, 'Conteúdo é obrigatório'),
   cover_image_url: z.string().optional(),
   tags: z.array(z.string()).default([])
 });
@@ -70,6 +79,11 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSuccess, onCancel }) => {
       setContent(post.content);
     }
   }, [post, reset]);
+
+  // Sync local content state with form state
+  useEffect(() => {
+    setValue('content', content);
+  }, [content, setValue]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -228,7 +242,10 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSuccess, onCancel }) => {
             <div className="min-h-[300px]">
               <ReactQuill
                 value={content}
-                onChange={setContent}
+                onChange={(value) => {
+                  setContent(value);
+                  setValue('content', value);
+                }}
                 modules={quillModules}
                 theme="snow"
                 placeholder="Escreva o conteúdo do post..."
