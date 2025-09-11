@@ -315,4 +315,113 @@ export class BlogService {
     if (error) throw error;
     return data;
   }
+
+  // Public blog methods
+  async getPublicBlogPosts(searchTerm?: string, pageSize: number = 10, pageOffset: number = 0): Promise<BlogPost[]> {
+    console.log('[BlogService] Fetching public blog posts:', { searchTerm, pageSize, pageOffset });
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('get_public_blog_posts', {
+          search_term: searchTerm || '',
+          page_size: pageSize,
+          page_offset: pageOffset
+        });
+
+      if (error) {
+        console.error('[BlogService] Error fetching public blog posts:', error);
+        throw error;
+      }
+
+      return data.map((post: any) => ({
+        ...post,
+        tags: Array.isArray(post.tags) ? post.tags.filter((tag: any) => tag && tag.id).map((tag: any) => ({
+          id: tag.id,
+          name: tag.name,
+          created_at: tag.created_at || new Date().toISOString()
+        })) : []
+      }));
+    } catch (error) {
+      console.error('[BlogService] Error fetching public blog posts:', error);
+      throw error;
+    }
+  }
+
+  async getPublicBlogPost(postId: string): Promise<BlogPost | null> {
+    console.log('[BlogService] Fetching public blog post:', postId);
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('get_public_blog_post', {
+          target_post_id: postId
+        });
+
+      if (error) {
+        console.error('[BlogService] Error fetching public blog post:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        return null;
+      }
+
+      const post = data[0];
+      return {
+        ...post,
+        tags: Array.isArray(post.tags) ? post.tags.filter((tag: any) => tag && tag.id).map((tag: any) => ({
+          id: tag.id,
+          name: tag.name,
+          created_at: tag.created_at || new Date().toISOString()
+        })) : []
+      };
+    } catch (error) {
+      console.error('[BlogService] Error fetching public blog post:', error);
+      throw error;
+    }
+  }
+
+  async toggleBlogPostLike(postId: string, userId?: string): Promise<boolean> {
+    console.log('[BlogService] Toggling blog post like:', { postId, userId });
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('toggle_blog_post_like', {
+          target_post_id: postId,
+          user_id_param: userId || null,
+          ip_address_param: userId ? null : 'anonymous'
+        });
+
+      if (error) {
+        console.error('[BlogService] Error toggling blog post like:', error);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('[BlogService] Error toggling blog post like:', error);
+      throw error;
+    }
+  }
+
+  async recordBlogPostView(postId: string, userId?: string): Promise<void> {
+    console.log('[BlogService] Recording blog post view:', { postId, userId });
+    
+    try {
+      const { error } = await supabase
+        .from('blog_post_views')
+        .insert({
+          post_id: postId,
+          user_id: userId || null,
+          ip_address: userId ? null : 'anonymous'
+        });
+
+      if (error) {
+        console.error('[BlogService] Error recording blog post view:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('[BlogService] Error recording blog post view:', error);
+      throw error;
+    }
+  }
 }

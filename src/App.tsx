@@ -17,6 +17,8 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import PasswordReset from "./pages/PasswordReset";
 import PublicLanding from "./pages/PublicLanding";
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
 import EmailVerification from "./pages/EmailVerification";
@@ -52,6 +54,8 @@ const App = () => {
                           <Route path="/auth" element={<Auth />} />
                           <Route path="/verify" element={<EmailVerification />} />
                           <Route path="/reset-password" element={<PasswordReset />} />
+                          <Route path="/blog" element={<Blog />} />
+                          <Route path="/blog/:id" element={<BlogPost />} />
                           
                           {/* Admin routes */}
                           <Route path="/admin-blog" element={<AdminBlog />} />
