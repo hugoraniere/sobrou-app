@@ -39,7 +39,8 @@ import Error from "./pages/Error";
 import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
 import NewTicket from "./pages/support/NewTicket";
-import MyTickets from "./pages/support/MyTickets";
+const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
+
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -69,7 +70,7 @@ const App = () => {
                           <Route path="/suporte" element={<SupportCenter />} />
                           <Route path="/suporte/artigo/:slug" element={<SupportArticle />} />
                           <Route path="/suporte/novo" element={<NewTicket />} />
-                          <Route path="/suporte/meus-tickets" element={<MyTickets />} />
+                          <Route path="/suporte/meus-tickets" element={<React.Suspense fallback={null}><MyTickets /></React.Suspense>} />
                           <Route path="/erro" element={<Error />} />
                           
                           {/* Admin routes */}
