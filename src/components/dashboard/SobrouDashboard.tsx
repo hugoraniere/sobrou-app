@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, 
   Activity, 
@@ -20,6 +21,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, BarChart, Bar } fro
 import { PeriodSelector, AdminPeriodOption, getPeriodDays } from '@/components/admin/PeriodSelector';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import UserMetricsBigNumbers from './UserMetricsBigNumbers';
+import BlogPostAnalytics from './BlogPostAnalytics';
 
 const ADMIN_PERIOD_OPTIONS: Array<{ value: AdminPeriodOption; label: string }> = [
   { value: '7-days', label: 'Últimos 7 dias' },
@@ -174,210 +176,225 @@ const SobrouDashboard: React.FC = () => {
         </Alert>
       )}
 
-      {/* User Metrics Big Numbers */}
-      <UserMetricsBigNumbers />
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="users">Usuários</TabsTrigger>
+          <TabsTrigger value="content">Conteúdo</TabsTrigger>
+          <TabsTrigger value="blog">Analytics Blog</TabsTrigger>
+        </TabsList>
 
-      {/* App User Metrics */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Métricas de Usuários do App</h3>
+        <TabsContent value="overview" className="space-y-6">
+          {/* User Metrics Big Numbers */}
+          <UserMetricsBigNumbers />
+
+          {/* Key Interactions Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Receitas Salvas</CardTitle>
+                <ChefHat className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{appTotals.total_saved_dishes.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Listas de Compras</CardTitle>
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{appTotals.total_shopping_lists.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Transações</CardTitle>
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{appTotals.total_transactions.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Blog Engagement Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Comentários</CardTitle>
+                <MessageCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{blogEngagement.total_comments.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Compartilhamentos</CardTitle>
+                <Share className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{blogEngagement.total_shares.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-6">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Métricas de Usuários do App</h3>
+            
+            {/* Activity Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Usuários Ativos ({getPeriodDays(selectedPeriod)} dias)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingErrors.activeUsers ? (
+                  <div className="text-center py-8 text-red-600">
+                    <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                    <p>{loadingErrors.activeUsers}</p>
+                  </div>
+                ) : activeUsersData.length > 0 ? (
+                  <ChartContainer config={chartConfig} className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={activeUsersData}>
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                        />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Line 
+                          type="monotone" 
+                          dataKey="daily_active_users" 
+                          stroke="var(--color-daily_active_users)" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="weekly_active_users" 
+                          stroke="var(--color-weekly_active_users)" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">Nenhum dado de atividade disponível</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Retention Cohorts */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Retenção de Usuários (Coortes Semanais)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingErrors.retention ? (
+                  <div className="text-center py-8 text-red-600">
+                    <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                    <p>{loadingErrors.retention}</p>
+                  </div>
+                ) : retentionData.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Coorte</th>
+                          <th className="text-center p-2">Usuários</th>
+                          <th className="text-center p-2">Semana 0</th>
+                          <th className="text-center p-2">Semana 1</th>
+                          <th className="text-center p-2">Semana 2</th>
+                          <th className="text-center p-2">Semana 3</th>
+                          <th className="text-center p-2">Semana 4</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {retentionData.map((cohort) => (
+                          <tr key={cohort.cohort_week} className="border-b">
+                            <td className="p-2">{new Date(cohort.cohort_week).toLocaleDateString('pt-BR')}</td>
+                            <td className="text-center p-2">{cohort.users_count}</td>
+                            <td className="text-center p-2 bg-primary/10">100%</td>
+                            <td className="text-center p-2">{formatRetentionPercentage(cohort.week_1, cohort.users_count)}</td>
+                            <td className="text-center p-2">{formatRetentionPercentage(cohort.week_2, cohort.users_count)}</td>
+                            <td className="text-center p-2">{formatRetentionPercentage(cohort.week_3, cohort.users_count)}</td>
+                            <td className="text-center p-2">{formatRetentionPercentage(cohort.week_4, cohort.users_count)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">Dados de retenção insuficientes</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
         
-        {/* Key Interactions Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Receitas Salvas</CardTitle>
-              <ChefHat className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{appTotals.total_saved_dishes.toLocaleString()}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Listas de Compras</CardTitle>
-              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{appTotals.total_shopping_lists.toLocaleString()}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Transações</CardTitle>
-              <Receipt className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{appTotals.total_transactions.toLocaleString()}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Activity Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Usuários Ativos ({getPeriodDays(selectedPeriod)} dias)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loadingErrors.activeUsers ? (
-              <div className="text-center py-8 text-red-600">
-                <AlertCircle className="h-8 w-8 mx-auto mb-2" />
-                <p>{loadingErrors.activeUsers}</p>
-              </div>
-            ) : activeUsersData.length > 0 ? (
-              <ChartContainer config={chartConfig} className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={activeUsersData}>
-                    <XAxis 
-                      dataKey="date" 
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                    />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line 
-                      type="monotone" 
-                      dataKey="daily_active_users" 
-                      stroke="var(--color-daily_active_users)" 
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="weekly_active_users" 
-                      stroke="var(--color-weekly_active_users)" 
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            ) : (
-              <p className="text-center text-muted-foreground py-8">Nenhum dado de atividade disponível</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Retention Cohorts */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Retenção de Usuários (Coortes Semanais)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loadingErrors.retention ? (
-              <div className="text-center py-8 text-red-600">
-                <AlertCircle className="h-8 w-8 mx-auto mb-2" />
-                <p>{loadingErrors.retention}</p>
-              </div>
-            ) : retentionData.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-2">Coorte</th>
-                      <th className="text-center p-2">Usuários</th>
-                      <th className="text-center p-2">Semana 0</th>
-                      <th className="text-center p-2">Semana 1</th>
-                      <th className="text-center p-2">Semana 2</th>
-                      <th className="text-center p-2">Semana 3</th>
-                      <th className="text-center p-2">Semana 4</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {retentionData.map((cohort) => (
-                      <tr key={cohort.cohort_week} className="border-b">
-                        <td className="p-2">{new Date(cohort.cohort_week).toLocaleDateString('pt-BR')}</td>
-                        <td className="text-center p-2">{cohort.users_count}</td>
-                        <td className="text-center p-2 bg-primary/10">100%</td>
-                        <td className="text-center p-2">{formatRetentionPercentage(cohort.week_1, cohort.users_count)}</td>
-                        <td className="text-center p-2">{formatRetentionPercentage(cohort.week_2, cohort.users_count)}</td>
-                        <td className="text-center p-2">{formatRetentionPercentage(cohort.week_3, cohort.users_count)}</td>
-                        <td className="text-center p-2">{formatRetentionPercentage(cohort.week_4, cohort.users_count)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-center text-muted-foreground py-8">Dados de retenção insuficientes</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Blog Metrics */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Métricas do Blog</h3>
+        <TabsContent value="content" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Blog Traffic Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Visualizações do Blog ({getPeriodDays(selectedPeriod)} dias)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingErrors.blogViews ? (
+                  <div className="text-center py-8 text-red-600">
+                    <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                    <p>{loadingErrors.blogViews}</p>
+                  </div>
+                ) : blogViewsData.length > 0 ? (
+                  <ChartContainer config={chartConfig} className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={blogViewsData}>
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                        />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Bar 
+                          dataKey="views_count" 
+                          fill="var(--color-views_count)" 
+                          radius={[4, 4, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">Nenhum dado de visualizações disponível</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
         
-        {/* Blog Engagement Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Comentários</CardTitle>
-              <MessageCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{blogEngagement.total_comments.toLocaleString()}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Compartilhamentos</CardTitle>
-              <Share className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{blogEngagement.total_shares.toLocaleString()}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Blog Traffic Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Visualizações do Blog ({getPeriodDays(selectedPeriod)} dias)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loadingErrors.blogViews ? (
-              <div className="text-center py-8 text-red-600">
-                <AlertCircle className="h-8 w-8 mx-auto mb-2" />
-                <p>{loadingErrors.blogViews}</p>
-              </div>
-            ) : blogViewsData.length > 0 ? (
-              <ChartContainer config={chartConfig} className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={blogViewsData}>
-                    <XAxis 
-                      dataKey="date" 
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                    />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar 
-                      dataKey="views_count" 
-                      fill="var(--color-views_count)" 
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            ) : (
-              <p className="text-center text-muted-foreground py-8">Nenhum dado de visualizações disponível</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="blog" className="space-y-6">
+          <BlogPostAnalytics />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

@@ -71,38 +71,36 @@ const FeaturedPostHero: React.FC<FeaturedPostHeroProps> = ({ featuredPost }) => 
 
   return (
     <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-border/50 mb-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="flex items-center gap-6 p-6">
         {/* Content */}
-        <div className="px-6 py-12 md:px-12 md:py-16 lg:order-1">
-          <Badge variant="secondary" className="mb-4">
+        <div className="flex-1 space-y-4">
+          <Badge variant="secondary" className="inline-block">
             Em Destaque
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-lg text-muted-foreground mb-4">
+            <p className="text-muted-foreground leading-relaxed">
               {subtitle}
             </p>
           )}
           {!featuredPost.is_custom && featuredPost.post_content && (
-            <p className="text-muted-foreground mb-6 leading-relaxed">
-              {getExcerpt(featuredPost.post_content)}
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {getExcerpt(featuredPost.post_content, 150)}
             </p>
           )}
           {!featuredPost.is_custom && featuredPost.post_published_at && (
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  {format(new Date(featuredPost.post_published_at), 'dd/MM/yyyy', { locale: ptBR })}
-                </span>
-              </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              <span>
+                {format(new Date(featuredPost.post_published_at), 'dd/MM/yyyy', { locale: ptBR })}
+              </span>
             </div>
           )}
           <div className="flex flex-col sm:flex-row gap-3">
             {!featuredPost.is_custom && featuredPost.post_slug ? (
-              <Button asChild size="lg">
+              <Button asChild>
                 <Link 
                   to={`/blog/${featuredPost.post_slug}`}
                   className="inline-flex items-center gap-2"
@@ -113,7 +111,7 @@ const FeaturedPostHero: React.FC<FeaturedPostHeroProps> = ({ featuredPost }) => 
               </Button>
             ) : (
               featuredPost.cta_text && featuredPost.cta_url && (
-                <Button asChild size="lg">
+                <Button asChild>
                   <a 
                     href={featuredPost.cta_url}
                     target={featuredPost.cta_url.startsWith('http') ? '_blank' : '_self'}
@@ -126,40 +124,20 @@ const FeaturedPostHero: React.FC<FeaturedPostHeroProps> = ({ featuredPost }) => 
                 </Button>
               )
             )}
-            {!featuredPost.is_custom && featuredPost.cta_text && featuredPost.cta_url && (
-              <Button variant="outline" size="lg" asChild>
-                <a 
-                  href={featuredPost.cta_url}
-                  target={featuredPost.cta_url.startsWith('http') ? '_blank' : '_self'}
-                  rel={featuredPost.cta_url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                >
-                  {featuredPost.cta_text}
-                </a>
-              </Button>
-            )}
           </div>
         </div>
 
         {/* Image */}
-        <div className="lg:order-2 relative">
+        <div className="w-32 h-24 shrink-0">
           {imageUrl ? (
-            <div className="aspect-[4/3] lg:aspect-[3/4] overflow-hidden rounded-l-xl lg:rounded-l-none lg:rounded-r-xl">
-              <img
-                src={imageUrl}
-                alt={title}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <img
+              src={imageUrl}
+              alt={title}
+              className="w-full h-full object-cover rounded-lg"
+            />
           ) : (
-            <div className="aspect-[4/3] lg:aspect-[3/4] bg-gradient-to-br from-muted/50 to-muted rounded-l-xl lg:rounded-l-none lg:rounded-r-xl flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                  <ArrowRight className="h-8 w-8 text-primary" />
-                </div>
-                <p className="text-muted-foreground font-medium">
-                  {title}
-                </p>
-              </div>
+            <div className="w-full h-full bg-gradient-to-br from-muted/50 to-muted rounded-lg flex items-center justify-center">
+              <ArrowRight className="h-6 w-6 text-primary" />
             </div>
           )}
         </div>
