@@ -71,13 +71,6 @@ export const useNavigationPages = () => {
       isOptional: false,
       isVisible: true,
     },
-    {
-      title: 'Suporte',
-      url: '/suporte',
-      icon: HelpCircle,
-      isOptional: false,
-      isVisible: true,
-    },
   ], [preferences]);
 
   const visiblePages = useMemo(() => 

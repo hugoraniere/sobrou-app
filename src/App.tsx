@@ -67,6 +67,8 @@ const App = () => {
                           <Route path="/blog/post/:id" element={<BlogPostLegacyRedirect />} />
                           <Route path="/suporte" element={<SupportCenter />} />
                           <Route path="/suporte/artigo/:slug" element={<SupportArticle />} />
+                          <Route path="/suporte/novo" element={<NewTicket />} />
+                          <Route path="/suporte/meus-tickets" element={<MyTickets />} />
                           <Route path="/erro" element={<Error />} />
                           
                           {/* Admin routes */}
@@ -203,16 +205,6 @@ const App = () => {
                             }
                           />
                           
-                          <Route
-                            path="/suporte/novo"
-                            element={
-                              <ProtectedRoute>
-                                <AppLayout>
-                                  <NewTicket />
-                                </AppLayout>
-                              </ProtectedRoute>
-                            }
-                          />
                           
                           <Route path="*" element={<NotFound />} />
                         </Routes>

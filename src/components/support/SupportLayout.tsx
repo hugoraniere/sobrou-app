@@ -1,94 +1,77 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, HelpCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import SupportHeaderButtons from '@/components/ui/SupportHeaderButtons';
-import AppButton from '@/components/ui/AppButton';
 import BackButton from '@/components/ui/BackButton';
+import AppButton from '@/components/ui/AppButton';
+import LogoWithSupportBadge from '@/components/brand/LogoWithSupportBadge';
+import SupportBreadcrumb from './SupportBreadcrumb';
 
 interface SupportLayoutProps {
   children: React.ReactNode;
   showBackButton?: boolean;
   title?: string;
   subtitle?: string;
+  currentPage?: string;
+  articleTitle?: string;
 }
 
 const SupportLayout: React.FC<SupportLayoutProps> = ({
   children,
   showBackButton = false,
   title = "Central de Ajuda",
-  subtitle = "Encontre respostas para suas dúvidas ou entre em contato conosco"
+  subtitle = "Encontre respostas para suas dúvidas ou entre em contato conosco",
+  currentPage,
+  articleTitle
 }) => {
   const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-background-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              {showBackButton && (
-                <Link to="/suporte">
-                  <Button variant="ghost" size="sm">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Voltar
-                  </Button>
-                </Link>
-              )}
-              
-              {!showBackButton && (
-                <div className="flex items-center gap-4">
-                  {user ? <AppButton /> : <BackButton />}
-                  <div className="flex items-center gap-2">
-                    <HelpCircle className="h-6 w-6 text-primary" />
-                    <span className="text-lg font-semibold text-text-primary">
-                      Central de Suporte
-                    </span>
-                  </div>
-                </div>
-              )}
-              
-              {showBackButton && (
-                <div className="flex items-center gap-2">
-                  <HelpCircle className="h-6 w-6 text-primary" />
-                  <span className="text-lg font-semibold text-text-primary">
-                    Central de Suporte
-                  </span>
-                </div>
-              )}
-            </div>
+            {showBackButton ? (
+              <BackButton />
+            ) : (
+              <Link to="/suporte">
+                <LogoWithSupportBadge size="sm" />
+              </Link>
+            )}
             
             <SupportHeaderButtons />
           </div>
         </div>
       </header>
 
-      {/* Title Section */}
-      {!showBackButton && (
-        <section className="bg-background-surface border-b border-border">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-            <h1 className="text-4xl font-bold text-text-primary mb-4">
-              {title}
-            </h1>
-            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              {subtitle}
-            </p>
-          </div>
-        </section>
-      )}
-
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
+      <main className="flex-1">
+        {!showBackButton && (
+          <section className="bg-primary py-12 md:py-16">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+                {title}
+              </h1>
+              <p className="text-lg text-white/90 max-w-2xl mx-auto">
+                {subtitle}
+              </p>
+            </div>
+          </section>
+        )}
+        
+        <div className="container mx-auto px-4 py-6">
+          <SupportBreadcrumb currentPage={currentPage} articleTitle={articleTitle} />
+        </div>
+        
+        <div className="container mx-auto px-4 pb-12">
+          {children}
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-background-surface mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <footer className="border-t bg-background mt-16">
+        <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-muted-foreground">
               Ainda precisa de ajuda?{' '}
               {user ? (
                 <Link to="/suporte/novo" className="text-primary hover:underline">
