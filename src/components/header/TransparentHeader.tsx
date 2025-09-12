@@ -4,20 +4,29 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
-import { useIsMobile } from '@/hooks/use-mobile';
+
 
 const TransparentHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, logout } = useAuth();
-  const isMobile = useIsMobile();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    const media = window.matchMedia('(max-width: 768px)');
+    const handleMedia = () => setIsMobile(media.matches);
+
+    // Initialize state
+    handleScroll();
+    handleMedia();
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    media.addEventListener('change', handleMedia);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      media.removeEventListener('change', handleMedia);
+    };
   }, []);
 
   return (
