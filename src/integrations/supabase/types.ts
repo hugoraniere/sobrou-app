@@ -977,7 +977,7 @@ export type Database = {
           status: string | null
           subcategory: string | null
           subject: string
-          ticket_number: string
+          ticket_number: string | null
           type: string
           updated_at: string | null
           url_context: string | null
@@ -995,7 +995,7 @@ export type Database = {
           status?: string | null
           subcategory?: string | null
           subject: string
-          ticket_number: string
+          ticket_number?: string | null
           type: string
           updated_at?: string | null
           url_context?: string | null
@@ -1013,7 +1013,7 @@ export type Database = {
           status?: string | null
           subcategory?: string | null
           subject?: string
-          ticket_number?: string
+          ticket_number?: string | null
           type?: string
           updated_at?: string | null
           url_context?: string | null

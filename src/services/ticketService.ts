@@ -2,16 +2,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { CreateTicketData, Ticket, TicketMessage, TicketFilters } from '@/types/support';
 import { Database } from '@/integrations/supabase/types';
 
-type TicketInsert = Omit<Database['public']['Tables']['tickets']['Insert'], 'ticket_number'> & {
-  ticket_number?: string;
-};
-
 export class TicketService {
   static async createTicket(data: CreateTicketData): Promise<Ticket> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User must be authenticated');
 
-    const insertData: TicketInsert = {
+    const insertData = {
       user_id: user.id,
       type: data.type,
       category: data.category,
@@ -20,7 +16,7 @@ export class TicketService {
       description: data.description,
       priority: data.priority,
       url_context: data.url_context || window.location.href,
-    };
+    } as Database['public']['Tables']['tickets']['Insert'];
 
     const { data: ticket, error } = await supabase
       .from('tickets')
