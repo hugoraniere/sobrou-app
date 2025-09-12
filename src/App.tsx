@@ -35,6 +35,10 @@ import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import InstallPrompt from './components/pwa/InstallPrompt';
+import Error from "./pages/Error";
+import SupportCenter from "./pages/support/SupportCenter";
+import SupportArticle from "./pages/support/SupportArticle";
+import NewTicket from "./pages/support/NewTicket";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -61,6 +65,9 @@ const App = () => {
                           <Route path="/blog" element={<Blog />} />
                           <Route path="/blog/:slug" element={<BlogPost />} />
                           <Route path="/blog/post/:id" element={<BlogPostLegacyRedirect />} />
+                          <Route path="/suporte" element={<SupportCenter />} />
+                          <Route path="/suporte/artigo/:slug" element={<SupportArticle />} />
+                          <Route path="/erro" element={<Error />} />
                           
                           {/* Admin routes */}
                           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
@@ -191,6 +198,17 @@ const App = () => {
                               <ProtectedRoute>
                                 <AppLayout>
                                   <MonthlySummary />
+                                </AppLayout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          
+                          <Route
+                            path="/suporte/novo"
+                            element={
+                              <ProtectedRoute>
+                                <AppLayout>
+                                  <NewTicket />
                                 </AppLayout>
                               </ProtectedRoute>
                             }
