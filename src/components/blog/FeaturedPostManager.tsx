@@ -22,7 +22,11 @@ const FeaturedPostManager: React.FC<FeaturedPostManagerProps> = () => {
   const [creating, setCreating] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
+    type: 'post', // 'post' ou 'custom'
     post_id: '',
+    title: '',
+    description: '',
+    image_url: '',
     cta_text: '',
     cta_url: '',
     display_order: 1,
@@ -56,7 +60,7 @@ const FeaturedPostManager: React.FC<FeaturedPostManagerProps> = () => {
   };
 
   const handleCreate = async () => {
-    if (!formData.post_id) {
+    if (formData.type === 'post' && !formData.post_id) {
       toast({
         message: 'Selecione um post para destacar',
         type: 'error'
@@ -64,22 +68,37 @@ const FeaturedPostManager: React.FC<FeaturedPostManagerProps> = () => {
       return;
     }
 
+    if (formData.type === 'custom' && (!formData.title || !formData.description)) {
+      toast({
+        message: 'Título e descrição são obrigatórios para conteúdo personalizado',
+        type: 'error'
+      });
+      return;
+    }
+
     setCreating(true);
     try {
-      await BlogService.createFeaturedPost({
+      const payload = {
         ...formData,
         start_date: formData.start_date || null,
-        end_date: formData.end_date || null
-      });
+        end_date: formData.end_date || null,
+        is_custom: formData.type === 'custom'
+      };
+
+      await BlogService.createFeaturedPost(payload);
       
       toast({
-        message: 'Post em destaque criado com sucesso!',
+        message: 'Conteúdo em destaque criado com sucesso!',
         type: 'success'
       });
       
       setShowCreateForm(false);
       setFormData({
+        type: 'post',
         post_id: '',
+        title: '',
+        description: '',
+        image_url: '',
         cta_text: '',
         cta_url: '',
         display_order: 1,
@@ -89,9 +108,9 @@ const FeaturedPostManager: React.FC<FeaturedPostManagerProps> = () => {
       
       await loadData();
     } catch (error) {
-      console.error('Error creating featured post:', error);
+      console.error('Error creating featured content:', error);
       toast({
-        message: 'Erro ao criar post em destaque',
+        message: 'Erro ao criar conteúdo em destaque',
         type: 'error'
       });
     } finally {
@@ -178,23 +197,75 @@ const FeaturedPostManager: React.FC<FeaturedPostManagerProps> = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Post</Label>
-                  <Select
-                    value={formData.post_id}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, post_id: value }))}
+                  <Label>Tipo de Conteúdo</Label>
+                  <Select 
+                    value={formData.type} 
+                    onValueChange={(value) => setFormData(prev => ({ 
+                      ...prev, 
+                      type: value as 'post' | 'custom',
+                      post_id: value === 'custom' ? '' : prev.post_id
+                    }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione um post" />
+                      <SelectValue placeholder="Escolha o tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {posts.map((post) => (
-                        <SelectItem key={post.id} value={post.id}>
-                          {post.title}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="post">Post do Blog</SelectItem>
+                      <SelectItem value="custom">Conteúdo Personalizado</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+
+                {formData.type === 'post' ? (
+                  <div>
+                    <Label>Selecionar Post</Label>
+                    <Select
+                      value={formData.post_id}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, post_id: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um post" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {posts.map((post) => (
+                          <SelectItem key={post.id} value={post.id}>
+                            {post.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Título</Label>
+                      <Input
+                        value={formData.title}
+                        onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                        placeholder="Ex: Promoção Especial de Natal"
+                        required={formData.type === 'custom'}
+                      />
+                    </div>
+                    <div>
+                      <Label>Descrição</Label>
+                      <Textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Descrição do conteúdo em destaque"
+                        required={formData.type === 'custom'}
+                        rows={3}
+                      />
+                    </div>
+                    <div>
+                      <Label>URL da Imagem (opcional)</Label>
+                      <Input
+                        value={formData.image_url}
+                        onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                        placeholder="https://exemplo.com/imagem.jpg"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -272,8 +343,8 @@ const FeaturedPostManager: React.FC<FeaturedPostManagerProps> = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold">
-                            {featured.blog_posts?.title || 'Post não encontrado'}
+							<h4 className="font-semibold">
+                            {featured.is_custom ? featured.title : (featured.blog_posts?.title || 'Post não encontrado')}
                           </h4>
                           <Badge variant={featured.is_active ? "default" : "secondary"}>
                             {featured.is_active ? 'Ativo' : 'Inativo'}

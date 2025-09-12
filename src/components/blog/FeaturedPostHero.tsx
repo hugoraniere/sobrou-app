@@ -8,15 +8,19 @@ import { ptBR } from 'date-fns/locale';
 
 interface FeaturedPost {
   id: string;
-  post_id: string;
+  post_id?: string;
+  title?: string;
+  description?: string;
+  image_url?: string;
   cta_text?: string;
   cta_url?: string;
-  post_title: string;
+  is_custom: boolean;
+  post_title?: string;
   post_subtitle?: string;
-  post_content: string;
+  post_content?: string;
   post_cover_image_url?: string;
-  post_slug: string;
-  post_published_at: string;
+  post_slug?: string;
+  post_published_at?: string;
 }
 
 interface FeaturedPostHeroProps {
@@ -60,6 +64,11 @@ const FeaturedPostHero: React.FC<FeaturedPostHeroProps> = ({ featuredPost }) => 
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
+  const title = featuredPost.is_custom ? featuredPost.title : featuredPost.post_title;
+  const subtitle = featuredPost.is_custom ? featuredPost.description : featuredPost.post_subtitle;
+  const imageUrl = featuredPost.is_custom ? featuredPost.image_url : featuredPost.post_cover_image_url;
+  const content = featuredPost.is_custom ? featuredPost.description : featuredPost.post_content;
+
   return (
     <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-border/50 mb-12">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -69,35 +78,55 @@ const FeaturedPostHero: React.FC<FeaturedPostHeroProps> = ({ featuredPost }) => 
             Em Destaque
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-            {featuredPost.post_title}
+            {title}
           </h2>
-          {featuredPost.post_subtitle && (
+          {subtitle && (
             <p className="text-lg text-muted-foreground mb-4">
-              {featuredPost.post_subtitle}
+              {subtitle}
             </p>
           )}
-          <p className="text-muted-foreground mb-6 leading-relaxed">
-            {getExcerpt(featuredPost.post_content)}
-          </p>
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>
-                {format(new Date(featuredPost.post_published_at), 'dd/MM/yyyy', { locale: ptBR })}
-              </span>
+          {!featuredPost.is_custom && featuredPost.post_content && (
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              {getExcerpt(featuredPost.post_content)}
+            </p>
+          )}
+          {!featuredPost.is_custom && featuredPost.post_published_at && (
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  {format(new Date(featuredPost.post_published_at), 'dd/MM/yyyy', { locale: ptBR })}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button asChild size="lg">
-              <Link 
-                to={`/blog/${featuredPost.post_slug}`}
-                className="inline-flex items-center gap-2"
-              >
-                Ler artigo
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            {featuredPost.cta_text && featuredPost.cta_url && (
+            {!featuredPost.is_custom && featuredPost.post_slug ? (
+              <Button asChild size="lg">
+                <Link 
+                  to={`/blog/${featuredPost.post_slug}`}
+                  className="inline-flex items-center gap-2"
+                >
+                  Ler artigo
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            ) : (
+              featuredPost.cta_text && featuredPost.cta_url && (
+                <Button asChild size="lg">
+                  <a 
+                    href={featuredPost.cta_url}
+                    target={featuredPost.cta_url.startsWith('http') ? '_blank' : '_self'}
+                    rel={featuredPost.cta_url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    className="inline-flex items-center gap-2"
+                  >
+                    {featuredPost.cta_text}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                </Button>
+              )
+            )}
+            {!featuredPost.is_custom && featuredPost.cta_text && featuredPost.cta_url && (
               <Button variant="outline" size="lg" asChild>
                 <a 
                   href={featuredPost.cta_url}
@@ -113,11 +142,11 @@ const FeaturedPostHero: React.FC<FeaturedPostHeroProps> = ({ featuredPost }) => 
 
         {/* Image */}
         <div className="lg:order-2 relative">
-          {featuredPost.post_cover_image_url ? (
+          {imageUrl ? (
             <div className="aspect-[4/3] lg:aspect-[3/4] overflow-hidden rounded-l-xl lg:rounded-l-none lg:rounded-r-xl">
               <img
-                src={featuredPost.post_cover_image_url}
-                alt={featuredPost.post_title}
+                src={imageUrl}
+                alt={title}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -128,7 +157,7 @@ const FeaturedPostHero: React.FC<FeaturedPostHeroProps> = ({ featuredPost }) => 
                   <ArrowRight className="h-8 w-8 text-primary" />
                 </div>
                 <p className="text-muted-foreground font-medium">
-                  {featuredPost.post_title}
+                  {title}
                 </p>
               </div>
             </div>

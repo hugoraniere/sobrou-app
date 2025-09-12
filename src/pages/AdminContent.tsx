@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostsList from '@/components/blog/PostsList';
 import PostForm from '@/components/blog/PostForm';
 import FeaturedPostManager from '@/components/blog/FeaturedPostManager';
+import TagManager from '@/components/admin/content/TagManager';
 
 const AdminContent = () => {
   return (
@@ -16,7 +17,7 @@ const AdminContent = () => {
         <Tabs defaultValue="posts" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="posts">Posts Existentes</TabsTrigger>
-            <TabsTrigger value="new-post">Criar Novo Post</TabsTrigger>
+            <TabsTrigger value="tags">Tags</TabsTrigger>
             <TabsTrigger value="featured">Posts em Destaque</TabsTrigger>
           </TabsList>
           
@@ -24,8 +25,8 @@ const AdminContent = () => {
             <PostsList />
           </TabsContent>
           
-          <TabsContent value="new-post">
-            <PostForm />
+          <TabsContent value="tags">
+            <TagManager />
           </TabsContent>
           
           <TabsContent value="featured">

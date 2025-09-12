@@ -23,7 +23,7 @@ const PostCardsView: React.FC<PostCardsViewProps> = ({ posts }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {posts.map((post) => (
         <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 border-border/40 bg-card/50 backdrop-blur-sm">
           <Link 
@@ -31,7 +31,7 @@ const PostCardsView: React.FC<PostCardsViewProps> = ({ posts }) => {
             className="block hover:scale-[1.02] transition-transform duration-200"
           >
             {post.cover_image_url && (
-              <div className="aspect-video overflow-hidden rounded-t-lg">
+              <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
                 <img
                   src={post.cover_image_url}
                   alt={post.title}
@@ -39,26 +39,26 @@ const PostCardsView: React.FC<PostCardsViewProps> = ({ posts }) => {
                 />
               </div>
             )}
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xl line-clamp-2 group-hover:text-primary transition-colors">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
                 {post.title}
               </CardTitle>
               {post.subtitle && (
-                <p className="text-muted-foreground text-sm line-clamp-2">
+                <p className="text-muted-foreground text-xs line-clamp-2">
                   {post.subtitle}
                 </p>
               )}
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm line-clamp-3 mb-4">
-                {getExcerpt(post.content)}
+            <CardContent className="pt-0">
+              <p className="text-muted-foreground text-xs line-clamp-2 mb-3">
+                {getExcerpt(post.content, 100)}
               </p>
               
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {post.tags.slice(0, 3).map((tag) => (
-                    <Badge key={tag.id} variant="secondary" className="text-xs">
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {post.tags.slice(0, 2).map((tag) => (
+                    <Badge key={tag.id} variant="secondary" className="text-xs px-2 py-0">
                       {tag.name}
                     </Badge>
                   ))}
@@ -67,10 +67,10 @@ const PostCardsView: React.FC<PostCardsViewProps> = ({ posts }) => {
               
               {/* Meta info */}
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    <span>{format(new Date(post.published_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
+                    <span>{format(new Date(post.published_at), 'dd/MM', { locale: ptBR })}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Heart className="h-3 w-3" />
