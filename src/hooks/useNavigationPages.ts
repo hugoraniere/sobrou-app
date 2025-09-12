@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { LayoutDashboard, FileText, Calendar, Target, TrendingUp, Calculator, CreditCard, BookOpen } from 'lucide-react';
+import { LayoutDashboard, FileText, Calendar, Target, TrendingUp, Calculator, CreditCard, BookOpen, HelpCircle } from 'lucide-react';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 export interface NavigationPage {
@@ -68,6 +68,13 @@ export const useNavigationPages = () => {
       title: 'Blog',
       url: '/blog',
       icon: BookOpen,
+      isOptional: false,
+      isVisible: true,
+    },
+    {
+      title: 'Suporte',
+      url: '/suporte',
+      icon: HelpCircle,
       isOptional: false,
       isVisible: true,
     },
