@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import SupportHeaderButtons from '@/components/ui/SupportHeaderButtons';
+import AppButton from '@/components/ui/AppButton';
+import BackButton from '@/components/ui/BackButton';
 
 interface SupportLayoutProps {
   children: React.ReactNode;
@@ -34,36 +37,30 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
                   </Button>
                 </Link>
               )}
-              <div className="flex items-center gap-2">
-                <HelpCircle className="h-6 w-6 text-primary" />
-                <span className="text-lg font-semibold text-text-primary">
-                  Central de Suporte
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {user ? (
-                <>
-                  <Link to="/suporte/meus-tickets">
-                    <Button variant="ghost" size="sm">
-                      Meus Tickets
-                    </Button>
-                  </Link>
-                  <Link to="/suporte/novo">
-                    <Button size="sm">
-                      Novo Ticket
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <Link to="/auth">
-                  <Button size="sm">
-                    Fazer Login
-                  </Button>
-                </Link>
+              
+              {!showBackButton && (
+                <div className="flex items-center gap-4">
+                  {user ? <AppButton /> : <BackButton />}
+                  <div className="flex items-center gap-2">
+                    <HelpCircle className="h-6 w-6 text-primary" />
+                    <span className="text-lg font-semibold text-text-primary">
+                      Central de Suporte
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {showBackButton && (
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="h-6 w-6 text-primary" />
+                  <span className="text-lg font-semibold text-text-primary">
+                    Central de Suporte
+                  </span>
+                </div>
               )}
             </div>
+            
+            <SupportHeaderButtons />
           </div>
         </div>
       </header>
