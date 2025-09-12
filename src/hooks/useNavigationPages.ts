@@ -16,6 +16,13 @@ export const useNavigationPages = () => {
 
   const allPages: NavigationPage[] = useMemo(() => [
     {
+      title: 'Página Inicial',
+      url: '/',
+      icon: HelpCircle,
+      isOptional: false,
+      isVisible: true,
+    },
+    {
       title: 'Dashboard',
       url: '/dashboard',
       icon: LayoutDashboard,
@@ -68,6 +75,13 @@ export const useNavigationPages = () => {
       title: 'Blog',
       url: '/blog',
       icon: BookOpen,
+      isOptional: false,
+      isVisible: true,
+    },
+    {
+      title: 'Suporte',
+      url: '/suporte',
+      icon: HelpCircle,
       isOptional: false,
       isVisible: true,
     },

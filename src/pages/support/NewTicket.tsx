@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SupportLayout from '@/components/support/SupportLayout';
+import SentimentSelector from '@/components/support/SentimentSelector';
+import FileUpload from '@/components/support/FileUpload';
 import { TicketService } from '@/services/ticketService';
 import { CreateTicketData } from '@/types/support';
 import { useToast } from '@/hooks/use-toast';
@@ -18,17 +20,34 @@ import { useToast } from '@/hooks/use-toast';
 const ticketSchema = z.object({
   type: z.enum(['bug', 'solicitacao', 'reclamacao', 'duvida'] as const),
   category: z.string().min(1, 'Categoria é obrigatória'),
-  subject: z.string().min(1, 'Assunto é obrigatório').max(200, 'Assunto muito longo'),
+  subject: z.string().min(1, 'Título é obrigatório').max(200, 'Título muito longo'),
   description: z.string().min(10, 'Descrição deve ter pelo menos 10 caracteres'),
   priority: z.enum(['baixa', 'media', 'alta'] as const),
 });
 
 type TicketFormData = z.infer<typeof ticketSchema>;
 
+interface UploadedFile extends File {
+  preview?: string;
+}
+
+const CATEGORIES = [
+  'Dashboard',
+  'Transações',
+  'Contas a Pagar',
+  'Metas de Economia',
+  'Relatórios',
+  'WhatsApp',
+  'Login/Cadastro',
+  'Problemas Técnicos',
+  'Outros'
+];
+
 const NewTicket = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [attachments, setAttachments] = useState<UploadedFile[]>([]);
 
   const {
     register,
@@ -51,7 +70,19 @@ const NewTicket = () => {
         priority: data.priority
       };
 
-      await TicketService.createTicket(ticketData);
+      const ticket = await TicketService.createTicket(ticketData);
+
+      // Upload attachments if any
+      if (attachments.length > 0) {
+        try {
+          await Promise.all(
+            attachments.map(file => TicketService.uploadAttachment(ticket.id, file))
+          );
+        } catch (uploadError) {
+          console.warn('Error uploading attachments:', uploadError);
+          // Continue anyway - ticket was created successfully
+        }
+      }
       
       toast({ 
         message: 'Ticket criado com sucesso! Nossa equipe entrará em contato em breve.',
@@ -83,57 +114,51 @@ const NewTicket = () => {
           
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="type">Tipo</Label>
-                  <Select onValueChange={(value) => setValue('type', value as any)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bug">Bug/Erro técnico</SelectItem>
-                      <SelectItem value="solicitacao">Solicitação</SelectItem>
-                      <SelectItem value="reclamacao">Reclamação</SelectItem>
-                      <SelectItem value="duvida">Dúvida</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.type && (
-                    <p className="text-sm text-destructive mt-1">{errors.type.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="priority">Prioridade</Label>
-                  <Select onValueChange={(value) => setValue('priority', value as any)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a prioridade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="baixa">Baixa</SelectItem>
-                      <SelectItem value="media">Média</SelectItem>
-                      <SelectItem value="alta">Alta</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.priority && (
-                    <p className="text-sm text-destructive mt-1">{errors.priority.message}</p>
-                  )}
-                </div>
+              <div>
+                <Label htmlFor="type">Tipo</Label>
+                <Select onValueChange={(value) => setValue('type', value as any)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bug">Bug/Erro técnico</SelectItem>
+                    <SelectItem value="solicitacao">Solicitação</SelectItem>
+                    <SelectItem value="reclamacao">Reclamação</SelectItem>
+                    <SelectItem value="duvida">Dúvida</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.type && (
+                  <p className="text-sm text-destructive mt-1">{errors.type.message}</p>
+                )}
               </div>
+
+              <SentimentSelector
+                value={watch('priority')}
+                onChange={(value) => setValue('priority', value as any)}
+                error={errors.priority?.message}
+              />
 
               <div>
                 <Label htmlFor="category">Categoria</Label>
-                <Input 
-                  {...register('category')}
-                  placeholder="Ex: Dashboard, Transações, Login"
-                  className="mt-1"
-                />
+                <Select onValueChange={(value) => setValue('category', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.category && (
                   <p className="text-sm text-destructive mt-1">{errors.category.message}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="subject">Assunto</Label>
+                <Label htmlFor="subject">Título</Label>
                 <Input 
                   {...register('subject')}
                   placeholder="Descreva brevemente o problema"
@@ -155,6 +180,12 @@ const NewTicket = () => {
                   <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
                 )}
               </div>
+
+              <FileUpload
+                files={attachments}
+                onFilesChange={setAttachments}
+                maxFiles={3}
+              />
 
               <Button size="lg" className="w-full" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (

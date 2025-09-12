@@ -7,6 +7,7 @@ import BackButton from '@/components/ui/BackButton';
 import AppButton from '@/components/ui/AppButton';
 import LogoWithSupportBadge from '@/components/brand/LogoWithSupportBadge';
 import SupportBreadcrumb from './SupportBreadcrumb';
+import SupportNavigation from './SupportNavigation';
 
 interface SupportLayoutProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
             {showBackButton ? (
               <BackButton />
             ) : (
-              <Link to="/suporte">
+              <Link to="/">
                 <LogoWithSupportBadge size="sm" />
               </Link>
             )}
@@ -61,6 +62,7 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
         
         <div className="container mx-auto px-4 py-6">
           <SupportBreadcrumb currentPage={currentPage} articleTitle={articleTitle} />
+          <SupportNavigation />
         </div>
         
         <div className="container mx-auto px-4 pb-12">
@@ -73,15 +75,14 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
               Ainda precisa de ajuda?{' '}
-              {user ? (
-                <Link to="/suporte/novo" className="text-primary hover:underline">
-                  Abra um ticket
-                </Link>
-              ) : (
-                <Link to="/auth" className="text-primary hover:underline">
-                  Faça login para abrir um ticket
-                </Link>
-              )}
+              <a 
+                href="https://wa.me/5583993211642" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                Fale conosco
+              </a>
             </p>
           </div>
         </div>
