@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string | null
+          event_name: string
+          event_params: Json | null
+          id: string
+          page: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_name: string
+          event_params?: Json | null
+          id?: string
+          page?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_name?: string
+          event_params?: Json | null
+          id?: string
+          page?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_events: {
         Row: {
           created_at: string
@@ -1184,6 +1214,10 @@ export type Database = {
           views_count: number
         }[]
       }
+      get_content_metrics: {
+        Args: { date_from: string; date_to: string }
+        Returns: Json
+      }
       get_detailed_user_stats: {
         Args: { target_user_id: string }
         Returns: {
@@ -1196,6 +1230,10 @@ export type Database = {
           total_post_comments: number
           total_post_views: number
         }[]
+      }
+      get_product_usage_metrics: {
+        Args: { date_from: string; date_to: string }
+        Returns: Json
       }
       get_public_blog_comments: {
         Args: { target_post_id?: string }
@@ -1261,6 +1299,14 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
+      }
+      get_signup_metrics: {
+        Args: { date_from: string; date_to: string }
+        Returns: Json
+      }
+      get_support_metrics: {
+        Args: { date_from: string; date_to: string }
+        Returns: Json
       }
       get_user_blog_stats: {
         Args: { target_user_id: string }
