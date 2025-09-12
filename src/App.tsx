@@ -39,6 +39,7 @@ import Error from "./pages/Error";
 import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
 import NewTicket from "./pages/support/NewTicket";
+import MyTickets from "./pages/support/MyTickets";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
