@@ -35,7 +35,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 pr-10 h-12 text-base"
+          className="pl-10 pr-10 h-12 text-base bg-white border-border"
         />
         {query && (
           <Button

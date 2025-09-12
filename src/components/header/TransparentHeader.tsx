@@ -37,6 +37,9 @@ const TransparentHeader = () => {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8 font-outfit text-sm">
+            <Link to="/" className="text-gray-700 hover:text-primary transition-colors">
+              Início
+            </Link>
             <Link to="/blog" className="text-gray-700 hover:text-primary transition-colors">
               Blog
             </Link>

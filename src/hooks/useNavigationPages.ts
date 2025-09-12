@@ -16,13 +16,6 @@ export const useNavigationPages = () => {
 
   const allPages: NavigationPage[] = useMemo(() => [
     {
-      title: 'Página Inicial',
-      url: '/',
-      icon: HelpCircle,
-      isOptional: false,
-      isVisible: true,
-    },
-    {
       title: 'Dashboard',
       url: '/dashboard',
       icon: LayoutDashboard,

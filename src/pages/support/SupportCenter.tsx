@@ -96,7 +96,7 @@ const SupportCenter: React.FC = () => {
       <section className="mb-12">
         <SearchInput 
           onSearch={handleSearch}
-          className="max-w-2xl mx-auto"
+          className="max-w-2xl"
         />
       </section>
 
