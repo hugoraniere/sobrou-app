@@ -38,6 +38,41 @@ export type Database = {
         }
         Relationships: []
       }
+      article_votes: {
+        Row: {
+          article_id: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          is_helpful: boolean
+          user_id: string | null
+        }
+        Insert: {
+          article_id: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_helpful: boolean
+          user_id?: string | null
+        }
+        Update: {
+          article_id?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_helpful?: boolean
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_votes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "support_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bill_transactions: {
         Row: {
           amount: number
@@ -453,6 +488,39 @@ export type Database = {
         }
         Relationships: []
       }
+      faq_entries: {
+        Row: {
+          answer_md: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          question: string
+          sort_order: number | null
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          answer_md: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question: string
+          sort_order?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          answer_md?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question?: string
+          sort_order?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ingredients: {
         Row: {
           created_at: string | null
@@ -711,6 +779,244 @@ export type Database = {
           plan?: string
           status?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_articles: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          excerpt: string | null
+          helpful_votes: number | null
+          id: string
+          is_featured: boolean | null
+          not_helpful_votes: number | null
+          reading_time_minutes: number | null
+          slug: string
+          status: string | null
+          tags: string[] | null
+          title: string
+          topic_id: string | null
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          excerpt?: string | null
+          helpful_votes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          not_helpful_votes?: number | null
+          reading_time_minutes?: number | null
+          slug: string
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          topic_id?: string | null
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          excerpt?: string | null
+          helpful_votes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          not_helpful_votes?: number | null
+          reading_time_minutes?: number | null
+          slug?: string
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          topic_id?: string | null
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_articles_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "support_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_topics: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ticket_attachments: {
+        Row: {
+          created_at: string | null
+          file_path: string
+          file_size: number | null
+          filename: string
+          id: string
+          message_id: string | null
+          mime_type: string | null
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          file_path: string
+          file_size?: number | null
+          filename: string
+          id?: string
+          message_id?: string | null
+          mime_type?: string | null
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string | null
+          file_path?: string
+          file_size?: number | null
+          filename?: string
+          id?: string
+          message_id?: string | null
+          mime_type?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_attachments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_internal: boolean | null
+          message: string
+          ticket_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          message: string
+          ticket_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          message?: string
+          ticket_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          assignee_id: string | null
+          category: string
+          created_at: string | null
+          description: string
+          id: string
+          priority: string | null
+          resolved_at: string | null
+          sla_due_at: string | null
+          status: string | null
+          subcategory: string | null
+          subject: string
+          ticket_number: string
+          type: string
+          updated_at: string | null
+          url_context: string | null
+          user_id: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          category: string
+          created_at?: string | null
+          description: string
+          id?: string
+          priority?: string | null
+          resolved_at?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          subcategory?: string | null
+          subject: string
+          ticket_number: string
+          type: string
+          updated_at?: string | null
+          url_context?: string | null
+          user_id: string
+        }
+        Update: {
+          assignee_id?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          priority?: string | null
+          resolved_at?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          subcategory?: string | null
+          subject?: string
+          ticket_number?: string
+          type?: string
+          updated_at?: string | null
+          url_context?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1019,6 +1325,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_support_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_support_agent: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       manage_user_role: {
         Args: {
           action: string
@@ -1066,7 +1380,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "editor"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "editor"
+        | "support_agent"
+        | "support_admin"
+      support_role: "support_agent" | "support_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1194,7 +1515,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "editor"],
+      app_role: [
+        "admin",
+        "moderator",
+        "user",
+        "editor",
+        "support_agent",
+        "support_admin",
+      ],
+      support_role: ["support_agent", "support_admin"],
     },
   },
 } as const
