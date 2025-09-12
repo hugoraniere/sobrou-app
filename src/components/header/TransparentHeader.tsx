@@ -1,14 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import LogoWithAlphaBadge from '../brand/LogoWithAlphaBadge';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const TransparentHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, logout } = useAuth();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,7 +43,6 @@ const TransparentHeader = () => {
             </Link>
           </nav>
 
-          <div className="flex items-center space-x-4">
             {user ? (
               <>
                 <Link to="/dashboard">
@@ -60,19 +60,28 @@ const TransparentHeader = () => {
               </>
             ) : (
               <>
-                <Link to="/auth">
-                  <Button variant="ghost" className="font-outfit text-sm text-gray-700 hover:text-primary">
-                    Entrar
-                  </Button>
-                </Link>
-                <Link to="/auth?tab=signup">
-                  <Button className="bg-primary hover:bg-primary-hover text-white font-outfit text-sm">
-                    Criar conta grátis
-                  </Button>
-                </Link>
+                {isMobile ? (
+                  <Link to="/auth?tab=signup">
+                    <Button className="bg-primary hover:bg-primary-hover text-white font-outfit text-sm">
+                      Entrar/Cadastrar
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/auth">
+                      <Button variant="ghost" className="font-outfit text-sm text-gray-700 hover:text-primary">
+                        Entrar
+                      </Button>
+                    </Link>
+                    <Link to="/auth?tab=signup">
+                      <Button className="bg-primary hover:bg-primary-hover text-white font-outfit text-sm">
+                        Criar conta grátis
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </>
             )}
-          </div>
         </div>
       </div>
     </header>

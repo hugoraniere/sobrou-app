@@ -128,8 +128,8 @@ const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ isPublic = false, onN
             </>
           ) : (
             <>
-              <Link to="/auth" className="flex items-center p-2 hover:bg-background-surface rounded" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('auth.login', 'Entrar')}
+              <Link to="/auth?tab=signup" className="flex items-center p-2 hover:bg-background-surface rounded" onClick={() => setIsMobileMenuOpen(false)}>
+                Criar Conta
               </Link>
             </>
           )}
