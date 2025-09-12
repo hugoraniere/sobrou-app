@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SupportLayout from '@/components/support/SupportLayout';
-import SearchInput from '@/components/support/SearchInput';
+import SupportSearchAndActions from '@/components/support/SupportSearchAndActions';
 import CategoryGrid from '@/components/support/CategoryGrid';
 import ArticleList from '@/components/support/ArticleList';
 import FAQAccordion from '@/components/support/FAQAccordion';
@@ -91,14 +91,14 @@ const SupportCenter: React.FC = () => {
   }
 
   return (
-    <SupportLayout>
-      {/* Search */}
-      <section className="mb-12">
-        <SearchInput 
-          onSearch={handleSearch}
-          className="max-w-2xl"
-        />
-      </section>
+    <SupportLayout showSearchAndActions>
+      {/* Search and Actions */}
+      <SupportSearchAndActions 
+        onSearch={handleSearch}
+        className="mb-12"
+      />
+
+      <div className="container mx-auto px-4 pb-12">
 
       {/* Search Results */}
       {searchResults && (
@@ -195,6 +195,7 @@ const SupportCenter: React.FC = () => {
           <FAQAccordion faqs={faqs} />
         </section>
       )}
+      </div>
     </SupportLayout>
   );
 };

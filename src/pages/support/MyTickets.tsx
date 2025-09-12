@@ -66,7 +66,7 @@ const MyTickets = () => {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Meus Tickets</h1>
           <Link to="/suporte/novo">
-            <Button>
+            <Button variant="default" size="default">
               <Plus className="h-4 w-4 mr-2" />
               Novo Ticket
             </Button>
@@ -117,7 +117,7 @@ const MyTickets = () => {
                 Você ainda não criou nenhum ticket de suporte.
               </p>
               <Link to="/suporte/novo">
-                <Button>
+                <Button variant="default" size="default">
                   <Plus className="h-4 w-4 mr-2" />
                   Criar Primeiro Ticket
                 </Button>

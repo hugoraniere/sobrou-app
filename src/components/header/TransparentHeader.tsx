@@ -1,14 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LogoWithAlphaBadge from '@/components/brand/LogoWithAlphaBadge';
+import LogoWithSupportBadge from '@/components/brand/LogoWithSupportBadge';
 import HeaderAuthButtons from '@/components/ui/HeaderAuthButtons';
 
 
 const TransparentHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation();
+  
+  const isSupportPage = location.pathname.startsWith('/suporte');
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
@@ -33,7 +37,11 @@ const TransparentHeader = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 md:h-16">
           <Link to="/" className="flex items-center">
-            <LogoWithAlphaBadge size="sm" className="h-8" />
+            {isSupportPage ? (
+              <LogoWithSupportBadge size="sm" className="h-8" />
+            ) : (
+              <LogoWithAlphaBadge size="sm" className="h-8" />
+            )}
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8 font-outfit text-sm">

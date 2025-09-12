@@ -2,12 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import SupportHeaderButtons from '@/components/ui/SupportHeaderButtons';
+import TransparentHeader from '@/components/header/TransparentHeader';
 import BackButton from '@/components/ui/BackButton';
-import AppButton from '@/components/ui/AppButton';
 import LogoWithSupportBadge from '@/components/brand/LogoWithSupportBadge';
 import SupportBreadcrumb from './SupportBreadcrumb';
-import SupportNavigation from './SupportNavigation';
 
 interface SupportLayoutProps {
   children: React.ReactNode;
@@ -16,6 +14,7 @@ interface SupportLayoutProps {
   subtitle?: string;
   currentPage?: string;
   articleTitle?: string;
+  showSearchAndActions?: boolean;
 }
 
 const SupportLayout: React.FC<SupportLayoutProps> = ({
@@ -24,27 +23,35 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
   title = "Central de Ajuda",
   subtitle = "Encontre respostas para suas dúvidas ou entre em contato conosco",
   currentPage,
-  articleTitle
+  articleTitle,
+  showSearchAndActions = false
 }) => {
   const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            {showBackButton ? (
+      {showBackButton ? (
+        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-16">
               <BackButton />
-            ) : (
-              <Link to="/">
-                <LogoWithSupportBadge size="sm" />
-              </Link>
-            )}
-            
-            <SupportHeaderButtons />
+              <div className="hidden md:flex items-center space-x-8 font-outfit text-sm">
+                <Link to="/" className="text-gray-700 hover:text-primary transition-colors">
+                  Início
+                </Link>
+                <Link to="/blog" className="text-gray-700 hover:text-primary transition-colors">
+                  Blog
+                </Link>
+                <Link to="/suporte" className="text-gray-700 hover:text-primary transition-colors">
+                  Suporte
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      ) : (
+        <TransparentHeader />
+      )}
 
       <main className="flex-1">
         {!showBackButton && (
@@ -60,14 +67,22 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
           </section>
         )}
         
-        <div className="container mx-auto px-4 py-6">
-          <SupportBreadcrumb currentPage={currentPage} articleTitle={articleTitle} />
-          <SupportNavigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <SupportBreadcrumb currentPage={currentPage} articleTitle={articleTitle} />
+          </div>
+          {showSearchAndActions && (
+            <div className="mb-8">
+              {children}
+            </div>
+          )}
         </div>
         
-        <div className="container mx-auto px-4 pb-12">
-          {children}
-        </div>
+        {!showSearchAndActions && (
+          <div className="container mx-auto px-4 pb-12">
+            {children}
+          </div>
+        )}
       </main>
 
       <footer className="border-t bg-background mt-16">
