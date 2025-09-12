@@ -25,6 +25,7 @@ import AppLayout from "./components/layout/AppLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminContent from "./pages/AdminContent";
+import AdminSupport from "./pages/AdminSupport";
 import AdminUsers from "./pages/AdminUsers";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
@@ -96,16 +97,26 @@ const App = () => {
                               </ProtectedRoute>
                             } 
                           />
-                          <Route 
-                            path="/admin/users" 
-                            element={
-                              <ProtectedRoute>
-                                <AdminLayout>
-                                  <AdminUsers />
-                                </AdminLayout>
-                              </ProtectedRoute>
-                            } 
-                          />
+                           <Route 
+                             path="/admin/support" 
+                             element={
+                               <ProtectedRoute>
+                                 <AdminLayout>
+                                   <AdminSupport />
+                                 </AdminLayout>
+                               </ProtectedRoute>
+                             } 
+                           />
+                           <Route 
+                             path="/admin/users" 
+                             element={
+                               <ProtectedRoute>
+                                 <AdminLayout>
+                                   <AdminUsers />
+                                 </AdminLayout>
+                               </ProtectedRoute>
+                             } 
+                           />
                           
                           {/* Protected routes */}
                           <Route

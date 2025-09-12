@@ -14,9 +14,9 @@ const SupportSearchAndActions: React.FC<SupportSearchAndActionsProps> = ({
   className = ""
 }) => {
   return (
-    <div className={`flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 ${className}`}>
+    <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 ${className}`}>
       {/* Search Input - Left Side */}
-      <div className="flex-1 lg:max-w-2xl">
+      <div className="flex-1 lg:max-w-xl">
         <SearchInput 
           onSearch={onSearch}
           className="w-full"
@@ -24,7 +24,7 @@ const SupportSearchAndActions: React.FC<SupportSearchAndActionsProps> = ({
       </div>
       
       {/* Action Buttons - Right Side */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-shrink-0">
         <Link to="/suporte/novo">
           <Button variant="default" size="default" className="shadow-sm">
             <Plus className="h-4 w-4 mr-2" />

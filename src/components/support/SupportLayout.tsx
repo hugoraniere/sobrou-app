@@ -6,6 +6,8 @@ import TransparentHeader from '@/components/header/TransparentHeader';
 import BackButton from '@/components/ui/BackButton';
 import LogoWithSupportBadge from '@/components/brand/LogoWithSupportBadge';
 import SupportBreadcrumb from './SupportBreadcrumb';
+import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
+import { getSectionContainer } from '@/constants/layoutTokens';
 
 interface SupportLayoutProps {
   children: React.ReactNode;
@@ -54,34 +56,36 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
       )}
 
       <main className="flex-1">
-        {!showBackButton && (
+        {!showBackButton && !showSearchAndActions && (
           <section className="bg-primary py-12 md:py-16">
-            <div className="container mx-auto px-4 text-center">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-                {title}
-              </h1>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto">
-                {subtitle}
-              </p>
+            <div className={getSectionContainer()}>
+              <div className="text-center">
+                <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+                  {title}
+                </h1>
+                <p className="text-lg text-white/90 max-w-2xl mx-auto">
+                  {subtitle}
+                </p>
+              </div>
             </div>
           </section>
         )}
         
-        <div className="container mx-auto px-4 py-8">
+        <ResponsivePageContainer className="py-8">
           <div className="mb-8">
             <SupportBreadcrumb currentPage={currentPage} articleTitle={articleTitle} />
           </div>
           {showSearchAndActions && (
-            <div className="mb-8">
+            <div className="mb-12">
               {children}
             </div>
           )}
-        </div>
+        </ResponsivePageContainer>
         
         {!showSearchAndActions && (
-          <div className="container mx-auto px-4 pb-12">
+          <ResponsivePageContainer className="pb-12">
             {children}
-          </div>
+          </ResponsivePageContainer>
         )}
       </main>
 
