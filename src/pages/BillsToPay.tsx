@@ -140,9 +140,7 @@ const BillsToPay = () => {
           </Button>}
       </ResponsivePageHeader>
 
-      <div className="space-y-4">
-        
-        
+      <div className="space-y-6">
         <BillsFilterBar searchTerm={searchTerm} onSearchChange={setSearchTerm} periodFilter={periodFilter} onPeriodFilterChange={setPeriodFilter} customMonth={customMonth} onCustomMonthChange={setCustomMonth} hidePaid={hidePaid} onHidePaidChange={setHidePaid} paidCount={paidBillsCount} />
 
         <BillBalanceCard unpaidBillsCount={billMetrics.unpaidBillsCount} paidBillsCount={billMetrics.paidBillsCount} totalAmountToPay={billMetrics.totalAmountToPay} totalAmountPaid={billMetrics.totalAmountPaid} />

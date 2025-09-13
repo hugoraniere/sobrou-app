@@ -32,7 +32,7 @@ export const BillTransactionBalance: React.FC<BillTransactionBalanceProps> = ({
   return (
     <div className={cn(
       "grid gap-3",
-      isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-3"
+      isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-3"
     )}>
       <BigNumberCard
         title="Valor Original"
