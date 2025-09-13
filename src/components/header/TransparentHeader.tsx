@@ -13,6 +13,13 @@ const TransparentHeader = () => {
   const location = useLocation();
   
   const isSupportPage = location.pathname.startsWith('/suporte');
+  
+  const isActivePage = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
@@ -45,13 +52,34 @@ const TransparentHeader = () => {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8 font-outfit text-sm">
-            <Link to="/" className="text-gray-700 hover:text-primary transition-colors">
+            <Link 
+              to="/" 
+              className={`transition-colors ${
+                isActivePage('/') 
+                  ? 'text-primary font-semibold' 
+                  : 'text-gray-700 hover:text-primary'
+              }`}
+            >
               Início
             </Link>
-            <Link to="/blog" className="text-gray-700 hover:text-primary transition-colors">
+            <Link 
+              to="/blog" 
+              className={`transition-colors ${
+                isActivePage('/blog') 
+                  ? 'text-primary font-semibold' 
+                  : 'text-gray-700 hover:text-primary'
+              }`}
+            >
               Blog
             </Link>
-            <Link to="/suporte" className="text-gray-700 hover:text-primary transition-colors">
+            <Link 
+              to="/suporte" 
+              className={`transition-colors ${
+                isActivePage('/suporte') 
+                  ? 'text-primary font-semibold' 
+                  : 'text-gray-700 hover:text-primary'
+              }`}
+            >
               Suporte
             </Link>
           </nav>
