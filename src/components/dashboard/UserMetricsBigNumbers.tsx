@@ -36,36 +36,19 @@ const UserMetricsBigNumbers = () => {
       let data: UserMetrics;
       if (customDate) {
         // Custom month mode
+        console.log('Fetching user metrics for month:', customDate);
         data = await AdminAnalyticsService.getUserMetricsByMonth(customDate);
       } else {
-        // Regular period mode - simulate dynamic data based on period
-        const period = periodDays || 30;
-        const simulatedData: UserMetrics = {
-          total_users: Math.floor(Math.random() * 500) + period * 8,
-          active_users: Math.floor(Math.random() * 300) + period * 4,
-          subscribers: Math.floor(Math.random() * 100) + period * 2,
-          prev_total_users: Math.floor(Math.random() * 400) + (period - 5) * 8,
-          prev_active_users: Math.floor(Math.random() * 250) + (period - 5) * 4,
-          prev_subscribers: Math.floor(Math.random() * 80) + (period - 5) * 2,
-        };
-        data = simulatedData;
+        // Regular period mode - fetch real data
+        console.log('Fetching user metrics for period:', periodDays || 30, 'days');
+        data = await AdminAnalyticsService.getUserMetrics(periodDays || 30);
       }
+      console.log('Real user metrics loaded:', data);
       setMetrics(data);
     } catch (error) {
       console.error('Error fetching user metrics:', error);
-      // Fallback to simulated data
-      const period = periodDays || 30;
-      const fallbackData: UserMetrics = {
-        total_users: Math.floor(Math.random() * 500) + period * 8,
-        active_users: Math.floor(Math.random() * 300) + period * 4,
-        subscribers: Math.floor(Math.random() * 100) + period * 2,
-        prev_total_users: Math.floor(Math.random() * 400) + (period - 5) * 8,
-        prev_active_users: Math.floor(Math.random() * 250) + (period - 5) * 4,
-        prev_subscribers: Math.floor(Math.random() * 80) + (period - 5) * 2,
-      };
-      setMetrics(fallbackData);
       toast({
-        message: 'Erro ao carregar métricas de usuários - usando dados simulados',
+        message: 'Erro ao carregar métricas de usuários',
         type: 'error'
       });
     } finally {

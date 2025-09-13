@@ -47,6 +47,22 @@ export interface UserMetrics {
   prev_subscribers: number;
 }
 
+export interface BlogPostStats {
+  id: string;
+  title: string;
+  author_id: string;
+  view_count: number;
+  comment_count: number;
+  published_at: string;
+  created_at: string;
+}
+
+export interface BlogOverallStats {
+  total_posts: number;
+  total_views: number;
+  total_comments: number;
+}
+
 export class AdminAnalyticsService {
   static async getActiveUsersStats(periodDays: number = 30): Promise<ActiveUsersData[]> {
     const { data, error } = await supabase.rpc('get_active_users_stats', {
@@ -205,5 +221,31 @@ export class AdminAnalyticsService {
     if (error) {
       console.error('Error tracking app event:', error);
     }
+  }
+
+  static async getBlogPostStats(): Promise<BlogPostStats[]> {
+    const { data, error } = await supabase.rpc('get_blog_post_stats');
+
+    if (error) {
+      console.error('Error fetching blog post stats:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+
+  static async getBlogOverallStats(): Promise<BlogOverallStats> {
+    const { data, error } = await supabase.rpc('get_blog_overall_stats');
+
+    if (error) {
+      console.error('Error fetching blog overall stats:', error);
+      throw error;
+    }
+
+    return data?.[0] || {
+      total_posts: 0,
+      total_views: 0,
+      total_comments: 0
+    };
   }
 }
