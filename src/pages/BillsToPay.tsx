@@ -128,8 +128,8 @@ const BillsToPay = () => {
       </ResponsivePageContainer>;
   }
 
-  // Contar contas pagas para o toggle
-  const paidBillsCount = bills?.filter(bill => bill.is_paid).length || 0;
+  // Usar contagem de contas pagas filtrada por período
+  const paidBillsCount = billMetrics.paidBillsCount;
   return <ResponsivePageContainer>
       <ResponsivePageHeader title={t('bills.title', 'Contas a Pagar')} description="Gerencie suas contas e acompanhe os pagamentos">
         {isMobile ? <Button onClick={() => setIsAddDialogOpen(true)} size="icon" className="rounded-full">

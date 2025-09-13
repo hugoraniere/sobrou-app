@@ -69,6 +69,9 @@ export const BillsFilterBar: React.FC<BillsFilterBarProps> = ({
     label: 'Dezembro'
   }];
   const periodOptions = [{
+    value: 'always',
+    label: 'Sempre'
+  }, {
     value: 'today',
     label: 'Hoje'
   }, {
@@ -80,9 +83,6 @@ export const BillsFilterBar: React.FC<BillsFilterBarProps> = ({
   }, {
     value: 'custom-month',
     label: 'Filtrar Mês'
-  }, {
-    value: 'always',
-    label: 'Sempre'
   }];
   return <div className="space-y-4">
       {/* Chips de período */}
