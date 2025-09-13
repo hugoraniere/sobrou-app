@@ -1,71 +1,87 @@
 
 import { useMemo } from 'react';
 import { Bill, BillPeriodFilter } from '@/types/bills';
+import { BillsPeriodFilter } from '@/components/bills/BillsFilterBar';
 import { 
   isToday, 
   isTomorrow, 
   isThisWeek, 
   isThisMonth, 
   isPast, 
-  parseISO 
+  parseISO,
+  startOfMonth,
+  endOfMonth,
+  isWithinInterval
 } from 'date-fns';
 
-export const useBillFilters = (bills: Bill[], filter: BillPeriodFilter) => {
+interface BillFilters {
+  searchTerm: string;
+  periodFilter: BillsPeriodFilter;
+  customMonth: string;
+  hidePaid: boolean;
+}
+
+export const useBillFilters = (bills: Bill[], filters: BillFilters) => {
   const filteredBills = useMemo(() => {
-    const unpaidBills = bills.filter(bill => !bill.is_paid);
-    
-    switch (filter) {
-      case 'overdue':
-        return unpaidBills.filter(bill => 
-          isPast(parseISO(bill.due_date)) && !isToday(parseISO(bill.due_date))
-        );
+    let filtered = bills;
+
+    // Filtro por termo de busca
+    if (filters.searchTerm.trim()) {
+      filtered = filtered.filter(bill => 
+        bill.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        (bill.description && bill.description.toLowerCase().includes(filters.searchTerm.toLowerCase()))
+      );
+    }
+
+    // Filtro para ocultar contas pagas
+    if (filters.hidePaid) {
+      filtered = filtered.filter(bill => !bill.is_paid);
+    }
+
+    // Filtro por período
+    switch (filters.periodFilter) {
       case 'today':
-        return unpaidBills.filter(bill => 
+        filtered = filtered.filter(bill => 
           isToday(parseISO(bill.due_date))
         );
-      case 'tomorrow':
-        return unpaidBills.filter(bill => 
-          isTomorrow(parseISO(bill.due_date))
-        );
+        break;
       case 'this-week':
-        return unpaidBills.filter(bill => 
+        filtered = filtered.filter(bill => 
           isThisWeek(parseISO(bill.due_date), { weekStartsOn: 0 })
         );
+        break;
       case 'this-month':
-        return unpaidBills.filter(bill => 
+        filtered = filtered.filter(bill => 
           isThisMonth(parseISO(bill.due_date))
         );
-      case 'all':
-      default:
-        return unpaidBills;
+        break;
+      case 'custom-month':
+        if (filters.customMonth) {
+          const monthStart = startOfMonth(parseISO(`${filters.customMonth}-01`));
+          const monthEnd = endOfMonth(parseISO(`${filters.customMonth}-01`));
+          filtered = filtered.filter(bill => 
+            isWithinInterval(parseISO(bill.due_date), { start: monthStart, end: monthEnd })
+          );
+        }
+        break;
     }
-  }, [bills, filter]);
 
-  const billCounts = useMemo(() => {
+    return filtered;
+  }, [bills, filters]);
+
+  const billMetrics = useMemo(() => {
     const unpaidBills = bills.filter(bill => !bill.is_paid);
+    const paidBills = bills.filter(bill => bill.is_paid);
     
     return {
-      overdue: unpaidBills.filter(bill => 
-        isPast(parseISO(bill.due_date)) && !isToday(parseISO(bill.due_date))
-      ).length,
-      today: unpaidBills.filter(bill => 
-        isToday(parseISO(bill.due_date))
-      ).length,
-      tomorrow: unpaidBills.filter(bill => 
-        isTomorrow(parseISO(bill.due_date))
-      ).length,
-      thisWeek: unpaidBills.filter(bill => 
-        isThisWeek(parseISO(bill.due_date), { weekStartsOn: 0 })
-      ).length,
-      thisMonth: unpaidBills.filter(bill => 
-        isThisMonth(parseISO(bill.due_date))
-      ).length,
-      all: unpaidBills.length,
+      unpaidBillsCount: unpaidBills.length,
+      paidBillsCount: paidBills.length,
+      totalAmountToPay: unpaidBills.reduce((sum, bill) => sum + bill.amount, 0),
     };
   }, [bills]);
 
   return {
     filteredBills,
-    billCounts,
+    billMetrics,
   };
 };

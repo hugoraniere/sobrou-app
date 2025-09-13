@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, History } from 'lucide-react';
 import { TransactionForm } from './TransactionForm';
 import { TransactionsList } from './TransactionsList';
-import { BillBalanceCard } from './BillBalanceCard';
+import { BillTransactionBalance } from './BillTransactionBalance';
 import { useBillTransactions, useBillBalance } from '@/hooks/useBillTransactions';
 import { Bill } from '@/types/bills';
 import { CreateBillTransactionData } from '@/types/billTransactions';
@@ -60,7 +60,7 @@ export const BillTransactionsDialog: React.FC<BillTransactionsDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <BillBalanceCard
+        <BillTransactionBalance
           originalAmount={bill.amount}
           currentBalance={balanceData?.current_balance || bill.amount}
           transactionsTotal={balanceData?.transactions_total || 0}

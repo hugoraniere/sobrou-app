@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { useResponsive } from '@/hooks/useResponsive';
 import { BillsList } from '@/components/bills/BillsList';
 import { BillBalanceCard } from '@/components/bills/BillBalanceCard';
+import { BillsFilterBar, BillsPeriodFilter } from '@/components/bills/BillsFilterBar';
 import { AddBillDialog } from '@/components/bills/AddBillDialog';
 import { useBillsData } from '@/hooks/useBillsData';
+import { useBillFilters } from '@/hooks/useBillFilters';
 import { Bill } from '@/types/bills';
 import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
@@ -22,6 +24,20 @@ const BillsToPay = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [notificationPreferences, setNotificationPreferences] = useState({ bill_due: true });
+  
+  // Estados para filtros
+  const [searchTerm, setSearchTerm] = useState('');
+  const [periodFilter, setPeriodFilter] = useState<BillsPeriodFilter>('this-month');
+  const [customMonth, setCustomMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [hidePaid, setHidePaid] = useState(false);
+
+  // Aplicar filtros
+  const { filteredBills, billMetrics } = useBillFilters(bills || [], {
+    searchTerm,
+    periodFilter,
+    customMonth,
+    hidePaid,
+  });
 
   // Create notifications for bills due today
   useEffect(() => {
@@ -110,10 +126,8 @@ const BillsToPay = () => {
     );
   }
 
-  // Calcular valores para o BillBalanceCard
-  const totalOriginalAmount = bills.reduce((sum, bill) => sum + bill.amount, 0);
-  const totalTransactions = 0; // Por enquanto 0, pois não temos transações implementadas
-  const currentBalance = totalOriginalAmount - totalTransactions;
+  // Contar contas pagas para o toggle
+  const paidBillsCount = bills?.filter(bill => bill.is_paid).length || 0;
 
   return (
     <ResponsivePageContainer>
@@ -139,17 +153,38 @@ const BillsToPay = () => {
 
       <div className="space-y-6">
         <BillBalanceCard 
-          originalAmount={totalOriginalAmount}
-          currentBalance={currentBalance}
-          transactionsTotal={totalTransactions}
-          hasTransactions={false}
+          unpaidBillsCount={billMetrics.unpaidBillsCount}
+          paidBillsCount={billMetrics.paidBillsCount}
+          totalAmountToPay={billMetrics.totalAmountToPay}
         />
-        <BillsList 
-          bills={bills} 
-          onEdit={handleEditBill}
-          onDelete={deleteBill}
-          onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
-        />
+
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold mb-1">Transações</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Adicione receitas ou despesas que irão alterar o valor original dessa conta
+            </p>
+          </div>
+          
+          <BillsFilterBar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            periodFilter={periodFilter}
+            onPeriodFilterChange={setPeriodFilter}
+            customMonth={customMonth}
+            onCustomMonthChange={setCustomMonth}
+            hidePaid={hidePaid}
+            onHidePaidChange={setHidePaid}
+            paidCount={paidBillsCount}
+          />
+
+          <BillsList 
+            bills={filteredBills} 
+            onEdit={handleEditBill}
+            onDelete={deleteBill}
+            onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
+          />
+        </div>
       </div>
 
       <AddBillDialog
