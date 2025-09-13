@@ -151,40 +151,39 @@ const BillsToPay = () => {
         )}
       </ResponsivePageHeader>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">Transações</h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            Adicione receitas ou despesas que irão alterar o valor original dessa conta
+          </p>
+        </div>
+        
+        <BillsFilterBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          periodFilter={periodFilter}
+          onPeriodFilterChange={setPeriodFilter}
+          customMonth={customMonth}
+          onCustomMonthChange={setCustomMonth}
+          hidePaid={hidePaid}
+          onHidePaidChange={setHidePaid}
+          paidCount={paidBillsCount}
+        />
+
         <BillBalanceCard 
           unpaidBillsCount={billMetrics.unpaidBillsCount}
           paidBillsCount={billMetrics.paidBillsCount}
           totalAmountToPay={billMetrics.totalAmountToPay}
+          totalAmountPaid={billMetrics.totalAmountPaid}
         />
 
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold mb-1">Transações</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Adicione receitas ou despesas que irão alterar o valor original dessa conta
-            </p>
-          </div>
-          
-          <BillsFilterBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            periodFilter={periodFilter}
-            onPeriodFilterChange={setPeriodFilter}
-            customMonth={customMonth}
-            onCustomMonthChange={setCustomMonth}
-            hidePaid={hidePaid}
-            onHidePaidChange={setHidePaid}
-            paidCount={paidBillsCount}
-          />
-
-          <BillsList 
-            bills={filteredBills} 
-            onEdit={handleEditBill}
-            onDelete={deleteBill}
-            onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
-          />
-        </div>
+        <BillsList 
+          bills={filteredBills} 
+          onEdit={handleEditBill}
+          onDelete={deleteBill}
+          onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)}
+        />
       </div>
 
       <AddBillDialog

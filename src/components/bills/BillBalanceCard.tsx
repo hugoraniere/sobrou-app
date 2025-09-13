@@ -9,19 +9,21 @@ interface BillBalanceCardProps {
   unpaidBillsCount: number;
   paidBillsCount: number; 
   totalAmountToPay: number;
+  totalAmountPaid: number;
 }
 
 export const BillBalanceCard: React.FC<BillBalanceCardProps> = ({
   unpaidBillsCount,
   paidBillsCount,
   totalAmountToPay,
+  totalAmountPaid,
 }) => {
   const { isMobile } = useResponsive();
 
   return (
     <div className={cn(
       "grid gap-3",
-      isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+      isMobile ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-4"
     )}>
       <BigNumberCard
         title="Contas a Pagar"
@@ -47,6 +49,16 @@ export const BillBalanceCard: React.FC<BillBalanceCardProps> = ({
         icon={DollarSign}
         color="#f59e0b"
         tooltip="Valor total das contas pendentes"
+        hideIconOnMobile={true}
+        isCurrency={true}
+      />
+
+      <BigNumberCard
+        title="Valor Pago"
+        value={totalAmountPaid}
+        icon={TrendingUp}
+        color="#10b981"
+        tooltip="Valor total das contas já pagas"
         hideIconOnMobile={true}
         isCurrency={true}
       />

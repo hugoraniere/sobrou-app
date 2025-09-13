@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Search, Calendar, Eye, EyeOff } from 'lucide-react';
+import { Search, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { 
   Select, 
   SelectContent, 
@@ -12,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-export type BillsPeriodFilter = 'today' | 'this-week' | 'this-month' | 'custom-month';
+export type BillsPeriodFilter = 'today' | 'this-week' | 'this-month' | 'custom-month' | 'always';
 
 interface BillsFilterBarProps {
   searchTerm: string;
@@ -58,44 +60,31 @@ export const BillsFilterBar: React.FC<BillsFilterBarProps> = ({
     { value: 'this-week', label: 'Esta Semana' },
     { value: 'this-month', label: 'Este Mês' },
     { value: 'custom-month', label: 'Filtrar Mês' },
+    { value: 'always', label: 'Sempre' },
   ];
 
   return (
     <div className="space-y-4">
-      {/* Campo de busca */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar conta por nome..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Filtros em linha */}
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Chips de período */}
-        <div className="flex flex-wrap gap-2">
-          {periodOptions.map((option) => (
-            <Button
-              key={option.value}
-              variant="outline"
-              size="sm"
-              onClick={() => onPeriodFilterChange(option.value as BillsPeriodFilter)}
-              className={cn(
-                "h-8 px-3 text-xs",
-                periodFilter === option.value
-                  ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                  : "bg-background hover:bg-muted"
-              )}
-            >
-              <Calendar className="h-3 w-3 mr-1.5" />
-              {option.label}
-            </Button>
-          ))}
-        </div>
-
+      {/* Chips de período */}
+      <div className="flex flex-wrap gap-2">
+        {periodOptions.map((option) => (
+          <Button
+            key={option.value}
+            variant="outline"
+            size="sm"
+            onClick={() => onPeriodFilterChange(option.value as BillsPeriodFilter)}
+            className={cn(
+              "h-8 px-3 text-xs",
+              periodFilter === option.value
+                ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+                : "bg-background hover:bg-muted"
+            )}
+          >
+            <Calendar className="h-3 w-3 mr-1.5" />
+            {option.label}
+          </Button>
+        ))}
+        
         {/* Dropdown de mês customizado */}
         {periodFilter === 'custom-month' && (
           <Select value={customMonth} onValueChange={onCustomMonthChange}>
@@ -111,36 +100,32 @@ export const BillsFilterBar: React.FC<BillsFilterBarProps> = ({
             </SelectContent>
           </Select>
         )}
+      </div>
+
+      {/* Campo de busca e toggle */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        {/* Campo de busca */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar conta por nome..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10"
+          />
+        </div>
 
         {/* Toggle de contas pagas */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onHidePaidChange(!hidePaid)}
-          className={cn(
-            "h-8 px-3 text-xs flex items-center gap-2",
-            hidePaid 
-              ? "bg-muted text-muted-foreground" 
-              : "bg-background hover:bg-muted"
-          )}
-        >
-          {hidePaid ? (
-            <>
-              <EyeOff className="h-3 w-3" />
-              Mostrar Pagas
-            </>
-          ) : (
-            <>
-              <Eye className="h-3 w-3" />
-              Ocultar Pagas
-            </>
-          )}
-          {paidCount > 0 && (
-            <Badge variant="secondary" className="ml-1 h-4 px-1.5 text-xs">
-              {paidCount}
-            </Badge>
-          )}
-        </Button>
+        <div className="flex items-center space-x-2 whitespace-nowrap">
+          <Switch 
+            id="hide-paid" 
+            checked={!hidePaid}
+            onCheckedChange={(checked) => onHidePaidChange(!checked)}
+          />
+          <Label htmlFor="hide-paid" className="text-sm">
+            Mostrar pagas ({paidCount})
+          </Label>
+        </div>
       </div>
     </div>
   );
