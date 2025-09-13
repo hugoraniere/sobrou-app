@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { useResponsive } from '@/hooks/useResponsive';
 import { BillsList } from '@/components/bills/BillsList';
 import { BillBalanceCard } from '@/components/bills/BillBalanceCard';
-import { BillsFilterBar, BillsPeriodFilter } from '@/components/bills/BillsFilterBar';
+import { BillsPeriodFilters, BillsPeriodFilter } from '@/components/bills/BillsPeriodFilters';
+import { BillsSearchAndToggle } from '@/components/bills/BillsSearchAndToggle';
 import { AddBillDialog } from '@/components/bills/AddBillDialog';
 import { useBillsData } from '@/hooks/useBillsData';
 import { useBillFilters } from '@/hooks/useBillFilters';
@@ -140,12 +141,41 @@ const BillsToPay = () => {
           </Button>}
       </ResponsivePageHeader>
 
-      <div className="space-y-6">
-        <BillsFilterBar searchTerm={searchTerm} onSearchChange={setSearchTerm} periodFilter={periodFilter} onPeriodFilterChange={setPeriodFilter} customMonth={customMonth} onCustomMonthChange={setCustomMonth} hidePaid={hidePaid} onHidePaidChange={setHidePaid} paidCount={paidBillsCount} />
+      <div className="space-y-4">
+        {/* 1. Filtros de período */}
+        <BillsPeriodFilters 
+          periodFilter={periodFilter} 
+          onPeriodFilterChange={setPeriodFilter} 
+          customMonth={customMonth} 
+          onCustomMonthChange={setCustomMonth} 
+        />
 
-        <BillBalanceCard unpaidBillsCount={billMetrics.unpaidBillsCount} paidBillsCount={billMetrics.paidBillsCount} totalAmountToPay={billMetrics.totalAmountToPay} totalAmountPaid={billMetrics.totalAmountPaid} />
+        {/* 2. Big numbers */}
+        <BillBalanceCard 
+          unpaidBillsCount={billMetrics.unpaidBillsCount} 
+          paidBillsCount={billMetrics.paidBillsCount} 
+          totalAmountToPay={billMetrics.totalAmountToPay} 
+          totalAmountPaid={billMetrics.totalAmountPaid} 
+        />
 
-        <BillsList bills={filteredBills} onEdit={handleEditBill} onDelete={deleteBill} onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)} />
+        {/* 3. Busca + toggle (com espaçamento maior) */}
+        <div className="pt-2">
+          <BillsSearchAndToggle 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+            hidePaid={hidePaid} 
+            onHidePaidChange={setHidePaid} 
+            paidCount={paidBillsCount} 
+          />
+        </div>
+
+        {/* 4. Lista de contas */}
+        <BillsList 
+          bills={filteredBills} 
+          onEdit={handleEditBill} 
+          onDelete={deleteBill} 
+          onTogglePaid={(id, isPaid) => isPaid ? markAsPaid(id) : markAsUnpaid(id)} 
+        />
       </div>
 
       <AddBillDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onSubmit={handleCreateBill} editingBill={editingBill} isSubmitting={isCreating || isUpdating} />
