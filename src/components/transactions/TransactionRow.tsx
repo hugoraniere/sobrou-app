@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { format } from 'date-fns';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import type { TransactionRowProps } from '@/types/component-types';
@@ -89,7 +90,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
     try {
       const updatedValue = value !== undefined ? value : 
         field === 'date' 
-          ? editValues.date.toISOString().split('T')[0]
+          ? format(editValues.date, 'yyyy-MM-dd')
           : editValues[field];
           
       await TransactionService.updateTransaction(transaction.id, {

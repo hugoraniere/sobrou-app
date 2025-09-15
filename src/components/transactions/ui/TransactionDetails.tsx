@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { format } from 'date-fns';
 import { Transaction } from '@/types/component-types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -66,7 +67,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           date={transaction.date ? new Date(transaction.date) : new Date()}
           onDateChange={(date) => {
             if (date) {
-              const formattedDate = date.toISOString().split('T')[0];
+              const formattedDate = format(date, 'yyyy-MM-dd');
               handleSelectChange('date', formattedDate);
             }
           }}
@@ -83,7 +84,7 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         onIsRecurringChange={(value) => handleSelectChange('is_recurring', value)}
         onFrequencyChange={(value) => handleSelectChange('recurrence_frequency', value)}
         onEndDateChange={(date) => {
-          const formattedDate = date ? date.toISOString().split('T')[0] : undefined;
+          const formattedDate = date ? format(date, 'yyyy-MM-dd') : undefined;
           handleSelectChange('recurrence_end_date', formattedDate || '');
         }}
         onInstallmentTotalChange={(total) => handleSelectChange('installment_total', total?.toString() || '')}

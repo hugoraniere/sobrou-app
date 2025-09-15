@@ -70,8 +70,16 @@ const App = () => {
                           <Route path="/blog/post/:id" element={<BlogPostLegacyRedirect />} />
                           <Route path="/suporte" element={<SupportCenter />} />
                           <Route path="/suporte/artigo/:slug" element={<SupportArticle />} />
-                          <Route path="/suporte/novo" element={<NewTicket />} />
-                          <Route path="/suporte/meus-tickets" element={<React.Suspense fallback={null}><MyTickets /></React.Suspense>} />
+          <Route path="/suporte/novo" element={
+            <ProtectedRoute>
+              <NewTicket />
+            </ProtectedRoute>
+          } />
+          <Route path="/suporte/meus-tickets" element={
+            <ProtectedRoute>
+              <React.Suspense fallback={null}><MyTickets /></React.Suspense>
+            </ProtectedRoute>
+          } />
                           <Route path="/erro" element={<Error />} />
                           
                           {/* Admin routes */}

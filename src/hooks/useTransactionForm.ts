@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { parseCurrencyToNumber } from '@/utils/currencyUtils';
 
@@ -49,7 +50,7 @@ export const useTransactionForm = (onSuccess?: () => void) => {
           description: data.description || null,
           amount: parseCurrencyToNumber(data.amount),
           category: data.category,
-          date: data.date.toISOString().split('T')[0],
+          date: format(data.date, 'yyyy-MM-dd'),
           type: data.type,
           user_id: user.id
         });

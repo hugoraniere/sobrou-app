@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 import SearchInput from './SearchInput';
 
 interface SupportSearchAndActionsProps {
@@ -13,6 +14,8 @@ const SupportSearchAndActions: React.FC<SupportSearchAndActionsProps> = ({
   onSearch,
   className = ""
 }) => {
+  const { user } = useAuth();
+
   return (
     <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 ${className}`}>
       {/* Search Input - Left Side */}
@@ -25,19 +28,21 @@ const SupportSearchAndActions: React.FC<SupportSearchAndActionsProps> = ({
       
       {/* Action Buttons - Right Side */}
       <div className="flex items-center gap-3 flex-shrink-0">
-        <Link to="/suporte/novo">
+        <Link to={user ? "/suporte/novo" : "/auth?redirect=/suporte/novo"}>
           <Button variant="default" size="default" className="shadow-sm">
             <Plus className="h-4 w-4 mr-2" />
             Novo Ticket
           </Button>
         </Link>
         
-        <Link to="/suporte/meus-tickets">
-          <Button variant="secondary" size="default" className="shadow-sm">
-            <FileText className="h-4 w-4 mr-2" />
-            Meus Tickets
-          </Button>
-        </Link>
+        {user && (
+          <Link to="/suporte/meus-tickets">
+            <Button variant="secondary" size="default" className="shadow-sm">
+              <FileText className="h-4 w-4 mr-2" />
+              Meus Tickets
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
