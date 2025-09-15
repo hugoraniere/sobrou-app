@@ -8,6 +8,7 @@ import { Users, UserCheck, Crown, Calendar, TrendingUp, TrendingDown } from 'luc
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 
 interface PeriodOption {
   label: string;
@@ -24,6 +25,7 @@ const PERIOD_OPTIONS: PeriodOption[] = [
 
 const UserMetricsBigNumbers = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [metrics, setMetrics] = useState<UserMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState(30);
@@ -150,6 +152,7 @@ const UserMetricsBigNumbers = () => {
             value: parseFloat(totalUsersTrend.value.replace('%', '')),
             isPositive: totalUsersTrend.isPositive
           } : undefined}
+          onClick={() => navigate('/admin/users')}
         />
 
         <BigNumberCard

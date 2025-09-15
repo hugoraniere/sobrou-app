@@ -54,6 +54,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             fullName: currentSession.user.user_metadata.full_name || '',
             user_metadata: currentSession.user.user_metadata
           });
+
+          // Track user activity for analytics
+          if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+            setTimeout(() => {
+              AdminAnalyticsService.trackAppEvent('user_activity', { 
+                timestamp: new Date().toISOString(),
+                event: event 
+              });
+            }, 100);
+          }
         } else {
           setUser(null);
         }
@@ -94,6 +104,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subscription.unsubscribe();
     };
   }, [navigate]);
+
+  // Track page navigation for authenticated users
+  useEffect(() => {
+    if (isAuthenticated && !isLoading && user) {
+      // Track page view for analytics
+      AdminAnalyticsService.trackAppEvent('page_view', { 
+        timestamp: new Date().toISOString(),
+        path: location.pathname
+      });
+    }
+  }, [location.pathname, isAuthenticated, isLoading, user]);
 
   // Completamente reescrita para evitar redirecionamentos em loops
   useEffect(() => {

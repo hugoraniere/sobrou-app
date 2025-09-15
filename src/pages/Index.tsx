@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
@@ -7,10 +7,14 @@ import { useDashboardData } from '../hooks/useDashboardData';
 import { useTranslation } from 'react-i18next';
 import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 
 const Index = () => {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [showAddTransaction, setShowAddTransaction] = useState(false);
   
   const {
     transactions,
@@ -45,7 +49,15 @@ const Index = () => {
       <ResponsivePageHeader 
         title={t('dashboard.title')}
         description={t('dashboard.subtitle')}
-      />
+      >
+        <Button
+          onClick={() => setShowAddTransaction(true)}
+          className="flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          {t('transactions.add', 'Adicionar Transação')}
+        </Button>
+      </ResponsivePageHeader>
       
       <div className="space-y-6">
         <DashboardContent
@@ -63,6 +75,15 @@ const Index = () => {
           onSavingGoalUpdated={fetchData}
         />
       </div>
+
+      <AddTransactionDialog
+        open={showAddTransaction}
+        onOpenChange={setShowAddTransaction}
+        onTransactionAdded={() => {
+          fetchData(); // Atualiza os dados do dashboard
+          setShowAddTransaction(false);
+        }}
+      />
     </ResponsivePageContainer>
   );
 };
