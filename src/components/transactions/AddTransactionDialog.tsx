@@ -1,25 +1,22 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import TransactionForm from './components/TransactionForm';
-
 interface AddTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTransactionAdded?: () => void;
 }
-
-const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ 
-  open, 
+const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
+  open,
   onOpenChange,
-  onTransactionAdded 
+  onTransactionAdded
 }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] min-h-[500px] overflow-y-auto">
+  const {
+    t
+  } = useTranslation();
+  return <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] min-h-[500px] overflow-y-auto bg-neutral-50">
         <DialogHeader className="space-y-2 pb-4">
           <DialogTitle className="text-xl font-semibold text-gray-900">
             {t('transactions.add', 'Nova Transação')}
@@ -30,14 +27,12 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({
         </DialogHeader>
         
         <TransactionForm onSuccess={() => {
-          onOpenChange(false);
-          if (onTransactionAdded) {
-            onTransactionAdded();
-          }
-        }} />
+        onOpenChange(false);
+        if (onTransactionAdded) {
+          onTransactionAdded();
+        }
+      }} />
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default AddTransactionDialog;
