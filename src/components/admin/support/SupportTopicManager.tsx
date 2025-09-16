@@ -6,15 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, FolderOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface SupportTopic {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  order_index: number;
-  created_at: string;
-}
+import { SupportService } from '@/services/supportService';
+import type { SupportTopic } from '@/types/support';
 
 const SupportTopicManager = () => {
   const [topics, setTopics] = useState<SupportTopic[]>([]);
@@ -22,9 +15,11 @@ const SupportTopicManager = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<SupportTopic | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
+    name: '',
     description: '',
-    icon: '❓'
+    icon: 'HelpCircle',
+    is_active: true,
+    sort_order: 0
   });
   const { toast } = useToast();
 
@@ -35,31 +30,8 @@ const SupportTopicManager = () => {
   const loadTopics = async () => {
     setLoading(true);
     try {
-      // TODO: Implementar busca de tópicos do Supabase
-      // const { data, error } = await supabase
-      //   .from('support_topics')
-      //   .select('*')
-      //   .order('order_index');
-      
-      // Mock data for now
-      setTopics([
-        {
-          id: '1',
-          title: 'Primeiros Passos',
-          description: 'Como começar a usar o sistema',
-          icon: '🚀',
-          order_index: 1,
-          created_at: '2024-01-15T10:00:00Z'
-        },
-        {
-          id: '2',
-          title: 'WhatsApp',
-          description: 'Configuração e uso do WhatsApp',
-          icon: '💬',
-          order_index: 2,
-          created_at: '2024-01-15T10:00:00Z'
-        }
-      ]);
+      const data = await SupportService.getAllTopics();
+      setTopics(data);
     } catch (error) {
       toast({
         message: "Erro ao carregar categorias",
@@ -75,24 +47,16 @@ const SupportTopicManager = () => {
     
     try {
       if (editingTopic) {
-        // TODO: Implementar atualização no Supabase
+        const updatedTopic = await SupportService.updateTopic(editingTopic.id, formData);
         setTopics(topics.map(topic => 
-          topic.id === editingTopic.id 
-            ? { ...topic, ...formData }
-            : topic
+          topic.id === editingTopic.id ? updatedTopic : topic
         ));
         toast({
           message: "Categoria atualizada com sucesso!",
           type: "success"
         });
       } else {
-        // TODO: Implementar criação no Supabase
-        const newTopic: SupportTopic = {
-          id: Date.now().toString(),
-          ...formData,
-          order_index: topics.length + 1,
-          created_at: new Date().toISOString()
-        };
+        const newTopic = await SupportService.createTopic(formData);
         setTopics([...topics, newTopic]);
         toast({
           message: "Categoria criada com sucesso!",
@@ -102,7 +66,7 @@ const SupportTopicManager = () => {
       
       setIsDialogOpen(false);
       setEditingTopic(null);
-      setFormData({ title: '', description: '', icon: '❓' });
+      setFormData({ name: '', description: '', icon: 'HelpCircle', is_active: true, sort_order: 0 });
     } catch (error) {
       toast({
         message: "Erro ao salvar categoria",
@@ -114,9 +78,11 @@ const SupportTopicManager = () => {
   const handleEdit = (topic: SupportTopic) => {
     setEditingTopic(topic);
     setFormData({
-      title: topic.title,
-      description: topic.description,
-      icon: topic.icon
+      name: topic.name,
+      description: topic.description || '',
+      icon: topic.icon,
+      is_active: topic.is_active,
+      sort_order: topic.sort_order
     });
     setIsDialogOpen(true);
   };
@@ -124,7 +90,7 @@ const SupportTopicManager = () => {
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta categoria?')) {
       try {
-        // TODO: Implementar exclusão no Supabase
+        await SupportService.deleteTopic(id);
         setTopics(topics.filter(topic => topic.id !== id));
         toast({
           message: "Categoria excluída com sucesso!",
@@ -152,7 +118,7 @@ const SupportTopicManager = () => {
           <DialogTrigger asChild>
             <Button onClick={() => {
               setEditingTopic(null);
-              setFormData({ title: '', description: '', icon: '❓' });
+              setFormData({ name: '', description: '', icon: 'HelpCircle', is_active: true, sort_order: 0 });
             }}>
               <Plus className="h-4 w-4 mr-2" />
               Nova Categoria
@@ -166,10 +132,10 @@ const SupportTopicManager = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Título</label>
+                <label className="block text-sm font-medium mb-2">Nome</label>
                 <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Ex: Primeiros Passos"
                   required
                 />
@@ -180,16 +146,14 @@ const SupportTopicManager = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Breve descrição da categoria"
-                  required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Ícone (emoji)</label>
+                <label className="block text-sm font-medium mb-2">Ícone (Lucide React)</label>
                 <Input
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder="🚀"
-                  maxLength={2}
+                  placeholder="HelpCircle"
                   required
                 />
               </div>
@@ -213,7 +177,7 @@ const SupportTopicManager = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <span className="text-2xl">{topic.icon}</span>
-                <span className="flex-1">{topic.title}</span>
+                <span className="flex-1">{topic.name}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>

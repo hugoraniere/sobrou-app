@@ -6,17 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, Eye, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface Ticket {
-  id: string;
-  title: string;
-  description: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  user_email: string;
-  created_at: string;
-  updated_at: string;
-}
+import { SupportService } from '@/services/supportService';
+import type { Ticket } from '@/types/support';
 
 const TicketManager = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -33,25 +24,8 @@ const TicketManager = () => {
   const loadTickets = async () => {
     setLoading(true);
     try {
-      // TODO: Implementar busca de tickets do Supabase
-      // const { data, error } = await supabase
-      //   .from('support_tickets')
-      //   .select('*')
-      //   .order('created_at', { ascending: false });
-      
-      // Mock data for now
-      setTickets([
-        {
-          id: '1',
-          title: 'Problema com WhatsApp',
-          description: 'Não consigo conectar meu WhatsApp',
-          status: 'open',
-          priority: 'medium',
-          user_email: 'user@example.com',
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z'
-        }
-      ]);
+      const data = await SupportService.getAllTickets({});
+      setTickets(data);
     } catch (error) {
       toast({
         message: "Erro ao carregar tickets",
@@ -64,27 +38,47 @@ const TicketManager = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-red-100 text-red-800';
-      case 'in_progress': return 'bg-yellow-100 text-yellow-800';
-      case 'resolved': return 'bg-green-100 text-green-800';
-      case 'closed': return 'bg-gray-100 text-gray-800';
+      case 'aberto': return 'bg-red-100 text-red-800';
+      case 'em_andamento': return 'bg-yellow-100 text-yellow-800';
+      case 'aguardando_resposta': return 'bg-blue-100 text-blue-800';
+      case 'resolvido': return 'bg-green-100 text-green-800';
+      case 'fechado': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-500 text-white';
-      case 'high': return 'bg-orange-500 text-white';
-      case 'medium': return 'bg-blue-500 text-white';
-      case 'low': return 'bg-gray-500 text-white';
+      case 'alta': return 'bg-red-500 text-white';
+      case 'media': return 'bg-orange-500 text-white';
+      case 'baixa': return 'bg-blue-500 text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'aberto': return 'Aberto';
+      case 'em_andamento': return 'Em Andamento';
+      case 'aguardando_resposta': return 'Aguardando Resposta';
+      case 'resolvido': return 'Resolvido';
+      case 'fechado': return 'Fechado';
+      default: return status;
+    }
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case 'baixa': return 'Baixa';
+      case 'media': return 'Média';
+      case 'alta': return 'Alta';
+      default: return priority;
+    }
+  };
+
   const filteredTickets = tickets.filter(ticket => {
-    const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ticket.user_email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = ticket.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         ticket.ticket_number?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter;
     
@@ -111,7 +105,7 @@ const TicketManager = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Buscar por título ou email do usuário..."
+                  placeholder="Buscar por assunto ou número do ticket..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -124,10 +118,11 @@ const TicketManager = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos Status</SelectItem>
-                <SelectItem value="open">Aberto</SelectItem>
-                <SelectItem value="in_progress">Em Progresso</SelectItem>
-                <SelectItem value="resolved">Resolvido</SelectItem>
-                <SelectItem value="closed">Fechado</SelectItem>
+                <SelectItem value="aberto">Aberto</SelectItem>
+                <SelectItem value="em_andamento">Em Andamento</SelectItem>
+                <SelectItem value="aguardando_resposta">Aguardando Resposta</SelectItem>
+                <SelectItem value="resolvido">Resolvido</SelectItem>
+                <SelectItem value="fechado">Fechado</SelectItem>
               </SelectContent>
             </Select>
             <Select value={priorityFilter} onValueChange={setPriorityFilter}>
@@ -136,10 +131,9 @@ const TicketManager = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="urgent">Urgente</SelectItem>
-                <SelectItem value="high">Alta</SelectItem>
-                <SelectItem value="medium">Média</SelectItem>
-                <SelectItem value="low">Baixa</SelectItem>
+                <SelectItem value="alta">Alta</SelectItem>
+                <SelectItem value="media">Média</SelectItem>
+                <SelectItem value="baixa">Baixa</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -162,17 +156,18 @@ const TicketManager = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-lg">{ticket.title}</h3>
+                      <h3 className="font-semibold text-lg">{ticket.subject}</h3>
                       <Badge className={getStatusColor(ticket.status)}>
-                        {ticket.status}
+                        {getStatusLabel(ticket.status)}
                       </Badge>
                       <Badge className={getPriorityColor(ticket.priority)}>
-                        {ticket.priority}
+                        {getPriorityLabel(ticket.priority)}
                       </Badge>
                     </div>
                     <p className="text-gray-600 mb-2">{ticket.description}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>De: {ticket.user_email}</span>
+                      <span>Ticket: {ticket.ticket_number}</span>
+                      <span>Categoria: {ticket.category}</span>
                       <span>Criado: {new Date(ticket.created_at).toLocaleDateString('pt-BR')}</span>
                     </div>
                   </div>

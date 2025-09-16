@@ -8,22 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, FileText, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface SupportArticle {
-  id: string;
-  title: string;
-  content: string;
-  summary: string;
-  topic_id: string;
-  is_popular: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-interface SupportTopic {
-  id: string;
-  title: string;
-}
+import { SupportService } from '@/services/supportService';
+import type { SupportArticle, SupportTopic } from '@/types/support';
 
 const SupportArticleManager = () => {
   const [articles, setArticles] = useState<SupportArticle[]>([]);
@@ -36,9 +22,9 @@ const SupportArticleManager = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    summary: '',
+    excerpt: '',
     topic_id: '',
-    is_popular: false
+    is_featured: false
   });
   const { toast } = useToast();
 
@@ -49,28 +35,15 @@ const SupportArticleManager = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      // TODO: Implementar busca do Supabase
-      // Mock data for now
-      setTopics([
-        { id: '1', title: 'Primeiros Passos' },
-        { id: '2', title: 'WhatsApp' }
+      const [topicsData, articlesData] = await Promise.all([
+        SupportService.getAllTopics(),
+        SupportService.getAllArticles()
       ]);
-      
-      setArticles([
-        {
-          id: '1',
-          title: 'Como começar a usar o sistema',
-          content: 'Guia completo para iniciantes...',
-          summary: 'Primeiros passos no sistema',
-          topic_id: '1',
-          is_popular: true,
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z'
-        }
-      ]);
+      setTopics(topicsData);
+      setArticles(articlesData);
     } catch (error) {
       toast({
-        message: "Erro ao carregar artigos",
+        message: "Erro ao carregar dados",
         type: "error"
       });
     } finally {
@@ -82,23 +55,29 @@ const SupportArticleManager = () => {
     e.preventDefault();
     
     try {
+      const articleData = {
+        title: formData.title,
+        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        content: formData.content,
+        excerpt: formData.excerpt,
+        topic_id: formData.topic_id || null,
+        status: 'published' as const,
+        is_featured: formData.is_featured,
+        tags: null,
+        created_by: null
+      };
+
       if (editingArticle) {
+        const updatedArticle = await SupportService.updateArticle(editingArticle.id, articleData);
         setArticles(articles.map(article => 
-          article.id === editingArticle.id 
-            ? { ...article, ...formData, updated_at: new Date().toISOString() }
-            : article
+          article.id === editingArticle.id ? updatedArticle : article
         ));
         toast({
           message: "Artigo atualizado com sucesso!",
           type: "success"
         });
       } else {
-        const newArticle: SupportArticle = {
-          id: Date.now().toString(),
-          ...formData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
+        const newArticle = await SupportService.createArticle(articleData);
         setArticles([...articles, newArticle]);
         toast({
           message: "Artigo criado com sucesso!",
@@ -121,9 +100,9 @@ const SupportArticleManager = () => {
     setFormData({
       title: '',
       content: '',
-      summary: '',
+      excerpt: '',
       topic_id: '',
-      is_popular: false
+      is_featured: false
     });
   };
 
@@ -132,9 +111,9 @@ const SupportArticleManager = () => {
     setFormData({
       title: article.title,
       content: article.content,
-      summary: article.summary,
-      topic_id: article.topic_id,
-      is_popular: article.is_popular
+      excerpt: article.excerpt || '',
+      topic_id: article.topic_id || '',
+      is_featured: article.is_featured
     });
     setIsDialogOpen(true);
   };
@@ -142,6 +121,7 @@ const SupportArticleManager = () => {
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este artigo?')) {
       try {
+        await SupportService.deleteArticle(id);
         setArticles(articles.filter(article => article.id !== id));
         toast({
           message: "Artigo excluído com sucesso!",
@@ -157,7 +137,8 @@ const SupportArticleManager = () => {
   };
 
   const filteredArticles = articles.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         article.content.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTopic = topicFilter === 'all' || article.topic_id === topicFilter;
     return matchesSearch && matchesTopic;
   });
@@ -200,10 +181,9 @@ const SupportArticleManager = () => {
               <div>
                 <label className="block text-sm font-medium mb-2">Resumo</label>
                 <Input
-                  value={formData.summary}
-                  onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                  value={formData.excerpt}
+                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                   placeholder="Breve resumo do artigo"
-                  required
                 />
               </div>
               <div>
@@ -213,8 +193,9 @@ const SupportArticleManager = () => {
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="">Nenhuma categoria</SelectItem>
                     {topics.map(topic => (
-                      <SelectItem key={topic.id} value={topic.id}>{topic.title}</SelectItem>
+                      <SelectItem key={topic.id} value={topic.id}>{topic.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -232,11 +213,11 @@ const SupportArticleManager = () => {
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  id="is_popular"
-                  checked={formData.is_popular}
-                  onChange={(e) => setFormData({ ...formData, is_popular: e.target.checked })}
+                  id="is_featured"
+                  checked={formData.is_featured}
+                  onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
                 />
-                <label htmlFor="is_popular" className="text-sm">Artigo popular</label>
+                <label htmlFor="is_featured" className="text-sm">Artigo em destaque</label>
               </div>
               <div className="flex gap-2 justify-end">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -273,7 +254,7 @@ const SupportArticleManager = () => {
               <SelectContent>
                 <SelectItem value="all">Todas as categorias</SelectItem>
                 {topics.map(topic => (
-                  <SelectItem key={topic.id} value={topic.id}>{topic.title}</SelectItem>
+                  <SelectItem key={topic.id} value={topic.id}>{topic.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -298,13 +279,13 @@ const SupportArticleManager = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-semibold text-lg">{article.title}</h3>
-                      {article.is_popular && (
-                        <Badge variant="secondary">Popular</Badge>
+                      {article.is_featured && (
+                        <Badge variant="secondary">Em Destaque</Badge>
                       )}
                     </div>
-                    <p className="text-gray-600 mb-2">{article.summary}</p>
+                    <p className="text-gray-600 mb-2">{article.excerpt}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>Categoria: {topics.find(t => t.id === article.topic_id)?.title}</span>
+                      <span>Categoria: {topics.find(t => t.id === article.topic_id)?.name || 'Nenhuma'}</span>
                       <span>Atualizado: {new Date(article.updated_at).toLocaleDateString('pt-BR')}</span>
                     </div>
                   </div>

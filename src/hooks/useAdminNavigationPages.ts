@@ -20,7 +20,7 @@ export const useAdminNavigationPages = () => {
       icon: FileText,
     },
     {
-      title: 'Central de Suporte',
+      title: 'Central de Ajuda',
       url: '/admin/support',
       icon: MessageSquare,
     },

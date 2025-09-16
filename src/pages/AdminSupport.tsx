@@ -10,7 +10,7 @@ const AdminSupport = () => {
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-background-base">
       <main className="w-full px-4 md:px-8 py-6 md:py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Central de Suporte</h1>
+          <h1 className="text-3xl font-bold mb-2">Central de Ajuda</h1>
           <p className="text-gray-600">Gerencie tickets, categorias, artigos e FAQ</p>
         </div>
         

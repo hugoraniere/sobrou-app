@@ -6,25 +6,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, HelpCircle, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-  order_index: number;
-  created_at: string;
-  updated_at: string;
-}
+import { SupportService } from '@/services/supportService';
+import type { FAQEntry } from '@/types/support';
 
 const FAQManager = () => {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [faqs, setFaqs] = useState<FAQEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingFaq, setEditingFaq] = useState<FAQ | null>(null);
+  const [editingFaq, setEditingFaq] = useState<FAQEntry | null>(null);
   const [formData, setFormData] = useState({
     question: '',
-    answer: ''
+    answer_md: '',
+    is_active: true,
+    sort_order: 0,
+    tags: null as string[] | null
   });
   const { toast } = useToast();
 
@@ -35,31 +31,8 @@ const FAQManager = () => {
   const loadFaqs = async () => {
     setLoading(true);
     try {
-      // TODO: Implementar busca de FAQs do Supabase
-      // const { data, error } = await supabase
-      //   .from('support_faqs')
-      //   .select('*')
-      //   .order('order_index');
-      
-      // Mock data for now
-      setFaqs([
-        {
-          id: '1',
-          question: 'Como funciona o sistema?',
-          answer: 'O sistema funciona de forma simples e intuitiva...',
-          order_index: 1,
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z'
-        },
-        {
-          id: '2',
-          question: 'Como conectar o WhatsApp?',
-          answer: 'Para conectar o WhatsApp, siga estes passos...',
-          order_index: 2,
-          created_at: '2024-01-15T11:00:00Z',
-          updated_at: '2024-01-15T11:00:00Z'
-        }
-      ]);
+      const data = await SupportService.getAllFAQEntries();
+      setFaqs(data);
     } catch (error) {
       toast({
         message: "Erro ao carregar FAQs",
@@ -75,25 +48,16 @@ const FAQManager = () => {
     
     try {
       if (editingFaq) {
-        // TODO: Implementar atualização no Supabase
+        const updatedFaq = await SupportService.updateFAQEntry(editingFaq.id, formData);
         setFaqs(faqs.map(faq => 
-          faq.id === editingFaq.id 
-            ? { ...faq, ...formData, updated_at: new Date().toISOString() }
-            : faq
+          faq.id === editingFaq.id ? updatedFaq : faq
         ));
         toast({
           message: "FAQ atualizada com sucesso!",
           type: "success"
         });
       } else {
-        // TODO: Implementar criação no Supabase
-        const newFaq: FAQ = {
-          id: Date.now().toString(),
-          ...formData,
-          order_index: faqs.length + 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
+        const newFaq = await SupportService.createFAQEntry(formData);
         setFaqs([...faqs, newFaq]);
         toast({
           message: "FAQ criada com sucesso!",
@@ -103,7 +67,7 @@ const FAQManager = () => {
       
       setIsDialogOpen(false);
       setEditingFaq(null);
-      setFormData({ question: '', answer: '' });
+      setFormData({ question: '', answer_md: '', is_active: true, sort_order: 0, tags: null });
     } catch (error) {
       toast({
         message: "Erro ao salvar FAQ",
@@ -112,11 +76,14 @@ const FAQManager = () => {
     }
   };
 
-  const handleEdit = (faq: FAQ) => {
+  const handleEdit = (faq: FAQEntry) => {
     setEditingFaq(faq);
     setFormData({
       question: faq.question,
-      answer: faq.answer
+      answer_md: faq.answer_md,
+      is_active: faq.is_active,
+      sort_order: faq.sort_order,
+      tags: faq.tags
     });
     setIsDialogOpen(true);
   };
@@ -124,7 +91,7 @@ const FAQManager = () => {
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta FAQ?')) {
       try {
-        // TODO: Implementar exclusão no Supabase
+        await SupportService.deleteFAQEntry(id);
         setFaqs(faqs.filter(faq => faq.id !== id));
         toast({
           message: "FAQ excluída com sucesso!",
@@ -141,7 +108,7 @@ const FAQManager = () => {
 
   const filteredFaqs = faqs.filter(faq =>
     faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+    faq.answer_md.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -157,7 +124,7 @@ const FAQManager = () => {
           <DialogTrigger asChild>
             <Button onClick={() => {
               setEditingFaq(null);
-              setFormData({ question: '', answer: '' });
+              setFormData({ question: '', answer_md: '', is_active: true, sort_order: 0, tags: null });
             }}>
               <Plus className="h-4 w-4 mr-2" />
               Nova FAQ
@@ -180,11 +147,11 @@ const FAQManager = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Resposta</label>
+                <label className="block text-sm font-medium mb-2">Resposta (Markdown)</label>
                 <Textarea
-                  value={formData.answer}
-                  onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                  placeholder="Digite a resposta completa"
+                  value={formData.answer_md}
+                  onChange={(e) => setFormData({ ...formData, answer_md: e.target.value })}
+                  placeholder="Digite a resposta completa (pode usar markdown)"
                   rows={6}
                   required
                 />
@@ -233,7 +200,7 @@ const FAQManager = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg mb-2">{faq.question}</h3>
-                    <p className="text-gray-600 mb-3">{faq.answer}</p>
+                    <p className="text-gray-600 mb-3 whitespace-pre-wrap">{faq.answer_md}</p>
                     <div className="text-sm text-gray-500">
                       Atualizada: {new Date(faq.updated_at).toLocaleDateString('pt-BR')}
                     </div>
