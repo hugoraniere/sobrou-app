@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { OnboardingProvider } from '../contexts/OnboardingContext';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
@@ -10,6 +11,11 @@ import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
+import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
+import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
+import { ProductTour } from '@/components/onboarding/ProductTour';
+import { HelpWidget } from '@/components/onboarding/HelpWidget';
+import { UpcomingPayables } from '@/components/dashboard/UpcomingPayables';
 
 const Index = () => {
   const { t } = useTranslation();
@@ -45,46 +51,56 @@ const Index = () => {
   const isLoading = authLoading || dataLoading;
   
   return (
-    <ResponsivePageContainer>
-      <ResponsivePageHeader 
-        title={t('dashboard.title')}
-        description={t('dashboard.subtitle')}
-      >
-        <Button
-          onClick={() => setShowAddTransaction(true)}
-          className="flex items-center gap-2"
+    <OnboardingProvider>
+      <ResponsivePageContainer>
+        <ResponsivePageHeader 
+          title={t('dashboard.title')}
+          description={t('dashboard.subtitle')}
         >
-          <Plus className="h-4 w-4" />
-          {t('transactions.add', 'Adicionar Transação')}
-        </Button>
-      </ResponsivePageHeader>
-      
-      <div className="space-y-6">
-        <DashboardContent
-          transactions={transactions}
-          filteredTransactions={filteredTransactions}
-          savingGoals={savingGoals}
-          filters={filters}
-          isLoading={isLoading}
-          hasTransactions={hasTransactions}
-          onTransactionUpdated={fetchData}
-          showOnboarding={false}
-          setShowOnboarding={setShowOnboarding}
-          whatsAppConnected={whatsAppConnected}
-          onSavingGoalAdded={fetchData}
-          onSavingGoalUpdated={fetchData}
-        />
-      </div>
+          <Button
+            onClick={() => setShowAddTransaction(true)}
+            className="flex items-center gap-2"
+            data-tour="add-transaction"
+          >
+            <Plus className="h-4 w-4" />
+            {t('transactions.add', 'Adicionar Transação')}
+          </Button>
+        </ResponsivePageHeader>
+        
+        <div className="space-y-6">
+          <UpcomingPayables />
+          
+          <DashboardContent
+            transactions={transactions}
+            filteredTransactions={filteredTransactions}
+            savingGoals={savingGoals}
+            filters={filters}
+            isLoading={isLoading}
+            hasTransactions={hasTransactions}
+            onTransactionUpdated={fetchData}
+            showOnboarding={false}
+            setShowOnboarding={setShowOnboarding}
+            whatsAppConnected={whatsAppConnected}
+            onSavingGoalAdded={fetchData}
+            onSavingGoalUpdated={fetchData}
+          />
+        </div>
 
-      <AddTransactionDialog
-        open={showAddTransaction}
-        onOpenChange={setShowAddTransaction}
-        onTransactionAdded={() => {
-          fetchData(); // Atualiza os dados do dashboard
-          setShowAddTransaction(false);
-        }}
-      />
-    </ResponsivePageContainer>
+        <AddTransactionDialog
+          open={showAddTransaction}
+          onOpenChange={setShowAddTransaction}
+          onTransactionAdded={() => {
+            fetchData();
+            setShowAddTransaction(false);
+          }}
+        />
+
+        <WelcomeModal />
+        <OnboardingChecklist />
+        <ProductTour />
+        <HelpWidget />
+      </ResponsivePageContainer>
+    </OnboardingProvider>
   );
 };
 

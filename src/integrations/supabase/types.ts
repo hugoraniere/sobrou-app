@@ -632,6 +632,72 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_progress: {
+        Row: {
+          created_at: string | null
+          effort_minutes: number | null
+          goal: string | null
+          quickwin_done: boolean | null
+          steps_completed: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          effort_minutes?: number | null
+          goal?: string | null
+          quickwin_done?: boolean | null
+          steps_completed?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          effort_minutes?: number | null
+          goal?: string | null
+          quickwin_done?: boolean | null
+          steps_completed?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payables: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string
+          due_date: string
+          id: string
+          repeats_monthly: boolean | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description: string
+          due_date: string
+          id?: string
+          repeats_monthly?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string
+          due_date?: string
+          id?: string
+          repeats_monthly?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
