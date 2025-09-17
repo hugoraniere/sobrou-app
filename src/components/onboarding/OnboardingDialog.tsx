@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { PersonalizationStep } from './PersonalizationStep';
-import { QuickWinStep } from './QuickWinStep';
+import { QuickWinDirections } from './QuickWinDirections';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 
 type OnboardingDialogStep = 'personalization' | 'quickwin' | 'completed';
@@ -36,7 +36,7 @@ export const OnboardingDialog: React.FC = () => {
       case 'personalization':
         return <PersonalizationStep onComplete={handlePersonalizationComplete} />;
       case 'quickwin':
-        return <QuickWinStep onComplete={handleQuickWinComplete} />;
+        return <QuickWinDirections onComplete={handleQuickWinComplete} />;
       case 'completed':
         return null;
       default:

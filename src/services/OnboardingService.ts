@@ -95,6 +95,11 @@ export class OnboardingService {
     return requiredSteps.every(step => progress.steps_completed?.includes(step));
   }
 
+  static hasSeenOnboarding(progress: OnboardingProgress | null): boolean {
+    // Se o usuário tem progresso (independente de ter sido completado ou pulado), já viu onboarding
+    return progress !== null;
+  }
+
   static getCompletionPercentage(progress: OnboardingProgress | null): number {
     if (!progress) return 0;
     

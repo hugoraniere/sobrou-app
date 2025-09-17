@@ -30,7 +30,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
         setProgress(userProgress);
 
         // Check if this is first login (no progress exists)
-        if (!userProgress) {
+        if (!OnboardingService.hasSeenOnboarding(userProgress)) {
           setIsFirstLogin(true);
           setWelcomeModalOpen(true);
           AnalyticsService.trackEvent('user_first_login');
