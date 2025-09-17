@@ -14,6 +14,7 @@ import AddTransactionDialog from '@/components/transactions/AddTransactionDialog
 // Onboarding Components
 import { WelcomeModal } from '../components/onboarding/WelcomeModal';
 import { GetStartedStepper } from '../components/onboarding/GetStartedStepper';
+import { TourBanner } from '../components/tour/TourBanner';
 
 const Index = () => {
   const { t } = useTranslation();
@@ -65,6 +66,7 @@ const Index = () => {
         </Button>
       </ResponsivePageHeader>
 
+      <TourBanner />
       <GetStartedStepper />
 
       <DashboardContent
