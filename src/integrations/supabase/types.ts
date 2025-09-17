@@ -590,6 +590,33 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_page_config: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_visible: boolean
+          section_key: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          section_key: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          section_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
