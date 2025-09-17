@@ -39,7 +39,7 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
           updatePosition();
-        }, 500);
+        }, 500 + (retryCount * 200)); // Progressive delay
       } else {
         setPosition(prev => ({ ...prev, found: false }));
       }
@@ -49,37 +49,45 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
     const rect = element.getBoundingClientRect();
     const padding = 8;
     
-    // Calculate position relative to document
-    const elementTop = rect.top + window.scrollY;
-    const elementLeft = rect.left + window.scrollX;
+    // Calculate position relative to current viewport (since body is fixed)
+    const currentTop = parseInt(document.body.style.top?.replace('-', '').replace('px', '')) || 0;
     
     setPosition({
-      top: elementTop - padding,
-      left: elementLeft - padding,
+      top: rect.top + currentTop - padding,
+      left: rect.left - padding,
       width: rect.width + (padding * 2),
       height: rect.height + (padding * 2),
       found: true
     });
 
-    // Center element in viewport
+    // Center element in viewport by adjusting body position
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
     
     const elementCenterY = rect.top + rect.height / 2;
     const elementCenterX = rect.left + rect.width / 2;
+    const viewportCenterY = viewportHeight / 2;
+    const viewportCenterX = viewportWidth / 2;
     
-    // Only scroll if element is not well positioned in viewport
-    if (elementCenterY < viewportHeight * 0.2 || elementCenterY > viewportHeight * 0.8 ||
-        elementCenterX < viewportWidth * 0.1 || elementCenterX > viewportWidth * 0.9) {
+    // Only adjust if element is significantly off-center
+    if (Math.abs(elementCenterY - viewportCenterY) > 100 || 
+        Math.abs(elementCenterX - viewportCenterX) > 100) {
       
-      const scrollToY = elementTop - viewportHeight / 2 + rect.height / 2;
-      const scrollToX = elementLeft - viewportWidth / 2 + rect.width / 2;
+      const adjustY = elementCenterY - viewportCenterY;
+      const newTop = Math.max(0, currentTop + adjustY);
+      document.body.style.top = `-${newTop}px`;
       
-      window.scrollTo({
-        top: Math.max(0, scrollToY),
-        left: Math.max(0, scrollToX),
-        behavior: 'smooth'
-      });
+      // Update position after adjustment
+      setTimeout(() => {
+        const newRect = element.getBoundingClientRect();
+        setPosition({
+          top: newRect.top + newTop - padding,
+          left: newRect.left - padding,
+          width: newRect.width + (padding * 2),
+          height: newRect.height + (padding * 2),
+          found: true
+        });
+      }, 100);
     }
     
     setRetryCount(0); // Reset retry count on success
@@ -145,40 +153,44 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
 
   // Setup and cleanup
   useEffect(() => {
-    // Disable page scroll
+    // Lock page scroll by fixing body position
+    const scrollY = window.scrollY;
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = `-${scrollY}px`;
     
     updatePosition();
     
-    // Throttle scroll and resize events for better performance
-    let scrollTimeout: NodeJS.Timeout;
+    // Only handle resize events since scroll is disabled
     let resizeTimeout: NodeJS.Timeout;
     
     const handleResize = () => {
       clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(updatePosition, 10);
-    };
-    
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(updatePosition, 10);
+      resizeTimeout = setTimeout(updatePosition, 100);
     };
     
     window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleScroll, { passive: true });
     document.addEventListener('keydown', handleKeyDown);
     
     // Show spotlight after position is calculated
-    const timer = setTimeout(() => setIsVisible(true), 100);
+    const timer = setTimeout(() => setIsVisible(true), 150);
     
     return () => {
-      // Re-enable page scroll
+      // Restore page scroll and position
+      const scrollY = document.body.style.top;
       document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
       
-      clearTimeout(scrollTimeout);
+      if (scrollY) {
+        const scrollPos = parseInt(scrollY.replace('-', '').replace('px', '')) || 0;
+        window.scrollTo(0, scrollPos);
+      }
+      
       clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('keydown', handleKeyDown);
       clearTimeout(timer);
     };
