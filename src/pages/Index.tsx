@@ -9,14 +9,11 @@ import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
-import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
-import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog';
-import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
-import { ProductTour } from '@/components/onboarding/ProductTour';
-import { HelpWidget } from '@/components/onboarding/HelpWidget';
-import { OnboardingBanner } from '@/components/onboarding/OnboardingBanner';
-import { UpcomingPayables } from '@/components/dashboard/UpcomingPayables';
+import AddTransactionDialog from '@/components/translations/AddTransactionDialog';
+
+// Onboarding Components
+import { WelcomeModal } from '../components/onboarding/WelcomeModal';
+import { GetStartedStepper } from '../components/onboarding/GetStartedStepper';
 
 const Index = () => {
   const { t } = useTranslation();
@@ -27,18 +24,19 @@ const Index = () => {
     transactions,
     savingGoals,
     isLoading: dataLoading,
+    fetchData,
+    hasTransactions,
     whatsAppConnected,
     showOnboarding,
-    setShowOnboarding,
-    fetchData,
-    hasTransactions
+    setShowOnboarding
   } = useDashboardData();
   
-  const {
-    filters,
-    filteredTransactions
-  } = useFilteredTransactions(transactions);
+  const { filters, filteredTransactions } = useFilteredTransactions(transactions);
   
+  const handleTransactionAdded = () => {
+    fetchData();
+  };
+
   // Aguardar a autenticação ser completada antes de buscar dados
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
@@ -52,58 +50,46 @@ const Index = () => {
   const isLoading = authLoading || dataLoading;
   
   return (
-    
-      <ResponsivePageContainer>
-        <ResponsivePageHeader 
-          title={t('dashboard.title')}
-          description={t('dashboard.subtitle')}
+    <ResponsivePageContainer>
+      <ResponsivePageHeader 
+        title={t('dashboard.title')}
+        description={t('dashboard.subtitle')}
+      >
+        <Button
+          onClick={() => setShowAddTransaction(true)}
+          className="flex items-center gap-2"
+          data-tour="add-transaction"
         >
-          <Button
-            onClick={() => setShowAddTransaction(true)}
-            className="flex items-center gap-2"
-            data-tour="add-transaction"
-          >
-            <Plus className="h-4 w-4" />
-            {t('transactions.add', 'Adicionar Transação')}
-          </Button>
-        </ResponsivePageHeader>
-        
-        <div className="space-y-6">
-          <OnboardingBanner />
-          <UpcomingPayables />
-          
-          <DashboardContent
-            transactions={transactions}
-            filteredTransactions={filteredTransactions}
-            savingGoals={savingGoals}
-            filters={filters}
-            isLoading={isLoading}
-            hasTransactions={hasTransactions}
-            onTransactionUpdated={fetchData}
-            showOnboarding={false}
-            setShowOnboarding={setShowOnboarding}
-            whatsAppConnected={whatsAppConnected}
-            onSavingGoalAdded={fetchData}
-            onSavingGoalUpdated={fetchData}
-          />
-        </div>
+          <Plus className="h-4 w-4" />
+          {t('transactions.add', 'Adicionar Transação')}
+        </Button>
+      </ResponsivePageHeader>
 
-        <AddTransactionDialog
-          open={showAddTransaction}
-          onOpenChange={setShowAddTransaction}
-          onTransactionAdded={() => {
-            fetchData();
-            setShowAddTransaction(false);
-          }}
-        />
+      <GetStartedStepper />
 
-        <WelcomeModal />
-        <OnboardingDialog />
-        <OnboardingChecklist />
-        <ProductTour />
-        <HelpWidget />
-      </ResponsivePageContainer>
-    
+      <DashboardContent
+        transactions={transactions}
+        filteredTransactions={filteredTransactions}
+        savingGoals={savingGoals}
+        filters={filters}
+        isLoading={isLoading}
+        hasTransactions={hasTransactions}
+        onTransactionUpdated={handleTransactionAdded}
+        whatsAppConnected={whatsAppConnected}
+        showOnboarding={showOnboarding}
+        setShowOnboarding={setShowOnboarding}
+        onSavingGoalAdded={fetchData}
+        onSavingGoalUpdated={fetchData}
+      />
+
+      <AddTransactionDialog
+        open={showAddTransaction}
+        onOpenChange={setShowAddTransaction}
+        onTransactionAdded={handleTransactionAdded}
+      />
+
+      <WelcomeModal />
+    </ResponsivePageContainer>
   );
 };
 

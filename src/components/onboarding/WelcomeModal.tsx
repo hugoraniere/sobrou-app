@@ -1,85 +1,105 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
 import { useOnboarding } from '@/contexts/OnboardingContext';
-import { AnalyticsService } from '@/services/AnalyticsService';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const WelcomeModal: React.FC = () => {
-  const { 
-    isWelcomeModalOpen, 
-    setWelcomeModalOpen, 
-    skipOnboarding,
-    setChecklistOpen 
-  } = useOnboarding();
+  const { isWelcomeModalOpen, setWelcomeModalOpen, showStepper } = useOnboarding();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Check if user is admin
+  const isAdmin = false; // TODO: Implement admin check when roles are ready
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    await showStepper();
     setWelcomeModalOpen(false);
-    setChecklistOpen(true);
-    AnalyticsService.trackOnboardingStarted();
   };
 
-  const handleSkip = () => {
-    skipOnboarding();
-    AnalyticsService.trackOnboardingSkipped();
+  const handleClose = () => {
+    setWelcomeModalOpen(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  const handleAdminConfig = () => {
+    navigate('/admin/onboarding');
+    setWelcomeModalOpen(false);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
       handleStart();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      handleSkip();
+    } else if (event.key === 'Escape') {
+      handleClose();
     }
   };
+
+  useEffect(() => {
+    if (isWelcomeModalOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isWelcomeModalOpen]);
 
   return (
     <Dialog open={isWelcomeModalOpen} onOpenChange={setWelcomeModalOpen}>
       <DialogContent 
         className="max-w-md"
-        onKeyDown={handleKeyDown}
         role="dialog"
         aria-labelledby="welcome-title"
-        aria-describedby="welcome-description"
       >
-        <DialogHeader>
-          <DialogTitle id="welcome-title" className="text-xl font-semibold">
+        <DialogHeader className="text-center">
+          <DialogTitle id="welcome-title" className="text-2xl">
             Bem-vindo ao Sobrou 👋
           </DialogTitle>
-          <DialogDescription id="welcome-description" className="text-muted-foreground">
-            Em 1 minuto você dá o primeiro passo e já vê resultado.
-            <br />
-            Pode pular quando quiser.
+          <DialogDescription className="text-base mt-2">
+            Este onboarding pode ser configurado no Admin. Em 1 minuto você deixa tudo pronto.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-3 mt-4">
-          <Button 
+        <div className="flex flex-col gap-3 mt-6">
+          <Button
             onClick={handleStart}
+            size="lg"
             className="w-full"
-            aria-label="Começar onboarding de 1 minuto"
           >
-            Começar (1 min)
+            Começar
           </Button>
           
-          <Button 
-            onClick={handleSkip}
-            variant="ghost"
+          <Button
+            onClick={handleClose}
+            variant="outline"
+            size="lg"
             className="w-full"
-            aria-label="Pular onboarding"
           >
-            Pular
+            Fechar
           </Button>
+
+          {isAdmin && (
+            <Button
+              onClick={handleAdminConfig}
+              variant="ghost"
+              size="sm"
+              className="mt-2 text-muted-foreground hover:text-foreground"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Configurar no Admin
+            </Button>
+          )}
         </div>
 
-        <div className="text-xs text-muted-foreground text-center mt-2">
-          Use Enter para começar ou ESC para pular
+        <div className="text-xs text-muted-foreground text-center mt-4">
+          <kbd className="px-2 py-1 bg-muted rounded text-xs">Enter</kbd> para iniciar • <kbd className="px-2 py-1 bg-muted rounded text-xs">ESC</kbd> para fechar
         </div>
       </DialogContent>
     </Dialog>

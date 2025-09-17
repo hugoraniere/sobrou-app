@@ -18,7 +18,6 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const { avatarUrl } = useAvatar();
-  const { restartOnboarding } = useOnboarding();
 
   const handleLogout = async () => {
     if (onLogout) {

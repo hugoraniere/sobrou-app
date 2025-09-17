@@ -1,178 +1,171 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { OnboardingProgress, OnboardingStep, OnboardingContext as IOnboardingContext } from '@/types/onboarding';
-import { OnboardingService } from '@/services/OnboardingService';
-import { AnalyticsService } from '@/services/AnalyticsService';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { OnboardingContext as IOnboardingContext, OnboardingStep, OnboardingProgress } from '@/types/onboarding';
+import { OnboardingService } from '@/services/OnboardingService';
 
-const OnboardingContext = createContext<IOnboardingContext | null>(null);
+const OnboardingContext = createContext<IOnboardingContext | undefined>(undefined);
 
 interface OnboardingProviderProps {
   children: ReactNode;
 }
 
 export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children }) => {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user } = useAuth();
+  const [steps, setSteps] = useState<OnboardingStep[]>([]);
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
-  const [currentStep, setCurrentStep] = useState<OnboardingStep | null>(null);
-  const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
-  const [isChecklistOpen, setChecklistOpen] = useState(false);
-  const [isTourActive, setTourActive] = useState(false);
-  const [isFirstLogin, setIsFirstLogin] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [eventCounts, setEventCounts] = useState<Record<string, number>>({});
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+  const [isStepperMinimized, setIsStepperMinimized] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load progress when user is authenticated
+  // Load initial data
   useEffect(() => {
-    const loadProgress = async () => {
-      if (!user || isLoading || isInitialized) return;
-
-      try {
-        const userProgress = await OnboardingService.getProgress(user.id);
-        setProgress(userProgress);
-
-        // Check if this is first login (no progress exists)
-        if (!OnboardingService.hasSeenOnboarding(userProgress)) {
-          setIsFirstLogin(true);
-          setWelcomeModalOpen(true);
-          AnalyticsService.trackEvent('user_first_login');
-        } else {
-          // Check if onboarding is completed
-          if (OnboardingService.isOnboardingCompleted(userProgress)) {
-            setCurrentStep('completed');
-          } else {
-            // Determine current step based on progress
-            if (!userProgress.goal) {
-              setCurrentStep('personalization');
-            } else if (!userProgress.quickwin_done) {
-              setCurrentStep('quickwin');
-            } else {
-              setCurrentStep('checklist');
-            }
-          }
-
-          // Show checklist if onboarding is not completed
-          const shouldShowChecklist = !OnboardingService.isOnboardingCompleted(userProgress);
-          setChecklistOpen(shouldShowChecklist);
-        }
-
-        setIsInitialized(true);
-      } catch (error) {
-        console.error('Error loading onboarding progress:', error);
-        setIsInitialized(true);
-      }
-    };
-
-    if (isAuthenticated && user && !isLoading) {
-      loadProgress();
+    if (user) {
+      loadOnboardingData();
+    } else {
+      setLoading(false);
     }
-  }, [user, isAuthenticated, isLoading, isInitialized]);
+  }, [user]);
 
-  const updateProgress = async (updates: Partial<OnboardingProgress>): Promise<void> => {
+  // Auto-complete steps based on event counts
+  useEffect(() => {
+    if (user && steps.length > 0 && Object.keys(eventCounts).length > 0) {
+      autoCompleteSteps();
+    }
+  }, [steps, eventCounts, user]);
+
+  const loadOnboardingData = async () => {
     if (!user) return;
 
+    setLoading(true);
     try {
-      let updatedProgress: OnboardingProgress | null = null;
+      const [stepsData, progressData, eventCountsData] = await Promise.all([
+        OnboardingService.getSteps(),
+        OnboardingService.getProgress(user.id),
+        OnboardingService.getEventCounts(user.id)
+      ]);
 
-      if (!progress) {
-        // Create new progress
-        updatedProgress = await OnboardingService.createProgress(
-          user.id,
-          updates.goal,
-          updates.effort_minutes
-        );
-      } else {
-        // Update existing progress
-        updatedProgress = await OnboardingService.updateProgress(user.id, updates);
-      }
+      setSteps(stepsData);
+      setProgress(progressData);
+      setEventCounts(eventCountsData);
+      setIsStepperMinimized(progressData?.minimized || false);
 
-      if (updatedProgress) {
-        setProgress(updatedProgress);
+      // Show welcome modal for first-time users
+      if (OnboardingService.isFirstLogin(progressData)) {
+        setIsWelcomeModalOpen(true);
+        // Track first visit
+        await OnboardingService.trackEvent('onboarding_first_visit', user.id);
       }
     } catch (error) {
-      console.error('Error updating progress:', error);
+      console.error('Error loading onboarding data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const completeStep = async (step: string): Promise<void> => {
+  const autoCompleteSteps = async () => {
+    if (!user || !progress) return;
+
+    const stepsToComplete = steps.filter(step => 
+      !progress.completed[step.key] && 
+      OnboardingService.shouldCompleteStep(step, eventCounts)
+    );
+
+    for (const step of stepsToComplete) {
+      await completeStep(step.key);
+    }
+  };
+
+  const completeStep = async (stepKey: string) => {
     if (!user) return;
 
     try {
-      const updatedProgress = await OnboardingService.completeStep(user.id, step);
+      const updatedProgress = await OnboardingService.completeStep(user.id, stepKey);
       if (updatedProgress) {
         setProgress(updatedProgress);
-        AnalyticsService.trackChecklistStepDone(step);
-
-        // Check if onboarding is now completed
-        if (OnboardingService.isOnboardingCompleted(updatedProgress)) {
-          setCurrentStep('completed');
-          setChecklistOpen(false);
-          AnalyticsService.trackOnboardingCompleted();
-        }
+        await OnboardingService.trackEvent(`step_completed_${stepKey}`, user.id);
       }
     } catch (error) {
       console.error('Error completing step:', error);
     }
   };
 
-  const skipOnboarding = async (): Promise<void> => {
+  const minimizeStepper = async () => {
     if (!user) return;
 
     try {
-      // Create progress with skipped flag
-      const skippedProgress = await OnboardingService.createProgress(user.id);
-      if (skippedProgress) {
-        setProgress(skippedProgress);
-        setCurrentStep('completed');
-        setWelcomeModalOpen(false);
-        setChecklistOpen(false);
-        AnalyticsService.trackOnboardingSkipped();
+      const updatedProgress = await OnboardingService.updateProgress(user.id, { minimized: true });
+      if (updatedProgress) {
+        setProgress(updatedProgress);
+        setIsStepperMinimized(true);
+        await OnboardingService.trackEvent('onboarding_hidden', user.id);
       }
     } catch (error) {
-      console.error('Error skipping onboarding:', error);
+      console.error('Error minimizing stepper:', error);
     }
   };
 
-  const restartOnboarding = async (): Promise<void> => {
+  const showStepper = async () => {
     if (!user) return;
 
     try {
-      // Reset progress
-      const resetProgress = await OnboardingService.updateProgress(user.id, {
-        goal: undefined,
-        effort_minutes: undefined,
-        steps_completed: [],
-        quickwin_done: false
-      });
-
-      if (resetProgress) {
-        setProgress(resetProgress);
-        setCurrentStep('personalization');
-        setWelcomeModalOpen(true);
-        setChecklistOpen(true);
-        AnalyticsService.trackEvent('onboarding_restarted');
+      const updatedProgress = await OnboardingService.updateProgress(user.id, { minimized: false });
+      if (updatedProgress) {
+        setProgress(updatedProgress);
+        setIsStepperMinimized(false);
+        await OnboardingService.trackEvent('onboarding_shown', user.id);
       }
     } catch (error) {
-      console.error('Error restarting onboarding:', error);
+      console.error('Error showing stepper:', error);
     }
   };
 
-  const contextValue: IOnboardingContext = {
+  const trackEvent = async (eventName: string, params?: Record<string, any>) => {
+    if (!user) return;
+
+    try {
+      await OnboardingService.trackEvent(eventName, user.id, params, window.location.pathname);
+      // Refresh event counts
+      const newEventCounts = await OnboardingService.getEventCounts(user.id);
+      setEventCounts(newEventCounts);
+    } catch (error) {
+      console.error('Error tracking event:', error);
+    }
+  };
+
+  const refreshData = async () => {
+    await loadOnboardingData();
+  };
+
+  const setWelcomeModalOpen = (open: boolean) => {
+    setIsWelcomeModalOpen(open);
+    if (open) {
+      OnboardingService.trackEvent('onboarding_started', user?.id);
+    } else {
+      OnboardingService.trackEvent('onboarding_closed', user?.id);
+    }
+  };
+
+  const value: IOnboardingContext = {
+    steps,
     progress,
-    currentStep,
+    eventCounts,
     isWelcomeModalOpen,
-    isChecklistOpen,
-    isTourActive,
-    isFirstLogin,
-    setWelcomeModalOpen: setWelcomeModalOpen,
-    setChecklistOpen: setChecklistOpen,
-    setTourActive: setTourActive,
-    updateProgress,
+    isStepperMinimized,
+    setWelcomeModalOpen,
     completeStep,
-    skipOnboarding,
-    restartOnboarding
+    minimizeStepper,
+    showStepper,
+    trackEvent,
+    refreshData
   };
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   return (
-    <OnboardingContext.Provider value={contextValue}>
+    <OnboardingContext.Provider value={value}>
       {children}
     </OnboardingContext.Provider>
   );
@@ -180,7 +173,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
 
 export const useOnboarding = (): IOnboardingContext => {
   const context = useContext(OnboardingContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useOnboarding must be used within an OnboardingProvider');
   }
   return context;

@@ -634,31 +634,73 @@ export type Database = {
       }
       onboarding_progress: {
         Row: {
+          completed: Json | null
           created_at: string | null
-          effort_minutes: number | null
-          goal: string | null
-          quickwin_done: boolean | null
-          steps_completed: string[] | null
+          minimized: boolean | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          completed?: Json | null
           created_at?: string | null
-          effort_minutes?: number | null
-          goal?: string | null
-          quickwin_done?: boolean | null
-          steps_completed?: string[] | null
+          minimized?: boolean | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          completed?: Json | null
           created_at?: string | null
-          effort_minutes?: number | null
-          goal?: string | null
-          quickwin_done?: boolean | null
-          steps_completed?: string[] | null
+          minimized?: boolean | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      onboarding_steps: {
+        Row: {
+          action_hint: string | null
+          action_path: string
+          active: boolean | null
+          completion_event: string
+          created_at: string | null
+          description: string
+          icon: string | null
+          id: number
+          key: string
+          sort_order: number | null
+          target_count: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_hint?: string | null
+          action_path: string
+          active?: boolean | null
+          completion_event: string
+          created_at?: string | null
+          description: string
+          icon?: string | null
+          id?: number
+          key: string
+          sort_order?: number | null
+          target_count?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_hint?: string | null
+          action_path?: string
+          active?: boolean | null
+          completion_event?: string
+          created_at?: string | null
+          description?: string
+          icon?: string | null
+          id?: number
+          key?: string
+          sort_order?: number | null
+          target_count?: number | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
