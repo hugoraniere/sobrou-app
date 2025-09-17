@@ -65,8 +65,11 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
       
+      // Adjust position to account for viewport offset and add slight upward adjustment
+      const adjustedTop = rect.top + scrollY - 8; // Move 8px higher
+      
       setPosition({
-        top: rect.top + scrollY,
+        top: Math.max(0, adjustedTop), // Ensure it doesn't go negative
         left: rect.left + scrollX,
         width: rect.width,
         height: rect.height,
