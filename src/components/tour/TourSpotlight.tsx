@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -27,71 +27,55 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
   });
   const [isVisible, setIsVisible] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const retryTimeoutRef = useRef<NodeJS.Timeout>();
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const maxRetries = 10;
+  const MAX_RETRIES = 10;
 
   // Calculate element position and create spotlight
-  const updatePosition = () => {
+  const updatePosition = useCallback(() => {
     const element = document.querySelector(`[data-tour-id="${step.anchor_id}"]`);
     
     if (!element) {
-      if (retryCount < maxRetries) {
-        setTimeout(() => {
+      console.warn(`Element with data-tour-id="${step.anchor_id}" not found`);
+      
+      // Retry with exponential backoff
+      if (retryCount < MAX_RETRIES) {
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        retryTimeoutRef.current = setTimeout(() => {
           setRetryCount(prev => prev + 1);
           updatePosition();
-        }, 500 + (retryCount * 200)); // Progressive delay
+        }, delay);
       } else {
-        setPosition(prev => ({ ...prev, found: false }));
+        console.error(`Failed to find element after ${MAX_RETRIES} attempts`);
+        setPosition({ top: 0, left: 0, width: 0, height: 0, found: false });
       }
       return;
     }
 
-    const rect = element.getBoundingClientRect();
-    const padding = 8;
-    
-    // Calculate position relative to current viewport (since body is fixed)
-    const currentTop = parseInt(document.body.style.top?.replace('-', '').replace('px', '')) || 0;
-    
-    setPosition({
-      top: rect.top + currentTop - padding,
-      left: rect.left - padding,
-      width: rect.width + (padding * 2),
-      height: rect.height + (padding * 2),
-      found: true
+    // Scroll element into view first
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center'
     });
 
-    // Center element in viewport by adjusting body position
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-    
-    const elementCenterY = rect.top + rect.height / 2;
-    const elementCenterX = rect.left + rect.width / 2;
-    const viewportCenterY = viewportHeight / 2;
-    const viewportCenterX = viewportWidth / 2;
-    
-    // Only adjust if element is significantly off-center
-    if (Math.abs(elementCenterY - viewportCenterY) > 100 || 
-        Math.abs(elementCenterX - viewportCenterX) > 100) {
+    // Wait for scroll to complete, then update position
+    setTimeout(() => {
+      const rect = element.getBoundingClientRect();
+      const scrollY = window.scrollY;
+      const scrollX = window.scrollX;
       
-      const adjustY = elementCenterY - viewportCenterY;
-      const newTop = Math.max(0, currentTop + adjustY);
-      document.body.style.top = `-${newTop}px`;
+      setPosition({
+        top: rect.top + scrollY,
+        left: rect.left + scrollX,
+        width: rect.width,
+        height: rect.height,
+        found: true
+      });
       
-      // Update position after adjustment
-      setTimeout(() => {
-        const newRect = element.getBoundingClientRect();
-        setPosition({
-          top: newRect.top + newTop - padding,
-          left: newRect.left - padding,
-          width: newRect.width + (padding * 2),
-          height: newRect.height + (padding * 2),
-          found: true
-        });
-      }, 100);
-    }
-    
-    setRetryCount(0); // Reset retry count on success
-  };
+      setRetryCount(0); // Reset retry count on success
+    }, 500);
+  }, [step.anchor_id, retryCount]);
 
   // Position tooltip relative to spotlight
   const getTooltipPosition = () => {
@@ -153,48 +137,58 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
 
   // Setup and cleanup
   useEffect(() => {
-    // Lock page scroll by fixing body position
-    const scrollY = window.scrollY;
+    // Simplified scroll lock - just prevent scrolling
     document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.top = `-${scrollY}px`;
     
+    // Find and position the spotlight
     updatePosition();
     
-    // Only handle resize events since scroll is disabled
-    let resizeTimeout: NodeJS.Timeout;
-    
+    // Add event listeners
     const handleResize = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(updatePosition, 100);
+      updatePosition();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          onPrevious();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          onNext();
+          break;
+        case 'Enter':
+          e.preventDefault();
+          onNext();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onClose();
+          break;
+      }
     };
     
     window.addEventListener('resize', handleResize);
     document.addEventListener('keydown', handleKeyDown);
     
-    // Show spotlight after position is calculated
-    const timer = setTimeout(() => setIsVisible(true), 150);
-    
+    // Show spotlight after a brief delay
+    const showTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+
     return () => {
-      // Restore page scroll and position
-      const scrollY = document.body.style.top;
+      // Restore scroll
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.top = '';
       
-      if (scrollY) {
-        const scrollPos = parseInt(scrollY.replace('-', '').replace('px', '')) || 0;
-        window.scrollTo(0, scrollPos);
-      }
-      
-      clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('keydown', handleKeyDown);
-      clearTimeout(timer);
+      clearTimeout(showTimer);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
     };
-  }, [step.anchor_id, isFirstStep, isLastStep, retryCount]);
+  }, [step.anchor_id, onNext, onPrevious, onClose, updatePosition]);
 
   // Don't render if element not found
   if (!position.found) {

@@ -210,13 +210,6 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
       // Update state
       setCurrentStep(step);
       setCurrentStepIndex(stepIndex);
-      
-      // Scroll element into view
-      element.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center',
-        inline: 'center'
-      });
 
     } catch (error) {
       console.error(`Error going to step "${stepKey}":`, error);
