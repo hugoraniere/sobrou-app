@@ -170,7 +170,10 @@ export class ModalInformativoService {
         .single();
 
       if (error) throw error;
-      return data;
+      return data ? {
+        ...data,
+        media_type: data.media_type as 'image' | 'video' | 'gif'
+      } : null;
     } catch (error) {
       console.error('Error updating modal slide:', error);
       return null;
@@ -222,7 +225,14 @@ export class ModalInformativoService {
 
       const slides = await this.getSlides(config.id);
       
-      return { config, slides: slides.filter(s => s.is_active) };
+      return { 
+        config: {
+          ...config,
+          visibility_rules: config.visibility_rules as any,
+          colors: config.colors as any
+        }, 
+        slides: slides.filter(s => s.is_active) 
+      };
     } catch (error) {
       console.error('Error getting active modal:', error);
       return null;

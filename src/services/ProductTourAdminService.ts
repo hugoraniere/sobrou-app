@@ -35,7 +35,7 @@ export class ProductTourAdminService {
         return this.getDefaultConfig();
       }
 
-      return data.setting_value as ProductTourAdminConfig;
+      return data.setting_value as unknown as ProductTourAdminConfig;
     } catch (error) {
       console.error('Error getting tour config:', error);
       return this.getDefaultConfig();
@@ -48,7 +48,7 @@ export class ProductTourAdminService {
         .from('tour_settings')
         .upsert({
           setting_key: 'general_config',
-          setting_value: config,
+          setting_value: config as any,
           is_active: true
         });
 
@@ -101,7 +101,16 @@ export class ProductTourAdminService {
     try {
       const { data, error } = await supabase
         .from('product_tour_steps')
-        .insert(step)
+        .insert({
+          step_key: step.step_key || 'new-step',
+          title: step.title || 'Novo Passo',
+          description: step.description || '',
+          anchor_id: step.anchor_id || 'body',
+          page_route: step.page_route || '/',
+          step_order: step.step_order || 0,
+          ...step,
+          is_active: step.is_active ?? true
+        })
         .select()
         .single();
 

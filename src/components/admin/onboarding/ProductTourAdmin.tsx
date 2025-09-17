@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { ProductTourAdminService, ProductTourAdminConfig } from '@/services/ProductTourAdminService';
 import { ProductTourStep } from '@/types/product-tour';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useOnboardingAdmin, useVirtualization } from '@/hooks/useOnboardingAdmin';
 
 export const ProductTourAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('settings');
@@ -30,6 +31,8 @@ export const ProductTourAdmin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editingStep, setEditingStep] = useState<ProductTourStep | null>(null);
   const [isCreatingStep, setIsCreatingStep] = useState(false);
+  
+  const { debouncedSave } = useOnboardingAdmin();
 
   useEffect(() => {
     loadData();
@@ -50,19 +53,23 @@ export const ProductTourAdmin: React.FC = () => {
     setIsLoading(false);
   };
 
-  const handleConfigUpdate = async (updates: Partial<ProductTourAdminConfig>) => {
+  const handleConfigUpdate = useCallback(async (updates: Partial<ProductTourAdminConfig>) => {
     if (!config) return;
     
+    // Optimistic update for better UX
     const updatedConfig = { ...config, ...updates };
-    const success = await ProductTourAdminService.updateConfig(updatedConfig);
+    setConfig(updatedConfig);
     
-    if (success) {
-      setConfig(updatedConfig);
-      toast.success('Configuração atualizada');
-    } else {
-      toast.error('Erro ao atualizar configuração');
-    }
-  };
+    // Debounced save to prevent excessive API calls
+    debouncedSave(async () => {
+      const success = await ProductTourAdminService.updateConfig(updatedConfig);
+      if (!success) {
+        // Revert on failure
+        setConfig(config);
+        throw new Error('Falha ao atualizar configuração');
+      }
+    });
+  }, [config, debouncedSave]);
 
   const handleStepSave = async (stepData: Partial<ProductTourStep>) => {
     let success = false;
@@ -115,7 +122,16 @@ export const ProductTourAdmin: React.FC = () => {
     await ProductTourAdminService.reorderSteps(items.map(s => s.id));
   };
 
-  const groupedSteps = ProductTourAdminService.groupStepsByPage(steps);
+  // Memoize expensive calculations for performance
+  const groupedSteps = useMemo(() => 
+    ProductTourAdminService.groupStepsByPage(steps), 
+    [steps]
+  );
+  
+  const sortedSteps = useMemo(() => 
+    [...steps].sort((a, b) => a.step_order - b.step_order),
+    [steps]
+  );
 
   if (isLoading) {
     return <div className="text-center py-8">Carregando...</div>;

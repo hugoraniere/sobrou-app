@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ import {
 import { toast } from 'sonner';
 import { ModalInformativoService, ModalInformativoConfig, ModalInformativoSlide } from '@/services/ModalInformativoService';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useOnboardingAdmin, useVirtualization } from '@/hooks/useOnboardingAdmin';
 
 export const ModalInformativoAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('configs');
@@ -36,6 +37,15 @@ export const ModalInformativoAdmin: React.FC = () => {
   const [editingSlide, setEditingSlide] = useState<ModalInformativoSlide | null>(null);
   const [isCreatingSlide, setIsCreatingSlide] = useState(false);
   const [isCreatingConfig, setIsCreatingConfig] = useState(false);
+  
+  const { debouncedSave } = useOnboardingAdmin();
+  
+  // Virtualization for large slide lists
+  const { visibleItems: visibleSlides, offsetY, totalHeight, onScroll } = useVirtualization(
+    slides,
+    80, // item height
+    400 // container height
+  );
 
   useEffect(() => {
     loadConfigs();

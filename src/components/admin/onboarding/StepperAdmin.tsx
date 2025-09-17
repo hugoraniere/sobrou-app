@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { OnboardingStep } from '@/types/onboarding';
 import { OnboardingConfigService } from '@/services/OnboardingConfigService';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useOnboardingAdmin, useVirtualization } from '@/hooks/useOnboardingAdmin';
 
 export const StepperAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('settings');
@@ -31,6 +32,8 @@ export const StepperAdmin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editingStep, setEditingStep] = useState<OnboardingStep | null>(null);
   const [isCreatingStep, setIsCreatingStep] = useState(false);
+  
+  const { debouncedSave } = useOnboardingAdmin();
 
   useEffect(() => {
     loadData();
@@ -61,19 +64,25 @@ export const StepperAdmin: React.FC = () => {
     return data || [];
   };
 
-  const handleConfigUpdate = async (updates: any) => {
-    const updatedConfig = { ...stepperConfig, ...updates };
-    const success = await OnboardingConfigService.updateConfig('get_started_stepper', {
-      content: updatedConfig
-    });
+  const handleConfigUpdate = useCallback(async (updates: any) => {
+    if (!stepperConfig) return;
     
-    if (success) {
-      setStepperConfig(updatedConfig);
-      toast.success('Configuração atualizada');
-    } else {
-      toast.error('Erro ao atualizar configuração');
-    }
-  };
+    // Optimistic update
+    const updatedConfig = { ...stepperConfig, ...updates };
+    setStepperConfig(updatedConfig);
+    
+    // Debounced save
+    debouncedSave(async () => {
+      const success = await OnboardingConfigService.updateConfig('get_started_stepper', {
+        content: updatedConfig
+      });
+      
+      if (!success) {
+        setStepperConfig(stepperConfig);
+        throw new Error('Falha ao atualizar configuração');
+      }
+    });
+  }, [stepperConfig, debouncedSave]);
 
   const handleStepSave = async (stepData: Partial<OnboardingStep>) => {
     let success = false;
