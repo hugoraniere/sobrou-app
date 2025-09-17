@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
-import { Search, UserCheck, UserX, Shield, Edit3, Eye, FileText, MessageCircle, TrendingUp, ArrowUpDown, Filter } from 'lucide-react';
+import { Search, UserCheck, UserX, Shield, Edit3, Eye, FileText, MessageCircle, TrendingUp, ArrowUpDown, Filter, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface User {
@@ -73,6 +73,39 @@ const UserManager = () => {
       });
     } finally {
       setManagingUser(null);
+    }
+  };
+
+  const copyToClipboard = async (email: string) => {
+    try {
+      await navigator.clipboard.writeText(email);
+      toast({
+        message: `Email ${email} copiado!`,
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error copying email:', error);
+      toast({
+        message: 'Erro ao copiar email',
+        type: 'error'
+      });
+    }
+  };
+
+  const copyAllEmails = async () => {
+    try {
+      const emailList = users.map(user => user.email).join(', ');
+      await navigator.clipboard.writeText(emailList);
+      toast({
+        message: `${users.length} emails copiados!`,
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error copying emails:', error);
+      toast({
+        message: 'Erro ao copiar emails',
+        type: 'error'
+      });
     }
   };
 
@@ -192,6 +225,17 @@ const UserManager = () => {
               <ArrowUpDown className="h-4 w-4 mr-2" />
               {sortOrder === 'ASC' ? 'Crescente' : 'Decrescente'}
             </Button>
+
+            {users.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={copyAllEmails}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copiar Todos os Emails ({users.length})
+              </Button>
+            )}
           </div>
 
           {users.length === 0 && !isLoading && (
@@ -207,6 +251,17 @@ const UserManager = () => {
                   <div className="space-y-1 cursor-pointer flex-1" onClick={() => handleUserClick(user)}>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{user.email}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyToClipboard(user.email);
+                        }}
+                        className="h-6 w-6 p-0"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
                       {user.full_name && (
                         <span className="text-muted-foreground">({user.full_name})</span>
                       )}
