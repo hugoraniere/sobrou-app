@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search } from 'lucide-react';
-import TransparentHeader from "@/components/header/TransparentHeader";
+import MainNavbar from '@/components/navigation/MainNavbar';
 import BlogBreadcrumb from '@/components/blog/BlogBreadcrumb';
+import BlogSidebar from '@/components/blog/BlogSidebar';
 import FeaturedPostHero from '@/components/blog/FeaturedPostHero';
 import CategoryNavigation from '@/components/blog/CategoryNavigation';
 import ViewModeToggle, { ViewMode } from '@/components/blog/ViewModeToggle';
@@ -256,114 +257,126 @@ const Blog: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <TransparentHeader />
-      <div className="container mx-auto px-4 py-8 pt-16">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <BlogBreadcrumb category={selectedCategory} />
-        </div>
-
-        {/* Featured Post Hero */}
-        <FeaturedPostHero featuredPost={featuredPost} />
-
-        {/* Search */}
-        <div className="mb-8">
-          <form onSubmit={handleSearch} className="max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Buscar artigos..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-10 pr-20"
-              />
-              <Button 
-                type="submit" 
-                size="sm" 
-                className="absolute right-1 top-1 h-8"
-              >
-                Buscar
-              </Button>
-            </div>
-          </form>
-        </div>
-
-        {/* Category Navigation */}
-        <CategoryNavigation
-          tags={tags}
-          selectedCategory={selectedCategory}
-          onCategorySelect={handleCategorySelect}
-          loading={tagsLoading}
-        />
-
-        {/* View Mode Toggle and Results Info */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-muted-foreground">
-            {searchTerm && `Resultados para "${searchTerm}" • `}
-            {selectedCategory && `Categoria: ${selectedCategory} • `}
-            Página {currentPage} {totalPages > 1 && `de ${totalPages}`}
+    <div className="min-h-screen bg-white">
+      <MainNavbar />
+      
+      <div className="pt-16">
+        <div className="container mx-auto px-4 py-8">
+          {/* Breadcrumb */}
+          <div className="mb-6">
+            <BlogBreadcrumb category={selectedCategory} />
           </div>
-          <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
-        </div>
 
-        {/* Content */}
-        <main>
-          {loading ? (
-            <div className={viewMode === 'cards' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-6'}>
-              {Array(6).fill(0).map((_, i) => (
-                <div key={i} className={viewMode === 'cards' ? 'space-y-4' : 'flex gap-4 p-4 border rounded-lg'}>
-                  <Skeleton className={viewMode === 'cards' ? 'aspect-video w-full' : 'w-48 aspect-video'} />
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-5/6" />
+          {/* Featured Post Hero */}
+          <FeaturedPostHero featuredPost={featuredPost} />
+
+          {/* Main Content with Sidebar */}
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Main Content */}
+            <div className="flex-1">
+              {/* Search */}
+              <div className="mb-8">
+                <form onSubmit={handleSearch} className="max-w-md">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      type="text"
+                      placeholder="Buscar artigos..."
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      className="pl-10 pr-20"
+                    />
+                    <Button 
+                      type="submit" 
+                      size="sm" 
+                      className="absolute right-1 top-1 h-8"
+                    >
+                      Buscar
+                    </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : posts.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="max-w-md mx-auto">
-                <h2 className="text-2xl font-semibold text-foreground mb-4">
-                  Nenhum artigo encontrado
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  {searchTerm ? 'Tente ajustar sua busca ou navegue pelas categorias.' : 
-                   selectedCategory ? 'Não há artigos nesta categoria no momento.' :
-                   'Ainda não há artigos publicados.'}
-                </p>
-                {(searchTerm || selectedCategory) && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSearchValue('');
-                      setSearchTerm('');
-                      setSelectedCategory(undefined);
-                      setCurrentPage(1);
-                      updateURL({ search: '', category: '', page: 1 });
-                      loadPosts('', undefined, 1);
-                    }}
-                  >
-                    Ver todos os artigos
-                  </Button>
-                )}
+                </form>
               </div>
+
+              {/* Category Navigation */}
+              <CategoryNavigation
+                tags={tags}
+                selectedCategory={selectedCategory}
+                onCategorySelect={handleCategorySelect}
+                loading={tagsLoading}
+              />
+
+              {/* View Mode Toggle and Results Info */}
+              <div className="flex justify-between items-center mb-6">
+                <div className="text-muted-foreground">
+                  {searchTerm && `Resultados para "${searchTerm}" • `}
+                  {selectedCategory && `Categoria: ${selectedCategory} • `}
+                  Página {currentPage} {totalPages > 1 && `de ${totalPages}`}
+                </div>
+                <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+              </div>
+
+              {/* Content */}
+              <main>
+                {loading ? (
+                  <div className={viewMode === 'cards' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-6'}>
+                    {Array(6).fill(0).map((_, i) => (
+                      <div key={i} className={viewMode === 'cards' ? 'space-y-4' : 'flex gap-4 p-4 border rounded-lg'}>
+                        <Skeleton className={viewMode === 'cards' ? 'aspect-video w-full' : 'w-48 aspect-video'} />
+                        <div className="space-y-2 flex-1">
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-3 w-1/2" />
+                          <Skeleton className="h-3 w-full" />
+                          <Skeleton className="h-3 w-5/6" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : posts.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="max-w-md mx-auto">
+                      <h2 className="text-2xl font-semibold text-foreground mb-4">
+                        Nenhum artigo encontrado
+                      </h2>
+                      <p className="text-muted-foreground mb-6">
+                        {searchTerm ? 'Tente ajustar sua busca ou navegue pelas categorias.' : 
+                         selectedCategory ? 'Não há artigos nesta categoria no momento.' :
+                         'Ainda não há artigos publicados.'}
+                      </p>
+                      {(searchTerm || selectedCategory) && (
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setSearchValue('');
+                            setSearchTerm('');
+                            setSelectedCategory(undefined);
+                            setCurrentPage(1);
+                            updateURL({ search: '', category: '', page: 1 });
+                            loadPosts('', undefined, 1);
+                          }}
+                        >
+                          Ver todos os artigos
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {viewMode === 'cards' ? (
+                      <PostCardsView posts={posts} />
+                    ) : (
+                      <PostListView posts={posts} />
+                    )}
+                    
+                    {renderPagination()}
+                  </>
+                )}
+              </main>
             </div>
-          ) : (
-            <>
-              {viewMode === 'cards' ? (
-                <PostCardsView posts={posts} />
-              ) : (
-                <PostListView posts={posts} />
-              )}
-              
-              {renderPagination()}
-            </>
-          )}
-        </main>
+
+            {/* Sidebar */}
+            <BlogSidebar />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -202,7 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      navigate('/');
+      navigate('/dashboard');
       return;
     } catch (error: any) {
       console.error('Signup failed:', error);

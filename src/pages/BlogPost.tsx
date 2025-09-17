@@ -11,7 +11,10 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
+import MainNavbar from '@/components/navigation/MainNavbar';
 import BlogBreadcrumb from '@/components/blog/BlogBreadcrumb';
+import BlogSidebar from '@/components/blog/BlogSidebar';
+import RelatedPostsCarousel from '@/components/blog/RelatedPostsCarousel';
 
 const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -97,17 +100,20 @@ const BlogPost: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-muted rounded w-32 mb-6" />
-            <div className="h-12 bg-muted rounded w-3/4 mb-4" />
-            <div className="h-6 bg-muted rounded w-1/2 mb-8" />
-            <div className="aspect-video bg-muted rounded mb-8" />
-            <div className="space-y-4">
-              {Array(8).fill(0).map((_, i) => (
-                <div key={i} className="h-4 bg-muted rounded" />
-              ))}
+      <div className="min-h-screen bg-white">
+        <MainNavbar />
+        <div className="pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-muted rounded w-32 mb-6" />
+              <div className="h-12 bg-muted rounded w-3/4 mb-4" />
+              <div className="h-6 bg-muted rounded w-1/2 mb-8" />
+              <div className="aspect-video bg-muted rounded mb-8" />
+              <div className="space-y-4">
+                {Array(8).fill(0).map((_, i) => (
+                  <div key={i} className="h-4 bg-muted rounded" />
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -116,36 +122,28 @@ const BlogPost: React.FC = () => {
   }
 
   if (!post) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <BlogBreadcrumb 
-            category={post.tags && post.tags.length > 0 ? post.tags[0].name : undefined}
-            postTitle={post.title} 
-          />
-        </div>
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <BlogBreadcrumb 
-            category={post.tags && post.tags.length > 0 ? post.tags[0].name : undefined}
-            postTitle={post.title} 
-          />
-        </div>
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-semibold text-foreground mb-4">
-              Artigo não encontrado
-            </h1>
-            <p className="text-muted-foreground mb-6">
-              O artigo que você está procurando não existe ou foi removido.
-            </p>
-            <Link to="/blog">
-              <Button variant="outline">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao Blog
-              </Button>
-            </Link>
+    return (
+      <div className="min-h-screen bg-white">
+        <MainNavbar />
+        <div className="pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <div className="mb-6">
+              <BlogBreadcrumb />
+            </div>
+            <div className="text-center py-12">
+              <h1 className="text-2xl font-semibold text-foreground mb-4">
+                Artigo não encontrado
+              </h1>
+              <p className="text-muted-foreground mb-6">
+                O artigo que você está procurando não existe ou foi removido.
+              </p>
+              <Link to="/blog">
+                <Button variant="outline">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Voltar ao Blog
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -153,112 +151,133 @@ const BlogPost: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Navigation */}
-      <div className="container mx-auto px-4 py-6">
-        <Link to="/blog">
-          <Button variant="ghost" size="sm" className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar ao Blog
-          </Button>
-        </Link>
-      </div>
+    <div className="min-h-screen bg-white">
+      <MainNavbar />
+      
+      <div className="pt-16">
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 py-6">
+          <BlogBreadcrumb 
+            category={post.tags && post.tags.length > 0 ? post.tags[0].name : undefined}
+            postTitle={post.title} 
+          />
+        </div>
 
-      {/* Article */}
-      <article className="container mx-auto px-4 pb-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <header className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
-              {post.title}
-            </h1>
-            
-            {post.subtitle && (
-              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
-                {post.subtitle}
-              </p>
-            )}
-
-            {/* Meta info */}
-            <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-6">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>{format(new Date(post.published_at), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
+        {/* Main Content with Sidebar */}
+        <div className="container mx-auto px-4 pb-12">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Article Content */}
+            <article className="flex-1 max-w-4xl">
+              {/* Navigation */}
+              <div className="mb-6">
+                <Link to="/blog">
+                  <Button variant="ghost" size="sm">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Voltar ao Blog
+                  </Button>
+                </Link>
               </div>
-              <div className="flex items-center gap-2">
-                <Heart className="h-4 w-4" />
-                <span>{likeCount} {likeCount === 1 ? 'curtida' : 'curtidas'}</span>
+
+              {/* Header */}
+              <header className="mb-8">
+                <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
+                  {post.title}
+                </h1>
+                
+                {post.subtitle && (
+                  <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                    {post.subtitle}
+                  </p>
+                )}
+
+                {/* Meta info */}
+                <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-6">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>{format(new Date(post.published_at), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-4 w-4" />
+                    <span>{likeCount} {likeCount === 1 ? 'curtida' : 'curtidas'}</span>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-8">
+                    {post.tags.map((tag) => (
+                      <Badge key={tag.id} variant="secondary">
+                        {tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Cover image */}
+                {post.cover_image_url && (
+                  <div className="aspect-video overflow-hidden rounded-lg mb-8">
+                    <img
+                      src={post.cover_image_url}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </header>
+
+              {/* Content */}
+              <div className="prose prose-lg max-w-none dark:prose-invert mb-8">
+                <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
+                  <CardContent className="p-8">
+                    <div 
+                      className="prose max-w-none dark:prose-invert"
+                      dangerouslySetInnerHTML={{ 
+                        __html: DOMPurify.sanitize(post.content, {
+                          ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'pre', 'code'],
+                          ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel', 'class']
+                        })
+                      }}
+                    />
+                  </CardContent>
+                </Card>
               </div>
-            </div>
 
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-8">
-                {post.tags.map((tag) => (
-                  <Badge key={tag.id} variant="secondary">
-                    {tag.name}
-                  </Badge>
-                ))}
+              {/* Actions */}
+              <div className="flex items-center justify-between border-t border-border/40 pt-8 mb-8">
+                <div className="flex items-center gap-4">
+                  <Button
+                    onClick={handleLike}
+                    disabled={liking}
+                    variant={isLiked ? "default" : "outline"}
+                    size="lg"
+                  >
+                    <Heart className={`mr-2 h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
+                    {liking ? 'Curtindo...' : isLiked ? 'Curtido' : 'Curtir'}
+                    <span className="ml-2 text-sm">({likeCount})</span>
+                  </Button>
+                  
+                  <Button onClick={handleShare} variant="outline" size="lg">
+                    <Share2 className="mr-2 h-5 w-5" />
+                    Compartilhar
+                  </Button>
+                </div>
+
+                <Link to="/blog">
+                  <Button variant="ghost">
+                    Mais artigos
+                  </Button>
+                </Link>
               </div>
-            )}
+            </article>
 
-            {/* Cover image */}
-            {post.cover_image_url && (
-              <div className="aspect-video overflow-hidden rounded-lg mb-8">
-                <img
-                  src={post.cover_image_url}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-          </header>
-
-          {/* Content */}
-          <div className="prose prose-lg max-w-none dark:prose-invert mb-8">
-            <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
-              <CardContent className="p-8">
-                <div 
-                  className="prose max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{ 
-                    __html: DOMPurify.sanitize(post.content, {
-                      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'pre', 'code'],
-                      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel', 'class']
-                    })
-                  }}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-between border-t border-border/40 pt-8">
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={handleLike}
-                disabled={liking}
-                variant={isLiked ? "default" : "outline"}
-                size="lg"
-              >
-                <Heart className={`mr-2 h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
-                {liking ? 'Curtindo...' : isLiked ? 'Curtido' : 'Curtir'}
-                <span className="ml-2 text-sm">({likeCount})</span>
-              </Button>
-              
-              <Button onClick={handleShare} variant="outline" size="lg">
-                <Share2 className="mr-2 h-5 w-5" />
-                Compartilhar
-              </Button>
-            </div>
-
-            <Link to="/blog">
-              <Button variant="ghost">
-                Mais artigos
-              </Button>
-            </Link>
+            {/* Sidebar */}
+            <BlogSidebar />
           </div>
         </div>
-      </article>
+
+        {/* Related Posts Carousel */}
+        <RelatedPostsCarousel currentPostId={post.id} />
+      </div>
     </div>
   );
 };

@@ -10,6 +10,7 @@ export interface BlogPost {
   user_id: string;
   slug: string;
   tags?: BlogTag[];
+  like_count?: number;
 }
 
 export interface BlogTag {

@@ -611,4 +611,106 @@ export class BlogService {
       return [];
     }
   }
+
+  async getRelatedBlogPosts(postId: string, limit: number = 3): Promise<BlogPost[]> {
+    try {
+      // Get the current post's tags
+      const currentPost = await this.getPublicBlogPost(postId);
+      if (!currentPost || !currentPost.tags || currentPost.tags.length === 0) {
+        return [];
+      }
+
+      const tagNames = currentPost.tags.map(tag => tag.name);
+      
+      // Get posts with similar tags, excluding the current post
+      const { data, error } = await supabase
+        .rpc('get_public_blog_posts', {
+          search_term: '',
+          page_size: limit + 5, // Get extra to filter out current post
+          page_offset: 0
+        });
+
+      if (error) throw error;
+
+      // Filter posts that share tags with current post and exclude current post
+      const relatedPosts = data
+        .filter((post: any) => 
+          post.id !== postId && 
+          post.tags && 
+          post.tags.some((tag: any) => tagNames.includes(tag.name))
+        )
+        .slice(0, limit);
+
+      return relatedPosts.map((post: any) => ({
+        ...post,
+        tags: Array.isArray(post.tags) ? post.tags.filter((tag: any) => tag && tag.id).map((tag: any) => ({
+          id: tag.id,
+          name: tag.name,
+          created_at: tag.created_at || new Date().toISOString()
+        })) : []
+      }));
+    } catch (error) {
+      console.error('[BlogService] Error fetching related posts:', error);
+      return [];
+    }
+  }
+
+  async getTagStats(): Promise<Array<{ name: string; count: number }>> {
+    try {
+      const { data, error } = await supabase
+        .from('blog_post_tags')
+        .select(`
+          tag_id,
+          blog_tags!inner(name)
+        `);
+
+      if (error) throw error;
+
+      // Count tag occurrences
+      const tagCounts: { [key: string]: number } = {};
+      data.forEach((item: any) => {
+        const tagName = item.blog_tags.name;
+        tagCounts[tagName] = (tagCounts[tagName] || 0) + 1;
+      });
+
+      // Convert to sorted array
+      return Object.entries(tagCounts)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10); // Top 10 tags
+    } catch (error) {
+      console.error('[BlogService] Error fetching tag stats:', error);
+      return [];
+    }
+  }
+
+  async getFeaturedPosts(limit: number = 3): Promise<BlogPost[]> {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_public_blog_posts', {
+          search_term: '',
+          page_size: limit * 2, // Get extra to sort by likes
+          page_offset: 0
+        });
+
+      if (error) throw error;
+
+      // Sort by like count and return top posts
+      const featuredPosts = data
+        .sort((a: any, b: any) => (b.like_count || 0) - (a.like_count || 0))
+        .slice(0, limit);
+
+      return featuredPosts.map((post: any) => ({
+        ...post,
+        tags: Array.isArray(post.tags) ? post.tags.filter((tag: any) => tag && tag.id).map((tag: any) => ({
+          id: tag.id,
+          name: tag.name,
+          created_at: tag.created_at || new Date().toISOString()
+        })) : []
+      }));
+    } catch (error) {
+      console.error('[BlogService] Error fetching featured posts:', error);
+      return [];
+    }
+  }
 }
