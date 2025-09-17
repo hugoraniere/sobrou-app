@@ -187,7 +187,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
 
         {/* Gastos por Categoria */}
-        <Card className="w-full">
+        <Card className="w-full" data-tour="category-chart">
           <CardHeader>
             <CardTitle className="text-xl">Gastos por categoria</CardTitle>
           </CardHeader>

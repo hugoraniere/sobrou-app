@@ -45,7 +45,7 @@ export const UpcomingPayables: React.FC = () => {
     const daysDiff = Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
     if (daysDiff <= 0) return 'destructive';
-    if (daysDiff <= 3) return 'warning';
+    if (daysDiff <= 3) return 'outline';
     return 'secondary';
   };
 

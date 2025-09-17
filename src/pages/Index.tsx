@@ -12,9 +12,11 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
+import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog';
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
 import { ProductTour } from '@/components/onboarding/ProductTour';
 import { HelpWidget } from '@/components/onboarding/HelpWidget';
+import { OnboardingBanner } from '@/components/onboarding/OnboardingBanner';
 import { UpcomingPayables } from '@/components/dashboard/UpcomingPayables';
 
 const Index = () => {
@@ -68,6 +70,7 @@ const Index = () => {
         </ResponsivePageHeader>
         
         <div className="space-y-6">
+          <OnboardingBanner />
           <UpcomingPayables />
           
           <DashboardContent
@@ -96,6 +99,7 @@ const Index = () => {
         />
 
         <WelcomeModal />
+        <OnboardingDialog />
         <OnboardingChecklist />
         <ProductTour />
         <HelpWidget />
