@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AdminSidebar } from './AdminSidebar';
 import MainNavbar from '../navigation/MainNavbar';
+import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import FloatingChatButton from '../chat/FloatingChatButton';
 import ChatWindow from '../chat/ChatWindow';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -60,7 +61,9 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={false}>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <OnboardingProvider>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </OnboardingProvider>
     </SidebarProvider>
   );
 };

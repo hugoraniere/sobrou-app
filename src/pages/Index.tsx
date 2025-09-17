@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { OnboardingProvider } from '../contexts/OnboardingContext';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { useFilteredTransactions } from '../hooks/useFilteredTransactions';
 import { useDashboardData } from '../hooks/useDashboardData';
@@ -53,7 +52,7 @@ const Index = () => {
   const isLoading = authLoading || dataLoading;
   
   return (
-    <OnboardingProvider>
+    
       <ResponsivePageContainer>
         <ResponsivePageHeader 
           title={t('dashboard.title')}
@@ -104,7 +103,7 @@ const Index = () => {
         <ProductTour />
         <HelpWidget />
       </ResponsivePageContainer>
-    </OnboardingProvider>
+    
   );
 };
 
