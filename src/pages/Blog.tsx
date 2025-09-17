@@ -14,6 +14,8 @@ import CategoryNavigation from '@/components/blog/CategoryNavigation';
 import ViewModeToggle, { ViewMode } from '@/components/blog/ViewModeToggle';
 import PostCardsView from '@/components/blog/PostCardsView';
 import PostListView from '@/components/blog/PostListView';
+import { usePageMeta } from '@/hooks/usePageMeta';
+import StructuredData from '@/components/seo/StructuredData';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 const Blog: React.FC = () => {
@@ -258,6 +260,9 @@ const Blog: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Organization Structured Data */}
+      <StructuredData type="organization" data={{}} />
+      
       <MainNavbar />
       
       <div className="pt-16">

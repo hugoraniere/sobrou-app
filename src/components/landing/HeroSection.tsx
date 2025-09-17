@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2, Shield, Smartphone } from 'lucide-react';
-import { getSectionContainer } from '@/constants/layoutTokens';
+import LazyImage from '@/components/ui/LazyImage';
 
 const HeroSection: React.FC = () => {
   return (
@@ -55,26 +55,26 @@ const HeroSection: React.FC = () => {
 
         {/* Div 2 - Imagem - Normal em mobile */}
         <div className="lg:hidden">
-          <img 
-            src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
-            alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-            className="w-full h-auto object-cover object-center shadow-2xl rounded-lg"
-            loading="eager" 
-            fetchPriority="high" 
-            decoding="async" 
-          />
+        <LazyImage 
+          src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
+          alt="Dashboard do Sobrou mostrando controle financeiro completo" 
+          className="w-full h-auto object-cover object-center shadow-2xl rounded-lg"
+          priority
+          width={800}
+          height={600}
+        />
         </div>
       </div>
 
       {/* Imagem sangrando para a direita - Apenas desktop */}
       <div className="hidden lg:block absolute right-0 w-[120vw] pointer-events-none" style={{ left: '50%', top: '10%', bottom: '10%' }}>
-        <img 
+        <LazyImage 
           src="/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png" 
           alt="Dashboard do Sobrou mostrando controle financeiro completo" 
           className="h-full w-auto object-cover object-left shadow-2xl"
-          loading="eager" 
-          fetchPriority="high" 
-          decoding="async" 
+          priority
+          width={1200}
+          height={800}
         />
       </div>
     </section>

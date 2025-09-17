@@ -15,6 +15,8 @@ import MainNavbar from '@/components/navigation/MainNavbar';
 import BlogBreadcrumb from '@/components/blog/BlogBreadcrumb';
 import BlogSidebar from '@/components/blog/BlogSidebar';
 import RelatedPostsCarousel from '@/components/blog/RelatedPostsCarousel';
+import { usePageMeta } from '@/hooks/usePageMeta';
+import StructuredData from '@/components/seo/StructuredData';
 
 const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -26,6 +28,20 @@ const BlogPost: React.FC = () => {
   const { user } = useAuth();
 
   const blogService = new BlogService();
+  
+  // SEO Meta Tags
+  usePageMeta({
+    title: post?.title || 'Carregando...',
+    description: post?.content?.substring(0, 160) || '',
+    type: 'article',
+    url: `https://sobrou.app/blog/${slug}`,
+    image: (post as any)?.cover_image,
+    publishedTime: post?.created_at,
+    modifiedTime: post?.updated_at,
+    author: 'Sobrou Team',
+    tags: post?.tags?.map(tag => tag.name),
+    keywords: post?.tags?.map(tag => tag.name).join(', ') || 'blog, finanças, sobrou'
+  });
 
   useEffect(() => {
     if (slug) {
