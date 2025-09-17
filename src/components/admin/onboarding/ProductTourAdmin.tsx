@@ -23,6 +23,8 @@ import { ProductTourAdminService, ProductTourAdminConfig } from '@/services/Prod
 import { ProductTourStep } from '@/types/product-tour';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useOnboardingAdmin, useVirtualization } from '@/hooks/useOnboardingAdmin';
+import { StepValidation } from './StepValidation';
+import { BehaviorSettings } from './BehaviorSettings';
 
 export const ProductTourAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('settings');
@@ -140,7 +142,7 @@ export const ProductTourAdmin: React.FC = () => {
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="w-4 h-4" />
             Configurações
@@ -156,6 +158,10 @@ export const ProductTourAdmin: React.FC = () => {
           <TabsTrigger value="appearance" className="flex items-center gap-2">
             <Palette className="w-4 h-4" />
             Aparência
+          </TabsTrigger>
+          <TabsTrigger value="behavior" className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Comportamento
           </TabsTrigger>
         </TabsList>
 
@@ -180,6 +186,10 @@ export const ProductTourAdmin: React.FC = () => {
 
         <TabsContent value="appearance" className="space-y-4">
           <AppearanceSettings config={config} onUpdate={handleConfigUpdate} />
+        </TabsContent>
+
+        <TabsContent value="behavior" className="space-y-4">
+          <BehaviorSettings config={config} onUpdate={handleConfigUpdate} />
         </TabsContent>
       </Tabs>
 
@@ -379,7 +389,11 @@ const StepsManager: React.FC<{
                               <div className="flex-1">
                                 <div className="font-medium">{step.title}</div>
                                 <div className="text-sm text-muted-foreground">{step.description}</div>
-                                <div className="text-xs text-muted-foreground">Elemento: #{step.anchor_id}</div>
+                                <StepValidation 
+                                  anchorId={step.anchor_id}
+                                  pageRoute={step.page_route}
+                                  className="mt-1"
+                                />
                               </div>
                               
                               <Badge variant={step.is_active ? "default" : "secondary"}>
