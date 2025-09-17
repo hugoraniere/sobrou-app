@@ -331,25 +331,74 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
   useEffect(() => {
     const initializeTour = async () => {
       if (!user?.id) return;
+      
+      setIsLoading(true);
+      try {
+        // Check if tour is enabled globally
+        const tourEnabled = await ProductTourService.isTourEnabled();
+        if (!tourEnabled) {
+          setIsLoading(false);
+          return;
+        }
 
-      // Load steps and progress
-      await Promise.all([
-        loadTourSteps(),
-        loadUserProgress()
-      ]);
+        // Load all tour steps
+        const allSteps = await ProductTourService.getTourSteps();
+        setSteps(allSteps);
+        setTotalSteps(allSteps.length);
 
-      // Check if should auto-start tour
-      const shouldAutoStart = await ProductTourService.shouldAutoStartTour(user.id);
-      if (shouldAutoStart) {
-        // Small delay to ensure UI is ready
-        setTimeout(() => {
-          startTour();
-        }, 2000);
+        // Load user progress
+        const userProgress = await ProductTourService.getUserProgress(user.id);
+        setProgress(userProgress);
+
+        // Check if should auto-start tour - delay to ensure dashboard loads
+        setTimeout(async () => {
+          const shouldAutoStart = await ProductTourService.shouldAutoStartTour(user.id);
+          if (shouldAutoStart && allSteps.length > 0) {
+            await startTour();
+          }
+        }, 1500);
+      } catch (error) {
+        console.error('Error initializing tour:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     initializeTour();
-  }, [user?.id, loadTourSteps, loadUserProgress, startTour]);
+  }, [user?.id]);
+
+  // Handle route changes to continue tour
+  useEffect(() => {
+    if (!isActive || !currentStep || !user?.id) return;
+
+    const handleRouteChange = async () => {
+      const currentPath = location.pathname;
+      
+      // If current step is for this page, reposition spotlight
+      if (currentStep.page_route === currentPath) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          // Force update by setting step again
+          const stepIndex = steps.findIndex(s => s.id === currentStep.id);
+          if (stepIndex !== -1) {
+            setCurrentStepIndex(stepIndex);
+          }
+        }, 500);
+      } else {
+        // Find next step for current page or continue sequence
+        const nextStepForPage = steps.find(step => 
+          step.page_route === currentPath && 
+          step.step_order > currentStep.step_order
+        );
+        
+        if (nextStepForPage) {
+          await goToStep(nextStepForPage.step_key);
+        }
+      }
+    };
+
+    handleRouteChange();
+  }, [location.pathname, isActive, currentStep, steps, user?.id, goToStep]);
 
   const contextValue: TourContextType = {
     // State

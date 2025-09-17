@@ -40,8 +40,8 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
     const padding = 8;
     
     setPosition({
-      top: rect.top - padding,
-      left: rect.left - padding,
+      top: rect.top + window.scrollY - padding,
+      left: rect.left + window.scrollX - padding,
       width: rect.width + (padding * 2),
       height: rect.height + (padding * 2),
       found: true
@@ -110,19 +110,32 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
   useEffect(() => {
     updatePosition();
     
-    const handleResize = () => updatePosition();
-    const handleScroll = () => updatePosition();
+    // Throttle scroll and resize events for better performance
+    let scrollTimeout: NodeJS.Timeout;
+    let resizeTimeout: NodeJS.Timeout;
+    
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(updatePosition, 10);
+    };
+    
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(updatePosition, 10);
+    };
     
     window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     document.addEventListener('keydown', handleKeyDown);
     
     // Show spotlight after position is calculated
     const timer = setTimeout(() => setIsVisible(true), 100);
     
     return () => {
+      clearTimeout(scrollTimeout);
+      clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('keydown', handleKeyDown);
       clearTimeout(timer);
     };
