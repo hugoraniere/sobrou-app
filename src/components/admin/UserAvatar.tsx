@@ -18,6 +18,11 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const { avatarUrl } = useAvatar();
+  const { setWelcomeModalOpen } = useOnboarding();
+
+  const handleTutorial = () => {
+    setWelcomeModalOpen(true);
+  };
 
   const handleLogout = async () => {
     if (onLogout) {
@@ -72,7 +77,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
             <DropdownMenuSeparator />
           </>
         )}
-        <DropdownMenuItem onClick={restartOnboarding} className="flex items-center">
+        <DropdownMenuItem onClick={handleTutorial} className="flex items-center">
           <BookOpen className="mr-2 h-4 w-4" />
           Tutorial do sistema
         </DropdownMenuItem>

@@ -9,7 +9,7 @@ import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import AddTransactionDialog from '@/components/translations/AddTransactionDialog';
+import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
 
 // Onboarding Components
 import { WelcomeModal } from '../components/onboarding/WelcomeModal';
