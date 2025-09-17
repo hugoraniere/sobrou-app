@@ -13,22 +13,61 @@ import {
 import { ProductTourAdmin } from '@/components/admin/onboarding/ProductTourAdmin';
 import { StepperAdmin } from '@/components/admin/onboarding/StepperAdmin';
 import { ModalInformativoAdmin } from '@/components/admin/onboarding/ModalInformativoAdmin';
+import { OnboardingSummaryBar } from '@/components/admin/onboarding/OnboardingSummaryBar';
+
+// Import onboarding components for preview
 import { GetStartedStepper } from '@/components/onboarding/GetStartedStepper';
 import { TourManager } from '@/components/tour/TourManager';
+import { OnboardingGate } from '@/components/onboarding/OnboardingGate';
 import { useProductTour } from '@/hooks/useProductTour';
+import { useOnboardingState } from '@/hooks/useOnboardingVisibility';
+import { toast } from 'sonner';
 
 const OnboardingAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('product-tour');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewType, setPreviewType] = useState<'stepper' | 'tour' | 'modal'>('stepper');
   const { startTour, isActive } = useProductTour();
+  const { resetUserStates } = useOnboardingState();
+
+  // Mock status data - in real app, fetch from your state management
+  const tourStatus = {
+    enabled: true,
+    visibility: 'first_login',
+    audience: 'new_users', 
+    version: '1.0',
+    lastPublished: '2024-01-15'
+  };
+
+  const stepperStatus = {
+    enabled: true,
+    visibility: 'until_complete',
+    audience: 'all_users',
+    version: '1.0', 
+    lastPublished: '2024-01-15'
+  };
 
   const handlePreview = (type: 'stepper' | 'tour' | 'modal') => {
     if (type === 'tour') {
-      startTour();
+      // Open tour in preview mode
+      const previewUrl = `${window.location.origin}?tour=preview`;
+      window.open(previewUrl, '_blank');
     } else {
       setPreviewType(type);
       setIsPreviewOpen(true);
+    }
+  };
+
+  const handlePublish = (type: 'tour' | 'stepper') => {
+    toast.success(`${type === 'tour' ? 'Product Tour' : 'Stepper'} publicado com sucesso!`);
+  };
+
+  const handleReset = async (type: 'tour' | 'stepper') => {
+    try {
+      await resetUserStates();
+      toast.success(`Estados de usuário resetados para ${type === 'tour' ? 'Product Tour' : 'Stepper'}`);
+    } catch (error) {
+      toast.error('Erro ao resetar estados de usuário');
     }
   };
 
@@ -75,10 +114,24 @@ const OnboardingAdmin: React.FC = () => {
         </TabsList>
 
         <TabsContent value="product-tour" className="space-y-4">
+          <OnboardingSummaryBar
+            type="tour"
+            status={tourStatus}
+            onPreview={() => handlePreview('tour')}
+            onPublish={() => handlePublish('tour')}
+            onReset={() => handleReset('tour')}
+          />
           <ProductTourAdmin />
         </TabsContent>
 
         <TabsContent value="stepper" className="space-y-4">
+          <OnboardingSummaryBar
+            type="stepper"
+            status={stepperStatus}
+            onPreview={() => handlePreview('stepper')}
+            onPublish={() => handlePublish('stepper')}
+            onReset={() => handleReset('stepper')}
+          />
           <StepperAdmin />
         </TabsContent>
 
@@ -121,7 +174,11 @@ const PreviewDialog: React.FC<{
         </DialogHeader>
         
         <div className="bg-muted/30 p-4 rounded-lg">
-          {type === 'stepper' && <GetStartedStepper />}
+          {type === 'stepper' && (
+            <OnboardingGate type="stepper" preview>
+              <GetStartedStepper />
+            </OnboardingGate>
+          )}
           {type === 'modal' && (
             <div className="flex items-center justify-center min-h-[200px]">
               <div className="text-muted-foreground">Preview do Modal Informativo em desenvolvimento</div>
@@ -129,7 +186,7 @@ const PreviewDialog: React.FC<{
           )}
           {type === 'tour' && (
             <div className="flex items-center justify-center min-h-[200px]">
-              <div className="text-muted-foreground">Tour iniciado - feche este modal para ver o tour</div>
+              <div className="text-muted-foreground">Tour iniciado em nova aba</div>
             </div>
           )}
         </div>

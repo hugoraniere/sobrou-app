@@ -751,28 +751,46 @@ export type Database = {
       }
       onboarding_config: {
         Row: {
+          audience: string | null
           content: Json
           created_at: string
+          enabled: boolean | null
+          hide_on_dismiss: boolean | null
           id: string
           is_visible: boolean
           section_key: string
+          show_when: string | null
+          sync_with_tour: boolean | null
           updated_at: string
+          version: string | null
         }
         Insert: {
+          audience?: string | null
           content?: Json
           created_at?: string
+          enabled?: boolean | null
+          hide_on_dismiss?: boolean | null
           id?: string
           is_visible?: boolean
           section_key: string
+          show_when?: string | null
+          sync_with_tour?: boolean | null
           updated_at?: string
+          version?: string | null
         }
         Update: {
+          audience?: string | null
           content?: Json
           created_at?: string
+          enabled?: boolean | null
+          hide_on_dismiss?: boolean | null
           id?: string
           is_visible?: boolean
           section_key?: string
+          show_when?: string | null
+          sync_with_tour?: boolean | null
           updated_at?: string
+          version?: string | null
         }
         Relationships: []
       }
@@ -1380,28 +1398,43 @@ export type Database = {
       }
       tour_settings: {
         Row: {
+          audience: string | null
           created_at: string
+          enabled: boolean | null
+          hide_on_dismiss: boolean | null
           id: string
           is_active: boolean
           setting_key: string
           setting_value: Json
+          show_when: string | null
           updated_at: string
+          version: string | null
         }
         Insert: {
+          audience?: string | null
           created_at?: string
+          enabled?: boolean | null
+          hide_on_dismiss?: boolean | null
           id?: string
           is_active?: boolean
           setting_key: string
           setting_value?: Json
+          show_when?: string | null
           updated_at?: string
+          version?: string | null
         }
         Update: {
+          audience?: string | null
           created_at?: string
+          enabled?: boolean | null
+          hide_on_dismiss?: boolean | null
           id?: string
           is_active?: boolean
           setting_key?: string
           setting_value?: Json
+          show_when?: string | null
           updated_at?: string
+          version?: string | null
         }
         Relationships: []
       }
@@ -1501,6 +1534,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stepper_state: {
+        Row: {
+          completed: boolean | null
+          dismissed: boolean | null
+          first_seen_at: string | null
+          last_seen_version: string | null
+          progress: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          dismissed?: boolean | null
+          first_seen_at?: string | null
+          last_seen_version?: string | null
+          progress?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          dismissed?: boolean | null
+          first_seen_at?: string | null
+          last_seen_version?: string | null
+          progress?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_tour_progress: {
         Row: {
           completed_at: string | null
@@ -1539,6 +1602,36 @@ export type Database = {
           total_steps?: number
           tour_version?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_tour_state: {
+        Row: {
+          completed: boolean | null
+          dismissed: boolean | null
+          first_seen_at: string | null
+          last_seen_version: string | null
+          last_step: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          dismissed?: boolean | null
+          first_seen_at?: string | null
+          last_seen_version?: string | null
+          last_step?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          dismissed?: boolean | null
+          first_seen_at?: string | null
+          last_seen_version?: string | null
+          last_step?: number | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1786,6 +1879,10 @@ export type Database = {
       mask_email: {
         Args: { email: string; show_full?: boolean }
         Returns: string
+      }
+      onboarding_visibility: {
+        Args: { target_user_id: string }
+        Returns: Json
       }
       search_users: {
         Args:
