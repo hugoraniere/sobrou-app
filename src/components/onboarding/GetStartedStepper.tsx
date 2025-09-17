@@ -67,7 +67,7 @@ export const GetStartedStepper: React.FC = () => {
   };
 
   return (
-    <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+    <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20" data-tour-id="dashboard.onboarding.stepper">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div>

@@ -24,7 +24,7 @@ export const BillBalanceCard: React.FC<BillBalanceCardProps> = ({
     <div className={cn(
       "grid gap-3",
       isMobile ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-4"
-    )}>
+    )} data-tour-id="bills-to-pay.metrics.balance-card">
       <BigNumberCard
         title="Contas a Pagar"
         value={unpaidBillsCount}

@@ -11,6 +11,8 @@ import { AvatarProvider } from "./contexts/AvatarContext";
 import { AIChatProvider } from "./contexts/AIChatContext";
 import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { TourDevOverlay, useTourDevMode } from './components/dev/TourDevOverlay';
+import { TourAnchorHighlighter } from './components/dev/TourAnchorHighlighter';
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
@@ -49,6 +51,7 @@ const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
+  const { isDevMode } = useTourDevMode();
   
   return (
     <React.StrictMode>
@@ -258,6 +261,12 @@ const App = () => {
                         
                         <WhatsAppChatButton />
                         <InstallPrompt />
+                        {isDevMode && (
+                          <>
+                            <TourDevOverlay enabled={isDevMode} />
+                            <TourAnchorHighlighter />
+                          </>
+                        )}
                       </div>
                       </NavigationProvider>
                     </WhatsAppButtonProvider>

@@ -250,7 +250,7 @@ const AIPromptInput: React.FC<AIPromptInputProps> = ({
   
   return (
     <div className={className}>
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3" data-tour-id="transactions.ai.prompt-input">
         <div className="flex-1">
           <PromptInputField
           inputValue={inputValue} 

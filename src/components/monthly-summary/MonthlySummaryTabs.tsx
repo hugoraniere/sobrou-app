@@ -33,7 +33,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         <TabsList className={cn(
           "w-full mb-4 flex",
           isMobile ? "h-9 p-0.5 max-w-full overflow-hidden" : "h-10"
-        )}>
+        )} data-tour-id="monthly-summary.tabs.navigation">
           <TabsTrigger 
             value="table" 
             className={cn(
@@ -41,6 +41,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
               "!whitespace-normal truncate", // Override whitespace-nowrap
               isMobile ? "flex-1 basis-1/3 min-w-0 px-1 py-1.5" : "flex-1"
             )}
+            data-tour-id="monthly-summary.tabs.monthly-expenses"
           >
             <span className="truncate">
               {isMobile ? "Gastos" : "Gastos Mensais"}
@@ -53,6 +54,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
               "!whitespace-normal truncate", // Override whitespace-nowrap
               isMobile ? "flex-1 basis-1/3 min-w-0 px-1 py-1.5" : "flex-1"
             )}
+            data-tour-id="monthly-summary.tabs.planning"
           >
             <span className="truncate">
               {isMobile ? "Plano" : "Planejamento"}
@@ -65,6 +67,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
               "!whitespace-normal truncate", // Override whitespace-nowrap
               isMobile ? "flex-1 basis-1/3 min-w-0 px-1 py-1.5" : "flex-1"
             )}
+            data-tour-id="monthly-summary.tabs.comparative"
           >
             <span className="truncate">
               {isMobile ? "Comp." : "Comparativo"}
@@ -73,7 +76,7 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
         </TabsList>
 
         <TabsContent value="table" className="mt-0">
-          <div className={cn("bg-white rounded-lg border p-4", isMobile && "w-full max-w-full")}>
+          <div className={cn("bg-white rounded-lg border p-4", isMobile && "w-full max-w-full")} data-tour-id="monthly-summary.data.monthly-table">
             <div className={getTableScrollContainer(isMobile)}>
               <MonthlyTable year={year} />
             </div>

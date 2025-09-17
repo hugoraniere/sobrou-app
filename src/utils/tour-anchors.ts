@@ -1,0 +1,312 @@
+export type TourAnchor = {
+  id: string;              // ex: 'transactions.actions.nova-transacao-btn'
+  label: string;           // humano: 'Nova transação'
+  selector: string;        // preferir [data-tour-id="..."]; fallback: #id, .class
+  description?: string;    // explicação breve pro tour
+  action?: 'click'|'hover'|'none';
+  visibleWhen?: string;    // condição simples (ex: 'lista>0', 'adminOnly', etc.)
+  scrollOffset?: number;   // px para ajustar spotlight
+};
+
+export type TourAnchorsManifest = Record<string /*routeKey*/, TourAnchor[]>;
+
+export const tourAnchorsManifest: TourAnchorsManifest = {
+  dashboard: [
+    {
+      id: 'dashboard.header.add-transaction-btn',
+      label: 'Adicionar Transação',
+      selector: '[data-tour-id="dashboard.header.add-transaction-btn"]',
+      description: 'Botão principal para adicionar uma nova transação',
+      action: 'click',
+      scrollOffset: -100
+    },
+    {
+      id: 'dashboard.onboarding.stepper',
+      label: 'Get Started',
+      selector: '[data-tour-id="dashboard.onboarding.stepper"]',
+      description: 'Guia de primeiros passos para novos usuários',
+      action: 'none',
+      visibleWhen: 'onboardingActive'
+    },
+    {
+      id: 'dashboard.kpis.overview-cards',
+      label: 'Cards KPI',
+      selector: '[data-tour-id="dashboard.kpis.overview-cards"]',
+      description: 'Resumo financeiro com receitas, gastos e saldo',
+      action: 'none'
+    },
+    {
+      id: 'dashboard.transactions.recent-list',
+      label: 'Transações Recentes',
+      selector: '[data-tour-id="dashboard.transactions.recent-list"]',
+      description: 'Lista das últimas transações registradas',
+      action: 'hover'
+    },
+    {
+      id: 'dashboard.charts.category-expenses',
+      label: 'Gastos por Categoria',
+      selector: '[data-tour-id="dashboard.charts.category-expenses"]',
+      description: 'Gráfico mostrando distribuição dos gastos por categoria',
+      action: 'none'
+    },
+    {
+      id: 'dashboard.charts.revenue-vs-expense',
+      label: 'Receita vs Despesa',
+      selector: '[data-tour-id="dashboard.charts.revenue-vs-expense"]',
+      description: 'Comparativo entre receitas e despesas do período',
+      action: 'none'
+    },
+    {
+      id: 'dashboard.goals.progress-section',
+      label: 'Metas Financeiras',
+      selector: '[data-tour-id="dashboard.goals.progress-section"]',
+      description: 'Progresso das suas metas de economia',
+      action: 'click'
+    },
+    {
+      id: 'dashboard.bills.summary-card',
+      label: 'Contas a Pagar',
+      selector: '[data-tour-id="dashboard.bills.summary-card"]',
+      description: 'Resumo das contas pendentes e vencimentos',
+      action: 'click'
+    }
+  ],
+
+  transactions: [
+    {
+      id: 'transactions.actions.import-statement-btn',
+      label: 'Importar Extrato',
+      selector: '[data-tour-id="transactions.actions.import-statement-btn"]',
+      description: 'Importar transações de um arquivo de extrato bancário',
+      action: 'click'
+    },
+    {
+      id: 'transactions.ai.prompt-input',
+      label: 'Input de IA',
+      selector: '[data-tour-id="transactions.ai.prompt-input"]',
+      description: 'Use IA para adicionar transações com linguagem natural',
+      action: 'click'
+    },
+    {
+      id: 'transactions.filters.view-toggle',
+      label: 'Alternar Visualização',
+      selector: '[data-tour-id="transactions.filters.view-toggle"]',
+      description: 'Alternar entre visualização mensal e todas as transações',
+      action: 'click'
+    },
+    {
+      id: 'transactions.navigation.month-navigator',
+      label: 'Navegador de Mês',
+      selector: '[data-tour-id="transactions.navigation.month-navigator"]',
+      description: 'Navegar entre diferentes meses',
+      action: 'click',
+      visibleWhen: 'monthlyView'
+    },
+    {
+      id: 'transactions.filters.search-bar',
+      label: 'Busca de Transações',
+      selector: '[data-tour-id="transactions.filters.search-bar"]',
+      description: 'Pesquisar transações por descrição ou valor',
+      action: 'click'
+    },
+    {
+      id: 'transactions.list.transaction-items',
+      label: 'Lista de Transações',
+      selector: '[data-tour-id="transactions.list.transaction-items"]',
+      description: 'Lista completa das suas transações',
+      action: 'none',
+      visibleWhen: 'hasTransactions'
+    }
+  ],
+
+  'monthly-summary': [
+    {
+      id: 'monthly-summary.filters.year-selector',
+      label: 'Seletor de Ano',
+      selector: '[data-tour-id="monthly-summary.filters.year-selector"]',
+      description: 'Selecionar o ano para visualização dos dados',
+      action: 'click'
+    },
+    {
+      id: 'monthly-summary.tabs.monthly-expenses',
+      label: 'Aba Gastos Mensais',
+      selector: '[data-tour-id="monthly-summary.tabs.monthly-expenses"]',
+      description: 'Visualizar gastos organizados por mês',
+      action: 'click'
+    },
+    {
+      id: 'monthly-summary.tabs.planning',
+      label: 'Aba Planejamento',
+      selector: '[data-tour-id="monthly-summary.tabs.planning"]',
+      description: 'Ferramentas de planejamento financeiro',
+      action: 'click'
+    },
+    {
+      id: 'monthly-summary.tabs.comparative',
+      label: 'Aba Comparativo',
+      selector: '[data-tour-id="monthly-summary.tabs.comparative"]',
+      description: 'Comparar gastos entre diferentes períodos',
+      action: 'click'
+    },
+    {
+      id: 'monthly-summary.data.monthly-table',
+      label: 'Tabela Mensal',
+      selector: '[data-tour-id="monthly-summary.data.monthly-table"]',
+      description: 'Dados detalhados dos gastos por mês e categoria',
+      action: 'none'
+    },
+    {
+      id: 'monthly-summary.planning.detailed-toggle',
+      label: 'Toggle Visão Detalhada',
+      selector: '[data-tour-id="monthly-summary.planning.detailed-toggle"]',
+      description: 'Alternar entre visão simples e detalhada do planejamento',
+      action: 'click'
+    }
+  ],
+
+  'bills-to-pay': [
+    {
+      id: 'bills-to-pay.actions.new-bill-btn',
+      label: 'Nova Conta',
+      selector: '[data-tour-id="bills-to-pay.actions.new-bill-btn"]',
+      description: 'Adicionar uma nova conta a pagar',
+      action: 'click'
+    },
+    {
+      id: 'bills-to-pay.filters.period-filters',
+      label: 'Filtros de Período',
+      selector: '[data-tour-id="bills-to-pay.filters.period-filters"]',
+      description: 'Filtrar contas por período de vencimento',
+      action: 'click'
+    },
+    {
+      id: 'bills-to-pay.metrics.balance-card',
+      label: 'Card de Saldo',
+      selector: '[data-tour-id="bills-to-pay.metrics.balance-card"]',
+      description: 'Resumo financeiro das contas a pagar',
+      action: 'none'
+    },
+    {
+      id: 'bills-to-pay.filters.search-and-toggle',
+      label: 'Busca e Toggle',
+      selector: '[data-tour-id="bills-to-pay.filters.search-and-toggle"]',
+      description: 'Buscar contas e alternar visualização de pagas/não pagas',
+      action: 'click'
+    },
+    {
+      id: 'bills-to-pay.list.bills-list',
+      label: 'Lista de Contas',
+      selector: '[data-tour-id="bills-to-pay.list.bills-list"]',
+      description: 'Lista completa das contas a pagar',
+      action: 'none',
+      visibleWhen: 'hasBills'
+    },
+    {
+      id: 'bills-to-pay.actions.mark-as-paid',
+      label: 'Marcar como Paga',
+      selector: '[data-tour-id="bills-to-pay.actions.mark-as-paid"]',
+      description: 'Marcar conta como paga ou não paga',
+      action: 'click',
+      visibleWhen: 'hasBills'
+    }
+  ],
+
+  goals: [
+    {
+      id: 'goals.actions.new-goal-btn',
+      label: 'Nova Meta',
+      selector: '[data-tour-id="goals.actions.new-goal-btn"]',
+      description: 'Criar uma nova meta de economia',
+      action: 'click'
+    },
+    {
+      id: 'goals.list.goals-container',
+      label: 'Lista de Metas',
+      selector: '[data-tour-id="goals.list.goals-container"]',
+      description: 'Suas metas de economia organizadas',
+      action: 'none',
+      visibleWhen: 'hasGoals'
+    },
+    {
+      id: 'goals.progress.goal-cards',
+      label: 'Cards de Progresso',
+      selector: '[data-tour-id="goals.progress.goal-cards"]',
+      description: 'Progresso individual de cada meta',
+      action: 'hover',
+      visibleWhen: 'hasGoals'
+    },
+    {
+      id: 'goals.actions.add-amount',
+      label: 'Adicionar Valor',
+      selector: '[data-tour-id="goals.actions.add-amount"]',
+      description: 'Adicionar valor à meta de economia',
+      action: 'click',
+      visibleWhen: 'hasGoals'
+    },
+    {
+      id: 'goals.metrics.total-saved',
+      label: 'Total Economizado',
+      selector: '[data-tour-id="goals.metrics.total-saved"]',
+      description: 'Valor total economizado em todas as metas',
+      action: 'none',
+      visibleWhen: 'hasGoals'
+    }
+  ],
+
+  suporte: [
+    {
+      id: 'support.search.main-search',
+      label: 'Busca Principal',
+      selector: '[data-tour-id="support.search.main-search"]',
+      description: 'Buscar artigos e FAQs de ajuda',
+      action: 'click'
+    },
+    {
+      id: 'support.categories.category-grid',
+      label: 'Categorias de Suporte',
+      selector: '[data-tour-id="support.categories.category-grid"]',
+      description: 'Navegar por categorias de ajuda',
+      action: 'click'
+    },
+    {
+      id: 'support.articles.popular-list',
+      label: 'Artigos Populares',
+      selector: '[data-tour-id="support.articles.popular-list"]',
+      description: 'Artigos mais acessados pelos usuários',
+      action: 'click'
+    },
+    {
+      id: 'support.articles.recent-list',
+      label: 'Artigos Recentes',
+      selector: '[data-tour-id="support.articles.recent-list"]',
+      description: 'Artigos adicionados recentemente',
+      action: 'click'
+    },
+    {
+      id: 'support.faq.accordion',
+      label: 'FAQ Accordion',
+      selector: '[data-tour-id="support.faq.accordion"]',
+      description: 'Perguntas frequentes organizadas',
+      action: 'click'
+    },
+    {
+      id: 'support.actions.open-ticket',
+      label: 'Abrir Ticket',
+      selector: '[data-tour-id="support.actions.open-ticket"]',
+      description: 'Abrir um ticket de suporte personalizado',
+      action: 'click'
+    }
+  ]
+};
+
+export const getTourAnchors = (routeKey: string): TourAnchor[] => {
+  return tourAnchorsManifest[routeKey] || [];
+};
+
+export const getAllRouteKeys = (): string[] => {
+  return Object.keys(tourAnchorsManifest);
+};
+
+export const getTotalAnchorsCount = (): number => {
+  return Object.values(tourAnchorsManifest).reduce((total, anchors) => total + anchors.length, 0);
+};
