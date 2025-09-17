@@ -617,6 +617,96 @@ export type Database = {
         }
         Relationships: []
       }
+      modal_informativo_config: {
+        Row: {
+          auto_transition: boolean
+          colors: Json | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          show_indicators: boolean
+          show_navigation: boolean
+          transition_time: number | null
+          updated_at: string
+          visibility_rules: Json | null
+        }
+        Insert: {
+          auto_transition?: boolean
+          colors?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          show_indicators?: boolean
+          show_navigation?: boolean
+          transition_time?: number | null
+          updated_at?: string
+          visibility_rules?: Json | null
+        }
+        Update: {
+          auto_transition?: boolean
+          colors?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          show_indicators?: boolean
+          show_navigation?: boolean
+          transition_time?: number | null
+          updated_at?: string
+          visibility_rules?: Json | null
+        }
+        Relationships: []
+      }
+      modal_informativo_slides: {
+        Row: {
+          created_at: string
+          cta_text: string | null
+          cta_url: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          media_type: string | null
+          media_url: string | null
+          modal_id: string
+          slide_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_text?: string | null
+          cta_url?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          media_type?: string | null
+          media_url?: string | null
+          modal_id: string
+          slide_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_text?: string | null
+          cta_url?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          media_type?: string | null
+          media_url?: string | null
+          modal_id?: string
+          slide_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
