@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ChevronLeft, ChevronRight, X, SkipForward } from 'lucide-react';
 import { TourSpotlightProps, SpotlightPosition } from '@/types/product-tour';
 import { cn } from '@/lib/utils';
@@ -25,27 +26,63 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
     found: false
   });
   const [isVisible, setIsVisible] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const maxRetries = 10;
 
   // Calculate element position and create spotlight
   const updatePosition = () => {
     const element = document.querySelector(`[data-tour-id="${step.anchor_id}"]`);
     
     if (!element) {
-      setPosition(prev => ({ ...prev, found: false }));
+      if (retryCount < maxRetries) {
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          updatePosition();
+        }, 500);
+      } else {
+        setPosition(prev => ({ ...prev, found: false }));
+      }
       return;
     }
 
     const rect = element.getBoundingClientRect();
     const padding = 8;
     
+    // Calculate position relative to document
+    const elementTop = rect.top + window.scrollY;
+    const elementLeft = rect.left + window.scrollX;
+    
     setPosition({
-      top: rect.top + window.scrollY - padding,
-      left: rect.left + window.scrollX - padding,
+      top: elementTop - padding,
+      left: elementLeft - padding,
       width: rect.width + (padding * 2),
       height: rect.height + (padding * 2),
       found: true
     });
+
+    // Center element in viewport
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    
+    const elementCenterY = rect.top + rect.height / 2;
+    const elementCenterX = rect.left + rect.width / 2;
+    
+    // Only scroll if element is not well positioned in viewport
+    if (elementCenterY < viewportHeight * 0.2 || elementCenterY > viewportHeight * 0.8 ||
+        elementCenterX < viewportWidth * 0.1 || elementCenterX > viewportWidth * 0.9) {
+      
+      const scrollToY = elementTop - viewportHeight / 2 + rect.height / 2;
+      const scrollToX = elementLeft - viewportWidth / 2 + rect.width / 2;
+      
+      window.scrollTo({
+        top: Math.max(0, scrollToY),
+        left: Math.max(0, scrollToX),
+        behavior: 'smooth'
+      });
+    }
+    
+    setRetryCount(0); // Reset retry count on success
   };
 
   // Position tooltip relative to spotlight
@@ -108,6 +145,9 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
 
   // Setup and cleanup
   useEffect(() => {
+    // Disable page scroll
+    document.body.style.overflow = 'hidden';
+    
     updatePosition();
     
     // Throttle scroll and resize events for better performance
@@ -132,6 +172,9 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
     const timer = setTimeout(() => setIsVisible(true), 100);
     
     return () => {
+      // Re-enable page scroll
+      document.body.style.overflow = '';
+      
       clearTimeout(scrollTimeout);
       clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
@@ -139,7 +182,7 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
       document.removeEventListener('keydown', handleKeyDown);
       clearTimeout(timer);
     };
-  }, [step.anchor_id, isFirstStep, isLastStep]);
+  }, [step.anchor_id, isFirstStep, isLastStep, retryCount]);
 
   // Don't render if element not found
   if (!position.found) {
@@ -218,14 +261,23 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
                 </div>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-6 w-6 p-0 ml-2"
-            >
-              <X className="h-3 w-3" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClose}
+                    className="h-6 w-6 p-0 ml-2"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Fechar tour (Esc)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           {/* Description */}
@@ -236,24 +288,42 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
           {/* Controls */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onPrevious}
-                disabled={isFirstStep}
-                className="h-8 px-2"
-              >
-                <ChevronLeft className="h-3 w-3" />
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onPrevious}
+                      disabled={isFirstStep}
+                      className="h-8 px-2"
+                    >
+                      <ChevronLeft className="h-3 w-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Passo anterior (←)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onSkip}
-                className="h-8 px-2"
-              >
-                <SkipForward className="h-3 w-3" />
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onSkip}
+                      className="h-8 px-2"
+                    >
+                      <SkipForward className="h-3 w-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Pular tour</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
             <Button
