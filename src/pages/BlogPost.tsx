@@ -165,9 +165,9 @@ const BlogPost: React.FC = () => {
 
         {/* Main Content with Sidebar */}
         <div className="container mx-auto px-4 pb-12">
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
             {/* Article Content */}
-            <article className="flex-1 max-w-4xl">
+            <article className="flex-1 lg:max-w-4xl">
               {/* Navigation */}
               <div className="mb-6">
                 <Link to="/blog">

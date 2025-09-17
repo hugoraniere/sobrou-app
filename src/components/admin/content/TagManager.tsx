@@ -7,13 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface BlogTag {
-  id: string;
-  name: string;
-  slug: string;
-  created_at: string;
-}
+import { BlogService } from '@/services/blogService';
+import { BlogTag } from '@/types/blog';
 
 const TagManager: React.FC = () => {
   const [tags, setTags] = useState<BlogTag[]>([]);
@@ -27,33 +22,8 @@ const TagManager: React.FC = () => {
   const loadTags = async () => {
     try {
       setIsLoading(true);
-      // TODO: Implementar integração com Supabase
-      // const { data, error } = await supabase.from('blog_tags').select('*').order('name');
-      // if (error) throw error;
-      // setTags(data || []);
-      
-      // Mock data para desenvolvimento
-      const mockTags: BlogTag[] = [
-        {
-          id: '1',
-          name: 'Finanças Pessoais',
-          slug: 'financas-pessoais',
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: 'Investimentos',
-          slug: 'investimentos',
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: '3',
-          name: 'Economia',
-          slug: 'economia',
-          created_at: new Date().toISOString(),
-        },
-      ];
-      setTags(mockTags);
+      const tags = await BlogService.getTags();
+      setTags(tags);
     } catch (error) {
       console.error('Erro ao carregar tags:', error);
       toast.error('Erro ao carregar tags');
@@ -86,36 +56,14 @@ const TagManager: React.FC = () => {
     }
 
     try {
-      const slug = createSlug(formData.name);
-      
       if (editingTag) {
-        // TODO: Implementar atualização no Supabase
-        // const { error } = await supabase.from('blog_tags').update({
-        //   name: formData.name,
-        //   slug
-        // }).eq('id', editingTag.id);
-        // if (error) throw error;
-        
+        const updatedTag = await BlogService.updateTag(editingTag.id, formData.name);
         setTags(prev => prev.map(tag => 
-          tag.id === editingTag.id 
-            ? { ...tag, name: formData.name, slug }
-            : tag
+          tag.id === editingTag.id ? updatedTag : tag
         ));
         toast.success('Tag atualizada com sucesso!');
       } else {
-        // TODO: Implementar criação no Supabase
-        // const { data, error } = await supabase.from('blog_tags').insert({
-        //   name: formData.name,
-        //   slug
-        // }).select().single();
-        // if (error) throw error;
-        
-        const newTag: BlogTag = {
-          id: Date.now().toString(),
-          name: formData.name,
-          slug,
-          created_at: new Date().toISOString(),
-        };
+        const newTag = await BlogService.createTag(formData.name);
         setTags(prev => [...prev, newTag]);
         toast.success('Tag criada com sucesso!');
       }
@@ -136,13 +84,10 @@ const TagManager: React.FC = () => {
   };
 
   const handleDelete = async (tagId: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta tag?')) return;
+    if (!confirm('Tem certeza que deseja excluir esta tag? Ela será removida de todos os posts associados.')) return;
 
     try {
-      // TODO: Implementar exclusão no Supabase
-      // const { error } = await supabase.from('blog_tags').delete().eq('id', tagId);
-      // if (error) throw error;
-      
+      await BlogService.deleteTag(tagId);
       setTags(prev => prev.filter(tag => tag.id !== tagId));
       toast.success('Tag excluída com sucesso!');
     } catch (error) {

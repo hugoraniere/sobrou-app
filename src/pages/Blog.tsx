@@ -271,9 +271,9 @@ const Blog: React.FC = () => {
           <FeaturedPostHero featuredPost={featuredPost} />
 
           {/* Main Content with Sidebar */}
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
             {/* Main Content */}
-            <div className="flex-1">
+            <div className="flex-1 lg:max-w-4xl">
               {/* Search */}
               <div className="mb-8">
                 <form onSubmit={handleSearch} className="max-w-md">

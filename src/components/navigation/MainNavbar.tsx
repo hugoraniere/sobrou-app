@@ -66,8 +66,8 @@ const MainNavbar: React.FC<{ isAdminContext?: boolean }> = ({ isAdminContext = f
               <div className="flex items-center space-x-2">
                 <NotificationBell className={isMobile ? 'hidden' : ''} />
                 
-                {/* Admin/Go to App Button */}
-                {!isMobile && canAccessAdmin && (
+                 {/* Admin/Go to App Button - Show for all users */}
+                {!isMobile && (
                   <>
                     {isAdminContext ? (
                       <Button
@@ -79,7 +79,7 @@ const MainNavbar: React.FC<{ isAdminContext?: boolean }> = ({ isAdminContext = f
                         <LayoutDashboard className="h-4 w-4" />
                         Ir para o App
                       </Button>
-                    ) : (
+                    ) : canAccessAdmin ? (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -88,6 +88,16 @@ const MainNavbar: React.FC<{ isAdminContext?: boolean }> = ({ isAdminContext = f
                       >
                         <Shield className="h-4 w-4" />
                         Admin
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/dashboard')}
+                        className="flex items-center gap-2"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Ir para o App
                       </Button>
                     )}
                   </>

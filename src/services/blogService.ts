@@ -111,18 +111,73 @@ export class BlogService {
       .order('name');
 
     if (error) throw error;
-    return data;
+    return (data || []).map((tag: any) => ({
+      ...tag,
+      slug: tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')
+    }));
   }
 
   static async createTag(name: string): Promise<BlogTag> {
+    const slug = name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+
     const { data, error } = await supabase
       .from('blog_tags')
-      .insert({ name })
+      .insert({ name, slug })
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      slug: (data as any).slug || slug
+    };
+  }
+
+  static async updateTag(id: string, name: string): Promise<BlogTag> {
+    const slug = name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+
+    const { data, error } = await supabase
+      .from('blog_tags')
+      .update({ name, slug })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return {
+      ...data,
+      slug: (data as any).slug || slug
+    };
+  }
+
+  static async deleteTag(id: string): Promise<void> {
+    // First, remove tag associations from posts
+    await supabase
+      .from('blog_post_tags')
+      .delete()
+      .eq('tag_id', id);
+
+    // Then delete the tag
+    const { error } = await supabase
+      .from('blog_tags')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
   }
 
   static async getOrCreateTags(tagNames: string[]): Promise<BlogTag[]> {
@@ -382,6 +437,7 @@ export class BlogService {
         tags: Array.isArray(post.tags) ? post.tags.filter((tag: any) => tag && tag.id).map((tag: any) => ({
           id: tag.id,
           name: tag.name,
+          slug: tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-'),
           created_at: tag.created_at || new Date().toISOString()
         })) : []
       };
@@ -438,6 +494,7 @@ export class BlogService {
         tags: Array.isArray(post.tags) ? post.tags.filter((tag: any) => tag && tag.id).map((tag: any) => ({
           id: tag.id,
           name: tag.name,
+          slug: tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-'),
           created_at: tag.created_at || new Date().toISOString()
         })) : []
       };
