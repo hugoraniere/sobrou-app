@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Settings } from 'lucide-react';
 import { useOnboarding } from '@/contexts/OnboardingContext';
+import { OnboardingConfigService } from '@/services/OnboardingConfigService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,9 +17,32 @@ export const WelcomeModal: React.FC = () => {
   const { isWelcomeModalOpen, setWelcomeModalOpen, showStepper } = useOnboarding();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [config, setConfig] = React.useState({
+    title: "Bem-vindo ao Sobrou 👋",
+    subtitle: "Este onboarding pode ser configurado no Admin. Em 1 minuto você deixa tudo pronto.",
+    image: "",
+    cta_start: "Começar",
+    cta_close: "Fechar",
+    show_admin_button: true
+  });
   
   // Check if user is admin
   const isAdmin = false; // TODO: Implement admin check when roles are ready
+
+  React.useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const welcomeConfig = await OnboardingConfigService.getWelcomeModalConfig();
+        setConfig(welcomeConfig);
+      } catch (error) {
+        console.error('Error loading welcome modal config:', error);
+      }
+    };
+    
+    if (isWelcomeModalOpen) {
+      loadConfig();
+    }
+  }, [isWelcomeModalOpen]);
 
   const handleStart = async () => {
     await showStepper();
@@ -60,12 +84,22 @@ export const WelcomeModal: React.FC = () => {
       >
         <DialogHeader className="text-center">
           <DialogTitle id="welcome-title" className="text-2xl">
-            Bem-vindo ao Sobrou 👋
+            {config.title}
           </DialogTitle>
           <DialogDescription className="text-base mt-2">
-            Este onboarding pode ser configurado no Admin. Em 1 minuto você deixa tudo pronto.
+            {config.subtitle}
           </DialogDescription>
         </DialogHeader>
+
+        {config.image && (
+          <div className="flex justify-center my-4">
+            <img 
+              src={config.image} 
+              alt="Onboarding" 
+              className="max-w-full h-auto max-h-48 rounded-lg"
+            />
+          </div>
+        )}
 
         <div className="flex flex-col gap-3 mt-6">
           <Button
@@ -73,7 +107,7 @@ export const WelcomeModal: React.FC = () => {
             size="lg"
             className="w-full"
           >
-            Começar
+            {config.cta_start}
           </Button>
           
           <Button
@@ -82,10 +116,10 @@ export const WelcomeModal: React.FC = () => {
             size="lg"
             className="w-full"
           >
-            Fechar
+            {config.cta_close}
           </Button>
 
-          {isAdmin && (
+          {isAdmin && config.show_admin_button && (
             <Button
               onClick={handleAdminConfig}
               variant="ghost"

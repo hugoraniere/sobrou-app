@@ -30,6 +30,7 @@ import AdminContent from "./pages/AdminContent";
 import AdminSupport from "./pages/AdminSupport";
 import AdminLandingPage from "./pages/admin/LandingPageAdmin";
 import AdminUsers from "./pages/AdminUsers";
+import OnboardingAdmin from "./pages/admin/OnboardingAdmin";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
@@ -126,6 +127,16 @@ const App = () => {
                                <ProtectedRoute>
                                  <AdminLayout>
                                    <AdminLandingPage />
+                                 </AdminLayout>
+                               </ProtectedRoute>
+                             } 
+                           />
+                           <Route 
+                             path="/admin/onboarding" 
+                             element={
+                               <ProtectedRoute>
+                                 <AdminLayout>
+                                   <OnboardingAdmin />
                                  </AdminLayout>
                                </ProtectedRoute>
                              } 
