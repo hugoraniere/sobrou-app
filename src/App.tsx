@@ -10,6 +10,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { AIChatProvider } from "./contexts/AIChatContext";
 import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
+import { OnboardingProvider } from "./contexts/OnboardingContext";
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
@@ -56,11 +57,12 @@ const App = () => {
           <Toaster />
           <BrowserRouter>
             <AuthProvider>
-              <LandingPageProvider>
-                <AvatarProvider>
-                <AIChatProvider>
-                  <WhatsAppButtonProvider>
-                    <NavigationProvider>
+              <OnboardingProvider>
+                <LandingPageProvider>
+                  <AvatarProvider>
+                  <AIChatProvider>
+                    <WhatsAppButtonProvider>
+                      <NavigationProvider>
                       <div className="min-h-screen bg-gray-50">
                         <Routes>
                           {/* Public routes */}
@@ -246,11 +248,12 @@ const App = () => {
                         <WhatsAppChatButton />
                         <InstallPrompt />
                       </div>
-                    </NavigationProvider>
-                  </WhatsAppButtonProvider>
-                </AIChatProvider>
-                  </AvatarProvider>
-                </LandingPageProvider>
+                      </NavigationProvider>
+                    </WhatsAppButtonProvider>
+                  </AIChatProvider>
+                    </AvatarProvider>
+                  </LandingPageProvider>
+                </OnboardingProvider>
               </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
