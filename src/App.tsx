@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
+import { LandingPageProvider } from './contexts/LandingPageContext';
 import { AuthProvider } from "./contexts/AuthContext";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { AIChatProvider } from "./contexts/AIChatContext";
@@ -26,6 +27,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminContent from "./pages/AdminContent";
 import AdminSupport from "./pages/AdminSupport";
+import AdminLandingPage from "./pages/admin/LandingPageAdmin";
 import AdminUsers from "./pages/AdminUsers";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
@@ -54,7 +56,8 @@ const App = () => {
           <Toaster />
           <BrowserRouter>
             <AuthProvider>
-              <AvatarProvider>
+              <LandingPageProvider>
+                <AvatarProvider>
                 <AIChatProvider>
                   <WhatsAppButtonProvider>
                     <NavigationProvider>
@@ -111,6 +114,16 @@ const App = () => {
                                <ProtectedRoute>
                                  <AdminLayout>
                                    <AdminSupport />
+                                 </AdminLayout>
+                               </ProtectedRoute>
+                             } 
+                           />
+                           <Route 
+                             path="/admin/landing" 
+                             element={
+                               <ProtectedRoute>
+                                 <AdminLayout>
+                                   <AdminLandingPage />
                                  </AdminLayout>
                                </ProtectedRoute>
                              } 
@@ -236,8 +249,9 @@ const App = () => {
                     </NavigationProvider>
                   </WhatsAppButtonProvider>
                 </AIChatProvider>
-              </AvatarProvider>
-            </AuthProvider>
+                  </AvatarProvider>
+                </LandingPageProvider>
+              </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

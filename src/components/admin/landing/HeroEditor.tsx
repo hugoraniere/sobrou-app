@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import { HeroConfig } from '@/services/landingPageService';
 import { Save, Upload, Trash2, Plus } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from "sonner";
 
 const HeroEditor: React.FC = () => {
   const { getConfig, updateConfig, uploadImage } = useLandingPage();
@@ -44,9 +44,7 @@ const HeroEditor: React.FC = () => {
       const imageUrl = await uploadImage(file, 'hero');
       if (imageUrl) {
         setConfig({ ...config, background_image: imageUrl });
-        toast({
-          description: "A imagem foi carregada com sucesso.",
-        });
+        toast("A imagem foi carregada com sucesso.");
       }
     } catch (error) {
       console.error('Error uploading image:', error);

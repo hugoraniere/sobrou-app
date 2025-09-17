@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export interface LandingPageConfig {
   id: string;
@@ -114,29 +114,19 @@ class LandingPageService {
 
       if (error) {
         console.error('Error updating landing page config:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível salvar as alterações. Tente novamente.",
-          variant: "destructive",
-        });
+        toast("Não foi possível salvar as alterações. Tente novamente.");
         return false;
       }
 
       // Clear cache to force refetch
       this.cache.delete(sectionKey);
       
-      toast({
-        title: "Sucesso",
-        description: "As alterações foram salvas.",
-      });
+      toast("As alterações foram salvas.");
       
       return true;
     } catch (error) {
       console.error('Error in updateConfig:', error);
-      toast({
-        description: "Ocorreu um erro inesperado. Tente novamente.",
-        variant: "destructive",
-      });
+        toast("Ocorreu um erro inesperado. Tente novamente.");
       return false;
     }
   }
@@ -153,10 +143,7 @@ class LandingPageService {
 
       if (uploadError) {
         console.error('Error uploading image:', uploadError);
-        toast({
-          description: "Não foi possível fazer upload da imagem.",
-          variant: "destructive",
-        });
+        toast("Não foi possível fazer upload da imagem.");
         return null;
       }
 
@@ -167,10 +154,7 @@ class LandingPageService {
       return publicUrl.publicUrl;
     } catch (error) {
       console.error('Error in uploadImage:', error);
-      toast({
-        description: "Ocorreu um erro inesperado no upload.",
-        variant: "destructive",
-      });
+      toast("Ocorreu um erro inesperado no upload.");
       return null;
     }
   }

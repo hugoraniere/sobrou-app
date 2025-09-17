@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Monitor, Eye, EyeOff, Save, RefreshCw } from 'lucide-react';
 import { useLandingPage } from '@/contexts/LandingPageContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from "sonner";
 import HeroEditor from '@/components/admin/landing/HeroEditor';
 import ModulesEditor from '@/components/admin/landing/ModulesEditor';
 import SectionVisibilityManager from '@/components/admin/landing/SectionVisibilityManager';
@@ -24,14 +24,9 @@ const LandingPageAdmin: React.FC = () => {
     setIsRefreshing(true);
     try {
       await refreshConfigs();
-      toast({
-        description: "Configurações recarregadas com sucesso.",
-      });
+      toast("Configurações recarregadas com sucesso.");
     } catch (error) {
-      toast({
-        description: "Não foi possível recarregar as configurações.",
-        variant: "destructive",
-      });
+      toast("Não foi possível recarregar as configurações.");
     } finally {
       setIsRefreshing(false);
     }
