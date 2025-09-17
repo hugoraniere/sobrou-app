@@ -30,49 +30,63 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
   const isLastStep = currentStepIndex === totalSteps - 1;
   const canNavigate = !isLoading;
 
-  // Load tour steps
+  // Enhanced tour step loading
   const loadTourSteps = useCallback(async () => {
     try {
+      console.log('🔄 Loading tour steps...');
       const tourSteps = await ProductTourService.getTourSteps();
+      console.log(`✅ Loaded ${tourSteps.length} tour steps:`, tourSteps.map(s => s.step_key));
+      
       setSteps(tourSteps);
       setTotalSteps(tourSteps.length);
       return tourSteps;
     } catch (error) {
-      console.error('Error loading tour steps:', error);
+      console.error('❌ Error loading tour steps:', error);
       return [];
     }
   }, []);
 
-  // Load user progress
+  // Enhanced user progress loading
   const loadUserProgress = useCallback(async () => {
     if (!user?.id) return null;
     
     try {
+      console.log(`🔄 Loading progress for user: ${user.id}`);
       const userProgress = await ProductTourService.getUserProgress(user.id);
+      console.log('✅ User progress loaded:', userProgress);
+      
       setProgress(userProgress);
       return userProgress;
     } catch (error) {
-      console.error('Error loading user progress:', error);
+      console.error('❌ Error loading user progress:', error);
       return null;
     }
   }, [user?.id]);
 
   // Find step by key
   const findStepByKey = useCallback((stepKey: string) => {
-    return steps.find(step => step.step_key === stepKey);
+    const step = steps.find(step => step.step_key === stepKey);
+    console.log(`🔍 Finding step "${stepKey}":`, step ? '✅ Found' : '❌ Not found');
+    return step;
   }, [steps]);
 
   // Find step index
   const findStepIndex = useCallback((stepKey: string) => {
-    return steps.findIndex(step => step.step_key === stepKey);
+    const index = steps.findIndex(step => step.step_key === stepKey);
+    console.log(`🔢 Step "${stepKey}" index:`, index);
+    return index;
   }, [steps]);
 
-  // Navigate to page if needed
-  const navigateToStepPage = useCallback(async (step: ProductTourStep) => {
+  // Enhanced page navigation with proper waiting
+  const navigateToStepPage = useCallback(async (step: ProductTourStep): Promise<void> => {
     const currentPath = location.pathname;
     const targetPath = step.page_route;
     
+    console.log(`🧭 Navigation check: ${currentPath} → ${targetPath}`);
+    
     if (currentPath !== targetPath) {
+      console.log(`🚀 Navigating to: ${targetPath}`);
+      
       await ProductTourService.logEvent('navigation_required', {
         userId: user?.id,
         sessionId,
@@ -83,39 +97,74 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
       
       navigate(targetPath);
       
-      // Wait for navigation and DOM to settle
+      // Enhanced wait logic - wait for route change AND DOM stabilization
       return new Promise<void>((resolve) => {
-        setTimeout(resolve, 1000);
+        console.log('⏳ Waiting for page navigation and DOM stabilization...');
+        
+        // First, wait for route to actually change
+        const checkRouteChange = () => {
+          if (window.location.pathname === targetPath) {
+            console.log('✅ Route changed, waiting for DOM to stabilize...');
+            
+            // Then wait for DOM to be ready and elements to load
+            setTimeout(() => {
+              console.log('✅ DOM stabilization complete');
+              resolve();
+            }, 800); // Increased stabilization time
+          } else {
+            setTimeout(checkRouteChange, 100);
+          }
+        };
+        
+        checkRouteChange();
       });
+    } else {
+      console.log('✅ Already on correct page');
     }
   }, [location.pathname, navigate, user?.id, sessionId]);
 
-  // Wait for element to be available
-  const waitForElement = useCallback((anchorId: string, maxAttempts = 30): Promise<Element | null> => {
+  // Enhanced element waiting with better retry logic
+  const waitForElement = useCallback((anchorId: string, maxAttempts = 20): Promise<Element | null> => {
+    console.log(`⏳ Waiting for element: ${anchorId} (max ${maxAttempts} attempts)`);
+    
     return new Promise((resolve) => {
       let attempts = 0;
       
       const checkElement = () => {
         const element = document.querySelector(`[data-tour-id="${anchorId}"]`);
+        attempts++;
         
         if (element) {
-          // Additional check to ensure element is visible and has dimensions
+          // Enhanced visibility check
           const rect = element.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
+          const isVisible = rect.width > 0 && rect.height > 0;
+          const isInDOM = document.contains(element);
+          
+          console.log(`🎯 Element check ${attempts}/${maxAttempts}:`, {
+            found: true,
+            visible: isVisible,
+            inDOM: isInDOM,
+            dimensions: { width: rect.width, height: rect.height }
+          });
+          
+          if (isVisible && isInDOM) {
+            console.log(`✅ Element ready: ${anchorId}`);
             resolve(element);
             return;
           }
+        } else {
+          console.log(`🔍 Element check ${attempts}/${maxAttempts}: not found`);
         }
         
-        attempts++;
         if (attempts >= maxAttempts) {
-          console.warn(`Element with tour-id "${anchorId}" not found after ${maxAttempts} attempts`);
+          console.warn(`❌ Element "${anchorId}" not found after ${maxAttempts} attempts`);
           resolve(null);
           return;
         }
         
-        // Progressive delay: start fast, then slow down
-        const delay = attempts < 10 ? 200 : attempts < 20 ? 500 : 1000;
+        // Progressive delay strategy: quick first attempts, then slower
+        const delay = attempts <= 5 ? 200 : attempts <= 10 ? 500 : 1000;
+        console.log(`⏳ Retrying in ${delay}ms...`);
         setTimeout(checkElement, delay);
       };
       
@@ -123,19 +172,25 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
     });
   }, []);
 
-  // Start tour
+  // Enhanced tour start
   const startTour = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.warn('❌ Cannot start tour: no user');
+      return;
+    }
     
+    console.log('🚀 Starting product tour...');
     setIsLoading(true);
     
     try {
       const tourSteps = steps.length > 0 ? steps : await loadTourSteps();
       
       if (tourSteps.length === 0) {
-        console.warn('No tour steps available');
+        console.warn('❌ No tour steps available');
         return;
       }
+
+      console.log(`📋 Tour initialized with ${tourSteps.length} steps`);
 
       // Initialize progress
       const newProgress = await ProductTourService.startTour(user.id, tourSteps.length);
@@ -150,47 +205,58 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
 
       // Set first step
       const firstStep = tourSteps[0];
+      console.log(`🎯 Starting with first step: ${firstStep.step_key}`);
+      
       setCurrentStep(firstStep);
       setCurrentStepIndex(0);
       setIsActive(true);
 
-      // Navigate to first step page if needed
+      // Navigate to first step page and wait for readiness
       await navigateToStepPage(firstStep);
       
     } catch (error) {
-      console.error('Error starting tour:', error);
+      console.error('❌ Error starting tour:', error);
     } finally {
       setIsLoading(false);
     }
   }, [user?.id, steps, loadTourSteps, sessionId, navigateToStepPage]);
 
-  // Go to specific step
+  // Enhanced step navigation
   const goToStep = useCallback(async (stepKey: string) => {
-    if (!user?.id || !canNavigate) return;
+    if (!user?.id || !canNavigate) {
+      console.warn('❌ Cannot navigate to step: no user or currently loading');
+      return;
+    }
     
     const step = findStepByKey(stepKey);
     const stepIndex = findStepIndex(stepKey);
     
     if (!step || stepIndex === -1) {
-      console.warn(`Step "${stepKey}" not found`);
+      console.warn(`❌ Step "${stepKey}" not found`);
       return;
     }
 
+    console.log(`🎯 Navigating to step: ${stepKey} (${stepIndex + 1}/${totalSteps})`);
     setIsLoading(true);
 
     try {
-      // Navigate to step page if needed
+      // Navigate to step page first
       await navigateToStepPage(step);
       
-      // Wait for element
+      // Wait for element to be ready
       const element = await waitForElement(step.anchor_id);
       
       if (!element) {
-        console.warn(`Element for step "${stepKey}" not found, skipping to next step`);
-        // Skip to next step if element not found
+        console.warn(`❌ Element for step "${stepKey}" not found, attempting auto-skip`);
+        
+        // Auto-skip to next available step
         if (stepIndex < steps.length - 1) {
+          console.log('🦘 Auto-skipping to next step...');
           const nextStep = steps[stepIndex + 1];
-          await goToStep(nextStep.step_key);
+          setTimeout(() => goToStep(nextStep.step_key), 1000);
+        } else {
+          console.log('🏁 No more steps, completing tour');
+          await completeTour();
         }
         return;
       }
@@ -208,19 +274,25 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
       });
 
       // Update state
+      console.log(`✅ Successfully navigated to step: ${stepKey}`);
       setCurrentStep(step);
       setCurrentStepIndex(stepIndex);
 
     } catch (error) {
-      console.error(`Error going to step "${stepKey}":`, error);
+      console.error(`❌ Error going to step "${stepKey}":`, error);
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id, canNavigate, findStepByKey, findStepIndex, navigateToStepPage, waitForElement, steps, sessionId]);
+  }, [user?.id, canNavigate, findStepByKey, findStepIndex, navigateToStepPage, waitForElement, steps, sessionId, totalSteps]);
 
-  // Next step
+  // Enhanced next step
   const nextStep = useCallback(async () => {
-    if (!currentStep || isLastStep || !canNavigate) return;
+    if (!currentStep || isLastStep || !canNavigate) {
+      console.warn('❌ Cannot go to next step:', { currentStep: !!currentStep, isLastStep, canNavigate });
+      return;
+    }
+    
+    console.log(`➡️  Moving to next step from: ${currentStep.step_key}`);
     
     // Log current step completion
     await ProductTourService.logEvent('step_completed', {
@@ -236,12 +308,20 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
     
     if (nextStepObj) {
       await goToStep(nextStepObj.step_key);
+    } else {
+      console.log('🏁 No next step, completing tour');
+      await completeTour();
     }
   }, [currentStep, isLastStep, canNavigate, user?.id, sessionId, currentStepIndex, steps, goToStep]);
 
-  // Previous step
+  // Enhanced previous step
   const previousStep = useCallback(async () => {
-    if (!currentStep || isFirstStep || !canNavigate) return;
+    if (!currentStep || isFirstStep || !canNavigate) {
+      console.warn('❌ Cannot go to previous step:', { currentStep: !!currentStep, isFirstStep, canNavigate });
+      return;
+    }
+    
+    console.log(`⬅️  Moving to previous step from: ${currentStep.step_key}`);
     
     const prevStepIndex = currentStepIndex - 1;
     const prevStepObj = steps[prevStepIndex];
@@ -251,9 +331,11 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
     }
   }, [currentStep, isFirstStep, canNavigate, currentStepIndex, steps, goToStep]);
 
-  // Complete tour
+  // Enhanced tour completion
   const completeTour = useCallback(async () => {
     if (!user?.id) return;
+    
+    console.log('🏁 Completing product tour...');
     
     try {
       // Log current step completion if there's a current step
@@ -280,6 +362,8 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         }
       });
 
+      console.log('✅ Tour completed successfully');
+
       // Reset state
       setIsActive(false);
       setCurrentStep(null);
@@ -289,13 +373,15 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
       await loadUserProgress();
       
     } catch (error) {
-      console.error('Error completing tour:', error);
+      console.error('❌ Error completing tour:', error);
     }
   }, [user?.id, currentStep, sessionId, currentStepIndex, totalSteps, loadUserProgress]);
 
-  // Skip tour
+  // Enhanced tour skip
   const skipTour = useCallback(async () => {
     if (!user?.id) return;
+    
+    console.log('🦘 Skipping product tour...');
     
     try {
       // Update progress
@@ -313,6 +399,8 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         }
       });
 
+      console.log('✅ Tour skipped successfully');
+
       // Reset state
       setIsActive(false);
       setCurrentStep(null);
@@ -322,20 +410,25 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
       await loadUserProgress();
       
     } catch (error) {
-      console.error('Error skipping tour:', error);
+      console.error('❌ Error skipping tour:', error);
     }
   }, [user?.id, sessionId, currentStep, currentStepIndex, totalSteps, loadUserProgress]);
 
-  // Initialize tour on mount
+  // Enhanced initialization
   useEffect(() => {
     const initializeTour = async () => {
       if (!user?.id) return;
       
+      console.log('🔧 Initializing product tour system...');
       setIsLoading(true);
+      
       try {
         // Check if tour is enabled globally
         const tourEnabled = await ProductTourService.isTourEnabled();
+        console.log(`🎛️  Tour enabled: ${tourEnabled}`);
+        
         if (!tourEnabled) {
+          console.log('❌ Tour disabled, skipping initialization');
           setIsLoading(false);
           return;
         }
@@ -344,54 +437,70 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         const allSteps = await ProductTourService.getTourSteps();
         setSteps(allSteps);
         setTotalSteps(allSteps.length);
+        console.log(`📋 Loaded ${allSteps.length} tour steps`);
 
         // Load user progress
         const userProgress = await ProductTourService.getUserProgress(user.id);
         setProgress(userProgress);
 
-        // Check if should auto-start tour - delay to ensure dashboard loads
+        // Check if should auto-start tour with enhanced delay
         setTimeout(async () => {
           const shouldAutoStart = await ProductTourService.shouldAutoStartTour(user.id);
+          console.log(`🚀 Should auto-start: ${shouldAutoStart}`);
+          
           if (shouldAutoStart && allSteps.length > 0) {
-            await startTour();
+            console.log('⏰ Auto-starting tour in 2 seconds...');
+            setTimeout(() => {
+              startTour();
+            }, 2000); // Give more time for page to fully load
           }
-        }, 1500);
+        }, 1000);
+        
       } catch (error) {
-        console.error('Error initializing tour:', error);
+        console.error('❌ Error initializing tour:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeTour();
-  }, [user?.id]);
+  }, [user?.id, startTour]);
 
-  // Handle route changes to continue tour
+  // Enhanced route change handling
   useEffect(() => {
     if (!isActive || !currentStep || !user?.id) return;
+
+    console.log(`🛤️  Route changed to: ${location.pathname} (tour active)`);
 
     const handleRouteChange = async () => {
       const currentPath = location.pathname;
       
-      // If current step is for this page, reposition spotlight
+      // If current step is for this page, just reposition
       if (currentStep.page_route === currentPath) {
-        // Small delay to ensure DOM is ready
+        console.log('✅ Current step matches page, repositioning...');
+        
+        // Small delay to ensure DOM is ready, then update step to trigger reposition
         setTimeout(() => {
-          // Force update by setting step again
           const stepIndex = steps.findIndex(s => s.id === currentStep.id);
           if (stepIndex !== -1) {
             setCurrentStepIndex(stepIndex);
+            console.log('🎯 Step repositioned');
           }
         }, 500);
       } else {
-        // Find next step for current page or continue sequence
+        // Find next appropriate step for current page
+        console.log('🔍 Looking for next step on current page...');
+        
         const nextStepForPage = steps.find(step => 
           step.page_route === currentPath && 
-          step.step_order > currentStep.step_order
+          step.step_order > (currentStep?.step_order || 0)
         );
         
         if (nextStepForPage) {
+          console.log(`🎯 Found next step for page: ${nextStepForPage.step_key}`);
           await goToStep(nextStepForPage.step_key);
+        } else {
+          console.log('❌ No relevant step for current page');
         }
       }
     };
