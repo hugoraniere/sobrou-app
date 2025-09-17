@@ -15,7 +15,7 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ topics }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-tour-id="support.categories.category-grid">
       {topics.map((topic) => {
         const Icon = getIcon(topic.icon);
         

@@ -58,7 +58,7 @@ const Index = () => {
         <Button
           onClick={() => setShowAddTransaction(true)}
           className="flex items-center gap-2"
-          data-tour="add-transaction"
+          data-tour-id="dashboard.header.add-transaction-btn"
         >
           <Plus className="h-4 w-4" />
           {t('transactions.add', 'Adicionar Transação')}

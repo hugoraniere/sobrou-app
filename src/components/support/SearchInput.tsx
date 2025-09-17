@@ -27,7 +27,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`relative ${className}`}>
+    <form onSubmit={handleSubmit} className={`relative ${className}`} data-tour-id="support.search.main-search">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary h-5 w-5" />
         <Input
