@@ -186,6 +186,19 @@ export class ProductTourService {
         return false;
       }
 
+      // Check if user is truly new (created within last 24 hours)
+      const { data: user } = await supabase.auth.getUser();
+      if (user?.user?.created_at) {
+        const createdAt = new Date(user.user.created_at);
+        const now = new Date();
+        const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+        
+        // Only auto-start for users created within last 24 hours
+        if (hoursSinceCreation > 24) {
+          return false;
+        }
+      }
+
       return true;
     } catch (error) {
       console.error('Error checking auto-start tour:', error);
