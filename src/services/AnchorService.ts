@@ -22,11 +22,11 @@ export class AnchorService {
 
     try {
       const { data, error } = await supabase.rpc('anchors_search', {
-        route_filter: route || null,
-        search_query: query,
-        kind_filter: kind || null,
-        limit_count: limit,
-        offset_count: offset
+        p_route: route || null,
+        p_q: query,
+        p_kind: kind || null,
+        p_limit: limit,
+        p_offset: offset
       });
 
       if (error) throw error;
@@ -120,7 +120,7 @@ export class AnchorService {
         .from('onboarding_anchors')
         .insert({
           ...anchorData,
-          kind: anchorData.kind || 'outro'
+          kind: anchorData.kind || 'other'
         })
         .select()
         .single();
@@ -264,24 +264,34 @@ export class AnchorService {
     return `Elemento ${element.tagName.toLowerCase()}`;
   }
 
-  static detectKind(element: Element): 'botao' | 'input' | 'grafico' | 'card' | 'outro' {
+  static detectKind(element: Element): 'button' | 'input' | 'select' | 'table' | 'chart' | 'card' | 'list' | 'tabs' | 'other' {
     const tagName = element.tagName.toLowerCase();
     const role = element.getAttribute('role');
     const className = element.className.toLowerCase();
 
     // Detectar botões
     if (tagName === 'button' || role === 'button' || className.includes('button') || className.includes('btn')) {
-      return 'botao';
+      return 'button';
     }
 
     // Detectar inputs
-    if (tagName === 'input' || tagName === 'textarea' || tagName === 'select' || role === 'textbox') {
+    if (tagName === 'input' || tagName === 'textarea' || role === 'textbox') {
       return 'input';
+    }
+
+    // Detectar selects
+    if (tagName === 'select' || role === 'combobox' || role === 'listbox') {
+      return 'select';
+    }
+
+    // Detectar tables
+    if (tagName === 'table' || role === 'table' || className.includes('table')) {
+      return 'table';
     }
 
     // Detectar gráficos
     if (tagName === 'canvas' || tagName === 'svg' || className.includes('chart') || className.includes('graph')) {
-      return 'grafico';
+      return 'chart';
     }
 
     // Detectar cards
@@ -289,17 +299,59 @@ export class AnchorService {
       return 'card';
     }
 
-    return 'outro';
+    // Detectar listas
+    if (tagName === 'ul' || tagName === 'ol' || role === 'list' || className.includes('list')) {
+      return 'list';
+    }
+
+    // Detectar tabs
+    if (role === 'tab' || role === 'tablist' || className.includes('tab')) {
+      return 'tabs';
+    }
+
+    return 'other';
   }
 
   static async markAsVerified(anchorId: string): Promise<void> {
     try {
-      await supabase
-        .from('onboarding_anchors')
-        .update({ last_verified_at: new Date().toISOString() })
-        .eq('anchor_id', anchorId);
+      const { error } = await supabase.rpc('anchor_mark_verified', {
+        p_anchor_id: anchorId
+      });
+      
+      if (error) throw error;
     } catch (error) {
       console.warn('Warning updating verification timestamp:', error);
+    }
+  }
+
+  // Upsert method using new RPC
+  static async upsertAnchor(
+    route: string,
+    anchorId: string, 
+    friendlyName: string,
+    selector?: string,
+    kind: 'button' | 'input' | 'select' | 'table' | 'chart' | 'card' | 'list' | 'tabs' | 'other' = 'other',
+    thumbUrl?: string,
+    width?: number,
+    height?: number
+  ): Promise<OnboardingAnchor> {
+    try {
+      const { data, error } = await supabase.rpc('anchor_upsert', {
+        p_route: route,
+        p_anchor_id: anchorId,
+        p_friendly_name: friendlyName,
+        p_selector: selector || null,
+        p_kind: kind,
+        p_thumb_url: thumbUrl || null,
+        p_width: width || null,
+        p_height: height || null
+      });
+
+      if (error) throw error;
+      return data as OnboardingAnchor;
+    } catch (error) {
+      console.error('Error upserting anchor:', error);
+      throw error;
     }
   }
 }

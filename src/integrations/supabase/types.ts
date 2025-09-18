@@ -759,7 +759,7 @@ export type Database = {
           kind: string | null
           last_verified_at: string | null
           route: string
-          selector: string
+          selector: string | null
           tags: string[] | null
           thumb_url: string | null
           updated_at: string
@@ -774,7 +774,7 @@ export type Database = {
           kind?: string | null
           last_verified_at?: string | null
           route: string
-          selector: string
+          selector?: string | null
           tags?: string[] | null
           thumb_url?: string | null
           updated_at?: string
@@ -789,7 +789,7 @@ export type Database = {
           kind?: string | null
           last_verified_at?: string | null
           route?: string
-          selector?: string
+          selector?: string | null
           tags?: string[] | null
           thumb_url?: string | null
           updated_at?: string
@@ -1689,28 +1689,59 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      anchors_search: {
+      anchor_mark_verified: {
+        Args: { p_anchor_id: string }
+        Returns: undefined
+      }
+      anchor_upsert: {
         Args: {
-          kind_filter?: string
-          limit_count?: number
-          offset_count?: number
-          route_filter?: string
-          search_query?: string
+          p_anchor_id: string
+          p_friendly_name: string
+          p_height?: number
+          p_kind?: string
+          p_route: string
+          p_selector?: string
+          p_thumb_url?: string
+          p_width?: number
         }
         Returns: {
           anchor_id: string
           created_at: string
           friendly_name: string
-          height: number
+          height: number | null
           id: string
-          kind: string
-          last_verified_at: string
+          kind: string | null
+          last_verified_at: string | null
           route: string
-          selector: string
-          tags: string[]
-          thumb_url: string
+          selector: string | null
+          tags: string[] | null
+          thumb_url: string | null
           updated_at: string
-          width: number
+          width: number | null
+        }
+      }
+      anchors_search: {
+        Args: {
+          p_kind?: string
+          p_limit?: number
+          p_offset?: number
+          p_q?: string
+          p_route?: string
+        }
+        Returns: {
+          anchor_id: string
+          created_at: string
+          friendly_name: string
+          height: number | null
+          id: string
+          kind: string | null
+          last_verified_at: string | null
+          route: string
+          selector: string | null
+          tags: string[] | null
+          thumb_url: string | null
+          updated_at: string
+          width: number | null
         }[]
       }
       generate_slug: {
