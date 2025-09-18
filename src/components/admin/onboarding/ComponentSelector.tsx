@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Search, Target, Monitor, Image } from 'lucide-react';
+import { Search, Target, Image, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import html2canvas from 'html2canvas';
 
@@ -22,6 +21,7 @@ interface DetectedComponent {
   text: string;
   position: { x: number; y: number; width: number; height: number };
   thumbnail?: string;
+  loadingThumbnail?: boolean;
 }
 
 export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
@@ -32,13 +32,17 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [detectedComponents, setDetectedComponents] = useState<DetectedComponent[]>([]);
   const [selectedComponent, setSelectedComponent] = useState<string>(value);
-  const [isScanning, setIsScanning] = useState(false);
   const [thumbnailCache, setThumbnailCache] = useState<Map<string, string>>(new Map());
 
-  // Generate thumbnail for component
-  const generateThumbnail = async (element: HTMLElement): Promise<string | undefined> => {
+  // Generate thumbnail for component with timeout
+  const generateThumbnail = useCallback(async (element: HTMLElement): Promise<string | undefined> => {
     try {
-      const canvas = await html2canvas(element, {
+      // Set a timeout to prevent hanging
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), 5000)
+      );
+      
+      const canvasPromise = html2canvas(element, {
         width: 200,
         height: 120,
         scale: 0.5,
@@ -47,17 +51,17 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
         useCORS: true,
         allowTaint: true
       });
+
+      const canvas = await Promise.race([canvasPromise, timeoutPromise]);
       return canvas.toDataURL('image/png');
     } catch (error) {
       console.warn('Failed to generate thumbnail:', error);
       return undefined;
     }
-  };
+  }, []);
 
-  // Scan page for selectable components
-  const scanComponents = async () => {
-    setIsScanning(true);
-    
+  // Scan page for selectable components without thumbnails initially
+  const scanComponents = useCallback(() => {
     try {
       const elements = document.querySelectorAll('[data-tour-id], [id], button, input, .card, .btn, [role="button"]');
       const components: DetectedComponent[] = [];
@@ -79,15 +83,6 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
         const classes = Array.from(htmlElement.classList);
         const text = htmlElement.textContent?.trim().substring(0, 50) || '';
         
-        // Check cache first
-        let thumbnail = thumbnailCache.get(id);
-        if (!thumbnail) {
-          thumbnail = await generateThumbnail(htmlElement);
-          if (thumbnail) {
-            setThumbnailCache(prev => new Map(prev).set(id, thumbnail!));
-          }
-        }
-        
         components.push({
           id,
           element: htmlElement,
@@ -100,17 +95,47 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
             width: rect.width,
             height: rect.height
           },
-          thumbnail
+          thumbnail: thumbnailCache.get(id),
+          loadingThumbnail: false
         });
       }
+
+      // Sort by priority: data-tour-id first, then id, then others
+      components.sort((a, b) => {
+        const aPriority = a.element.getAttribute('data-tour-id') ? 0 : a.element.id ? 1 : 2;
+        const bPriority = b.element.getAttribute('data-tour-id') ? 0 : b.element.id ? 1 : 2;
+        return aPriority - bPriority;
+      });
 
       setDetectedComponents(components);
     } catch (error) {
       console.error('Error scanning components:', error);
-    } finally {
-      setIsScanning(false);
     }
-  };
+  }, [thumbnailCache]);
+
+  // Load thumbnail on demand
+  const loadThumbnailForComponent = useCallback(async (componentId: string) => {
+    const component = detectedComponents.find(c => c.id === componentId);
+    if (!component || component.thumbnail || component.loadingThumbnail) return;
+
+    // Mark as loading
+    setDetectedComponents(prev => 
+      prev.map(c => c.id === componentId ? { ...c, loadingThumbnail: true } : c)
+    );
+
+    const thumbnail = await generateThumbnail(component.element);
+    
+    if (thumbnail) {
+      setThumbnailCache(prev => new Map(prev).set(componentId, thumbnail));
+      setDetectedComponents(prev => 
+        prev.map(c => c.id === componentId ? { ...c, thumbnail, loadingThumbnail: false } : c)
+      );
+    } else {
+      setDetectedComponents(prev => 
+        prev.map(c => c.id === componentId ? { ...c, loadingThumbnail: false } : c)
+      );
+    }
+  }, [detectedComponents, generateThumbnail]);
 
   // Filter components based on search
   const filteredComponents = detectedComponents.filter(component => 
@@ -151,6 +176,7 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
   };
 
   useEffect(() => {
+    // Scan components immediately when component mounts
     scanComponents();
     
     // Add CSS for highlighting
@@ -169,7 +195,7 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
       document.head.removeChild(style);
       removeHighlight();
     };
-  }, []);
+  }, [scanComponents]);
 
   return (
     <div className={cn("space-y-4", className)} data-admin-interface>
@@ -195,19 +221,10 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
             />
           </div>
 
-          {/* Component scanner */}
+          {/* Components list */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label>Componentes Detectados</Label>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={scanComponents}
-                disabled={isScanning}
-              >
-                <Monitor className="w-4 h-4 mr-2" />
-                {isScanning ? 'Escaneando...' : 'Escanear Página'}
-              </Button>
+              <Label>Componentes Disponíveis ({filteredComponents.length})</Label>
             </div>
 
             {/* Search components */}
@@ -225,7 +242,7 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
             <div className="max-h-64 overflow-y-auto space-y-2 border rounded-lg p-2">
               {filteredComponents.length === 0 ? (
                 <div className="text-center py-4 text-muted-foreground text-sm">
-                  {isScanning ? 'Escaneando componentes...' : 'Nenhum componente encontrado'}
+                  Nenhum componente encontrado
                 </div>
               ) : (
                 filteredComponents.map((component) => (
@@ -236,13 +253,22 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
                       selectedComponent === component.id && "ring-2 ring-primary"
                     )}
                     onClick={() => selectComponent(component)}
-                    onMouseEnter={() => highlightComponent(component)}
+                    onMouseEnter={() => {
+                      highlightComponent(component);
+                      if (!component.thumbnail && !component.loadingThumbnail) {
+                        loadThumbnailForComponent(component.id);
+                      }
+                    }}
                     onMouseLeave={removeHighlight}
                   >
                     <div className="flex gap-3">
                       {/* Thumbnail */}
                       <div className="flex-shrink-0 w-16 h-12 border rounded overflow-hidden bg-muted">
-                        {component.thumbnail ? (
+                        {component.loadingThumbnail ? (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                          </div>
+                        ) : component.thumbnail ? (
                           <img 
                             src={component.thumbnail} 
                             alt={`Preview of ${component.id}`}
