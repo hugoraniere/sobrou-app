@@ -13,6 +13,8 @@ import { AnchorSearch } from './AnchorSearch';
 import { AnchorListItem } from './AnchorListItem';
 import { AnchorPickingManager } from '../anchor-picking/AnchorPickingManager';
 import { AnchorMaintenancePanel } from '../anchor-maintenance/AnchorMaintenancePanel';
+import { AnchorStatusBadge } from '../anchor-maintenance/AnchorStatusBadge';
+import { useAnchorMaintenance } from '@/hooks/useAnchorMaintenance';
 import type { OnboardingAnchor } from '@/types/onboarding-anchors';
 import { Plus, X } from 'lucide-react';
 
