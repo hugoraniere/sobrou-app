@@ -29,6 +29,7 @@ import { useOnboardingAdmin, useVirtualization } from '@/hooks/useOnboardingAdmi
 import { StepValidation } from './StepValidation';
 import { BehaviorSettings } from './BehaviorSettings';
 import { ComponentSelector } from './ComponentSelector';
+import { AnchorPickerDrawer } from './AnchorPickerDrawer';
 
 export const ProductTourAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('configuracoes');
@@ -667,6 +668,7 @@ const StepEditor: React.FC<{
     page_route: step?.page_route || '',
     is_active: step?.is_active ?? true
   });
+  const [isAnchorPickerOpen, setIsAnchorPickerOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -726,11 +728,33 @@ const StepEditor: React.FC<{
             />
           </div>
 
-          {/* Component Selector */}
           <div className="space-y-4">
-            <ComponentSelector
+            <div className="flex items-center justify-between">
+              <Label htmlFor="anchor_id">Componente de Âncora</Label>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAnchorPickerOpen(true)}
+              >
+                {formData.anchor_id ? 'Alterar Componente' : 'Selecionar Componente'}
+              </Button>
+            </div>
+            
+            {formData.anchor_id && (
+              <Input
+                id="anchor_id"
+                value={formData.anchor_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, anchor_id: e.target.value }))}
+                placeholder="ID do componente âncora"
+              />
+            )}
+
+            <AnchorPickerDrawer
+              open={isAnchorPickerOpen}
+              onOpenChange={setIsAnchorPickerOpen}
               value={formData.anchor_id || ''}
               onChange={(anchorId) => setFormData(prev => ({ ...prev, anchor_id: anchorId }))}
+              defaultRoute={formData.page_route || ''}
             />
           </div>
 
