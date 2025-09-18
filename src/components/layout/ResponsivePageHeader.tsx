@@ -32,7 +32,7 @@ const ResponsivePageHeader: React.FC<ResponsivePageHeaderProps> = ({
           )}
         </div>
         {children && (
-          <div className={stackOnMobile && isMobile ? "" : "ml-4"} data-tour-id="page.header.actions">
+          <div className={stackOnMobile && isMobile ? "" : "ml-4"}>
             {children}
           </div>
         )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -30,7 +30,7 @@ const ADMIN_PERIOD_OPTIONS: Array<{ value: AdminPeriodOption; label: string }> =
   { value: '1-year', label: 'Último ano' }
 ];
 
-const SobrouDashboard: React.FC = React.memo(() => {
+const SobrouDashboard: React.FC = () => {
   const [activeUsersData, setActiveUsersData] = useState<ActiveUsersData[]>([]);
   const [retentionData, setRetentionData] = useState<RetentionCohort[]>([]);
   const [appTotals, setAppTotals] = useState<AppInteractionTotals>({
@@ -45,7 +45,11 @@ const SobrouDashboard: React.FC = React.memo(() => {
   const [loadingErrors, setLoadingErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
-  const loadDashboardData = useCallback(async () => {
+  useEffect(() => {
+    loadDashboardData();
+  }, [selectedPeriod]);
+
+  const loadDashboardData = async () => {
     try {
       setIsLoading(true);
       setLoadingErrors({});
@@ -119,11 +123,7 @@ const SobrouDashboard: React.FC = React.memo(() => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedPeriod, toast]);
-
-  useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+  };
 
   if (isLoading) {
     return (
@@ -397,8 +397,6 @@ const SobrouDashboard: React.FC = React.memo(() => {
       </Tabs>
     </div>
   );
-});
-
-SobrouDashboard.displayName = 'SobrouDashboard';
+};
 
 export default SobrouDashboard;

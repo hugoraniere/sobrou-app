@@ -146,8 +146,8 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
   
   return (
     <>
-      <div className="flex items-center space-x-2" data-tour-id="transactions.navigation.month-navigator">
-        <Button
+      <div className="flex items-center space-x-2">
+        <Button 
           onClick={handlePrevMonth} 
           variant="ghost" 
           size="sm"

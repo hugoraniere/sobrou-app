@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, FileText, MapPin } from 'lucide-react';
+import { Plus, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useProductTour } from '@/contexts/ProductTourProvider';
 import SearchInput from './SearchInput';
 
 interface SupportSearchAndActionsProps {
@@ -16,11 +15,6 @@ const SupportSearchAndActions: React.FC<SupportSearchAndActionsProps> = ({
   className = ""
 }) => {
   const { user } = useAuth();
-  const { startTour, isActive } = useProductTour();
-
-  const handleStartTour = () => {
-    startTour();
-  };
 
   return (
     <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 ${className}`}>
@@ -34,19 +28,6 @@ const SupportSearchAndActions: React.FC<SupportSearchAndActionsProps> = ({
       
       {/* Action Buttons - Right Side */}
       <div className="flex items-center gap-3 flex-shrink-0">
-        {user && (
-          <Button 
-            variant="outline" 
-            size="default" 
-            onClick={handleStartTour}
-            disabled={isActive}
-            className="shadow-sm"
-          >
-            <MapPin className="h-4 w-4 mr-2" />
-            Fazer Tour
-          </Button>
-        )}
-        
         <Link to={user ? "/suporte/novo" : "/auth?redirect=/suporte/novo"}>
           <Button variant="default" size="default" className="shadow-sm">
             <Plus className="h-4 w-4 mr-2" />

@@ -149,7 +149,6 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         variant={variant}
         size={size}
         className="gap-1.5"
-        data-tour-id="transactions.actions.import-statement-btn"
       >
         <Upload className="h-4 w-4" />
         {t('transactions.importStatement', 'Importar extrato')}

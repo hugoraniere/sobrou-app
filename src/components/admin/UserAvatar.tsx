@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, Settings, BookOpen } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAvatar } from '@/contexts/AvatarContext';
-import { useOnboarding } from '@/contexts/OnboardingContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -18,11 +17,6 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const { avatarUrl } = useAvatar();
-  const { setWelcomeModalOpen } = useOnboarding();
-
-  const handleTutorial = () => {
-    setWelcomeModalOpen(true);
-  };
 
   const handleLogout = async () => {
     if (onLogout) {
@@ -77,11 +71,6 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
             <DropdownMenuSeparator />
           </>
         )}
-        <DropdownMenuItem onClick={handleTutorial} className="flex items-center">
-          <BookOpen className="mr-2 h-4 w-4" />
-          Tutorial do sistema
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="text-red-600 flex items-center">
           <LogOut className="mr-2 h-4 w-4" />
           Sair

@@ -44,7 +44,7 @@ export const BillsPeriodFilters: React.FC<BillsPeriodFiltersProps> = ({
   ];
 
   return (
-    <div className="flex flex-wrap gap-2" data-tour-id="bills-to-pay.filters.period-filters">
+    <div className="flex flex-wrap gap-2">
       {periodOptions.map((option) => (
         <Button
           key={option.value}

@@ -13,7 +13,7 @@ export const PlanningViewToggle: React.FC<PlanningViewToggleProps> = ({
   onToggle
 }) => {
   return (
-    <div className="flex items-center space-x-3" data-tour-id="monthly-summary.planning.detailed-toggle">
+    <div className="flex items-center space-x-3">
       <Label htmlFor="view-toggle" className="text-sm font-medium">
         Visão Simples
       </Label>

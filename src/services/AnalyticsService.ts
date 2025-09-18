@@ -11,6 +11,7 @@ export class AnalyticsService {
       const event: AnalyticsEvent = {
         event_name: eventName,
         user_id: user?.id,
+        session_id: this.sessionId,
         event_params: params || {},
         page: page || window.location.pathname
       };

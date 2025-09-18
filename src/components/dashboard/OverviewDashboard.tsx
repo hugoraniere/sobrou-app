@@ -155,9 +155,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   return (
     <div className="space-y-6 w-full max-w-full">
       {/* Card de Visão Geral com Big Numbers - ocupa toda a largura */}
-      <div data-tour-id="dashboard.kpis.overview-cards">
-        <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
-      </div>
+      <DashboardOverviewCard transactions={transactions} totalSavings={totalSavings} />
 
       {/* Grid responsivo */}
       <div className={cn(
@@ -165,7 +163,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"
       )}>
         {/* Transações Recentes */}
-        <Card className="w-full" data-tour-id="dashboard.transactions.recent-list">
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-xl">Últimas transações</CardTitle>
             <Button 
@@ -189,7 +187,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
 
         {/* Gastos por Categoria */}
-        <Card className="w-full" data-tour-id="dashboard.charts.category-expenses">
+        <Card className="w-full" data-tour="category-chart">
           <CardHeader>
             <CardTitle className="text-xl">Gastos por categoria</CardTitle>
           </CardHeader>
@@ -205,7 +203,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
 
         {/* Receitas vs Despesas */}
-        <Card className="w-full" data-tour-id="dashboard.charts.revenue-vs-expense">
+        <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-xl">Receita vs Despesa</CardTitle>
           </CardHeader>
@@ -254,7 +252,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
 
         {/* Metas Financeiras */}
-        <Card className="w-full" data-tour-id="dashboard.goals.progress-section">
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-xl">{TEXT.dashboard.charts.financialGoals}</CardTitle>
             <Button 
@@ -277,7 +275,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </Card>
 
         {/* Contas a Pagar */}
-        <Card className="w-full" data-tour-id="dashboard.bills.summary-card">
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-xl flex items-center gap-2">
               <CreditCard className="h-5 w-5" />

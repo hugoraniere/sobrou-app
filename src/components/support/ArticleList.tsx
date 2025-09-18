@@ -29,7 +29,7 @@ const ArticleList: React.FC<ArticleListProps> = ({
   }
 
   return (
-    <div className={`space-y-4 ${className}`} data-tour-id="support.articles.article-list">
+    <div className={`space-y-4 ${className}`}>
       {articles.map((article) => (
         <Link key={article.id} to={`/suporte/artigo/${article.slug}`}>
           <Card className="hover:shadow-md transition-shadow cursor-pointer group">

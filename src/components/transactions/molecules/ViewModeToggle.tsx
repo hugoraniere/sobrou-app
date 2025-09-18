@@ -17,7 +17,7 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
   className
 }) => {
   return (
-    <div className={cn("flex gap-1 bg-muted p-1 rounded-lg", className)} data-tour-id="transactions.filters.view-toggle">
+    <div className={cn("flex gap-1 bg-muted p-1 rounded-lg", className)}>
       <Button
         variant={viewMode === 'monthly' ? 'default' : 'ghost'}
         size="sm"

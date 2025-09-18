@@ -85,12 +85,12 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({ savingGoals, onGoalAdded, onG
   };
 
   return (
-    <Card data-tour-id="goals.list.goals-container">
+    <Card>
       <CardHeader>
         <CardTitle>{t('savingGoals.title', 'Metas de Economia')}</CardTitle>
         <CardDescription>{t('savingGoals.subtitle', 'Acompanhe suas metas financeiras')}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4" data-tour-id="goals.progress.goal-cards">
+      <CardContent className="space-y-4">
         {savingGoals.length > 0 ? (
           <div className="h-[220px] overflow-y-auto space-y-4">
             {savingGoals.map((goal) => (
@@ -156,7 +156,7 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({ savingGoals, onGoalAdded, onG
             <Button onClick={handleAddGoal}>{t('savingGoals.addGoal', 'Adicionar Meta')}</Button>
           </div>
         ) : (
-          <Button variant="outline" className="w-full" onClick={() => setIsAddingGoal(true)} data-tour-id="goals.actions.new-goal-btn">
+          <Button variant="outline" className="w-full" onClick={() => setIsAddingGoal(true)}>
             <PlusCircle className="h-4 w-4 mr-2" />
             {t('savingGoals.addGoalButton', 'Adicionar Nova Meta')}
           </Button>

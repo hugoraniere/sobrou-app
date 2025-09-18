@@ -20,7 +20,7 @@ export const BillsSearchAndToggle: React.FC<BillsSearchAndToggleProps> = ({
   paidCount,
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row gap-3" data-tour-id="bills-to-pay.filters.search-and-toggle">
+    <div className="flex flex-col sm:flex-row gap-3">
       {/* Campo de busca */}
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

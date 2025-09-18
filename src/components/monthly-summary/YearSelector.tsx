@@ -38,7 +38,7 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
       "flex items-center",
       isMobile ? "gap-1" : "gap-4 shrink-0",
       className
-    )} data-tour-id="monthly-summary.filters.year-selector">
+    )}>
       <Button
         variant="outline"
         size="sm"
