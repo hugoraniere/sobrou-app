@@ -1,6 +1,7 @@
 import React from 'react';
 import { useProductTour } from '@/contexts/ProductTourProvider';
 import { TourSpotlight } from './TourSpotlight';
+import { TourPreviewMode } from './TourPreviewMode';
 import { OnboardingGate } from '@/components/onboarding/OnboardingGate';
 import { useOnboardingVisibility } from '@/hooks/useOnboardingVisibility';
 
@@ -42,18 +43,23 @@ export const TourManager: React.FC = () => {
   };
 
   return (
-    <OnboardingGate type="tour" preview={visibility.preview}>
-      <TourSpotlight
-        step={currentStep}
-        onNext={handleNext}
-        onPrevious={previousStep}
-        onSkip={skipTour}
-        onClose={handleClose}
-        isFirstStep={isFirstStep}
-        isLastStep={isLastStep}
-        currentStepIndex={currentStepIndex}
-        totalSteps={totalSteps}
-      />
-    </OnboardingGate>
+    <>
+      <OnboardingGate type="tour" preview={visibility.preview}>
+        <TourSpotlight
+          step={currentStep}
+          onNext={handleNext}
+          onPrevious={previousStep}
+          onSkip={skipTour}
+          onClose={handleClose}
+          isFirstStep={isFirstStep}
+          isLastStep={isLastStep}
+          currentStepIndex={currentStepIndex}
+          totalSteps={totalSteps}
+        />
+      </OnboardingGate>
+      
+      {/* Preview mode sempre ativo para capturar mensagens */}
+      <TourPreviewMode />
+    </>
   );
 };

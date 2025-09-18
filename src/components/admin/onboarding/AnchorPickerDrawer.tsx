@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useAnchorSearch } from '@/hooks/useAnchorSearch';
 import { AnchorSearch } from './AnchorSearch';
 import { AnchorListItem } from './AnchorListItem';
+import { AnchorPickingManager } from '../anchor-picking/AnchorPickingManager';
 import type { OnboardingAnchor } from '@/types/onboarding-anchors';
 import { Plus, X } from 'lucide-react';
 
@@ -89,6 +90,12 @@ export const AnchorPickerDrawer: React.FC<AnchorPickerDrawerProps> = ({
     // TODO: Implementar na Etapa 3
     console.log('Criar nova âncora - será implementado na Etapa 3');
   }, []);
+
+  // Handle anchor picked from app
+  const handleAnchorPickedFromApp = useCallback((anchorId: string) => {
+    onChange(anchorId);
+    onOpenChange(false);
+  }, [onChange, onOpenChange]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -189,6 +196,11 @@ export const AnchorPickerDrawer: React.FC<AnchorPickerDrawerProps> = ({
         </div>
 
         <DrawerFooter className="border-t">
+          <AnchorPickingManager 
+            onAnchorSelected={handleAnchorPickedFromApp}
+            disabled={false}
+          />
+          
           <div className="flex items-center justify-between">
             <Button
               variant="outline"
