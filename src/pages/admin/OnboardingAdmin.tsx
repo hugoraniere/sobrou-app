@@ -114,13 +114,6 @@ const OnboardingAdmin: React.FC = () => {
         </TabsList>
 
         <TabsContent value="product-tour" className="space-y-4">
-          <OnboardingSummaryBar
-            type="tour"
-            status={tourStatus}
-            onPreview={() => handlePreview('tour')}
-            onPublish={() => handlePublish('tour')}
-            onReset={() => handleReset('tour')}
-          />
           <ProductTourAdmin />
         </TabsContent>
 

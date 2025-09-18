@@ -8,15 +8,17 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   Settings, 
-  Users, 
   Palette, 
   Plus,
   Edit,
   Trash2,
   GripVertical,
-  Eye
+  Eye,
+  Play,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProductTourAdminService, ProductTourAdminConfig } from '@/services/ProductTourAdminService';
@@ -25,9 +27,10 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useOnboardingAdmin, useVirtualization } from '@/hooks/useOnboardingAdmin';
 import { StepValidation } from './StepValidation';
 import { BehaviorSettings } from './BehaviorSettings';
+import { ComponentSelector } from './ComponentSelector';
 
 export const ProductTourAdmin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('settings');
+  const [activeTab, setActiveTab] = useState('configuracoes');
   const [config, setConfig] = useState<ProductTourAdminConfig | null>(null);
   const [steps, setSteps] = useState<ProductTourStep[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -141,36 +144,49 @@ export const ProductTourAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Action Bar */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center p-4 border rounded-lg bg-card">
+        <div className="flex items-center gap-3">
+          <div className={`w-3 h-3 rounded-full ${config?.enabled ? 'bg-green-500' : 'bg-red-500'}`} />
+          <div>
+            <h2 className="font-semibold">Product Tour</h2>
+            <p className="text-sm text-muted-foreground">
+              {config?.enabled ? 'Ativo' : 'Inativo'} • Versão {config?.version || '1.0'}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">
+            <Play className="w-4 h-4 mr-2" />
+            Preview
+          </Button>
+          <Button variant="outline" size="sm">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Reset
+          </Button>
+        </div>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="settings" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="configuracoes" className="flex items-center gap-2">
             <Settings className="w-4 h-4" />
-            Configurações
-          </TabsTrigger>
-          <TabsTrigger value="visibility" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Visibilidade
+            <span className="hidden sm:inline">Configurações</span>
+            <span className="sm:hidden">Config</span>
           </TabsTrigger>
           <TabsTrigger value="steps" className="flex items-center gap-2">
             <Eye className="w-4 h-4" />
             Passos
           </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
+          <TabsTrigger value="personalizacao" className="flex items-center gap-2">
             <Palette className="w-4 h-4" />
-            Aparência
-          </TabsTrigger>
-          <TabsTrigger value="behavior" className="flex items-center gap-2">
-            <Settings className="w-4 h-4" />
-            Comportamento
+            <span className="hidden sm:inline">Personalização</span>
+            <span className="sm:hidden">Visual</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="settings" className="space-y-4">
-          <GeneralSettings config={config} onUpdate={handleConfigUpdate} />
-        </TabsContent>
-
-        <TabsContent value="visibility" className="space-y-4">
-          <VisibilitySettings config={config} onUpdate={handleConfigUpdate} />
+        <TabsContent value="configuracoes" className="space-y-4">
+          <ConfiguracoesSection config={config} onUpdate={handleConfigUpdate} />
         </TabsContent>
 
         <TabsContent value="steps" className="space-y-4">
@@ -184,12 +200,8 @@ export const ProductTourAdmin: React.FC = () => {
           />
         </TabsContent>
 
-        <TabsContent value="appearance" className="space-y-4">
-          <AppearanceSettings config={config} onUpdate={handleConfigUpdate} />
-        </TabsContent>
-
-        <TabsContent value="behavior" className="space-y-4">
-          <BehaviorSettings config={config} onUpdate={handleConfigUpdate} />
+        <TabsContent value="personalizacao" className="space-y-4">
+          <PersonalizacaoSection config={config} onUpdate={handleConfigUpdate} />
         </TabsContent>
       </Tabs>
 
@@ -208,137 +220,139 @@ export const ProductTourAdmin: React.FC = () => {
   );
 };
 
-const GeneralSettings: React.FC<{
+const ConfiguracoesSection: React.FC<{
   config: ProductTourAdminConfig | null;
   onUpdate: (updates: Partial<ProductTourAdminConfig>) => void;
 }> = ({ config, onUpdate }) => {
   if (!config) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Configurações Gerais</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label>Ativar Product Tour</Label>
-            <p className="text-sm text-muted-foreground">Habilitar o tour guiado para os usuários</p>
-          </div>
-          <Switch
-            checked={config.enabled}
-            onCheckedChange={(checked) => onUpdate({ enabled: checked })}
-          />
-        </div>
+    <Accordion type="single" collapsible defaultValue="geral" className="w-full">
+      <AccordionItem value="geral">
+        <AccordionTrigger>Configurações Gerais</AccordionTrigger>
+        <AccordionContent>
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label>Ativar Product Tour</Label>
+                    <p className="text-sm text-muted-foreground">Habilitar o tour guiado</p>
+                  </div>
+                  <Switch
+                    checked={config.enabled}
+                    onCheckedChange={(checked) => onUpdate({ enabled: checked })}
+                  />
+                </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <Label>Iniciar automaticamente para novos usuários</Label>
-            <p className="text-sm text-muted-foreground">Mostrar tour automaticamente no primeiro acesso</p>
-          </div>
-          <Switch
-            checked={config.auto_start_for_new_users}
-            onCheckedChange={(checked) => onUpdate({ auto_start_for_new_users: checked })}
-          />
-        </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label>Iniciar automaticamente</Label>
+                    <p className="text-sm text-muted-foreground">Para novos usuários</p>
+                  </div>
+                  <Switch
+                    checked={config.auto_start_for_new_users}
+                    onCheckedChange={(checked) => onUpdate({ auto_start_for_new_users: checked })}
+                  />
+                </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <Label>Mostrar progresso</Label>
-            <p className="text-sm text-muted-foreground">Exibir barra de progresso durante o tour</p>
-          </div>
-          <Switch
-            checked={config.show_progress}
-            onCheckedChange={(checked) => onUpdate({ show_progress: checked })}
-          />
-        </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label>Mostrar progresso</Label>
+                    <p className="text-sm text-muted-foreground">Barra de progresso</p>
+                  </div>
+                  <Switch
+                    checked={config.show_progress}
+                    onCheckedChange={(checked) => onUpdate({ show_progress: checked })}
+                  />
+                </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <Label>Permitir pular</Label>
-            <p className="text-sm text-muted-foreground">Permitir que usuários pulem o tour</p>
-          </div>
-          <Switch
-            checked={config.allow_skip}
-            onCheckedChange={(checked) => onUpdate({ allow_skip: checked })}
-          />
-        </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label>Permitir pular</Label>
+                    <p className="text-sm text-muted-foreground">Usuários podem pular</p>
+                  </div>
+                  <Switch
+                    checked={config.allow_skip}
+                    onCheckedChange={(checked) => onUpdate({ allow_skip: checked })}
+                  />
+                </div>
+              </div>
 
-        <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="version">Versão do Tour</Label>
-          <Input
-            id="version"
-            value={config.version}
-            onChange={(e) => onUpdate({ version: e.target.value })}
-            placeholder="1.0"
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+              <div className="grid w-full items-center gap-2">
+                <Label htmlFor="version">Versão do Tour</Label>
+                <Input
+                  id="version"
+                  value={config.version}
+                  onChange={(e) => onUpdate({ version: e.target.value })}
+                  placeholder="1.0"
+                  className="max-w-xs"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </AccordionContent>
+      </AccordionItem>
 
-const VisibilitySettings: React.FC<{
-  config: ProductTourAdminConfig | null;
-  onUpdate: (updates: Partial<ProductTourAdminConfig>) => void;
-}> = ({ config, onUpdate }) => {
-  if (!config) return null;
+      <AccordionItem value="visibilidade">
+        <AccordionTrigger>Regras de Visibilidade</AccordionTrigger>
+        <AccordionContent>
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Quando mostrar</Label>
+                  <Select
+                    value={config.visibility_rules.show_on}
+                    onValueChange={(value: any) => 
+                      onUpdate({ 
+                        visibility_rules: { 
+                          ...config.visibility_rules, 
+                          show_on: value 
+                        } 
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="first_access">Apenas no primeiro acesso</SelectItem>
+                      <SelectItem value="until_completion">Até completar o onboarding</SelectItem>
+                      <SelectItem value="never_show_again">Marca ativo botão "Não ver mais"</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Configurações de Visibilidade</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid w-full items-center gap-1.5">
-          <Label>Quando mostrar</Label>
-          <Select
-            value={config.visibility_rules.show_on}
-            onValueChange={(value: any) => 
-              onUpdate({ 
-                visibility_rules: { 
-                  ...config.visibility_rules, 
-                  show_on: value 
-                } 
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="first_access">Apenas no primeiro acesso</SelectItem>
-              <SelectItem value="until_completion">Até completar o onboarding</SelectItem>
-              <SelectItem value="never_show_again">Marca ativo botão "Não ver mais"</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid w-full items-center gap-1.5">
-          <Label>Usuários alvo</Label>
-          <Select
-            value={config.visibility_rules.target_users}
-            onValueChange={(value: any) => 
-              onUpdate({ 
-                visibility_rules: { 
-                  ...config.visibility_rules, 
-                  target_users: value 
-                } 
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os usuários</SelectItem>
-              <SelectItem value="new_users">Apenas novos usuários</SelectItem>
-              <SelectItem value="existing_users">Apenas usuários existentes</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardContent>
-    </Card>
+                <div className="space-y-2">
+                  <Label>Usuários alvo</Label>
+                  <Select
+                    value={config.visibility_rules.target_users}
+                    onValueChange={(value: any) => 
+                      onUpdate({ 
+                        visibility_rules: { 
+                          ...config.visibility_rules, 
+                          target_users: value 
+                        } 
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os usuários</SelectItem>
+                      <SelectItem value="new_users">Apenas novos usuários</SelectItem>
+                      <SelectItem value="existing_users">Apenas usuários existentes</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
@@ -432,89 +446,164 @@ const StepsManager: React.FC<{
   );
 };
 
-const AppearanceSettings: React.FC<{
+const PersonalizacaoSection: React.FC<{
   config: ProductTourAdminConfig | null;
   onUpdate: (updates: Partial<ProductTourAdminConfig>) => void;
 }> = ({ config, onUpdate }) => {
   if (!config) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Personalização Visual</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="primary-color">Cor Primária</Label>
-            <Input
-              id="primary-color"
-              type="color"
-              value={config.colors.primary}
-              onChange={(e) => 
-                onUpdate({ 
-                  colors: { 
-                    ...config.colors, 
-                    primary: e.target.value 
-                  } 
-                })
-              }
-            />
-          </div>
+    <Accordion type="single" collapsible defaultValue="aparencia" className="w-full">
+      <AccordionItem value="aparencia">
+        <AccordionTrigger>Aparência Visual</AccordionTrigger>
+        <AccordionContent>
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="space-y-2">
+                  <Label htmlFor="primary-color">Cor Primária</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="primary-color"
+                      type="color"
+                      value={config.colors.primary}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            primary: e.target.value 
+                          } 
+                        })
+                      }
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      value={config.colors.primary}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            primary: e.target.value 
+                          } 
+                        })
+                      }
+                      className="flex-1"
+                      placeholder="#000000"
+                    />
+                  </div>
+                </div>
 
-          <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="background-color">Cor de Fundo</Label>
-            <Input
-              id="background-color"
-              type="color"
-              value={config.colors.background}
-              onChange={(e) => 
-                onUpdate({ 
-                  colors: { 
-                    ...config.colors, 
-                    background: e.target.value 
-                  } 
-                })
-              }
-            />
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="background-color">Cor de Fundo</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="background-color"
+                      type="color"
+                      value={config.colors.background}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            background: e.target.value 
+                          } 
+                        })
+                      }
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      value={config.colors.background}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            background: e.target.value 
+                          } 
+                        })
+                      }
+                      className="flex-1"
+                      placeholder="#ffffff"
+                    />
+                  </div>
+                </div>
 
-          <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="text-color">Cor do Texto</Label>
-            <Input
-              id="text-color"
-              type="color"
-              value={config.colors.text}
-              onChange={(e) => 
-                onUpdate({ 
-                  colors: { 
-                    ...config.colors, 
-                    text: e.target.value 
-                  } 
-                })
-              }
-            />
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="text-color">Cor do Texto</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="text-color"
+                      type="color"
+                      value={config.colors.text}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            text: e.target.value 
+                          } 
+                        })
+                      }
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      value={config.colors.text}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            text: e.target.value 
+                          } 
+                        })
+                      }
+                      className="flex-1"
+                      placeholder="#000000"
+                    />
+                  </div>
+                </div>
 
-          <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="overlay-color">Cor do Overlay</Label>
-            <Input
-              id="overlay-color"
-              type="color"
-              value={config.colors.overlay.replace('rgba(0, 0, 0, 0.5)', '#000000')}
-              onChange={(e) => 
-                onUpdate({ 
-                  colors: { 
-                    ...config.colors, 
-                    overlay: `rgba(${parseInt(e.target.value.slice(1, 3), 16)}, ${parseInt(e.target.value.slice(3, 5), 16)}, ${parseInt(e.target.value.slice(5, 7), 16)}, 0.5)`
-                  } 
-                })
-              }
-            />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="overlay-color">Cor do Overlay</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="overlay-color"
+                      type="color"
+                      value={config.colors.overlay.replace('rgba(0, 0, 0, 0.5)', '#000000')}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            overlay: `rgba(${parseInt(e.target.value.slice(1, 3), 16)}, ${parseInt(e.target.value.slice(3, 5), 16)}, ${parseInt(e.target.value.slice(5, 7), 16)}, 0.5)`
+                          } 
+                        })
+                      }
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      value={config.colors.overlay}
+                      onChange={(e) => 
+                        onUpdate({ 
+                          colors: { 
+                            ...config.colors, 
+                            overlay: e.target.value 
+                          } 
+                        })
+                      }
+                      className="flex-1"
+                      placeholder="rgba(0,0,0,0.5)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="comportamento">
+        <AccordionTrigger>Comportamento</AccordionTrigger>
+        <AccordionContent>
+          <BehaviorSettings config={config} onUpdate={onUpdate} />
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
@@ -591,26 +680,22 @@ const StepEditor: React.FC<{
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="anchor_id">ID do Elemento</Label>
-              <Input
-                id="anchor_id"
-                value={formData.anchor_id}
-                onChange={(e) => setFormData(prev => ({ ...prev, anchor_id: e.target.value }))}
-                required
-              />
-            </div>
+          {/* Component Selector */}
+          <div className="space-y-4">
+            <ComponentSelector
+              value={formData.anchor_id || ''}
+              onChange={(anchorId) => setFormData(prev => ({ ...prev, anchor_id: anchorId }))}
+            />
+          </div>
 
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="visible_when">Visível Quando</Label>
-              <Input
-                id="visible_when"
-                value={formData.visible_when}
-                onChange={(e) => setFormData(prev => ({ ...prev, visible_when: e.target.value }))}
-                placeholder="Condição opcional"
-              />
-            </div>
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="visible_when">Visível Quando</Label>
+            <Input
+              id="visible_when"
+              value={formData.visible_when}
+              onChange={(e) => setFormData(prev => ({ ...prev, visible_when: e.target.value }))}
+              placeholder="Condição opcional"
+            />
           </div>
 
           <div className="flex items-center space-x-2">
