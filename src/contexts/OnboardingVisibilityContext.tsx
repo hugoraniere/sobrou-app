@@ -70,7 +70,7 @@ export function OnboardingVisibilityProvider({ children, preview = false }: Onbo
     }
   }, []);
 
-  const fetchVisibility = async () => {
+  const fetchVisibility = useCallback(async () => {
     if (authLoading || !user) {
       setLoading(true);
       return;
@@ -148,11 +148,11 @@ export function OnboardingVisibilityProvider({ children, preview = false }: Onbo
     } finally {
       setLoading(false);
     }
-  };
+  }, [authLoading, user, preview, checkIsAdmin]);
 
   useEffect(() => {
     fetchVisibility();
-  }, [user, authLoading, preview]);
+  }, [fetchVisibility]);
 
   const contextValue: OnboardingVisibilityContextType = {
     ...visibility,

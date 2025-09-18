@@ -276,8 +276,8 @@ const App = () => {
                         </Routes>
                         
                         <WhatsAppChatButton />
-                        <TourManager />
                         <InstallPrompt />
+                        <TourManager />
                         {isDevMode && (
                           <>
                             <TourDevOverlay enabled={isDevMode} />
