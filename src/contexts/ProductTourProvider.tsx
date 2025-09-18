@@ -91,7 +91,7 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
   }, [location.pathname, navigate, user?.id, sessionId]);
 
   // Wait for element to be available
-  const waitForElement = useCallback((anchorId: string, maxAttempts = 20): Promise<Element | null> => {
+  const waitForElement = useCallback((anchorId: string, maxAttempts = 30): Promise<Element | null> => {
     return new Promise((resolve) => {
       let attempts = 0;
       
@@ -99,8 +99,12 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         const element = document.querySelector(`[data-tour-id="${anchorId}"]`);
         
         if (element) {
-          resolve(element);
-          return;
+          // Additional check to ensure element is visible and has dimensions
+          const rect = element.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            resolve(element);
+            return;
+          }
         }
         
         attempts++;
@@ -110,7 +114,9 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
           return;
         }
         
-        setTimeout(checkElement, 250);
+        // Progressive delay: start fast, then slow down
+        const delay = attempts < 10 ? 200 : attempts < 20 ? 500 : 1000;
+        setTimeout(checkElement, delay);
       };
       
       checkElement();

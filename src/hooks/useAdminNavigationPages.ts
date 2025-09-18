@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { LayoutDashboard, FileText, Users, MessageSquare, Monitor } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, MessageSquare, Monitor, Settings } from 'lucide-react';
 
 export interface AdminNavigationPage {
   title: string;
@@ -28,6 +28,11 @@ export const useAdminNavigationPages = () => {
       title: 'Central de Ajuda',
       url: '/admin/support',
       icon: MessageSquare,
+    },
+    {
+      title: 'Onboarding',
+      url: '/admin/onboarding',
+      icon: Settings,
     },
     {
       title: 'Gerenciar Usuários',

@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardDateProvider } from '@/contexts/DashboardDateProvider';
 import { PeriodSelector } from '@/components/dashboard/widgets/PeriodSelector';
-import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
-import { UsersAuthTab } from '@/components/dashboard/tabs/UsersAuthTab';
-import { ProductUsageTab } from '@/components/dashboard/tabs/ProductUsageTab';
-import { SupportTab } from '@/components/dashboard/tabs/SupportTab';
-import { ContentBlogTab } from '@/components/dashboard/tabs/ContentBlogTab';
+
+// Lazy load dashboard tabs for better performance
+const OverviewTab = lazy(() => import('@/components/dashboard/tabs/OverviewTab').then(m => ({ default: m.OverviewTab })));
+const UsersAuthTab = lazy(() => import('@/components/dashboard/tabs/UsersAuthTab').then(m => ({ default: m.UsersAuthTab })));
+const ProductUsageTab = lazy(() => import('@/components/dashboard/tabs/ProductUsageTab').then(m => ({ default: m.ProductUsageTab })));
+const SupportTab = lazy(() => import('@/components/dashboard/tabs/SupportTab').then(m => ({ default: m.SupportTab })));
+const ContentBlogTab = lazy(() => import('@/components/dashboard/tabs/ContentBlogTab').then(m => ({ default: m.ContentBlogTab })));
 
 const TABS = [
   { value: 'overview', label: 'Visão Geral', component: OverviewTab },
@@ -57,7 +59,9 @@ export default function AdminDashboardNew() {
               const Component = tab.component;
               return (
                 <TabsContent key={tab.value} value={tab.value}>
-                  <Component />
+                  <Suspense fallback={<div className="flex items-center justify-center p-8">Carregando...</div>}>
+                    <Component />
+                  </Suspense>
                 </TabsContent>
               );
             })}
