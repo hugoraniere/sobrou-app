@@ -343,7 +343,23 @@ export class BlogService {
       ]);
       return isAdmin || isEditor;
     } catch (error) {
-      return false;
+      // Fallback: direct user_roles query
+      try {
+        const { data: user } = await supabase.auth.getUser();
+        if (!user.user) return false;
+
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.user.id)
+          .in('role', ['admin', 'editor']);
+
+        if (error) return false;
+        return (data || []).length > 0;
+      } catch (fallbackError) {
+        console.error('Admin access check failed:', fallbackError);
+        return false;
+      }
     }
   }
 

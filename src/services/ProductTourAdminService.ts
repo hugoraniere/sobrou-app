@@ -62,8 +62,8 @@ export class ProductTourAdminService {
 
   private static getDefaultConfig(): ProductTourAdminConfig {
     return {
-      enabled: true,
-      auto_start_for_new_users: true,
+      enabled: false, // Default disabled
+      auto_start_for_new_users: false,
       version: '1.0',
       total_steps: 0,
       show_progress: true,

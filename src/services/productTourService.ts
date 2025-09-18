@@ -217,8 +217,8 @@ export class ProductTourService {
         .single();
 
       if (error || !data) {
-        console.log('No tour config found, using default (enabled)');
-        return true;
+        // Default disabled when no config found
+        return false;
       }
 
       const config = data.setting_value as any;

@@ -8,6 +8,7 @@ import { useOnboarding } from '@/contexts/OnboardingContext';
 import { OnboardingService } from '@/services/OnboardingService';
 import { OnboardingGate } from './OnboardingGate';
 import { useOnboardingVisibilityContext } from '@/contexts/OnboardingVisibilityContext';
+import { getPercent } from '@/lib/progress';
 
 export const GetStartedStepper: React.FC = () => {
   const { 
@@ -28,7 +29,7 @@ export const GetStartedStepper: React.FC = () => {
     progress?.completed[step.key] || OnboardingService.shouldCompleteStep(step, eventCounts)
   );
 
-  const completionPercentage = OnboardingService.getCompletionPercentage(steps, progress, eventCounts);
+  const completionPercentage = getPercent(completedSteps.length, steps.length);
   const allCompleted = completedSteps.length === steps.length;
 
   if (allCompleted) return null; // Hide when all steps are completed

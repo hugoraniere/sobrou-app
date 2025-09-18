@@ -90,6 +90,7 @@ export class OnboardingConfigService {
       title: "Bem-vindo ao Sobrou 👋",
       subtitle: "Este onboarding pode ser configurado no Admin. Em 1 minuto você deixa tudo pronto.",
       image: "",
+      enabled: false, // Default disabled
       cta_start: "Começar",
       cta_close: "Fechar",
       show_admin_button: true
@@ -101,6 +102,7 @@ export class OnboardingConfigService {
     const config = await this.getConfig('get_started_stepper');
     return config?.content || {
       title: "Primeiros Passos",
+      enabled: false, // Default disabled
       show_progress: true,
       show_minimize: true,
       completion_message: "Parabéns! Você concluiu todos os passos.",
@@ -116,10 +118,57 @@ export class OnboardingConfigService {
   static async getGeneralSettings() {
     const config = await this.getConfig('general_settings');
     return config?.content || {
-      auto_show_welcome: true,
+      auto_show_welcome: false, // Default disabled
       auto_complete_steps: true,
       show_completion_celebration: true,
       reset_on_new_users: false
     };
+  }
+
+  // Check if stepper is enabled
+  static async isStepperEnabled(): Promise<boolean> {
+    try {
+      const config = await this.getConfig('get_started_stepper');
+      return config?.content?.enabled === true && config?.is_visible === true;
+    } catch (error) {
+      console.error('Error checking if stepper is enabled:', error);
+      return false;
+    }
+  }
+
+  // Enable stepper
+  static async enableStepper(): Promise<boolean> {
+    try {
+      const config = await this.getConfig('get_started_stepper');
+      const content = config?.content || {};
+      
+      await this.updateConfig('get_started_stepper', {
+        content: { ...content, enabled: true },
+        is_visible: true
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error enabling stepper:', error);
+      return false;
+    }
+  }
+
+  // Disable stepper
+  static async disableStepper(): Promise<boolean> {
+    try {
+      const config = await this.getConfig('get_started_stepper');
+      const content = config?.content || {};
+      
+      await this.updateConfig('get_started_stepper', {
+        content: { ...content, enabled: false },
+        is_visible: false
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error disabling stepper:', error);
+      return false;
+    }
   }
 }

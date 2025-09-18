@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ChevronLeft, ChevronRight, X, SkipForward } from 'lucide-react';
 import { TourSpotlightProps, SpotlightPosition } from '@/types/product-tour';
 import { cn } from '@/lib/utils';
+import { getPercent } from '@/lib/progress';
 
 export const TourSpotlight: React.FC<TourSpotlightProps> = ({
   step,
@@ -348,7 +349,7 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
   }
 
   const tooltipPosition = getTooltipPosition();
-  const progressPercentage = ((currentStepIndex + 1) / totalSteps) * 100;
+  const progressPercentage = getPercent(currentStepIndex + 1, totalSteps);
 
   return (
     <>

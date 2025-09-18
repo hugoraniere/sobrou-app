@@ -1,29 +1,28 @@
 import React, { useMemo } from 'react';
 import { Progress } from '@/components/ui/progress';
+import { getPercent } from '@/lib/progress';
 
 interface TourProgressBarProps {
-  currentStep: number;
-  totalSteps: number;
+  completed: number;
+  total: number;
   className?: string;
 }
 
 export const TourProgressBar: React.FC<TourProgressBarProps> = ({
-  currentStep,
-  totalSteps,
+  completed,
+  total,
   className = ""
 }) => {
-  // Fixed progress calculation
+  // Unified progress calculation
   const progressValue = useMemo(() => {
-    if (totalSteps === 0) return 0;
-    // Progress should be based on completed steps, not current step index
-    return Math.round(((currentStep + 1) / totalSteps) * 100);
-  }, [currentStep, totalSteps]);
+    return getPercent(completed, total);
+  }, [completed, total]);
 
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex justify-between text-sm text-muted-foreground">
         <span>Progresso</span>
-        <span>{currentStep + 1} de {totalSteps}</span>
+        <span>{completed} de {total}</span>
       </div>
       <Progress 
         value={progressValue} 

@@ -17,6 +17,8 @@ import {
 import { toast } from 'sonner';
 import { ProductTourService } from '@/services/productTourService';
 import { ProductTourAdminService } from '@/services/ProductTourAdminService';
+import { OnboardingConfigService } from '@/services/OnboardingConfigService';
+import { ModalInformativoService } from '@/services/ModalInformativoService';
 
 interface OnboardingFeature {
   id: string;
@@ -40,10 +42,11 @@ export const UnifiedOnboardingControl: React.FC = () => {
   const loadFeatures = async () => {
     setIsLoading(true);
     try {
-      // Load all feature states
-      const [tourEnabled, tourConfig] = await Promise.all([
+      // Load all feature states in parallel
+      const [tourEnabled, stepperEnabled, modalEnabled] = await Promise.all([
         ProductTourService.isTourEnabled(),
-        ProductTourAdminService.getConfig().catch(() => null)
+        OnboardingConfigService.isStepperEnabled(),
+        ModalInformativoService.isEnabled()
       ]);
 
       const features: OnboardingFeature[] = [
@@ -60,16 +63,16 @@ export const UnifiedOnboardingControl: React.FC = () => {
           name: 'Get Started Stepper',
           description: 'Checklist de primeiros passos',
           icon: <List className="w-4 h-4" />,
-          enabled: true, // TODO: Get from stepper config
-          status: 'active'
+          enabled: stepperEnabled,
+          status: stepperEnabled ? 'active' : 'inactive'
         },
         {
           id: 'modal',
           name: 'Modal Informativo',
           description: 'Release notes e avisos',
           icon: <MessageSquare className="w-4 h-4" />,
-          enabled: false, // TODO: Get from modal config
-          status: 'inactive'
+          enabled: modalEnabled,
+          status: modalEnabled ? 'active' : 'inactive'
         }
       ];
 
@@ -86,6 +89,8 @@ export const UnifiedOnboardingControl: React.FC = () => {
     setIsUpdating(featureId);
     
     try {
+      let success = false;
+
       switch (featureId) {
         case 'product-tour':
           if (enabled) {
@@ -93,21 +98,30 @@ export const UnifiedOnboardingControl: React.FC = () => {
           } else {
             await ProductTourService.disableTourGlobally();
           }
+          success = true;
           break;
         
         case 'stepper':
-          // TODO: Implement stepper toggle
+          if (enabled) {
+            success = await OnboardingConfigService.enableStepper();
+          } else {
+            success = await OnboardingConfigService.disableStepper();
+          }
           break;
           
         case 'modal':
-          // TODO: Implement modal toggle
+          success = await (enabled ? ModalInformativoService.enable() : ModalInformativoService.disable());
           break;
 
         default:
           throw new Error(`Feature ${featureId} not implemented`);
       }
 
-      // Update local state optimistically
+      if (!success) {
+        throw new Error('Failed to update feature');
+      }
+
+      // Update local state after successful change
       setFeatures(prev => prev.map(f => 
         f.id === featureId 
           ? { ...f, enabled, status: enabled ? 'active' : 'inactive' }
@@ -118,8 +132,11 @@ export const UnifiedOnboardingControl: React.FC = () => {
       toast.success(`Recurso ${action} com sucesso`);
 
     } catch (error) {
-      console.error('Error toggling feature:', error);
+      console.error(`Error toggling feature ${featureId}:`, error);
       toast.error('Erro ao atualizar recurso');
+      
+      // Reload features to ensure accuracy
+      loadFeatures();
     } finally {
       setIsUpdating(null);
     }

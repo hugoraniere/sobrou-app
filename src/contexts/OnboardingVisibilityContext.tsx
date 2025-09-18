@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
@@ -54,19 +54,21 @@ export function OnboardingVisibilityProvider({ children, preview = false }: Onbo
     return () => subscription.unsubscribe();
   }, []);
 
-  // Check if user is admin for preview mode
-  const isAdmin = useMemo(async () => {
-    if (!user) return false;
-    
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin')
-      .single();
-      
-    return !!data;
-  }, [user]);
+  // Check if user is admin for preview mode (non-async)
+  const checkIsAdmin = useCallback(async (userId: string): Promise<boolean> => {
+    try {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
+        
+      return !!data;
+    } catch {
+      return false;
+    }
+  }, []);
 
   const fetchVisibility = async () => {
     if (authLoading || !user) {
@@ -77,7 +79,7 @@ export function OnboardingVisibilityProvider({ children, preview = false }: Onbo
     try {
       // In preview mode, bypass gating for admins
       if (preview) {
-        const isUserAdmin = await isAdmin;
+        const isUserAdmin = await checkIsAdmin(user.id);
         if (isUserAdmin) {
           setVisibility({
             showProductTour: true,
@@ -92,21 +94,57 @@ export function OnboardingVisibilityProvider({ children, preview = false }: Onbo
         }
       }
 
-      // Call RPC to get visibility
-      const { data, error } = await supabase.rpc('onboarding_visibility', {
-        target_user_id: user.id
+      // Create a timeout promise for fallback
+      const timeoutPromise = new Promise<OnboardingVisibilityResponse>((resolve) => {
+        setTimeout(() => {
+          console.warn('Onboarding visibility check timed out, using defaults');
+          resolve({
+            showProductTour: false,
+            showStepper: false,
+            tourReason: 'timeout',
+            stepperReason: 'timeout',
+            version: '1.0',
+            isNewUser: false
+          });
+        }, 500); // 500ms timeout
       });
 
-      if (error) {
-        console.error('Error fetching onboarding visibility:', error);
-        setError(error.message);
-      } else if (data) {
-        setVisibility(data as unknown as OnboardingVisibilityResponse);
-      }
+      // Race between RPC call and timeout
+      const visibilityPromise = supabase.rpc('onboarding_visibility', {
+        target_user_id: user.id
+      }).then(({ data, error }) => {
+        if (error) {
+          console.error('Error fetching onboarding visibility:', error);
+          return {
+            showProductTour: false,
+            showStepper: false,
+            tourReason: 'error',
+            stepperReason: 'error',
+            version: '1.0',
+            isNewUser: false
+          };
+        }
+        return data as unknown as OnboardingVisibilityResponse;
+      });
+
+      const result = await Promise.race([visibilityPromise, timeoutPromise]);
+      setVisibility(result);
+      setError(null);
+
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
       console.error('Error in OnboardingVisibilityProvider:', errorMsg);
       setError(errorMsg);
+      
+      // Fallback to defaults
+      setVisibility({
+        showProductTour: false,
+        showStepper: false,
+        tourReason: 'error',
+        stepperReason: 'error',
+        version: '1.0',
+        isNewUser: false
+      });
     } finally {
       setLoading(false);
     }
