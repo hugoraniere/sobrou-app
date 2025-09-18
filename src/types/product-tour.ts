@@ -7,7 +7,6 @@ export interface ProductTourStep {
   page_route: string;
   step_order: number;
   is_active: boolean;
-  visible_when?: string;
   created_at: string;
   updated_at: string;
 }
