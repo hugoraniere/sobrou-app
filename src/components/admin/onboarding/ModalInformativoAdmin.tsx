@@ -39,13 +39,6 @@ export const ModalInformativoAdmin: React.FC = () => {
   const [isCreatingConfig, setIsCreatingConfig] = useState(false);
   
   const { debouncedSave } = useOnboardingAdmin();
-  
-  // Virtualization for large slide lists
-  const { visibleItems: visibleSlides, offsetY, totalHeight, onScroll } = useVirtualization(
-    slides,
-    80, // item height
-    400 // container height
-  );
 
   useEffect(() => {
     loadConfigs();

@@ -14,12 +14,14 @@ import { ProductTourAdmin } from '@/components/admin/onboarding/ProductTourAdmin
 import { StepperAdmin } from '@/components/admin/onboarding/StepperAdmin';
 import { ModalInformativoAdmin } from '@/components/admin/onboarding/ModalInformativoAdmin';
 import { OnboardingSummaryBar } from '@/components/admin/onboarding/OnboardingSummaryBar';
+import { UnifiedOnboardingControl } from '@/components/admin/UnifiedOnboardingControl';
+import { ReleaseNotesModal } from '@/components/admin/modals/ReleaseNotesModal';
 
 // Import onboarding components for preview
 import { GetStartedStepper } from '@/components/onboarding/GetStartedStepper';
 import { TourManager } from '@/components/tour/TourManager';
 import { OnboardingGate } from '@/components/onboarding/OnboardingGate';
-import { useProductTour } from '@/hooks/useProductTour';
+import { useProductTour } from '@/contexts/ProductTourProvider';
 import { useOnboardingState } from '@/hooks/useOnboardingVisibility';
 import { toast } from 'sonner';
 
@@ -80,22 +82,10 @@ const OnboardingAdmin: React.FC = () => {
             Configure a experiência completa de onboarding dos usuários
           </p>
         </div>
-        
-        <div className="flex gap-2">
-          <Button onClick={() => handlePreview('tour')} variant="outline">
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Tour
-          </Button>
-          <Button onClick={() => handlePreview('stepper')} variant="outline">
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Stepper
-          </Button>
-          <Button onClick={() => handlePreview('modal')} variant="outline">
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Modal
-          </Button>
-        </div>
       </div>
+
+      {/* Unified Control Panel */}
+      <UnifiedOnboardingControl />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
