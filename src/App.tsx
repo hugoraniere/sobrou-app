@@ -13,7 +13,7 @@ import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
 import { ConditionalOnboardingProvider } from "./contexts/ConditionalOnboardingProvider";
 import { TourDevOverlay, useTourDevMode } from './components/dev/TourDevOverlay';
 import { TourAnchorHighlighter } from './components/dev/TourAnchorHighlighter';
-import { TourManager } from './components/tour/TourManager';
+import SafeTourManager from './components/tour/SafeTourManager';
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
@@ -273,7 +273,7 @@ const App = () => {
                         
                         <WhatsAppChatButton />
                         <InstallPrompt />
-                        <TourManager />
+                        <SafeTourManager />
                         {isDevMode && (
                           <>
                             <TourDevOverlay enabled={isDevMode} />
