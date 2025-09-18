@@ -19,7 +19,6 @@ import { ReleaseNotesModal } from '@/components/admin/modals/ReleaseNotesModal';
 
 // Import onboarding components for preview
 import { GetStartedStepper } from '@/components/onboarding/GetStartedStepper';
-import { TourManager } from '@/components/tour/TourManager';
 import { OnboardingGate } from '@/components/onboarding/OnboardingGate';
 import { useProductTour } from '@/contexts/ProductTourProvider';
 import { useOnboardingState } from '@/hooks/useOnboardingVisibility';
@@ -129,8 +128,7 @@ const OnboardingAdmin: React.FC = () => {
         type={previewType}
       />
 
-      {/* Tour Manager for preview */}
-      {isActive && <TourManager />}
+      {/* Remove duplicate TourManager render - already rendered in App.tsx */}
     </div>
   );
 };

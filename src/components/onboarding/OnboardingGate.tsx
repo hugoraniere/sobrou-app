@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useOnboardingVisibility } from '@/hooks/useOnboardingVisibility';
+import { useOnboardingVisibilityContext } from '@/contexts/OnboardingVisibilityContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -12,7 +12,7 @@ interface OnboardingGateProps {
 }
 
 export function OnboardingGate({ children, type, preview = false }: OnboardingGateProps) {
-  const visibility = useOnboardingVisibility({ preview });
+  const visibility = useOnboardingVisibilityContext();
 
   // Loading skeleton while checking visibility
   if (visibility.loading) {

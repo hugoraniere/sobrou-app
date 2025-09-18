@@ -95,15 +95,8 @@ export function useOnboardingVisibility(options: UseOnboardingVisibilityOptions 
           console.error('Error fetching onboarding visibility:', error);
           setError(error.message);
           
-          // Track error event
-          await supabase
-            .from('analytics_events')
-            .insert({
-              user_id: user.id,
-              event_name: 'tour_visibility_error',
-              event_params: { error: error.message },
-              page: window.location.pathname
-            });
+          // Track error event - using batched analytics
+          // Removed individual analytics insert to improve performance
         } else if (data) {
           setVisibility(data as unknown as OnboardingVisibilityResponse);
         }
@@ -118,35 +111,6 @@ export function useOnboardingVisibility(options: UseOnboardingVisibilityOptions 
 
     fetchVisibility();
   }, [user, authLoading, preview, isAdmin]);
-
-  // Track visibility events
-  useEffect(() => {
-    if (!loading && !error && user) {
-      const trackEvent = async (eventName: string, component: 'tour' | 'stepper', visible: boolean) => {
-        await supabase
-          .from('analytics_events')
-          .insert({
-            user_id: user.id,
-            event_name: eventName,
-            event_params: {
-              component,
-              visible,
-              reason: component === 'tour' ? visibility.tourReason : visibility.stepperReason,
-              version: visibility.version,
-              preview
-            },
-            page: window.location.pathname
-          });
-      };
-
-      if (visibility.showProductTour) {
-        trackEvent('tour_visibility_check', 'tour', true);
-      }
-      if (visibility.showStepper) {
-        trackEvent('stepper_visibility_check', 'stepper', true);
-      }
-    }
-  }, [visibility, loading, error, user, preview]);
 
   return {
     ...visibility,
@@ -189,15 +153,8 @@ export function useOnboardingState() {
       console.error('Error updating tour state:', error);
     }
 
-    // Track the state change
-    await supabase
-      .from('analytics_events')
-      .insert({
-        user_id: user.id,
-        event_name: updates.completed ? 'tour_completed' : updates.dismissed ? 'tour_dismissed' : 'tour_step_completed',
-        event_params: updates,
-        page: window.location.pathname
-      });
+    // Track the state change - using batched analytics
+    // Removed individual analytics inserts to improve performance
   };
 
   const updateStepperState = async (updates: {
@@ -219,15 +176,8 @@ export function useOnboardingState() {
       console.error('Error updating stepper state:', error);
     }
 
-    // Track the state change
-    await supabase
-      .from('analytics_events')
-      .insert({
-        user_id: user.id,
-        event_name: updates.completed ? 'stepper_completed' : updates.dismissed ? 'stepper_dismissed' : 'stepper_step_completed',
-        event_params: updates,
-        page: window.location.pathname
-      });
+    // Track the state change - using batched analytics  
+    // Removed individual analytics inserts to improve performance
   };
 
   const resetUserStates = async (userId?: string) => {

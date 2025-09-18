@@ -7,7 +7,7 @@ import { CheckCircle, Circle, Eye, EyeOff } from 'lucide-react';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { OnboardingService } from '@/services/OnboardingService';
 import { OnboardingGate } from './OnboardingGate';
-import { useOnboardingVisibility } from '@/hooks/useOnboardingVisibility';
+import { useOnboardingVisibilityContext } from '@/contexts/OnboardingVisibilityContext';
 
 export const GetStartedStepper: React.FC = () => {
   const { 
@@ -20,7 +20,7 @@ export const GetStartedStepper: React.FC = () => {
     trackEvent 
   } = useOnboarding();
   const navigate = useNavigate();
-  const visibility = useOnboardingVisibility();
+  const visibility = useOnboardingVisibilityContext();
 
   if (steps.length === 0) return null;
 

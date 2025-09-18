@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { ProductTourStep, UserTourProgress, TourContextType } from '@/types/product-tour';
 import { ProductTourAdminService } from '@/services/ProductTourAdminService';
-import { useOnboardingVisibility, useOnboardingState } from '@/hooks/useOnboardingVisibility';
-import { useTelemetry } from '@/hooks/useTelemetry';
+import { useOnboardingState } from '@/hooks/useOnboardingVisibility';
+import { useOnboardingVisibilityContext } from './OnboardingVisibilityContext';
+import { useAnalyticsBatch } from '@/hooks/useAnalyticsBatch';
 
 const ProductTourContext = createContext<TourContextType | undefined>(undefined);
 
@@ -17,9 +18,9 @@ export function ProductTourProvider({ children }: ProductTourProviderProps) {
   const [progress, setProgress] = useState<UserTourProgress | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  const visibility = useOnboardingVisibility();
+  const visibility = useOnboardingVisibilityContext();
   const { updateTourState } = useOnboardingState();
-  const { trackTourEvent } = useTelemetry();
+  const { trackEvent } = useAnalyticsBatch();
 
   // Tour is active if visibility shows it and we have steps
   const isActive = visibility.showProductTour && steps.length > 0 && currentStep !== null;
@@ -54,19 +55,22 @@ export function ProductTourProvider({ children }: ProductTourProviderProps) {
   // Start the tour
   const startTour = useCallback(async () => {
     await loadSteps();
-    trackTourEvent('tour_started', undefined, {
-      totalSteps: steps.length,
-      version: visibility.version
-    });
-  }, [loadSteps, steps.length, visibility.version, trackTourEvent]);
+    if (visibility.showProductTour) {
+      trackEvent('tour_started', {
+        totalSteps: steps.length,
+        version: visibility.version
+      });
+    }
+  }, [loadSteps, steps.length, visibility.version, visibility.showProductTour, trackEvent]);
 
   // Navigate to next step
   const nextStep = useCallback(async () => {
     if (!currentStep) return;
     
-    trackTourEvent('tour_step_completed', currentStep.step_key, {
+    trackEvent('tour_step_completed', {
       stepIndex: currentStepIndex,
-      totalSteps: steps.length
+      totalSteps: steps.length,
+      stepKey: currentStep.step_key
     });
 
     const nextIndex = currentStepIndex + 1;
@@ -81,7 +85,7 @@ export function ProductTourProvider({ children }: ProductTourProviderProps) {
     } else {
       await completeTour();
     }
-  }, [currentStep, currentStepIndex, steps, updateTourState, trackTourEvent]);
+  }, [currentStep, currentStepIndex, steps, updateTourState, trackEvent]);
 
   // Navigate to previous step
   const previousStep = useCallback(async () => {
@@ -99,9 +103,10 @@ export function ProductTourProvider({ children }: ProductTourProviderProps) {
 
   // Skip the entire tour
   const skipTour = useCallback(async () => {
-    trackTourEvent('tour_skipped', currentStep?.step_key, {
+    trackEvent('tour_skipped', {
       stepIndex: currentStepIndex,
-      totalSteps: steps.length
+      totalSteps: steps.length,
+      stepKey: currentStep?.step_key
     });
 
     await updateTourState({
@@ -110,13 +115,14 @@ export function ProductTourProvider({ children }: ProductTourProviderProps) {
     
     setCurrentStep(null);
     setCurrentStepIndex(0);
-  }, [currentStep, currentStepIndex, steps.length, updateTourState, trackTourEvent]);
+  }, [currentStep, currentStepIndex, steps.length, updateTourState, trackEvent]);
 
   // Complete the tour
   const completeTour = useCallback(async () => {
-    trackTourEvent('tour_finished', currentStep?.step_key, {
+    trackEvent('tour_finished', {
       totalSteps: steps.length,
-      completed: true
+      completed: true,
+      stepKey: currentStep?.step_key
     });
 
     await updateTourState({
@@ -126,7 +132,7 @@ export function ProductTourProvider({ children }: ProductTourProviderProps) {
     
     setCurrentStep(null);
     setCurrentStepIndex(0);
-  }, [currentStep, steps.length, updateTourState, trackTourEvent]);
+  }, [currentStep, steps.length, updateTourState, trackEvent]);
 
   // Go to a specific step
   const goToStep = useCallback(async (stepKey: string) => {

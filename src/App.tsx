@@ -12,6 +12,7 @@ import { AIChatProvider } from "./contexts/AIChatContext";
 import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { ProductTourProvider } from "./contexts/ProductTourProvider";
+import { OnboardingVisibilityProvider } from "./contexts/OnboardingVisibilityContext";
 import { TourDevOverlay, useTourDevMode } from './components/dev/TourDevOverlay';
 import { TourAnchorHighlighter } from './components/dev/TourAnchorHighlighter';
 import { TourManager } from './components/tour/TourManager';
@@ -64,8 +65,9 @@ const App = () => {
           <Toaster />
           <BrowserRouter>
             <AuthProvider>
-              <OnboardingProvider>
-                <ProductTourProvider>
+              <OnboardingVisibilityProvider>
+                <OnboardingProvider>
+                  <ProductTourProvider>
                   <LandingPageProvider>
                   <AvatarProvider>
                   <AIChatProvider>
@@ -288,8 +290,9 @@ const App = () => {
                   </AIChatProvider>
                     </AvatarProvider>
                   </LandingPageProvider>
-                </ProductTourProvider>
-              </OnboardingProvider>
+                  </ProductTourProvider>
+                </OnboardingProvider>
+              </OnboardingVisibilityProvider>
               </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>

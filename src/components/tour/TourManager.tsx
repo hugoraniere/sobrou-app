@@ -3,7 +3,6 @@ import { useProductTour } from '@/contexts/ProductTourProvider';
 import { TourSpotlight } from './TourSpotlight';
 import { TourPreviewMode } from './TourPreviewMode';
 import { OnboardingGate } from '@/components/onboarding/OnboardingGate';
-import { useOnboardingVisibility } from '@/hooks/useOnboardingVisibility';
 
 export const TourManager: React.FC = () => {
   const {
@@ -18,8 +17,6 @@ export const TourManager: React.FC = () => {
     isFirstStep,
     isLastStep,
   } = useProductTour();
-
-  const visibility = useOnboardingVisibility();
 
   // Don't render if tour is not active or no current step
   if (!isActive || !currentStep) {
@@ -44,7 +41,7 @@ export const TourManager: React.FC = () => {
 
   return (
     <>
-      <OnboardingGate type="tour" preview={visibility.preview}>
+      <OnboardingGate type="tour">
         <TourSpotlight
           step={currentStep}
           onNext={handleNext}
