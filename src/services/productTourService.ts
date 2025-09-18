@@ -209,12 +209,69 @@ export class ProductTourService {
   // Check if tour is enabled globally
   static async isTourEnabled(): Promise<boolean> {
     try {
-      const settings = await this.getTourSettings();
-      const tourEnabled = settings.tour_enabled || {};
-      return tourEnabled.enabled === true;
+      const { data, error } = await supabase
+        .from('tour_settings')
+        .select('setting_value')
+        .eq('setting_key', 'general_config')
+        .eq('is_active', true)
+        .single();
+
+      if (error || !data) {
+        console.log('No tour config found, using default (enabled)');
+        return true;
+      }
+
+      const config = data.setting_value as any;
+      return config?.enabled === true;
     } catch (error) {
       console.error('Error checking if tour is enabled:', error);
       return false;
+    }
+  }
+
+  // Real-time tour control - stop active tours when disabled
+  static async disableTourGlobally(): Promise<void> {
+    try {
+      // Update the setting
+      await supabase
+        .from('tour_settings')
+        .upsert({
+          setting_key: 'general_config',
+          setting_value: { enabled: false },
+          is_active: true
+        });
+
+      // Broadcast disable event to all active sessions
+      await supabase
+        .from('tour_events')
+        .insert({
+          event_type: 'tour_disabled_globally',
+          event_data: { timestamp: new Date().toISOString() }
+        });
+
+      console.log('✅ Tour disabled globally');
+    } catch (error) {
+      console.error('❌ Error disabling tour globally:', error);
+      throw error;
+    }
+  }
+
+  // Enable tour globally
+  static async enableTourGlobally(): Promise<void> {
+    try {
+      // Update the setting
+      await supabase
+        .from('tour_settings')
+        .upsert({
+          setting_key: 'general_config',
+          setting_value: { enabled: true },
+          is_active: true
+        });
+
+      console.log('✅ Tour enabled globally');
+    } catch (error) {
+      console.error('❌ Error enabling tour globally:', error);
+      throw error;
     }
   }
 }

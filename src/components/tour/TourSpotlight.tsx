@@ -31,7 +31,7 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
   const tooltipRef = useRef<HTMLDivElement>(null);
   const MAX_RETRIES = 10;
 
-  // Enhanced element positioning with better viewport calculation
+  // Enhanced element positioning with intelligent viewport calculation
   const updatePosition = useCallback(() => {
     console.log(`🎯 Looking for element with tour-id: ${step.anchor_id}`);
     
@@ -58,14 +58,52 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
 
     console.log(`✅ Element found:`, element);
 
-    // Ensure element is scrolled into perfect center view
-    element.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-      inline: 'center'
-    });
+    // Calculate optimal positioning that ensures both element and tooltip are visible
+    const calculateOptimalScroll = () => {
+      const rect = element.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      
+      // Estimate tooltip height (will be refined later)
+      const estimatedTooltipHeight = 350;
+      const spacing = 20;
+      const padding = 8;
+      
+      // Calculate required space for element + tooltip + spacing
+      const requiredVerticalSpace = rect.height + estimatedTooltipHeight + spacing * 2;
+      
+      let targetPosition;
+      
+      if (requiredVerticalSpace <= viewportHeight) {
+        // We can fit both element and tooltip - center them together
+        const combinedHeight = rect.height + estimatedTooltipHeight + spacing;
+        const idealTop = (viewportHeight - combinedHeight) / 2;
+        
+        targetPosition = {
+          top: Math.max(0, rect.top - idealTop),
+          left: 0,
+          behavior: 'smooth' as ScrollBehavior
+        };
+      } else {
+        // Not enough space - prioritize element visibility in upper portion
+        const elementOptimalTop = viewportHeight * 0.3; // 30% from top
+        
+        targetPosition = {
+          top: Math.max(0, rect.top - elementOptimalTop),
+          left: 0,
+          behavior: 'smooth' as ScrollBehavior
+        };
+      }
+      
+      return targetPosition;
+    };
 
-    // Wait for scroll to complete, then calculate position
+    const scrollTarget = calculateOptimalScroll();
+    
+    // Perform optimized scroll
+    window.scrollTo(scrollTarget);
+
+    // Wait for scroll to complete, then calculate final position
     setTimeout(() => {
       const rect = element.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
@@ -82,11 +120,15 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
       const width = rect.width + (padding * 2);
       const height = rect.height + (padding * 2);
       
-      console.log(`📐 Position calculated:`, {
+      console.log(`📐 Optimized position calculated:`, {
         element: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
         viewport: { width: viewportWidth, height: viewportHeight },
         scroll: { x: scrollX, y: scrollY },
-        final: { top: absoluteTop, left: absoluteLeft, width, height }
+        final: { top: absoluteTop, left: absoluteLeft, width, height },
+        visibility: {
+          elementVisible: rect.top >= 0 && rect.bottom <= viewportHeight,
+          hasSpaceForTooltip: rect.bottom + 350 <= viewportHeight || rect.top >= 350
+        }
       });
 
       setPosition({
@@ -98,10 +140,10 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
       });
       
       setRetryCount(0); // Reset retry count on success
-    }, 600); // Increased wait time for scroll completion
+    }, 800); // Increased wait time for scroll completion
   }, [step.anchor_id, retryCount]);
 
-  // Smart tooltip positioning that never goes off-screen
+  // Intelligent tooltip positioning with enhanced visibility checks
   const getTooltipPosition = () => {
     if (!position.found || !tooltipRef.current) {
       return { top: 0, left: 0 };
@@ -111,49 +153,90 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
     const tooltipRect = tooltip.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
     const spacing = 20;
     
-    // Spotlight center
+    // Convert spotlight position to viewport coordinates
+    const spotlightViewportTop = position.top - scrollY;
+    const spotlightViewportBottom = spotlightViewportTop + position.height;
     const spotlightCenterX = position.left + position.width / 2;
     const spotlightCenterY = position.top + position.height / 2;
     
     let tooltipTop = position.top + position.height + spacing;
     let tooltipLeft = spotlightCenterX - tooltipRect.width / 2;
+    let placement = 'bottom';
     
-    // Adjust vertically - prefer bottom, but use top if no space
-    if (tooltipTop + tooltipRect.height > viewportHeight - spacing) {
-      tooltipTop = position.top - tooltipRect.height - spacing;
+    // Enhanced positioning logic with priority order
+    
+    // 1. Try bottom position (preferred)
+    const bottomSpace = viewportHeight - spotlightViewportBottom;
+    if (bottomSpace >= tooltipRect.height + spacing) {
+      tooltipTop = position.top + position.height + spacing;
+      placement = 'bottom';
     }
-    
-    // Ensure top positioning doesn't go negative
-    if (tooltipTop < spacing) {
-      // If neither top nor bottom work, place it beside the spotlight
-      tooltipTop = Math.max(spacing, spotlightCenterY - tooltipRect.height / 2);
-      
-      // Try right side first
-      tooltipLeft = position.left + position.width + spacing;
-      
-      // If right side doesn't fit, try left side
-      if (tooltipLeft + tooltipRect.width > viewportWidth - spacing) {
+    // 2. Try top position
+    else if (spotlightViewportTop >= tooltipRect.height + spacing) {
+      tooltipTop = position.top - tooltipRect.height - spacing;
+      placement = 'top';
+    }
+    // 3. Try right side
+    else {
+      const rightSpace = viewportWidth - (position.left + position.width);
+      if (rightSpace >= tooltipRect.width + spacing) {
+        tooltipTop = Math.max(spacing + scrollY, spotlightCenterY - tooltipRect.height / 2);
+        tooltipLeft = position.left + position.width + spacing;
+        placement = 'right';
+      }
+      // 4. Try left side
+      else if (position.left >= tooltipRect.width + spacing) {
+        tooltipTop = Math.max(spacing + scrollY, spotlightCenterY - tooltipRect.height / 2);
         tooltipLeft = position.left - tooltipRect.width - spacing;
+        placement = 'left';
+      }
+      // 5. Fallback: overlay positioning with scroll-aware placement
+      else {
+        const availableTop = spotlightViewportTop;
+        const availableBottom = viewportHeight - spotlightViewportBottom;
+        
+        if (availableBottom >= availableTop) {
+          // Place below, even if it overflows
+          tooltipTop = position.top + position.height + spacing;
+          placement = 'bottom-overlay';
+        } else {
+          // Place above, even if it overflows
+          tooltipTop = Math.max(scrollY + spacing, position.top - tooltipRect.height - spacing);
+          placement = 'top-overlay';
+        }
       }
     }
 
-    // Final horizontal bounds check
-    if (tooltipLeft + tooltipRect.width > viewportWidth - spacing) {
-      tooltipLeft = viewportWidth - tooltipRect.width - spacing;
-    }
-    
-    if (tooltipLeft < spacing) {
-      tooltipLeft = spacing;
+    // Horizontal centering for top/bottom placements
+    if (placement === 'bottom' || placement === 'top' || placement.includes('overlay')) {
+      tooltipLeft = spotlightCenterX - tooltipRect.width / 2;
+      
+      // Ensure tooltip doesn't exceed viewport horizontally
+      const maxLeft = viewportWidth - tooltipRect.width - spacing;
+      const minLeft = spacing;
+      tooltipLeft = Math.max(minLeft, Math.min(maxLeft, tooltipLeft));
     }
 
+    // Final bounds checking
+    tooltipTop = Math.max(scrollY + spacing, tooltipTop);
+    tooltipLeft = Math.max(spacing, Math.min(viewportWidth - tooltipRect.width - spacing, tooltipLeft));
+
     const finalPosition = {
-      top: Math.max(spacing, tooltipTop),
-      left: Math.max(spacing, tooltipLeft),
+      top: tooltipTop,
+      left: tooltipLeft,
     };
     
-    console.log(`🎪 Tooltip positioned:`, finalPosition);
+    console.log(`🎪 Smart tooltip positioned:`, {
+      placement,
+      viewport: { width: viewportWidth, height: viewportHeight },
+      spotlight: { top: spotlightViewportTop, bottom: spotlightViewportBottom },
+      tooltip: { width: tooltipRect.width, height: tooltipRect.height },
+      final: finalPosition
+    });
+    
     return finalPosition;
   };
 

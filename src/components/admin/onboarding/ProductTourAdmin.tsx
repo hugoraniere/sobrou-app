@@ -23,6 +23,7 @@ import {
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { toast } from 'sonner';
 import { ProductTourAdminService, ProductTourAdminConfig } from '@/services/ProductTourAdminService';
+import { ProductTourService } from '@/services/productTourService';
 import { ProductTourStep } from '@/types/product-tour';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useOnboardingAdmin, useVirtualization } from '@/hooks/useOnboardingAdmin';

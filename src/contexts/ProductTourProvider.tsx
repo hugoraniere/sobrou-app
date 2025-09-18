@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { ProductTourService } from '@/services/productTourService';
 import { ProductTourStep, UserTourProgress, TourContextType } from '@/types/product-tour';
+import { supabase } from '@/integrations/supabase/client';
 
 const ProductTourContext = createContext<TourContextType | null>(null);
 
@@ -24,6 +25,64 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
   const [isLoading, setIsLoading] = useState(false);
   const [steps, setSteps] = useState<ProductTourStep[]>([]);
   const [sessionId] = useState(() => crypto.randomUUID());
+  const [tourEnabled, setTourEnabled] = useState(true);
+
+  // Real-time tour control listener
+  useEffect(() => {
+    if (!user?.id) return;
+
+    console.log('🎧 Setting up real-time tour control listener...');
+
+    // Listen for global tour disable events
+    const channel = supabase
+      .channel('tour_control')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'tour_events',
+        filter: `event_type=eq.tour_disabled_globally`
+      }, (payload) => {
+        console.log('📢 Received tour disable broadcast:', payload);
+        
+        if (isActive) {
+          console.log('🛑 Stopping active tour due to global disable');
+          setIsActive(false);
+          setCurrentStep(null);
+          setCurrentStepIndex(0);
+          setTourEnabled(false);
+          
+          // Show notification to user
+          console.log('ℹ️ Tour was disabled by administrator');
+        }
+      })
+      .subscribe();
+
+    // Periodic check for tour enabled status
+    const checkTourStatus = setInterval(async () => {
+      try {
+        const enabled = await ProductTourService.isTourEnabled();
+        if (enabled !== tourEnabled) {
+          console.log(`🔄 Tour status changed: ${tourEnabled} → ${enabled}`);
+          setTourEnabled(enabled);
+          
+          if (!enabled && isActive) {
+            console.log('🛑 Stopping tour due to status change');
+            setIsActive(false);
+            setCurrentStep(null);
+            setCurrentStepIndex(0);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error checking tour status:', error);
+      }
+    }, 30000); // Check every 30 seconds
+
+    return () => {
+      console.log('🧹 Cleaning up tour control listener');
+      supabase.removeChannel(channel);
+      clearInterval(checkTourStatus);
+    };
+  }, [user?.id, isActive, tourEnabled]);
 
   // Derived state
   const isFirstStep = currentStepIndex === 0;
@@ -172,10 +231,17 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
     });
   }, []);
 
-  // Enhanced tour start
+  // Enhanced tour start with enabled check
   const startTour = useCallback(async () => {
     if (!user?.id) {
       console.warn('❌ Cannot start tour: no user');
+      return;
+    }
+
+    // Check if tour is enabled before starting
+    const enabled = await ProductTourService.isTourEnabled();
+    if (!enabled) {
+      console.warn('❌ Cannot start tour: tour is disabled globally');
       return;
     }
     
@@ -426,6 +492,7 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         // Check if tour is enabled globally
         const tourEnabled = await ProductTourService.isTourEnabled();
         console.log(`🎛️  Tour enabled: ${tourEnabled}`);
+        setTourEnabled(tourEnabled);
         
         if (!tourEnabled) {
           console.log('❌ Tour disabled, skipping initialization');
