@@ -87,7 +87,7 @@ const BigNumberCard: React.FC<BigNumberCardProps> = memo(({
       <HoverCardTrigger asChild>
         <Card 
           style={{ borderColor: color }} 
-          className={`min-w-0 bg-white ${className} ${onClick ? 'cursor-pointer' : ''}`}
+          className={`${isMobile ? 'min-w-0' : 'min-w-[240px]'} flex-1 bg-white ${className} ${onClick ? 'cursor-pointer' : ''}`}
           onClick={onClick}
         >
           {cardContent}

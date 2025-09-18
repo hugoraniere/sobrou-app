@@ -6,8 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Circle, Eye, EyeOff } from 'lucide-react';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { OnboardingService } from '@/services/OnboardingService';
-import { OnboardingGate } from './OnboardingGate';
-import { useOnboardingVisibility } from '@/hooks/useOnboardingVisibility';
 
 export const GetStartedStepper: React.FC = () => {
   const { 
@@ -20,7 +18,6 @@ export const GetStartedStepper: React.FC = () => {
     trackEvent 
   } = useOnboarding();
   const navigate = useNavigate();
-  const visibility = useOnboardingVisibility();
 
   if (steps.length === 0) return null;
 
@@ -70,98 +67,96 @@ export const GetStartedStepper: React.FC = () => {
   };
 
   return (
-    <OnboardingGate type="stepper" preview={visibility.preview}>
-      <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20" data-tour-id="dashboard.onboarding.stepper">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-semibold text-lg">Get Started</h3>
-              <p className="text-sm text-muted-foreground">
-                Complete estas tarefas para aproveitar melhor o Sobrou
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-xs">
-                {completedSteps.length}/{steps.length} concluído
-              </Badge>
-              <Button
-                onClick={minimizeStepper}
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                aria-label="Ocultar Get Started"
+    <Card className="mb-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20" data-tour-id="dashboard.onboarding.stepper">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-semibold text-lg">Get Started</h3>
+            <p className="text-sm text-muted-foreground">
+              Complete estas tarefas para aproveitar melhor o Sobrou
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              {completedSteps.length}/{steps.length} concluído
+            </Badge>
+            <Button
+              onClick={minimizeStepper}
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              aria-label="Ocultar Get Started"
+            >
+              <EyeOff className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="w-full bg-muted rounded-full h-2 mb-6">
+          <div 
+            className="bg-primary h-2 rounded-full transition-all duration-300" 
+            style={{ width: `${completionPercentage}%` }}
+          />
+        </div>
+
+        {/* Steps grid - responsive */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {steps.map((step, index) => {
+            const status = getStepStatus(step, index);
+            const isCompleted = status === 'completed';
+            const isActive = status === 'active';
+            
+            return (
+              <div
+                key={step.key}
+                className={`
+                  p-4 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer
+                  ${isCompleted ? 'bg-primary/5 border-primary/30' : 
+                    isActive ? 'bg-orange-50 border-orange-200' : 
+                    'bg-background border-border hover:border-primary/30'}
+                `}
+                onClick={() => handleStepClick(step)}
               >
-                <EyeOff className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-full bg-muted rounded-full h-2 mb-6">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300" 
-              style={{ width: `${completionPercentage}%` }}
-            />
-          </div>
-
-          {/* Steps grid - responsive */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {steps.map((step, index) => {
-              const status = getStepStatus(step, index);
-              const isCompleted = status === 'completed';
-              const isActive = status === 'active';
-              
-              return (
-                <div
-                  key={step.key}
-                  className={`
-                    p-4 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer
-                    ${isCompleted ? 'bg-primary/5 border-primary/30' : 
-                      isActive ? 'bg-orange-50 border-orange-200' : 
-                      'bg-background border-border hover:border-primary/30'}
-                  `}
-                  onClick={() => handleStepClick(step)}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      {isCompleted ? (
-                        <CheckCircle className="w-5 h-5 text-primary" />
-                      ) : (
-                        <Circle className={`w-5 h-5 ${isActive ? 'text-orange-500' : 'text-muted-foreground'}`} />
-                      )}
-                    </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {isCompleted ? (
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                    ) : (
+                      <Circle className={`w-5 h-5 ${isActive ? 'text-orange-500' : 'text-muted-foreground'}`} />
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`font-medium text-sm mb-1 ${isCompleted ? 'text-primary' : 'text-foreground'}`}>
+                      {step.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                      {step.description}
+                    </p>
                     
-                    <div className="flex-1 min-w-0">
-                      <h4 className={`font-medium text-sm mb-1 ${isCompleted ? 'text-primary' : 'text-foreground'}`}>
-                        {step.title}
-                      </h4>
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
-                        {step.description}
-                      </p>
-                      
-                      {!isCompleted && (
-                        <Button
-                          size="sm"
-                          variant={isActive ? "default" : "outline"}
-                          className="text-xs h-7"
-                        >
-                          Ir agora
-                        </Button>
-                      )}
+                    {!isCompleted && (
+                      <Button
+                        size="sm"
+                        variant={isActive ? "default" : "outline"}
+                        className="text-xs h-7"
+                      >
+                        Ir agora
+                      </Button>
+                    )}
 
-                      {isCompleted && (
-                        <Badge variant="secondary" className="text-xs">
-                          ✅ Concluído
-                        </Badge>
-                      )}
-                    </div>
+                    {isCompleted && (
+                      <Badge variant="secondary" className="text-xs">
+                        ✅ Concluído
+                      </Badge>
+                    )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </OnboardingGate>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 };

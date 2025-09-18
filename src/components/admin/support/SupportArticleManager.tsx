@@ -139,8 +139,7 @@ const SupportArticleManager = () => {
   const filteredArticles = articles.filter(article => {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          article.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTopic = topicFilter === 'all' || article.topic_id === topicFilter || 
-                        (topicFilter === 'none' && !article.topic_id);
+    const matchesTopic = topicFilter === 'all' || article.topic_id === topicFilter;
     return matchesSearch && matchesTopic;
   });
 
@@ -194,7 +193,7 @@ const SupportArticleManager = () => {
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Nenhuma categoria</SelectItem>
+                    <SelectItem value="">Nenhuma categoria</SelectItem>
                     {topics.map(topic => (
                       <SelectItem key={topic.id} value={topic.id}>{topic.name}</SelectItem>
                     ))}
