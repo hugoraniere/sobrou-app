@@ -749,6 +749,54 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_anchors: {
+        Row: {
+          anchor_id: string
+          created_at: string
+          friendly_name: string
+          height: number | null
+          id: string
+          kind: string | null
+          last_verified_at: string | null
+          route: string
+          selector: string
+          tags: string[] | null
+          thumb_url: string | null
+          updated_at: string
+          width: number | null
+        }
+        Insert: {
+          anchor_id: string
+          created_at?: string
+          friendly_name: string
+          height?: number | null
+          id?: string
+          kind?: string | null
+          last_verified_at?: string | null
+          route: string
+          selector: string
+          tags?: string[] | null
+          thumb_url?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Update: {
+          anchor_id?: string
+          created_at?: string
+          friendly_name?: string
+          height?: number | null
+          id?: string
+          kind?: string | null
+          last_verified_at?: string | null
+          route?: string
+          selector?: string
+          tags?: string[] | null
+          thumb_url?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       onboarding_config: {
         Row: {
           audience: string | null
@@ -1641,6 +1689,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anchors_search: {
+        Args: {
+          kind_filter?: string
+          limit_count?: number
+          offset_count?: number
+          route_filter?: string
+          search_query?: string
+        }
+        Returns: {
+          anchor_id: string
+          created_at: string
+          friendly_name: string
+          height: number
+          id: string
+          kind: string
+          last_verified_at: string
+          route: string
+          selector: string
+          tags: string[]
+          thumb_url: string
+          updated_at: string
+          width: number
+        }[]
+      }
       generate_slug: {
         Args: { title: string }
         Returns: string
