@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Search, Target, Monitor } from 'lucide-react';
+import { Search, Target, Monitor, Image } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import html2canvas from 'html2canvas';
 
 interface ComponentSelectorProps {
   value: string;
@@ -20,6 +21,7 @@ interface DetectedComponent {
   classes: string[];
   text: string;
   position: { x: number; y: number; width: number; height: number };
+  thumbnail?: string;
 }
 
 export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
@@ -31,24 +33,44 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
   const [detectedComponents, setDetectedComponents] = useState<DetectedComponent[]>([]);
   const [selectedComponent, setSelectedComponent] = useState<string>(value);
   const [isScanning, setIsScanning] = useState(false);
+  const [thumbnailCache, setThumbnailCache] = useState<Map<string, string>>(new Map());
+
+  // Generate thumbnail for component
+  const generateThumbnail = async (element: HTMLElement): Promise<string | undefined> => {
+    try {
+      const canvas = await html2canvas(element, {
+        width: 200,
+        height: 120,
+        scale: 0.5,
+        backgroundColor: null,
+        logging: false,
+        useCORS: true,
+        allowTaint: true
+      });
+      return canvas.toDataURL('image/png');
+    } catch (error) {
+      console.warn('Failed to generate thumbnail:', error);
+      return undefined;
+    }
+  };
 
   // Scan page for selectable components
-  const scanComponents = () => {
+  const scanComponents = async () => {
     setIsScanning(true);
     
-    setTimeout(() => {
+    try {
       const elements = document.querySelectorAll('[data-tour-id], [id], button, input, .card, .btn, [role="button"]');
       const components: DetectedComponent[] = [];
 
-      elements.forEach((element) => {
+      for (const element of Array.from(elements)) {
         const htmlElement = element as HTMLElement;
         
         // Skip if element is not visible
         const rect = htmlElement.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
+        if (rect.width === 0 || rect.height === 0) continue;
         
         // Skip if element is in admin interface
-        if (htmlElement.closest('[data-admin-interface]')) return;
+        if (htmlElement.closest('[data-admin-interface]')) continue;
 
         const id = htmlElement.getAttribute('data-tour-id') || 
                    htmlElement.id || 
@@ -56,6 +78,15 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
         
         const classes = Array.from(htmlElement.classList);
         const text = htmlElement.textContent?.trim().substring(0, 50) || '';
+        
+        // Check cache first
+        let thumbnail = thumbnailCache.get(id);
+        if (!thumbnail) {
+          thumbnail = await generateThumbnail(htmlElement);
+          if (thumbnail) {
+            setThumbnailCache(prev => new Map(prev).set(id, thumbnail!));
+          }
+        }
         
         components.push({
           id,
@@ -68,13 +99,17 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
             y: rect.top,
             width: rect.width,
             height: rect.height
-          }
+          },
+          thumbnail
         });
-      });
+      }
 
       setDetectedComponents(components);
+    } catch (error) {
+      console.error('Error scanning components:', error);
+    } finally {
       setIsScanning(false);
-    }, 500);
+    }
   };
 
   // Filter components based on search
@@ -204,32 +239,50 @@ export const ComponentSelector: React.FC<ComponentSelectorProps> = ({
                     onMouseEnter={() => highlightComponent(component)}
                     onMouseLeave={removeHighlight}
                   >
-                    <div className="space-y-2">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                          <div className="font-mono text-sm font-medium">
-                            {component.id}
+                    <div className="flex gap-3">
+                      {/* Thumbnail */}
+                      <div className="flex-shrink-0 w-16 h-12 border rounded overflow-hidden bg-muted">
+                        {component.thumbnail ? (
+                          <img 
+                            src={component.thumbnail} 
+                            alt={`Preview of ${component.id}`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Image className="w-4 h-4 text-muted-foreground" />
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-xs">
-                              {component.tagName}
-                            </Badge>
-                            {component.classes.length > 0 && (
-                              <Badge variant="outline" className="text-xs">
-                                {component.classes.slice(0, 2).join(' ')}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        {selectedComponent === component.id && (
-                          <Target className="w-4 h-4 text-primary" />
                         )}
                       </div>
-                      {component.text && (
-                        <div className="text-xs text-muted-foreground">
-                          "{component.text}"
+                      
+                      {/* Component Info */}
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1">
+                            <div className="font-mono text-sm font-medium">
+                              {component.id}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className="text-xs">
+                                {component.tagName}
+                              </Badge>
+                              {component.classes.length > 0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  {component.classes.slice(0, 2).join(' ')}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          {selectedComponent === component.id && (
+                            <Target className="w-4 h-4 text-primary flex-shrink-0" />
+                          )}
                         </div>
-                      )}
+                        {component.text && (
+                          <div className="text-xs text-muted-foreground">
+                            "{component.text}"
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </Card>
                 ))

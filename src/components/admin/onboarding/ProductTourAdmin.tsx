@@ -20,6 +20,7 @@ import {
   Play,
   RefreshCw
 } from 'lucide-react';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { toast } from 'sonner';
 import { ProductTourAdminService, ProductTourAdminConfig } from '@/services/ProductTourAdminService';
 import { ProductTourStep } from '@/types/product-tour';
@@ -36,6 +37,10 @@ export const ProductTourAdmin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editingStep, setEditingStep] = useState<ProductTourStep | null>(null);
   const [isCreatingStep, setIsCreatingStep] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean; step: ProductTourStep | null }>({
+    isOpen: false,
+    step: null
+  });
   
   const { debouncedSave } = useOnboardingAdmin();
 
@@ -106,13 +111,31 @@ export const ProductTourAdmin: React.FC = () => {
     }
   };
 
-  const handleStepDelete = async (stepId: string) => {
-    const success = await ProductTourAdminService.deleteStep(stepId);
+  const handleStepDelete = (step: ProductTourStep) => {
+    setDeleteConfirmation({ isOpen: true, step });
+  };
+
+  const confirmStepDelete = async () => {
+    if (!deleteConfirmation.step) return;
+    
+    const success = await ProductTourAdminService.deleteStep(deleteConfirmation.step.id);
     if (success) {
-      setSteps(prev => prev.filter(s => s.id !== stepId));
-      toast.success('Passo removido');
+      setSteps(prev => prev.filter(s => s.id !== deleteConfirmation.step!.id));
+      toast.success('Passo removido com sucesso');
     } else {
       toast.error('Erro ao remover passo');
+    }
+    
+    setDeleteConfirmation({ isOpen: false, step: null });
+  };
+
+  const handleToggleStep = async (stepId: string, isActive: boolean) => {
+    const success = await ProductTourAdminService.updateStep(stepId, { is_active: isActive });
+    if (success) {
+      setSteps(prev => prev.map(s => s.id === stepId ? { ...s, is_active: isActive } : s));
+      toast.success(`Passo ${isActive ? 'ativado' : 'desativado'}`);
+    } else {
+      toast.error('Erro ao atualizar passo');
     }
   };
 
@@ -195,6 +218,7 @@ export const ProductTourAdmin: React.FC = () => {
             groupedSteps={groupedSteps}
             onEdit={setEditingStep}
             onDelete={handleStepDelete}
+            onToggle={handleToggleStep}
             onDragEnd={handleDragEnd}
             onCreateNew={() => setIsCreatingStep(true)}
           />
@@ -214,8 +238,24 @@ export const ProductTourAdmin: React.FC = () => {
             setEditingStep(null);
             setIsCreatingStep(false);
           }}
-        />
-      )}
+          />
+        )}
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, step: null })}
+        onConfirm={confirmStepDelete}
+        title="Confirmar Exclusão"
+        description={
+          deleteConfirmation.step 
+            ? `Tem certeza que deseja excluir o passo "${deleteConfirmation.step.title}"? Esta ação não pode ser desfeita.`
+            : ''
+        }
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="destructive"
+      />
     </div>
   );
 };
@@ -360,10 +400,11 @@ const StepsManager: React.FC<{
   steps: ProductTourStep[];
   groupedSteps: Record<string, ProductTourStep[]>;
   onEdit: (step: ProductTourStep) => void;
-  onDelete: (stepId: string) => void;
+  onDelete: (step: ProductTourStep) => void;
+  onToggle: (stepId: string, isActive: boolean) => void;
   onDragEnd: (result: any) => void;
   onCreateNew: () => void;
-}> = ({ steps, groupedSteps, onEdit, onDelete, onDragEnd, onCreateNew }) => {
+}> = ({ steps, groupedSteps, onEdit, onDelete, onToggle, onDragEnd, onCreateNew }) => {
   return (
     <Card>
       <CardHeader>
@@ -410,9 +451,15 @@ const StepsManager: React.FC<{
                                 />
                               </div>
                               
-                              <Badge variant={step.is_active ? "default" : "secondary"}>
-                                {step.is_active ? "Ativo" : "Inativo"}
-                              </Badge>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={step.is_active}
+                                  onCheckedChange={(checked) => onToggle(step.id, checked)}
+                                />
+                                <Badge variant={step.is_active ? "default" : "secondary"}>
+                                  {step.is_active ? "Ativo" : "Inativo"}
+                                </Badge>
+                              </div>
                               
                               <Button
                                 size="sm"
@@ -425,7 +472,7 @@ const StepsManager: React.FC<{
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => onDelete(step.id)}
+                                onClick={() => onDelete(step)}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -618,7 +665,6 @@ const StepEditor: React.FC<{
     description: step?.description || '',
     anchor_id: step?.anchor_id || '',
     page_route: step?.page_route || '',
-    visible_when: step?.visible_when || '',
     is_active: step?.is_active ?? true
   });
 
@@ -685,16 +731,6 @@ const StepEditor: React.FC<{
             <ComponentSelector
               value={formData.anchor_id || ''}
               onChange={(anchorId) => setFormData(prev => ({ ...prev, anchor_id: anchorId }))}
-            />
-          </div>
-
-          <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="visible_when">Visível Quando</Label>
-            <Input
-              id="visible_when"
-              value={formData.visible_when}
-              onChange={(e) => setFormData(prev => ({ ...prev, visible_when: e.target.value }))}
-              placeholder="Condição opcional"
             />
           </div>
 
