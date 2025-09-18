@@ -11,8 +11,10 @@ import { AvatarProvider } from "./contexts/AvatarContext";
 import { AIChatProvider } from "./contexts/AIChatContext";
 import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { ProductTourProvider } from "./contexts/ProductTourProvider";
 import { TourDevOverlay, useTourDevMode } from './components/dev/TourDevOverlay';
 import { TourAnchorHighlighter } from './components/dev/TourAnchorHighlighter';
+import { TourManager } from './components/tour/TourManager';
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
@@ -62,7 +64,8 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <OnboardingProvider>
-                <LandingPageProvider>
+                <ProductTourProvider>
+                  <LandingPageProvider>
                   <AvatarProvider>
                   <AIChatProvider>
                     <WhatsAppButtonProvider>
@@ -260,6 +263,7 @@ const App = () => {
                         </Routes>
                         
                         <WhatsAppChatButton />
+                        <TourManager />
                         <InstallPrompt />
                         {isDevMode && (
                           <>
@@ -273,7 +277,8 @@ const App = () => {
                   </AIChatProvider>
                     </AvatarProvider>
                   </LandingPageProvider>
-                </OnboardingProvider>
+                </ProductTourProvider>
+              </OnboardingProvider>
               </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>

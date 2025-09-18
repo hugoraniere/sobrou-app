@@ -794,6 +794,48 @@ export type Database = {
         }
         Relationships: []
       }
+      product_tour_steps: {
+        Row: {
+          anchor_id: string
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          page_route: string
+          step_key: string
+          step_order: number
+          title: string
+          updated_at: string
+          visible_when: string | null
+        }
+        Insert: {
+          anchor_id: string
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          page_route: string
+          step_key: string
+          step_order: number
+          title: string
+          updated_at?: string
+          visible_when?: string | null
+        }
+        Update: {
+          anchor_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          page_route?: string
+          step_key?: string
+          step_order?: number
+          title?: string
+          updated_at?: string
+          visible_when?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -1213,6 +1255,66 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_events: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          page_route: string | null
+          session_id: string | null
+          step_key: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          page_route?: string | null
+          session_id?: string | null
+          step_key?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          page_route?: string | null
+          session_id?: string | null
+          step_key?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      tour_settings: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -1305,6 +1407,48 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_tour_progress: {
+        Row: {
+          completed_at: string | null
+          completed_steps: number
+          created_at: string
+          current_step_key: string | null
+          id: string
+          skipped_at: string | null
+          started_at: string | null
+          total_steps: number
+          tour_version: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: number
+          created_at?: string
+          current_step_key?: string | null
+          id?: string
+          skipped_at?: string | null
+          started_at?: string | null
+          total_steps?: number
+          tour_version?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: number
+          created_at?: string
+          current_step_key?: string | null
+          id?: string
+          skipped_at?: string | null
+          started_at?: string | null
+          total_steps?: number
+          tour_version?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
