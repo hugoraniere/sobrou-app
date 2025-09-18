@@ -333,6 +333,58 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
     }
   }, [user?.id, sessionId, currentStep, currentStepIndex, totalSteps, loadUserProgress]);
 
+  // Real-time tour control - listen for settings changes
+  useEffect(() => {
+    let checkInterval: NodeJS.Timeout;
+    
+    const checkTourStatus = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const tourEnabled = await ProductTourService.isTourEnabled();
+        
+        // If tour was disabled and is currently active, stop it
+        if (!tourEnabled && isActive) {
+          console.log('Tour disabled by admin - stopping active tour');
+          
+          // Log tour interruption
+          await ProductTourService.logEvent('tour_skipped', {
+            userId: user.id,
+            sessionId,
+            stepKey: currentStep?.step_key,
+            pageRoute: currentStep?.page_route,
+            eventData: { 
+              reason: 'disabled_by_admin',
+              step_index: currentStepIndex + 1,
+              total_steps: totalSteps
+            }
+          });
+          
+          // Reset state
+          setIsActive(false);
+          setCurrentStep(null);
+          setCurrentStepIndex(0);
+          
+          // Show notification that tour was stopped
+          console.log('Tour was disabled by administrator');
+        }
+      } catch (error) {
+        console.error('Error checking tour status:', error);
+      }
+    };
+    
+    // Check tour status every 30 seconds when active
+    if (isActive) {
+      checkInterval = setInterval(checkTourStatus, 30000);
+    }
+    
+    return () => {
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
+    };
+  }, [user?.id, isActive, currentStep, sessionId, currentStepIndex, totalSteps]);
+
   // Initialize tour on mount
   useEffect(() => {
     const initializeTour = async () => {

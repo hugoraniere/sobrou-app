@@ -206,6 +206,24 @@ export class ProductTourService {
     }
   }
 
+  // Update tour settings
+  static async updateTourSettings(settingKey: string, settingValue: Record<string, any>): Promise<void> {
+    const { data, error } = await supabase
+      .from('tour_settings')
+      .upsert({
+        setting_key: settingKey,
+        setting_value: settingValue,
+        is_active: true,
+      }, {
+        onConflict: 'setting_key'
+      });
+
+    if (error) {
+      console.error('Error updating tour settings:', error);
+      throw error;
+    }
+  }
+
   // Check if tour is enabled globally
   static async isTourEnabled(): Promise<boolean> {
     try {
@@ -216,5 +234,19 @@ export class ProductTourService {
       console.error('Error checking if tour is enabled:', error);
       return false;
     }
+  }
+
+  // Enable/disable tour globally
+  static async setTourEnabled(enabled: boolean): Promise<void> {
+    await this.updateTourSettings('tour_enabled', { enabled });
+  }
+
+  // Update tour configuration  
+  static async updateTourConfig(config: Partial<Record<string, any>>): Promise<void> {
+    const currentSettings = await this.getTourSettings();
+    const currentConfig = currentSettings.tour_config || {};
+    const newConfig = { ...currentConfig, ...config };
+    
+    await this.updateTourSettings('tour_config', newConfig);
   }
 }

@@ -30,7 +30,7 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
   const tooltipRef = useRef<HTMLDivElement>(null);
   const maxRetries = 10;
 
-  // Calculate element position and create spotlight
+  // Calculate element position and create spotlight with smart positioning
   const updatePosition = () => {
     const element = document.querySelector(`[data-tour-id="${step.anchor_id}"]`);
     
@@ -48,46 +48,74 @@ export const TourSpotlight: React.FC<TourSpotlightProps> = ({
 
     const rect = element.getBoundingClientRect();
     const padding = 8;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
     
     // Calculate position relative to current viewport (since body is fixed)
     const currentTop = parseInt(document.body.style.top?.replace('-', '').replace('px', '')) || 0;
     
-    setPosition({
-      top: rect.top + currentTop - padding,
-      left: rect.left - padding,
-      width: rect.width + (padding * 2),
-      height: rect.height + (padding * 2),
-      found: true
-    });
-
-    // Center element in viewport by adjusting body position
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
+    // Calculate tooltip dimensions (estimate)
+    const tooltipHeight = 200; // Approximate tooltip height
+    const tooltipWidth = 384; // max-w-sm = 384px
+    const spacing = 16;
     
+    // Smart positioning: ensure both element and tooltip are visible
     const elementCenterY = rect.top + rect.height / 2;
-    const elementCenterX = rect.left + rect.width / 2;
-    const viewportCenterY = viewportHeight / 2;
-    const viewportCenterX = viewportWidth / 2;
+    const elementBottom = rect.bottom;
+    const elementTop = rect.top;
     
-    // Only adjust if element is significantly off-center
-    if (Math.abs(elementCenterY - viewportCenterY) > 100 || 
-        Math.abs(elementCenterX - viewportCenterX) > 100) {
+    // Calculate the optimal scroll position
+    let optimalScrollY = currentTop;
+    
+    // Determine tooltip position preference
+    const tooltipBelowElement = elementBottom + spacing + tooltipHeight < viewportHeight;
+    const tooltipAboveElement = elementTop - spacing - tooltipHeight > 0;
+    
+    if (!tooltipBelowElement && !tooltipAboveElement) {
+      // If tooltip doesn't fit above or below, center the element
+      const viewportCenter = viewportHeight / 2;
+      const scrollAdjustment = elementCenterY - viewportCenter;
+      optimalScrollY = Math.max(0, currentTop + scrollAdjustment);
+    } else if (!tooltipBelowElement && tooltipAboveElement) {
+      // Tooltip needs to go above, ensure element is visible in lower half
+      const targetY = viewportHeight * 0.7;
+      if (elementCenterY > targetY) {
+        const scrollAdjustment = elementCenterY - targetY;
+        optimalScrollY = Math.max(0, currentTop + scrollAdjustment);
+      }
+    } else if (tooltipBelowElement) {
+      // Tooltip can go below, ensure element is visible in upper half
+      const targetY = viewportHeight * 0.3;
+      if (elementCenterY < targetY) {
+        const scrollAdjustment = elementCenterY - targetY;
+        optimalScrollY = Math.max(0, currentTop + scrollAdjustment);
+      }
+    }
+    
+    // Apply smooth scroll adjustment if needed
+    if (Math.abs(optimalScrollY - currentTop) > 10) {
+      document.body.style.top = `-${optimalScrollY}px`;
       
-      const adjustY = elementCenterY - viewportCenterY;
-      const newTop = Math.max(0, currentTop + adjustY);
-      document.body.style.top = `-${newTop}px`;
-      
-      // Update position after adjustment
+      // Update position after scroll adjustment
       setTimeout(() => {
         const newRect = element.getBoundingClientRect();
         setPosition({
-          top: newRect.top + newTop - padding,
+          top: newRect.top + optimalScrollY - padding,
           left: newRect.left - padding,
           width: newRect.width + (padding * 2),
           height: newRect.height + (padding * 2),
           found: true
         });
-      }, 100);
+      }, 150);
+    } else {
+      // No scroll needed, set position immediately
+      setPosition({
+        top: rect.top + currentTop - padding,
+        left: rect.left - padding,
+        width: rect.width + (padding * 2),
+        height: rect.height + (padding * 2),
+        found: true
+      });
     }
     
     setRetryCount(0); // Reset retry count on success
