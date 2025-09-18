@@ -12,6 +12,7 @@ import { useAnchorSearch } from '@/hooks/useAnchorSearch';
 import { AnchorSearch } from './AnchorSearch';
 import { AnchorListItem } from './AnchorListItem';
 import { AnchorPickingManager } from '../anchor-picking/AnchorPickingManager';
+import { AnchorMaintenancePanel } from '../anchor-maintenance/AnchorMaintenancePanel';
 import type { OnboardingAnchor } from '@/types/onboarding-anchors';
 import { Plus, X } from 'lucide-react';
 
