@@ -617,96 +617,6 @@ export type Database = {
         }
         Relationships: []
       }
-      modal_informativo_config: {
-        Row: {
-          auto_transition: boolean
-          colors: Json | null
-          created_at: string
-          id: string
-          is_active: boolean
-          name: string
-          show_indicators: boolean
-          show_navigation: boolean
-          transition_time: number | null
-          updated_at: string
-          visibility_rules: Json | null
-        }
-        Insert: {
-          auto_transition?: boolean
-          colors?: Json | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          name: string
-          show_indicators?: boolean
-          show_navigation?: boolean
-          transition_time?: number | null
-          updated_at?: string
-          visibility_rules?: Json | null
-        }
-        Update: {
-          auto_transition?: boolean
-          colors?: Json | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          name?: string
-          show_indicators?: boolean
-          show_navigation?: boolean
-          transition_time?: number | null
-          updated_at?: string
-          visibility_rules?: Json | null
-        }
-        Relationships: []
-      }
-      modal_informativo_slides: {
-        Row: {
-          created_at: string
-          cta_text: string | null
-          cta_url: string | null
-          description: string | null
-          id: string
-          is_active: boolean
-          media_type: string | null
-          media_url: string | null
-          modal_id: string
-          slide_order: number
-          subtitle: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          cta_text?: string | null
-          cta_url?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          media_type?: string | null
-          media_url?: string | null
-          modal_id: string
-          slide_order?: number
-          subtitle?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          cta_text?: string | null
-          cta_url?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          media_type?: string | null
-          media_url?: string | null
-          modal_id?: string
-          slide_order?: number
-          subtitle?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       notifications: {
         Row: {
           body: string
@@ -749,96 +659,30 @@ export type Database = {
         }
         Relationships: []
       }
-      onboarding_anchors: {
-        Row: {
-          anchor_id: string
-          created_at: string
-          friendly_name: string
-          height: number | null
-          id: string
-          kind: string | null
-          last_verified_at: string | null
-          route: string
-          selector: string | null
-          tags: string[] | null
-          thumb_url: string | null
-          updated_at: string
-          width: number | null
-        }
-        Insert: {
-          anchor_id: string
-          created_at?: string
-          friendly_name: string
-          height?: number | null
-          id?: string
-          kind?: string | null
-          last_verified_at?: string | null
-          route: string
-          selector?: string | null
-          tags?: string[] | null
-          thumb_url?: string | null
-          updated_at?: string
-          width?: number | null
-        }
-        Update: {
-          anchor_id?: string
-          created_at?: string
-          friendly_name?: string
-          height?: number | null
-          id?: string
-          kind?: string | null
-          last_verified_at?: string | null
-          route?: string
-          selector?: string | null
-          tags?: string[] | null
-          thumb_url?: string | null
-          updated_at?: string
-          width?: number | null
-        }
-        Relationships: []
-      }
       onboarding_config: {
         Row: {
-          audience: string | null
           content: Json
           created_at: string
-          enabled: boolean | null
-          hide_on_dismiss: boolean | null
           id: string
           is_visible: boolean
           section_key: string
-          show_when: string | null
-          sync_with_tour: boolean | null
           updated_at: string
-          version: string | null
         }
         Insert: {
-          audience?: string | null
           content?: Json
           created_at?: string
-          enabled?: boolean | null
-          hide_on_dismiss?: boolean | null
           id?: string
           is_visible?: boolean
           section_key: string
-          show_when?: string | null
-          sync_with_tour?: boolean | null
           updated_at?: string
-          version?: string | null
         }
         Update: {
-          audience?: string | null
           content?: Json
           created_at?: string
-          enabled?: boolean | null
-          hide_on_dismiss?: boolean | null
           id?: string
           is_visible?: boolean
           section_key?: string
-          show_when?: string | null
-          sync_with_tour?: boolean | null
           updated_at?: string
-          version?: string | null
         }
         Relationships: []
       }
@@ -947,48 +791,6 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           user_id?: string
-        }
-        Relationships: []
-      }
-      product_tour_steps: {
-        Row: {
-          anchor_id: string
-          created_at: string
-          description: string
-          id: string
-          is_active: boolean
-          page_route: string
-          step_key: string
-          step_order: number
-          title: string
-          updated_at: string
-          visible_when: string | null
-        }
-        Insert: {
-          anchor_id: string
-          created_at?: string
-          description: string
-          id?: string
-          is_active?: boolean
-          page_route: string
-          step_key: string
-          step_order: number
-          title: string
-          updated_at?: string
-          visible_when?: string | null
-        }
-        Update: {
-          anchor_id?: string
-          created_at?: string
-          description?: string
-          id?: string
-          is_active?: boolean
-          page_route?: string
-          step_key?: string
-          step_order?: number
-          title?: string
-          updated_at?: string
-          visible_when?: string | null
         }
         Relationships: []
       }
@@ -1411,81 +1213,6 @@ export type Database = {
         }
         Relationships: []
       }
-      tour_events: {
-        Row: {
-          created_at: string
-          event_data: Json | null
-          event_type: string
-          id: string
-          page_route: string | null
-          session_id: string | null
-          step_key: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          event_data?: Json | null
-          event_type: string
-          id?: string
-          page_route?: string | null
-          session_id?: string | null
-          step_key?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          event_data?: Json | null
-          event_type?: string
-          id?: string
-          page_route?: string | null
-          session_id?: string | null
-          step_key?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      tour_settings: {
-        Row: {
-          audience: string | null
-          created_at: string
-          enabled: boolean | null
-          hide_on_dismiss: boolean | null
-          id: string
-          is_active: boolean
-          setting_key: string
-          setting_value: Json
-          show_when: string | null
-          updated_at: string
-          version: string | null
-        }
-        Insert: {
-          audience?: string | null
-          created_at?: string
-          enabled?: boolean | null
-          hide_on_dismiss?: boolean | null
-          id?: string
-          is_active?: boolean
-          setting_key: string
-          setting_value?: Json
-          show_when?: string | null
-          updated_at?: string
-          version?: string | null
-        }
-        Update: {
-          audience?: string | null
-          created_at?: string
-          enabled?: boolean | null
-          hide_on_dismiss?: boolean | null
-          id?: string
-          is_active?: boolean
-          setting_key?: string
-          setting_value?: Json
-          show_when?: string | null
-          updated_at?: string
-          version?: string | null
-        }
-        Relationships: []
-      }
       transactions: {
         Row: {
           amount: number
@@ -1582,168 +1309,11 @@ export type Database = {
         }
         Relationships: []
       }
-      user_stepper_state: {
-        Row: {
-          completed: boolean | null
-          dismissed: boolean | null
-          first_seen_at: string | null
-          last_seen_version: string | null
-          progress: Json | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          completed?: boolean | null
-          dismissed?: boolean | null
-          first_seen_at?: string | null
-          last_seen_version?: string | null
-          progress?: Json | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          completed?: boolean | null
-          dismissed?: boolean | null
-          first_seen_at?: string | null
-          last_seen_version?: string | null
-          progress?: Json | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_tour_progress: {
-        Row: {
-          completed_at: string | null
-          completed_steps: number
-          created_at: string
-          current_step_key: string | null
-          id: string
-          skipped_at: string | null
-          started_at: string | null
-          total_steps: number
-          tour_version: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          completed_at?: string | null
-          completed_steps?: number
-          created_at?: string
-          current_step_key?: string | null
-          id?: string
-          skipped_at?: string | null
-          started_at?: string | null
-          total_steps?: number
-          tour_version?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          completed_at?: string | null
-          completed_steps?: number
-          created_at?: string
-          current_step_key?: string | null
-          id?: string
-          skipped_at?: string | null
-          started_at?: string | null
-          total_steps?: number
-          tour_version?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_tour_state: {
-        Row: {
-          completed: boolean | null
-          dismissed: boolean | null
-          first_seen_at: string | null
-          last_seen_version: string | null
-          last_step: number | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          completed?: boolean | null
-          dismissed?: boolean | null
-          first_seen_at?: string | null
-          last_seen_version?: string | null
-          last_step?: number | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          completed?: boolean | null
-          dismissed?: boolean | null
-          first_seen_at?: string | null
-          last_seen_version?: string | null
-          last_step?: number | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      anchor_mark_verified: {
-        Args: { p_anchor_id: string }
-        Returns: undefined
-      }
-      anchor_upsert: {
-        Args: {
-          p_anchor_id: string
-          p_friendly_name: string
-          p_height?: number
-          p_kind?: string
-          p_route: string
-          p_selector?: string
-          p_thumb_url?: string
-          p_width?: number
-        }
-        Returns: {
-          anchor_id: string
-          created_at: string
-          friendly_name: string
-          height: number | null
-          id: string
-          kind: string | null
-          last_verified_at: string | null
-          route: string
-          selector: string | null
-          tags: string[] | null
-          thumb_url: string | null
-          updated_at: string
-          width: number | null
-        }
-      }
-      anchors_search: {
-        Args: {
-          p_kind?: string
-          p_limit?: number
-          p_offset?: number
-          p_q?: string
-          p_route?: string
-        }
-        Returns: {
-          anchor_id: string
-          created_at: string
-          friendly_name: string
-          height: number | null
-          id: string
-          kind: string | null
-          last_verified_at: string | null
-          route: string
-          selector: string | null
-          tags: string[] | null
-          thumb_url: string | null
-          updated_at: string
-          width: number | null
-        }[]
-      }
       generate_slug: {
         Args: { title: string }
         Returns: string
@@ -1982,10 +1552,6 @@ export type Database = {
       mask_email: {
         Args: { email: string; show_full?: boolean }
         Returns: string
-      }
-      onboarding_visibility: {
-        Args: { target_user_id: string }
-        Returns: Json
       }
       search_users: {
         Args:

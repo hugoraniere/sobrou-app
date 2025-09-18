@@ -1,74 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 import { 
   Eye, 
-  Route,
-  List,
-  MessageSquare
+  Settings,
+  Users,
+  MessageSquare,
+  BarChart3,
+  Palette
 } from 'lucide-react';
-
-// Import section components
-import { ProductTourAdmin } from '@/components/admin/onboarding/ProductTourAdmin';
-import { StepperAdmin } from '@/components/admin/onboarding/StepperAdmin';
-import { ModalInformativoAdmin } from '@/components/admin/onboarding/ModalInformativoAdmin';
-import { OnboardingSummaryBar } from '@/components/admin/onboarding/OnboardingSummaryBar';
-
-// Import onboarding components for preview
+import { OnboardingConfigService } from '@/services/OnboardingConfigService';
+import { WelcomeModalEditor } from '@/components/admin/onboarding/WelcomeModalEditor';
+import { StepperEditor } from '@/components/admin/onboarding/StepperEditor';
+import { GeneralSettingsEditor } from '@/components/admin/onboarding/GeneralSettingsEditor';
+import { StepsManager } from '@/components/admin/onboarding/StepsManager';
 import { GetStartedStepper } from '@/components/onboarding/GetStartedStepper';
-import { TourManager } from '@/components/tour/TourManager';
-import { OnboardingGate } from '@/components/onboarding/OnboardingGate';
-import { useProductTour } from '@/hooks/useProductTour';
-import { useOnboardingState } from '@/hooks/useOnboardingVisibility';
-import { toast } from 'sonner';
+import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
 
 const OnboardingAdmin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('product-tour');
+  const [activeTab, setActiveTab] = useState('welcome');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [previewType, setPreviewType] = useState<'stepper' | 'tour' | 'modal'>('stepper');
-  const { startTour, isActive } = useProductTour();
-  const { resetUserStates } = useOnboardingState();
+  const [previewType, setPreviewType] = useState<'welcome' | 'stepper'>('welcome');
+  const [configs, setConfigs] = useState<any>({});
 
-  // Mock status data - in real app, fetch from your state management
-  const tourStatus = {
-    enabled: true,
-    visibility: 'first_login',
-    audience: 'new_users', 
-    version: '1.0',
-    lastPublished: '2024-01-15'
-  };
+  useEffect(() => {
+    loadAllConfigs();
+  }, []);
 
-  const stepperStatus = {
-    enabled: true,
-    visibility: 'until_complete',
-    audience: 'all_users',
-    version: '1.0', 
-    lastPublished: '2024-01-15'
-  };
-
-  const handlePreview = (type: 'stepper' | 'tour' | 'modal') => {
-    if (type === 'tour') {
-      // Open tour in preview mode
-      const previewUrl = `${window.location.origin}?tour=preview`;
-      window.open(previewUrl, '_blank');
-    } else {
-      setPreviewType(type);
-      setIsPreviewOpen(true);
-    }
-  };
-
-  const handlePublish = (type: 'tour' | 'stepper') => {
-    toast.success(`${type === 'tour' ? 'Product Tour' : 'Stepper'} publicado com sucesso!`);
-  };
-
-  const handleReset = async (type: 'tour' | 'stepper') => {
+  const loadAllConfigs = async () => {
     try {
-      await resetUserStates();
-      toast.success(`Estados de usuário resetados para ${type === 'tour' ? 'Product Tour' : 'Stepper'}`);
+      const allConfigs = await OnboardingConfigService.getAllConfigs();
+      const configMap = allConfigs.reduce((acc, config) => {
+        acc[config.section_key] = config;
+        return acc;
+      }, {} as any);
+      setConfigs(configMap);
     } catch (error) {
-      toast.error('Erro ao resetar estados de usuário');
+      toast.error('Erro ao carregar configurações');
     }
+  };
+
+  const handlePreview = (type: 'welcome' | 'stepper') => {
+    setPreviewType(type);
+    setIsPreviewOpen(true);
   };
 
   return (
@@ -77,59 +56,81 @@ const OnboardingAdmin: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold">Administração do Onboarding</h1>
           <p className="text-muted-foreground">
-            Configure a experiência completa de onboarding dos usuários
+            Configure a experiência de onboarding dos novos usuários
           </p>
         </div>
         
         <div className="flex gap-2">
-          <Button onClick={() => handlePreview('tour')} variant="outline">
+          <Button onClick={() => handlePreview('welcome')} variant="outline">
             <Eye className="w-4 h-4 mr-2" />
-            Preview Tour
+            Preview Modal
           </Button>
           <Button onClick={() => handlePreview('stepper')} variant="outline">
             <Eye className="w-4 h-4 mr-2" />
             Preview Stepper
           </Button>
-          <Button onClick={() => handlePreview('modal')} variant="outline">
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Modal
-          </Button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="product-tour" className="flex items-center gap-2">
-            <Route className="w-4 h-4" />
-            Product Tour
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="welcome" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Modal
           </TabsTrigger>
           <TabsTrigger value="stepper" className="flex items-center gap-2">
-            <List className="w-4 h-4" />
+            <BarChart3 className="w-4 h-4" />
             Stepper
           </TabsTrigger>
-          <TabsTrigger value="modal-informativo" className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" />
-            Modal Informativo
+          <TabsTrigger value="steps" className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            Passos
+          </TabsTrigger>
+          <TabsTrigger value="appearance" className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            Aparência
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Configurações
+          </TabsTrigger>
+          <TabsTrigger value="visibility" className="flex items-center gap-2">
+            <Eye className="w-4 h-4" />
+            Visibilidade
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="product-tour" className="space-y-4">
-          <ProductTourAdmin />
+        <TabsContent value="welcome" className="space-y-4">
+          <WelcomeModalEditor />
         </TabsContent>
 
         <TabsContent value="stepper" className="space-y-4">
-          <OnboardingSummaryBar
-            type="stepper"
-            status={stepperStatus}
-            onPreview={() => handlePreview('stepper')}
-            onPublish={() => handlePublish('stepper')}
-            onReset={() => handleReset('stepper')}
-          />
-          <StepperAdmin />
+          <StepperEditor />
         </TabsContent>
 
-        <TabsContent value="modal-informativo" className="space-y-4">
-          <ModalInformativoAdmin />
+        <TabsContent value="steps" className="space-y-4">
+          <StepsManager />
+        </TabsContent>
+
+        <TabsContent value="appearance" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Aparência e Branding</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Configurações de aparência personalizadas em desenvolvimento...
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-4">
+          <GeneralSettingsEditor />
+        </TabsContent>
+
+        <TabsContent value="visibility" className="space-y-4">
+          <VisibilityManager configs={configs} onUpdate={loadAllConfigs} />
         </TabsContent>
       </Tabs>
 
@@ -138,54 +139,77 @@ const OnboardingAdmin: React.FC = () => {
         onClose={() => setIsPreviewOpen(false)}
         type={previewType}
       />
-
-      {/* Tour Manager for preview */}
-      {isActive && <TourManager />}
     </div>
+  );
+};
+
+const VisibilityManager: React.FC<{configs: any, onUpdate: () => void}> = ({ configs, onUpdate }) => {
+  const handleToggleVisibility = async (sectionKey: string, isVisible: boolean) => {
+    try {
+      await OnboardingConfigService.updateVisibility(sectionKey, isVisible);
+      toast.success('Visibilidade atualizada');
+      onUpdate();
+    } catch (error) {
+      toast.error('Erro ao atualizar visibilidade');
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Gerenciar Visibilidade</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-medium">Modal de Boas-vindas</h4>
+            <p className="text-sm text-muted-foreground">Mostrar modal para novos usuários</p>
+          </div>
+          <Switch
+            checked={configs.welcome_modal?.is_visible ?? true}
+            onCheckedChange={(checked) => handleToggleVisibility('welcome_modal', checked)}
+          />
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-medium">Get Started Stepper</h4>
+            <p className="text-sm text-muted-foreground">Mostrar stepper de primeiros passos</p>
+          </div>
+          <Switch
+            checked={configs.get_started_stepper?.is_visible ?? true}
+            onCheckedChange={(checked) => handleToggleVisibility('get_started_stepper', checked)}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
 const PreviewDialog: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  type: 'stepper' | 'tour' | 'modal';
-}> = ({ isOpen, onClose, type }) => {
-  const getTitle = () => {
-    switch (type) {
-      case 'stepper': return 'Preview - Get Started Stepper';
-      case 'tour': return 'Preview - Product Tour';
-      case 'modal': return 'Preview - Modal Informativo';
-      default: return 'Preview';
-    }
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{getTitle()}</DialogTitle>
-        </DialogHeader>
-        
-        <div className="bg-muted/30 p-4 rounded-lg">
-          {type === 'stepper' && (
-            <OnboardingGate type="stepper" preview>
-              <GetStartedStepper />
-            </OnboardingGate>
-          )}
-          {type === 'modal' && (
-            <div className="flex items-center justify-center min-h-[200px]">
-              <div className="text-muted-foreground">Preview do Modal Informativo em desenvolvimento</div>
-            </div>
-          )}
-          {type === 'tour' && (
-            <div className="flex items-center justify-center min-h-[200px]">
-              <div className="text-muted-foreground">Tour iniciado em nova aba</div>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
+  type: 'welcome' | 'stepper';
+}> = ({ isOpen, onClose, type }) => (
+  <Dialog open={isOpen} onOpenChange={onClose}>
+    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>
+          Preview - {type === 'welcome' ? 'Modal de Boas-vindas' : 'Get Started Stepper'}
+        </DialogTitle>
+      </DialogHeader>
+      
+      <div className="bg-muted/30 p-4 rounded-lg">
+        {type === 'welcome' ? (
+          <div className="flex items-center justify-center min-h-[200px]">
+            <div className="text-muted-foreground">Preview do modal em desenvolvimento</div>
+          </div>
+        ) : (
+          <GetStartedStepper />
+        )}
+      </div>
+    </DialogContent>
+  </Dialog>
+);
 
 export default OnboardingAdmin;

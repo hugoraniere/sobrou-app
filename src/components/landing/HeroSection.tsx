@@ -106,7 +106,7 @@ const HeroSection: React.FC = () => {
         <LazyImage 
           src={config.background_image}
           alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-          className="max-h-[80vh] w-full object-cover object-left shadow-2xl"
+          className="h-full w-full object-cover object-left shadow-2xl"
           priority
           width={1200}
           height={800}
