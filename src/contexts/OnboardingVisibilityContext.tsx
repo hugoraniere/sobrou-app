@@ -77,59 +77,87 @@ export function OnboardingVisibilityProvider({ children, preview = false }: Onbo
     }
 
     try {
+      setLoading(true);
+      
+      // Check cache first (5 minute cache)
+      const cacheKey = `onboarding_visibility_${user.id}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+      
+      if (cachedData && cacheTime) {
+        const age = Date.now() - parseInt(cacheTime);
+        if (age < 5 * 60 * 1000) { // 5 minutes
+          setVisibility(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+      }
+
       // In preview mode, bypass gating for admins
       if (preview) {
         const isUserAdmin = await checkIsAdmin(user.id);
         if (isUserAdmin) {
-          setVisibility({
+          const previewData = {
             showProductTour: true,
             showStepper: true,
             tourReason: 'preview',
             stepperReason: 'preview',
             version: '1.0',
             isNewUser: false
-          });
+          };
+          setVisibility(previewData);
           setLoading(false);
           return;
         }
       }
 
-      // Create a timeout promise for fallback
+      // Optimized timeout with functional fallback
+      const fallbackData = {
+        showProductTour: false,
+        showStepper: false,
+        tourReason: 'default',
+        stepperReason: 'default',
+        version: '1.0',
+        isNewUser: false
+      };
+
+      let timeoutHandle: NodeJS.Timeout;
       const timeoutPromise = new Promise<OnboardingVisibilityResponse>((resolve) => {
-        setTimeout(() => {
-          console.warn('Onboarding visibility check timed out, using defaults');
-          resolve({
-            showProductTour: false,
-            showStepper: false,
-            tourReason: 'timeout',
-            stepperReason: 'timeout',
-            version: '1.0',
-            isNewUser: false
-          });
-        }, 500); // 500ms timeout
+        timeoutHandle = setTimeout(() => {
+          console.warn('Onboarding visibility check timed out (300ms), using safe defaults');
+          resolve(fallbackData);
+        }, 300); // Reduced to 300ms
       });
 
-      // Race between RPC call and timeout
+      // RPC call with proper error handling
       const visibilityPromise = supabase.rpc('onboarding_visibility', {
         target_user_id: user.id
       }).then(({ data, error }) => {
+        clearTimeout(timeoutHandle);
+        
         if (error) {
-          console.error('Error fetching onboarding visibility:', error);
-          return {
-            showProductTour: false,
-            showStepper: false,
-            tourReason: 'error',
-            stepperReason: 'error',
-            version: '1.0',
-            isNewUser: false
-          };
+          console.error('RPC onboarding_visibility error:', error);
+          return fallbackData;
         }
-        return data as unknown as OnboardingVisibilityResponse;
+        
+        const result = data as unknown as OnboardingVisibilityResponse;
+        
+        // Cache successful result
+        localStorage.setItem(cacheKey, JSON.stringify(result));
+        localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
+        
+        return result;
       });
 
-      const result = await Promise.race([visibilityPromise, timeoutPromise]);
-      setVisibility(result);
-      setError(null);
+      try {
+        const result = await Promise.race([visibilityPromise, timeoutPromise]);
+        setVisibility(result);
+        setError(null);
+      } catch (error) {
+        console.error('Promise race error:', error);
+        setVisibility(fallbackData);
+        setError('Timeout exceeded');
+      }
 
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';

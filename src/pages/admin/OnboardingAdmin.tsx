@@ -21,7 +21,7 @@ import { ReleaseNotesModal } from '@/components/admin/modals/ReleaseNotesModal';
 import { GetStartedStepper } from '@/components/onboarding/GetStartedStepper';
 import { OnboardingGate } from '@/components/onboarding/OnboardingGate';
 import { useProductTour } from '@/contexts/ProductTourProvider';
-import { useOnboardingState } from '@/hooks/useOnboardingVisibility';
+import { useOnboardingState } from '@/hooks/useOnboardingState';
 import { toast } from 'sonner';
 
 const OnboardingAdmin: React.FC = () => {

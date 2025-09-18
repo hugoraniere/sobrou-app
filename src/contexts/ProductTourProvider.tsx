@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { ProductTourStep, UserTourProgress, TourContextType } from '@/types/product-tour';
 import { ProductTourAdminService } from '@/services/ProductTourAdminService';
-import { useOnboardingState } from '@/hooks/useOnboardingVisibility';
+import { useOnboardingState } from '@/hooks/useOnboardingState';
 import { useOnboardingVisibilityContext } from './OnboardingVisibilityContext';
 import { useAnalyticsBatch } from '@/hooks/useAnalyticsBatch';
 
