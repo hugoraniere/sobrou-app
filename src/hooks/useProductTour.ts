@@ -1,5 +1,2 @@
-import { useContext } from 'react';
-import { ProductTourProvider } from '@/contexts/ProductTourProvider';
-
-// Re-export the hook from the provider
+// Re-export the hook from the provider for convenience
 export { useProductTour } from '@/contexts/ProductTourProvider';

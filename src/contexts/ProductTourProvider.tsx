@@ -11,7 +11,9 @@ interface ProductTourProviderProps {
 }
 
 export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ children }) => {
+  console.log('ProductTourProvider: Rendering...');
   const { user } = useAuth();
+  console.log('ProductTourProvider: User from auth:', user?.id);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -482,6 +484,8 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
     canNavigate,
   };
 
+  console.log('ProductTourProvider: Creating context value:', contextValue);
+
   return (
     <ProductTourContext.Provider value={contextValue}>
       {children}
@@ -490,8 +494,11 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
 };
 
 export const useProductTour = (): TourContextType => {
+  console.log('useProductTour: Hook called');
   const context = useContext(ProductTourContext);
+  console.log('useProductTour: Context value:', context);
   if (!context) {
+    console.error('useProductTour: No context found - Provider not rendering correctly!');
     throw new Error('useProductTour must be used within a ProductTourProvider');
   }
   return context;

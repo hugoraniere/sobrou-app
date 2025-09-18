@@ -3,6 +3,7 @@ import { useProductTour } from '@/contexts/ProductTourProvider';
 import { TourSpotlight } from './TourSpotlight';
 
 export const TourManager: React.FC = () => {
+  console.log('TourManager: Component rendering...');
   const {
     isActive,
     currentStep,
@@ -15,6 +16,8 @@ export const TourManager: React.FC = () => {
     isFirstStep,
     isLastStep,
   } = useProductTour();
+  
+  console.log('TourManager: Tour state - isActive:', isActive, 'currentStep:', currentStep?.title);
 
   // Don't render if tour is not active or no current step
   if (!isActive || !currentStep) {
