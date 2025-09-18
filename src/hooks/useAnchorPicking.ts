@@ -6,9 +6,13 @@ export interface UseAnchorPickingReturn {
   isPickingMode: boolean;
   isProcessing: boolean;
   error: string | null;
+  isModalOpen: boolean;
   startPicking: () => void;
   stopPicking: () => void;
+  openModal: () => void;
+  closeModal: () => void;
   onAnchorPicked: (anchor: GeneratedAnchor) => void;
+  handleModalMessage: (message: PostMessage) => void;
 }
 
 interface UseAnchorPickingProps {
@@ -23,26 +27,23 @@ export const useAnchorPicking = ({
   const [isPickingMode, setIsPickingMode] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = useCallback(() => {
+    setIsModalOpen(true);
+    setError(null);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    setIsPickingMode(false);
+    setError(null);
+  }, []);
 
   const startPicking = useCallback(() => {
     setIsPickingMode(true);
     setError(null);
-    
-    // Enviar mensagem para iframe ou janela
-    const message: PostMessage = { type: 'ANCHOR_PICK_START' };
-    
-    // Se estamos no iframe, enviar para parent
-    if (window.parent !== window) {
-      window.parent.postMessage(message, targetOrigin);
-    }
-    // Se estamos no parent, enviar para iframe
-    else {
-      const iframe = document.querySelector('iframe');
-      if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage(message, targetOrigin);
-      }
-    }
-  }, [targetOrigin]);
+  }, []);
 
   const stopPicking = useCallback(() => {
     setIsPickingMode(false);
@@ -69,7 +70,8 @@ export const useAnchorPicking = ({
       
       if (success) {
         onAnchorSelected?.(anchor.anchor_id);
-        stopPicking();
+        setIsModalOpen(false);
+        setIsPickingMode(false);
       } else {
         setError('Falha ao salvar a âncora');
       }
@@ -79,7 +81,24 @@ export const useAnchorPicking = ({
     } finally {
       setIsProcessing(false);
     }
-  }, [onAnchorSelected, stopPicking]);
+  }, [onAnchorSelected]);
+
+  const handleModalMessage = useCallback(async (message: PostMessage) => {
+    if (message.type === 'ANCHOR_PICKED') {
+      try {
+        const generatedAnchor = await AnchorGenerationService.generateAnchor(
+          message.route,
+          message.bbox,
+          message.elementMeta
+        );
+        
+        await onAnchorPicked(generatedAnchor);
+      } catch (error) {
+        console.error('Error generating anchor:', error);
+        setError('Erro ao gerar âncora');
+      }
+    }
+  }, [onAnchorPicked]);
 
   useEffect(() => {
     const handleMessage = async (event: MessageEvent<PostMessage>) => {
@@ -132,8 +151,12 @@ export const useAnchorPicking = ({
     isPickingMode,
     isProcessing,
     error,
+    isModalOpen,
     startPicking,
     stopPicking,
-    onAnchorPicked
+    openModal,
+    closeModal,
+    onAnchorPicked,
+    handleModalMessage
   };
 };

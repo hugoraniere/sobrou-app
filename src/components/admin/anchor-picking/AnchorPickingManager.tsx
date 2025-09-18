@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, MousePointer, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAnchorPicking } from '@/hooks/useAnchorPicking';
+import { SitePreviewModal } from './SitePreviewModal';
 
 interface AnchorPickingManagerProps {
   onAnchorSelected?: (anchorId: string) => void;
@@ -17,26 +18,24 @@ export const AnchorPickingManager: React.FC<AnchorPickingManagerProps> = ({
     isPickingMode,
     isProcessing,
     error,
-    startPicking,
-    stopPicking
+    isModalOpen,
+    openModal,
+    closeModal,
+    handleModalMessage
   } = useAnchorPicking({
     onAnchorSelected
   });
 
-  const handleTogglePicking = () => {
-    if (isPickingMode) {
-      stopPicking();
-    } else {
-      startPicking();
-    }
+  const handleStartPicking = () => {
+    openModal();
   };
 
   return (
     <div className="space-y-3">
       <Button
-        variant={isPickingMode ? "destructive" : "outline"}
+        variant="outline"
         size="sm"
-        onClick={handleTogglePicking}
+        onClick={handleStartPicking}
         disabled={disabled || isProcessing}
         className="w-full"
       >
@@ -45,24 +44,13 @@ export const AnchorPickingManager: React.FC<AnchorPickingManagerProps> = ({
         ) : (
           <MousePointer className="h-4 w-4 mr-2" />
         )}
-        {isPickingMode ? 'Parar Seleção' : 'Selecionar no App'}
+        Selecionar no App
       </Button>
 
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {isPickingMode && (
-        <Alert>
-          <MousePointer className="h-4 w-4" />
-          <AlertDescription>
-            Modo de seleção ativo. Clique em um elemento no preview para criar uma âncora.
-            <br />
-            Pressione <kbd className="px-1 py-0.5 text-xs bg-muted rounded">Esc</kbd> para cancelar.
-          </AlertDescription>
         </Alert>
       )}
 
@@ -74,6 +62,13 @@ export const AnchorPickingManager: React.FC<AnchorPickingManagerProps> = ({
           </AlertDescription>
         </Alert>
       )}
+
+      <SitePreviewModal 
+        open={isModalOpen}
+        onClose={closeModal}
+        onAnchorPicked={handleModalMessage}
+        isProcessing={isProcessing}
+      />
     </div>
   );
 };
