@@ -55,7 +55,7 @@ export const BillsList: React.FC<BillsListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour-id="bills-to-pay.list.bills-list">
       {bills.map((bill) => (
         <BillCard
           key={bill.id}

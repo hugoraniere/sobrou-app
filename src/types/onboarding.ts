@@ -1,23 +1,41 @@
-export type OnboardingGoal = 'dividas' | 'organizar' | 'cartao';
-
-export type OnboardingStep = 
-  | 'personalization'
-  | 'quickwin'
-  | 'checklist'
-  | 'checklist_payable'
-  | 'checklist_transactions'
-  | 'checklist_budget'
-  | 'tour'
-  | 'completed';
+export interface OnboardingStep {
+  id: number;
+  key: string;
+  title: string;
+  description: string;
+  icon?: string;
+  action_path: string;
+  action_hint?: string;
+  completion_event: string;
+  target_count: number;
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface OnboardingProgress {
   user_id: string;
-  goal?: OnboardingGoal;
-  effort_minutes?: number;
-  steps_completed: string[];
-  quickwin_done: boolean;
+  completed: Record<string, boolean>;
+  minimized: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface OnboardingContext {
+  steps: OnboardingStep[];
+  progress: OnboardingProgress | null;
+  eventCounts: Record<string, number>;
+  isWelcomeModalOpen: boolean;
+  isStepperMinimized: boolean;
+  
+  // Actions
+  setWelcomeModalOpen: (open: boolean) => void;
+  completeStep: (stepKey: string) => Promise<void>;
+  minimizeStepper: () => Promise<void>;
+  showStepper: () => Promise<void>;
+  trackEvent: (eventName: string, params?: Record<string, any>) => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 export interface Payable {
@@ -32,28 +50,9 @@ export interface Payable {
   updated_at: string;
 }
 
-export interface OnboardingContext {
-  progress: OnboardingProgress | null;
-  currentStep: OnboardingStep | null;
-  isWelcomeModalOpen: boolean;
-  isChecklistOpen: boolean;
-  isTourActive: boolean;
-  isFirstLogin: boolean;
-  
-  // Actions
-  setWelcomeModalOpen: (open: boolean) => void;
-  setChecklistOpen: (open: boolean) => void;
-  setTourActive: (active: boolean) => void;
-  updateProgress: (updates: Partial<OnboardingProgress>) => Promise<void>;
-  completeStep: (step: string) => Promise<void>;
-  skipOnboarding: () => Promise<void>;
-  restartOnboarding: () => Promise<void>;
-}
-
 export interface AnalyticsEvent {
   event_name: string;
   user_id?: string;
-  session_id?: string;
   event_params?: Record<string, any>;
   page?: string;
 }

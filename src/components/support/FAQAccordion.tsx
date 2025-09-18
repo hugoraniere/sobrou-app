@@ -22,7 +22,7 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, className = "" }) => 
   }
 
   return (
-    <Accordion type="single" collapsible className={`w-full ${className}`}>
+    <Accordion type="single" collapsible className={`w-full ${className}`} data-tour-id="support.faq.accordion">
       {faqs.map((faq) => (
         <AccordionItem key={faq.id} value={faq.id}>
           <AccordionTrigger className="text-left text-text-primary hover:text-primary">

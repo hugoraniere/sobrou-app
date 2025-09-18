@@ -1,7 +1,25 @@
 import { supabase } from '@/integrations/supabase/client';
-import { OnboardingProgress, OnboardingGoal } from '@/types/onboarding';
+import { OnboardingStep, OnboardingProgress, AnalyticsEvent } from '@/types/onboarding';
 
 export class OnboardingService {
+  // Get all active onboarding steps
+  static async getSteps(): Promise<OnboardingStep[]> {
+    try {
+      const { data, error } = await supabase
+        .from('onboarding_steps')
+        .select('*')
+        .eq('active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting onboarding steps:', error);
+      return [];
+    }
+  }
+
+  // Get user's onboarding progress
   static async getProgress(userId: string): Promise<OnboardingProgress | null> {
     try {
       const { data, error } = await supabase
@@ -18,37 +36,16 @@ export class OnboardingService {
     }
   }
 
-  static async createProgress(userId: string, goal?: OnboardingGoal, effortMinutes?: number): Promise<OnboardingProgress | null> {
-    try {
-      const { data, error } = await supabase
-        .from('onboarding_progress')
-        .insert({
-          user_id: userId,
-          goal,
-          effort_minutes: effortMinutes,
-          steps_completed: [],
-          quickwin_done: false
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as OnboardingProgress;
-    } catch (error) {
-      console.error('Error creating onboarding progress:', error);
-      return null;
-    }
-  }
-
+  // Create or update user's onboarding progress
   static async updateProgress(userId: string, updates: Partial<OnboardingProgress>): Promise<OnboardingProgress | null> {
     try {
       const { data, error } = await supabase
         .from('onboarding_progress')
-        .update({
+        .upsert({
+          user_id: userId,
           ...updates,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', userId)
         .select()
         .single();
 
@@ -60,19 +57,14 @@ export class OnboardingService {
     }
   }
 
-  static async completeStep(userId: string, step: string): Promise<OnboardingProgress | null> {
+  // Mark a step as completed
+  static async completeStep(userId: string, stepKey: string): Promise<OnboardingProgress | null> {
     try {
-      // Get current progress
       const progress = await this.getProgress(userId);
-      if (!progress) return null;
-
-      const updatedSteps = [...progress.steps_completed];
-      if (!updatedSteps.includes(step)) {
-        updatedSteps.push(step);
-      }
-
+      const completed = progress?.completed || {};
+      
       return await this.updateProgress(userId, {
-        steps_completed: updatedSteps
+        completed: { ...completed, [stepKey]: true }
       });
     } catch (error) {
       console.error('Error completing onboarding step:', error);
@@ -80,35 +72,139 @@ export class OnboardingService {
     }
   }
 
-  static async markQuickWinDone(userId: string): Promise<OnboardingProgress | null> {
-    return await this.updateProgress(userId, { quickwin_done: true });
+  // Get event counts for completion tracking
+  static async getEventCounts(userId: string): Promise<Record<string, number>> {
+    try {
+      const { data, error } = await supabase
+        .from('analytics_events')
+        .select('event_name')
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      const counts: Record<string, number> = {};
+      data?.forEach(event => {
+        counts[event.event_name] = (counts[event.event_name] || 0) + 1;
+      });
+
+      return counts;
+    } catch (error) {
+      console.error('Error getting event counts:', error);
+      return {};
+    }
   }
 
-  static isStepCompleted(progress: OnboardingProgress | null, step: string): boolean {
-    return progress?.steps_completed?.includes(step) || false;
+  // Track analytics event
+  static async trackEvent(eventName: string, userId?: string, params?: Record<string, any>, page?: string): Promise<void> {
+    try {
+      const eventData: AnalyticsEvent = {
+        event_name: eventName,
+        user_id: userId,
+        event_params: params || {},
+        page
+      };
+
+      const { error } = await supabase
+        .from('analytics_events')
+        .insert(eventData);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error tracking analytics event:', error);
+    }
   }
 
-  static isOnboardingCompleted(progress: OnboardingProgress | null): boolean {
-    if (!progress) return false;
-    
-    const requiredSteps = ['checklist_payable', 'checklist_transactions', 'checklist_budget'];
-    return requiredSteps.every(step => progress.steps_completed?.includes(step));
+  // Check if a step should be marked as completed based on event counts
+  static shouldCompleteStep(step: OnboardingStep, eventCounts: Record<string, number>): boolean {
+    const count = eventCounts[step.completion_event] || 0;
+    return count >= step.target_count;
   }
 
-  static getCompletionPercentage(progress: OnboardingProgress | null): number {
-    if (!progress) return 0;
-    
-    const totalSteps = 4; // personalization + quickwin + 3 checklist items
-    let completed = 0;
-    
-    if (progress.goal) completed += 0.25;
-    if (progress.quickwin_done) completed += 0.25;
-    
-    const checklistSteps = ['checklist_payable', 'checklist_transactions', 'checklist_budget'];
-    completed += (checklistSteps.filter(step => 
-      progress.steps_completed?.includes(step)
-    ).length / checklistSteps.length) * 0.5;
-    
-    return Math.round(completed * 100);
+  // Check if user has seen onboarding (has progress record)
+  static hasSeenOnboarding(progress: OnboardingProgress | null): boolean {
+    return progress !== null;
+  }
+
+  // Check if user is a first-time visitor
+  static isFirstLogin(progress: OnboardingProgress | null): boolean {
+    return progress === null;
+  }
+
+  // Get completion percentage
+  static getCompletionPercentage(steps: OnboardingStep[], progress: OnboardingProgress | null, eventCounts: Record<string, number>): number {
+    if (steps.length === 0) return 0;
+
+    const completedCount = steps.filter(step => {
+      return progress?.completed[step.key] || this.shouldCompleteStep(step, eventCounts);
+    }).length;
+
+    return Math.round((completedCount / steps.length) * 100);
+  }
+
+  // Admin functions
+  static async createStep(step: Omit<OnboardingStep, 'id' | 'created_at' | 'updated_at'>): Promise<OnboardingStep | null> {
+    try {
+      const { data, error } = await supabase
+        .from('onboarding_steps')
+        .insert(step)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating onboarding step:', error);
+      return null;
+    }
+  }
+
+  static async updateStep(id: number, updates: Partial<OnboardingStep>): Promise<OnboardingStep | null> {
+    try {
+      const { data, error } = await supabase
+        .from('onboarding_steps')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error updating onboarding step:', error);
+      return null;
+    }
+  }
+
+  static async deleteStep(id: number): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('onboarding_steps')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error deleting onboarding step:', error);
+      return false;
+    }
+  }
+
+  // Reset progress for all users or specific user
+  static async resetProgress(userId?: string): Promise<boolean> {
+    try {
+      let query = supabase.from('onboarding_progress').delete();
+      
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { error } = await query;
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error resetting onboarding progress:', error);
+      return false;
+    }
   }
 }

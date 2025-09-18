@@ -5,10 +5,16 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
+import { LandingPageProvider } from './contexts/LandingPageContext';
 import { AuthProvider } from "./contexts/AuthContext";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { AIChatProvider } from "./contexts/AIChatContext";
 import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
+import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { ProductTourProvider } from "./contexts/ProductTourProvider";
+import { TourDevOverlay, useTourDevMode } from './components/dev/TourDevOverlay';
+import { TourAnchorHighlighter } from './components/dev/TourAnchorHighlighter';
+import { TourManager } from './components/tour/TourManager';
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
@@ -26,7 +32,9 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminContent from "./pages/AdminContent";
 import AdminSupport from "./pages/AdminSupport";
+import AdminLandingPage from "./pages/admin/LandingPageAdmin";
 import AdminUsers from "./pages/AdminUsers";
+import OnboardingAdmin from "./pages/admin/OnboardingAdmin";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
@@ -45,6 +53,7 @@ const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
+  const { isDevMode } = useTourDevMode();
   
   return (
     <React.StrictMode>
@@ -54,10 +63,13 @@ const App = () => {
           <Toaster />
           <BrowserRouter>
             <AuthProvider>
-              <AvatarProvider>
-                <AIChatProvider>
-                  <WhatsAppButtonProvider>
-                    <NavigationProvider>
+              <OnboardingProvider>
+                <ProductTourProvider>
+                  <LandingPageProvider>
+                  <AvatarProvider>
+                  <AIChatProvider>
+                    <WhatsAppButtonProvider>
+                      <NavigationProvider>
                       <div className="min-h-screen bg-gray-50">
                         <Routes>
                           {/* Public routes */}
@@ -111,6 +123,26 @@ const App = () => {
                                <ProtectedRoute>
                                  <AdminLayout>
                                    <AdminSupport />
+                                 </AdminLayout>
+                               </ProtectedRoute>
+                             } 
+                           />
+                           <Route 
+                             path="/admin/landing" 
+                             element={
+                               <ProtectedRoute>
+                                 <AdminLayout>
+                                   <AdminLandingPage />
+                                 </AdminLayout>
+                               </ProtectedRoute>
+                             } 
+                           />
+                           <Route 
+                             path="/admin/onboarding" 
+                             element={
+                               <ProtectedRoute>
+                                 <AdminLayout>
+                                   <OnboardingAdmin />
                                  </AdminLayout>
                                </ProtectedRoute>
                              } 
@@ -231,13 +263,23 @@ const App = () => {
                         </Routes>
                         
                         <WhatsAppChatButton />
+                        <TourManager />
                         <InstallPrompt />
+                        {isDevMode && (
+                          <>
+                            <TourDevOverlay enabled={isDevMode} />
+                            <TourAnchorHighlighter />
+                          </>
+                        )}
                       </div>
-                    </NavigationProvider>
-                  </WhatsAppButtonProvider>
-                </AIChatProvider>
-              </AvatarProvider>
-            </AuthProvider>
+                      </NavigationProvider>
+                    </WhatsAppButtonProvider>
+                  </AIChatProvider>
+                    </AvatarProvider>
+                  </LandingPageProvider>
+                </ProductTourProvider>
+              </OnboardingProvider>
+              </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

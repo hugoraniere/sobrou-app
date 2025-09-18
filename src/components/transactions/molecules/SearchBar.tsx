@@ -18,7 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Buscar..."
 }) => {
   return (
-    <div className={cn("relative w-full max-w-[320px]", className)}>
+    <div className={cn("relative w-full max-w-[320px]", className)} data-tour-id="transactions.filters.search-bar">
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
         type="text"

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import MainNavbar from '../navigation/MainNavbar';
+import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import FloatingChatButton from '../chat/FloatingChatButton';
 import ChatWindow from '../chat/ChatWindow';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -61,7 +62,9 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={false}>
-      <AppLayoutContent>{children}</AppLayoutContent>
+      <OnboardingProvider>
+        <AppLayoutContent>{children}</AppLayoutContent>
+      </OnboardingProvider>
     </SidebarProvider>
   );
 };
