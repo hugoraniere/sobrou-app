@@ -15,7 +15,7 @@ interface AnchorSearchProps {
 }
 
 const KIND_OPTIONS = [
-  { value: '', label: 'Todos os tipos' },
+  { value: 'all', label: 'Todos os tipos' },
   { value: 'button', label: 'Button' },
   { value: 'input', label: 'Input' },
   { value: 'select', label: 'Select' },
@@ -92,7 +92,7 @@ export const AnchorSearch: React.FC<AnchorSearchProps> = ({
               <SelectValue placeholder="Todas as rotas" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas as rotas</SelectItem>
+              <SelectItem value="all">Todas as rotas</SelectItem>
               {availableRoutes.map((route) => (
                 <SelectItem key={route} value={route}>
                   {route}

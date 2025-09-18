@@ -57,8 +57,8 @@ export const AnchorPickerDrawer: React.FC<AnchorPickerDrawerProps> = ({
   useEffect(() => {
     if (open) {
       search({
-        route: routeFilter || undefined,
-        kind: kindFilter as any || undefined,
+        route: routeFilter && routeFilter !== 'all' ? routeFilter : undefined,
+        kind: kindFilter && kindFilter !== 'all' ? kindFilter as any : undefined,
         query: searchQuery || undefined,
         limit: 50
       });
