@@ -4,6 +4,7 @@ import { KpiCard } from '../widgets/KpiCard';
 import { StackedBarChart, SimplePieChart } from '../widgets/Charts';
 import { DataTable, TableColumn, TableAction } from '../widgets/DataTable';
 import { useSupportMetrics } from '@/hooks/useDashboardMetrics';
+import { useSupportBacklog } from '@/hooks/useRealData';
 
 // Mock backlog data
 const mockBacklogTickets = [
@@ -32,6 +33,7 @@ const mockBacklogTickets = [
 
 export function SupportTab() {
   const supportMetrics = useSupportMetrics();
+  const { data: backlogTickets, isLoading: backlogLoading } = useSupportBacklog(72);
 
   const slaMetrics = [
     {
@@ -177,11 +179,15 @@ export function SupportTab() {
       <DataTable
         title="Backlog (>72h)"
         columns={backlogColumns}
-        data={mockBacklogTickets}
+        data={backlogTickets || []}
         actions={backlogActions}
         pageSize={10}
         emptyMessage="Nenhum ticket em backlog"
-        source="Tickets Database"
+        source="Analytics Events"
+        isLoading={backlogLoading}
+        isError={false}
+        lastUpdated={new Date()}
+        onRefresh={() => window.location.reload()}
       />
     </div>
   );

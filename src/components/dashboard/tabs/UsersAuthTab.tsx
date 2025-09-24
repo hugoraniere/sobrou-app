@@ -2,6 +2,8 @@ import React from 'react';
 import { SimplePieChart, TimeSeriesChart, StackedBarChart } from '../widgets/Charts';
 import { DataTable, TableColumn } from '../widgets/DataTable';
 import { useAuthMetrics } from '@/hooks/useDashboardMetrics';
+import { useRecentSignups, useLoginErrors } from '@/hooks/useRealData';
+import { useDashboardPeriod } from '@/contexts/DashboardDateProvider';
 
 // Mock data for recent signups since we don't have auth.users access
 const mockRecentSignups = [
@@ -19,7 +21,14 @@ const mockLoginErrors = [
 ];
 
 export function UsersAuthTab() {
+  const { dateRange } = useDashboardPeriod();
   const authMetrics = useAuthMetrics();
+  
+  const { data: recentSignups, isLoading: signupsLoading } = useRecentSignups(10);
+  const { data: loginErrors, isLoading: errorsLoading } = useLoginErrors(
+    dateRange.dateFrom.toISOString().split('T')[0],
+    dateRange.dateTo.toISOString().split('T')[0]
+  );
 
   const signupColumns: TableColumn[] = [
     { 

@@ -100,8 +100,11 @@ export function useOverviewMetrics(): MetricsResult<OverviewMetrics> {
       period_days: Math.ceil((new Date(dateTo).getTime() - new Date(dateFrom).getTime()) / (24 * 60 * 60 * 1000))
     });
 
-    // Get support SLA - using fallback for now
-    const slaCompliance = 85.5; // Mock SLA data
+    // Get support SLA from real data
+    const { data: supportMetrics } = await supabase.rpc('get_support_metrics', {
+      date_from: dateFrom,
+      date_to: dateTo
+    });
 
     const metrics = (currentMetrics as any)?.[0] || {
       total_users: 0,
@@ -111,6 +114,8 @@ export function useOverviewMetrics(): MetricsResult<OverviewMetrics> {
       prev_active_users: 0,
       prev_subscribers: 0
     };
+
+    const slaCompliance = (supportMetrics as any)?.sla_compliance || 0;
 
     return {
       totalUsers: metrics.total_users || 0,
@@ -173,8 +178,8 @@ export function useSupportMetrics(): MetricsResult<SupportMetrics> {
     return (data as any) || {
       tickets_by_status: [],
       tickets_by_type: [],
-      sla_compliance: 85.5,
-      avg_first_response_hours: 4.2,
+      sla_compliance: 0,
+      avg_first_response_hours: 0,
       backlog_count: 0
     };
   });

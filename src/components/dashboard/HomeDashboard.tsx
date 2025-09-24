@@ -3,6 +3,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Transaction } from '@/services/transactions';
 import { SavingGoal } from '@/services/SavingsService';
+import { useAuth } from '@/contexts/AuthContext';
+import { useFinancialAlerts, useFinancialRecommendations } from '@/hooks/useRealData';
 import DashboardBigNumbers from './DashboardBigNumbers';
 import DashboardCharts from './DashboardCharts';
 import DashboardInsights from './DashboardInsights';
@@ -10,18 +12,25 @@ import DashboardInsights from './DashboardInsights';
 interface HomeDashboardProps {
   transactions: Transaction[];
   savingGoals: SavingGoal[];
+  isLoading?: boolean;
 }
 
 const HomeDashboard: React.FC<HomeDashboardProps> = ({ 
   transactions,
-  savingGoals
+  savingGoals,
+  isLoading = false
 }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   // Calculate total savings
   const calculateTotalSavings = () => {
     return savingGoals.reduce((sum, goal) => sum + goal.current_amount, 0);
   };
+
+  // Get real alerts and recommendations from Supabase
+  const { data: alerts, isLoading: alertsLoading } = useFinancialAlerts(user?.id);
+  const { data: recommendations, isLoading: recommendationsLoading } = useFinancialRecommendations(user?.id);
 
   // Sample alerts (in real app, these would be calculated based on actual financial data)
   const sampleAlerts = [
@@ -87,8 +96,8 @@ const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Alerts and Recommendations Section */}
       <DashboardInsights 
-        alerts={sampleAlerts}
-        recommendations={sampleRecommendations}
+        alerts={alerts || []}
+        recommendations={recommendations || []}
       />
     </div>
   );

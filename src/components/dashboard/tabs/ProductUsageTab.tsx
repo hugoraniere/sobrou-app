@@ -4,6 +4,8 @@ import { KpiCard } from '../widgets/KpiCard';
 import { TimeSeriesChart } from '../widgets/Charts';
 import { DataTable, TableColumn } from '../widgets/DataTable';
 import { useProductUsageMetrics } from '@/hooks/useDashboardMetrics';
+import { useTopUsersByUsage, useActiveUsersTimeline } from '@/hooks/useRealData';
+import { useDashboardPeriod } from '@/contexts/DashboardDateProvider';
 
 // Mock data for top users by usage
 const mockTopUsers = [
@@ -21,7 +23,18 @@ const mockActiveUsersData = Array.from({ length: 30 }, (_, i) => ({
 }));
 
 export function ProductUsageTab() {
+  const { dateRange } = useDashboardPeriod();
   const productMetrics = useProductUsageMetrics();
+  
+  const { data: topUsers, isLoading: topUsersLoading } = useTopUsersByUsage(
+    dateRange.dateFrom.toISOString().split('T')[0],
+    dateRange.dateTo.toISOString().split('T')[0]
+  );
+  
+  const { data: activeUsersData, isLoading: activeUsersLoading } = useActiveUsersTimeline(
+    dateRange.dateFrom.toISOString().split('T')[0],
+    dateRange.dateTo.toISOString().split('T')[0]
+  );
 
   const usageCards = [
     {
@@ -111,21 +124,25 @@ export function ProductUsageTab() {
       {/* Active Users Over Time */}
       <TimeSeriesChart
         title="Usuários Ativos ao Longo do Tempo"
-        data={mockActiveUsersData}
+        data={activeUsersData || []}
         xAxisKey="date"
         yAxisKey="active_users"
         lineColor="hsl(var(--primary))"
         height={300}
         source="Analytics Events"
+        isLoading={activeUsersLoading}
+        isError={false}
+        lastUpdated={new Date()}
+        onRefresh={() => window.location.reload()}
       />
 
       {/* Top Users by Usage */}
       <DataTable
         title="Top Usuários por Uso"
         columns={topUsersColumns}
-        data={mockTopUsers}
+        data={topUsers || []}
         pageSize={10}
-        emptyMessage="Dados de uso insuficientes"
+        emptyMessage="Nenhum usuário com atividade no período"
         actions={[
           {
             label: 'Ver Perfil',
@@ -134,6 +151,10 @@ export function ProductUsageTab() {
           }
         ]}
         source="Aggregated Data"
+        isLoading={topUsersLoading}
+        isError={false}
+        lastUpdated={new Date()}
+        onRefresh={() => window.location.reload()}
       />
     </div>
   );
