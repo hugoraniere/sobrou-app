@@ -106,14 +106,6 @@ class EnhancedAIService {
       id: crypto.randomUUID()
     };
 
-    // Verificar cache primeiro
-    const cacheKey = this.getCacheKey(request.functionName, request.input);
-    const cachedResult = this.getCachedResult(cacheKey);
-    
-    if (cachedResult) {
-      return Promise.resolve(cachedResult);
-    }
-
     this.batchQueue.push(batchRequest);
     
     // Processar lote se necessário
