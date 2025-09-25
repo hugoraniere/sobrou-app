@@ -15,15 +15,12 @@ import {
   Palette
 } from 'lucide-react';
 import { OnboardingConfigService } from '@/services/OnboardingConfigService';
-import { WelcomeModalEditor } from '@/components/admin/onboarding/WelcomeModalEditor';
-import { StepperEditor } from '@/components/admin/onboarding/StepperEditor';
-import { GeneralSettingsEditor } from '@/components/admin/onboarding/GeneralSettingsEditor';
-import { StepsManager } from '@/components/admin/onboarding/StepsManager';
+import { GetStartedEditor } from '@/components/admin/onboarding/GetStartedEditor';
 import { GetStartedStepper } from '@/components/onboarding/GetStartedStepper';
 import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
 
 const OnboardingAdmin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('welcome');
+  const [activeTab, setActiveTab] = useState('progress');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewType, setPreviewType] = useState<'welcome' | 'stepper'>('welcome');
   const [configs, setConfigs] = useState<any>({});
@@ -73,64 +70,69 @@ const OnboardingAdmin: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="welcome" className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" />
-            Modal
-          </TabsTrigger>
-          <TabsTrigger value="stepper" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="progress" className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
-            Stepper
+            Progress
           </TabsTrigger>
-          <TabsTrigger value="steps" className="flex items-center gap-2">
+          <TabsTrigger value="product-tour" className="flex items-center gap-2 relative">
             <Users className="w-4 h-4" />
-            Passos
+            Product Tour
+            <span className="ml-1 px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full">
+              Em breve
+            </span>
           </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
-            <Palette className="w-4 h-4" />
-            Aparência
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
+          <TabsTrigger value="release-notes" className="flex items-center gap-2 relative">
             <Settings className="w-4 h-4" />
-            Configurações
-          </TabsTrigger>
-          <TabsTrigger value="visibility" className="flex items-center gap-2">
-            <Eye className="w-4 h-4" />
-            Visibilidade
+            Release Notes
+            <span className="ml-1 px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full">
+              Em breve
+            </span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="welcome" className="space-y-4">
-          <WelcomeModalEditor />
+        <TabsContent value="progress" className="space-y-4">
+          <GetStartedEditor />
         </TabsContent>
 
-        <TabsContent value="stepper" className="space-y-4">
-          <StepperEditor />
-        </TabsContent>
-
-        <TabsContent value="steps" className="space-y-4">
-          <StepsManager />
-        </TabsContent>
-
-        <TabsContent value="appearance" className="space-y-4">
+        <TabsContent value="product-tour" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Aparência e Branding</CardTitle>
+              <CardTitle>Product Tour</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Configurações de aparência personalizadas em desenvolvimento...
-              </p>
+              <div className="text-center py-12">
+                <Users className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium mb-2">Product Tour</h3>
+                <p className="text-muted-foreground mb-4">
+                  Configure tours guiados para ajudar novos usuários a descobrir funcionalidades
+                </p>
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-sm">
+                  🚧 Em desenvolvimento
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-4">
-          <GeneralSettingsEditor />
-        </TabsContent>
-
-        <TabsContent value="visibility" className="space-y-4">
-          <VisibilityManager configs={configs} onUpdate={loadAllConfigs} />
+        <TabsContent value="release-notes" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Release Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <Settings className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium mb-2">Release Notes</h3>
+                <p className="text-muted-foreground mb-4">
+                  Gerencie notas de versão e novidades para manter usuários informados
+                </p>
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-sm">
+                  🚧 Em desenvolvimento
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 

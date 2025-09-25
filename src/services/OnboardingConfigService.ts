@@ -122,4 +122,56 @@ export class OnboardingConfigService {
       reset_on_new_users: false
     };
   }
+
+  // Get Get Started config
+  static async getGetStartedConfig() {
+    const config = await this.getConfig('get_started_config');
+    return config?.content || {
+      title: 'Get Started',
+      subtitle: 'Complete estas tarefas para aproveitar melhor o Sobrou',
+      is_enabled: true,
+      show_progress_bar: true,
+      show_minimize_button: true,
+      completion_message: 'Parabéns! Você concluiu todos os passos.'
+    };
+  }
+
+  // Update Get Started config
+  static async updateGetStartedConfig(config: any) {
+    return await this.updateConfig('get_started_config', { content: config });
+  }
+
+  // Get Get Started tasks
+  static async getGetStartedTasks() {
+    const config = await this.getConfig('get_started_tasks');
+    return config?.content || [
+      {
+        id: 'task_1',
+        title: 'Adicionar primeira transação',
+        description: 'Registre sua primeira movimentação financeira',
+        cta_text: 'Ir agora',
+        cta_url: '/transactions',
+        cta_enabled: true,
+        completion_event: 'transaction_created',
+        sort_order: 0,
+        is_active: true
+      },
+      {
+        id: 'task_2',
+        title: 'Criar lista de compras',
+        description: 'Organize suas compras com uma lista',
+        cta_text: 'Criar lista',
+        cta_url: '/shopping-lists',
+        cta_enabled: true,
+        completion_event: 'shopping_list_created',
+        sort_order: 1,
+        is_active: true
+      }
+    ];
+  }
+
+  // Update Get Started tasks
+  static async updateGetStartedTasks(tasks: any[]) {
+    return await this.updateConfig('get_started_tasks', { content: tasks });
+  }
 }
