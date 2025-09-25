@@ -126,3 +126,36 @@
   background-color: hsl(var(--background));
   border: 1px solid hsl(var(--border));
 }
+
+/* Custom styles for ReactQuill */
+.ql-editor {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ql-toolbar {
+  border-top: 1px solid hsl(var(--border));
+  border-left: 1px solid hsl(var(--border));
+  border-right: 1px solid hsl(var(--border));
+  border-bottom: none;
+  background-color: hsl(var(--background));
+}
+
+.ql-container {
+  border-bottom: 1px solid hsl(var(--border));
+  border-left: 1px solid hsl(var(--border));
+  border-right: 1px solid hsl(var(--border));
+  border-top: none;
+  background-color: hsl(var(--background));
+}
+
+.ql-editor.ql-blank::before {
+  color: hsl(var(--muted-foreground));
+  font-style: normal;
+}
+
+/* Brand color for Quill */
+.ql-color .ql-picker-options [data-value="#22c55e"] {
+  background-color: #22c55e !important;
+}

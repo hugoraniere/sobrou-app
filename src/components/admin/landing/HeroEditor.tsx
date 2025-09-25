@@ -8,6 +8,8 @@ import { useLandingPage } from '@/contexts/LandingPageContext';
 import { HeroConfig } from '@/services/landingPageService';
 import { Save, Upload, Trash2, Plus } from 'lucide-react';
 import { toast } from "sonner";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const HeroEditor: React.FC = () => {
   const { getConfig, updateConfig, uploadImage } = useLandingPage();
@@ -53,6 +55,19 @@ const HeroEditor: React.FC = () => {
     }
   };
 
+  // Configuração do ReactQuill
+  const quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline'],
+      [{ 'color': ['#000000', '#22c55e', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16'] }],
+      ['clean']
+    ],
+  };
+
+  const quillFormats = [
+    'bold', 'italic', 'underline', 'color'
+  ];
+
   const addBenefit = () => {
     if (!config) return;
     const newBenefit = {
@@ -90,22 +105,25 @@ const HeroEditor: React.FC = () => {
         <div className="space-y-4">
           <div>
             <Label htmlFor="title">Título Principal</Label>
-            <Input
-              id="title"
+            <ReactQuill
               value={config.title}
-              onChange={(e) => setConfig({ ...config, title: e.target.value })}
-              placeholder="Título da seção hero"
+              onChange={(value) => setConfig({...config, title: value})}
+              modules={quillModules}
+              formats={quillFormats}
+              placeholder="Digite o título principal"
+              style={{ backgroundColor: 'white' }}
             />
           </div>
 
           <div>
             <Label htmlFor="subtitle">Subtítulo</Label>
-            <Textarea
-              id="subtitle"
+            <ReactQuill
               value={config.subtitle}
-              onChange={(e) => setConfig({ ...config, subtitle: e.target.value })}
-              placeholder="Subtítulo descritivo"
-              rows={3}
+              onChange={(value) => setConfig({...config, subtitle: value})}
+              modules={quillModules}
+              formats={quillFormats}
+              placeholder="Digite o subtítulo"
+              style={{ backgroundColor: 'white' }}
             />
           </div>
 

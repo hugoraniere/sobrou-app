@@ -52,12 +52,14 @@ const HeroSection: React.FC = () => {
         {/* Div 1 - Conteúdo */}
         <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start">
           <div className="max-w-2xl mx-auto lg:mx-0">
-            <h1 className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl">
-              {config.title}
-            </h1>
-            <p className="font-alliance text-gray-600 mb-8 text-lg font-light">
-              {config.subtitle}
-            </p>
+            <h1 
+              className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl"
+              dangerouslySetInnerHTML={{ __html: config.title }}
+            />
+            <div 
+              className="font-alliance text-gray-600 mb-8 text-lg font-light"
+              dangerouslySetInnerHTML={{ __html: config.subtitle }}
+            />
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link to={config.cta_url || "/auth"}>
                 <Button size="lg" className="bg-primary hover:bg-primary-hover text-white font-alliance-n2 text-lg px-4 w-full sm:w-auto">
@@ -93,7 +95,7 @@ const HeroSection: React.FC = () => {
           <LazyImage 
             src={config.background_image}
             alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-            className="w-full h-auto object-cover object-center shadow-2xl rounded-lg"
+            className="w-full h-auto object-contain object-center shadow-2xl rounded-lg"
             priority
             width={800}
             height={600}
@@ -102,11 +104,11 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Imagem sangrando para a direita - Apenas desktop */}
-      <div className="hidden lg:block absolute right-0 top-[10%] bottom-[10%] w-1/2 pointer-events-none overflow-hidden">
+      <div className="hidden lg:block absolute right-0 top-[10%] bottom-[10%] w-1/2 pointer-events-none overflow-hidden flex items-center justify-center">
         <LazyImage 
           src={config.background_image}
           alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-          className="h-full w-full object-cover object-left shadow-2xl"
+          className="max-h-full w-auto object-contain object-center shadow-2xl"
           priority
           width={1200}
           height={800}
