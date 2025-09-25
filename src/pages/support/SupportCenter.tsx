@@ -82,7 +82,7 @@ const SupportCenter: React.FC = () => {
 
   if (loading) {
     return (
-      <SupportLayout showSearchAndActions>
+      <SupportLayout showSearchAndActions={false}>
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -91,14 +91,13 @@ const SupportCenter: React.FC = () => {
   }
 
   return (
-    <SupportLayout showSearchAndActions>
-      {/* Search and Actions */}
-      <SupportSearchAndActions 
-        onSearch={handleSearch}
-        className="mb-12"
-      />
-
+    <SupportLayout showSearchAndActions={false}>
       <div className="container mx-auto px-4 pb-12">
+        {/* Search and Actions */}
+        <SupportSearchAndActions 
+          onSearch={handleSearch}
+          className="mb-12"
+        />
 
       {/* Search Results */}
       {searchResults && (

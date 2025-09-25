@@ -104,7 +104,7 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Imagem sangrando para a direita - Apenas desktop */}
-      <div className="hidden lg:block absolute right-0 top-[10%] bottom-[10%] w-1/2 pointer-events-none overflow-hidden flex items-center justify-center">
+      <div className="hidden lg:block absolute right-0 top-[10%] bottom-[10%] w-1/2 pointer-events-none overflow-hidden flex items-center justify-start">
         <LazyImage 
           src={config.background_image}
           alt="Dashboard do Sobrou mostrando controle financeiro completo" 
