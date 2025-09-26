@@ -5,9 +5,15 @@ import { ArrowRight, CheckCircle2, Shield, Smartphone, Zap, Star } from 'lucide-
 import LazyImage from '@/components/ui/LazyImage';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import * as LucideIcons from 'lucide-react';
+import InlineEditableText from '@/components/admin/inline-editor/InlineEditableText';
+import InlineEditableImage from '@/components/admin/inline-editor/InlineEditableImage';
 
-const HeroSection: React.FC = () => {
-  const { getConfig } = useLandingPage();
+interface HeroSectionProps {
+  editMode?: boolean;
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ editMode = false }) => {
+const { getConfig, updateConfig } = useLandingPage();
   const heroConfig = getConfig('hero');
 
   // Fallback data em caso de não carregar a configuração
@@ -46,24 +52,69 @@ const HeroSection: React.FC = () => {
     return <IconComponent className="h-5 w-5 text-primary" />;
   };
 
+  const handleConfigUpdate = async (field: string, value: any) => {
+    if (!editMode) return;
+    const updatedConfig = { ...config, [field]: value };
+    await updateConfig('hero', updatedConfig);
+  };
+
+  const handleBenefitUpdate = async (index: number, field: string, value: string) => {
+    if (!editMode) return;
+    const updatedBenefits = [...config.benefits];
+    updatedBenefits[index] = { ...updatedBenefits[index], [field]: value };
+    const updatedConfig = { ...config, benefits: updatedBenefits };
+    await updateConfig('hero', updatedConfig);
+  };
+
   return (
     <section id="hero" className="w-full lg:h-[90vh] py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center relative">
       <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-16 overflow-visible">
         {/* Div 1 - Conteúdo */}
         <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start">
           <div className="max-w-2xl mx-auto lg:mx-0">
-            <h1 
-              className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl"
-              dangerouslySetInnerHTML={{ __html: config.title }}
-            />
-            <div 
-              className="font-alliance text-gray-600 mb-8 text-lg font-light"
-              dangerouslySetInnerHTML={{ __html: config.subtitle }}
-            />
+            {editMode ? (
+              <InlineEditableText
+                value={config.title}
+                onChange={(value) => handleConfigUpdate('title', value)}
+                element="h1"
+                className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl"
+                placeholder="Digite o título principal"
+              />
+            ) : (
+              <h1 
+                className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl"
+                dangerouslySetInnerHTML={{ __html: config.title }}
+              />
+            )}
+            
+            {editMode ? (
+              <InlineEditableText
+                value={config.subtitle}
+                onChange={(value) => handleConfigUpdate('subtitle', value)}
+                element="div"
+                className="font-alliance text-gray-600 mb-8 text-lg font-light"
+                placeholder="Digite o subtítulo"
+                multiline
+              />
+            ) : (
+              <div 
+                className="font-alliance text-gray-600 mb-8 text-lg font-light"
+                dangerouslySetInnerHTML={{ __html: config.subtitle }}
+              />
+            )}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link to={config.cta_url || "/auth"}>
                 <Button size="lg" className="bg-primary hover:bg-primary-hover text-white font-alliance-n2 text-lg px-4 w-full sm:w-auto">
-                  {config.cta_text}
+                  {editMode ? (
+                    <InlineEditableText
+                      value={config.cta_text}
+                      onChange={(value) => handleConfigUpdate('cta_text', value)}
+                      element="span"
+                      placeholder="Texto do botão"
+                    />
+                  ) : (
+                    config.cta_text
+                  )}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -81,8 +132,28 @@ const HeroSection: React.FC = () => {
                     {renderIcon(benefit.icon)}
                   </div>
                   <div className="text-left">
-                    <span className="font-alliance text-sm font-medium text-gray-900 block">{benefit.title}</span>
-                    <span className="font-alliance text-xs text-gray-600">{benefit.description}</span>
+                    {editMode ? (
+                      <InlineEditableText
+                        value={benefit.title}
+                        onChange={(value) => handleBenefitUpdate(index, 'title', value)}
+                        element="span"
+                        className="font-alliance text-sm font-medium text-gray-900 block"
+                        placeholder="Título do benefício"
+                      />
+                    ) : (
+                      <span className="font-alliance text-sm font-medium text-gray-900 block">{benefit.title}</span>
+                    )}
+                    {editMode ? (
+                      <InlineEditableText
+                        value={benefit.description}
+                        onChange={(value) => handleBenefitUpdate(index, 'description', value)}
+                        element="span"
+                        className="font-alliance text-xs text-gray-600"
+                        placeholder="Descrição do benefício"
+                      />
+                    ) : (
+                      <span className="font-alliance text-xs text-gray-600">{benefit.description}</span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -92,27 +163,47 @@ const HeroSection: React.FC = () => {
 
         {/* Div 2 - Imagem - Normal em mobile */}
         <div className="lg:hidden">
-          <LazyImage 
-            src={config.background_image}
-            alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-            className="w-full h-auto object-contain object-center shadow-2xl rounded-lg"
-            priority
-            width={800}
-            height={600}
-          />
+          {editMode ? (
+            <InlineEditableImage
+              src={config.background_image}
+              alt="Dashboard do Sobrou mostrando controle financeiro completo"
+              onImageChange={(src) => handleConfigUpdate('background_image', src)}
+              section="hero"
+              className="w-full h-auto object-contain object-center shadow-2xl rounded-lg"
+            />
+          ) : (
+            <LazyImage 
+              src={config.background_image}
+              alt="Dashboard do Sobrou mostrando controle financeiro completo" 
+              className="w-full h-auto object-contain object-center shadow-2xl rounded-lg"
+              priority
+              width={800}
+              height={600}
+            />
+          )}
         </div>
       </div>
 
       {/* Imagem sangrando para a direita - Apenas desktop */}
       <div className="hidden lg:block absolute right-0 top-[10%] bottom-[10%] w-1/2 pointer-events-none overflow-hidden flex items-center justify-start">
-        <LazyImage 
-          src={config.background_image}
-          alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-          className="max-h-full w-auto object-contain object-center shadow-2xl"
-          priority
-          width={1200}
-          height={800}
-        />
+        {editMode ? (
+          <InlineEditableImage
+            src={config.background_image}
+            alt="Dashboard do Sobrou mostrando controle financeiro completo"
+            onImageChange={(src) => handleConfigUpdate('background_image', src)}
+            section="hero"
+            className="max-h-full w-auto object-contain object-center shadow-2xl"
+          />
+        ) : (
+          <LazyImage 
+            src={config.background_image}
+            alt="Dashboard do Sobrou mostrando controle financeiro completo" 
+            className="max-h-full w-auto object-contain object-center shadow-2xl"
+            priority
+            width={1200}
+            height={800}
+          />
+        )}
       </div>
     </section>
   );

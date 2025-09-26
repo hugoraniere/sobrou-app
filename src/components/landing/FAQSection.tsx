@@ -6,9 +6,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLandingPage } from '@/contexts/LandingPageContext';
+import InlineEditableText from '@/components/admin/inline-editor/InlineEditableText';
 
-const FAQSection: React.FC = () => {
-  const { getConfig } = useLandingPage();
+interface FAQSectionProps {
+  editMode?: boolean;
+}
+
+const FAQSection: React.FC<FAQSectionProps> = ({ editMode = false }) => {
+  const { getConfig, updateConfig } = useLandingPage();
   const faqConfig = getConfig('faq');
 
   // Fallback data em caso de não carregar a configuração
@@ -48,16 +53,42 @@ const FAQSection: React.FC = () => {
     return null;
   }
 
+  const handleConfigUpdate = async (field: string, value: any) => {
+    if (!editMode) return;
+    const updatedConfig = { ...config, [field]: value };
+    await updateConfig('faq', updatedConfig);
+  };
+
   return (
     <section id="faq" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {config.title}
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            {config.subtitle}
-          </p>
+          {editMode ? (
+            <InlineEditableText
+              value={config.title}
+              onChange={(value) => handleConfigUpdate('title', value)}
+              element="h2"
+              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+              placeholder="Título da FAQ"
+            />
+          ) : (
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {config.title}
+            </h2>
+          )}
+          {editMode ? (
+            <InlineEditableText
+              value={config.subtitle}
+              onChange={(value) => handleConfigUpdate('subtitle', value)}
+              element="p"
+              className="text-xl text-gray-600 max-w-2xl mx-auto"
+              placeholder="Subtítulo da FAQ"
+            />
+          ) : (
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              {config.subtitle}
+            </p>
+          )}
         </div>
         
         <div className="max-w-3xl mx-auto">

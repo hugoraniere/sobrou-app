@@ -1,7 +1,12 @@
 import React from 'react';
 import { BarChart3, Calendar, Receipt, Target, Calculator } from 'lucide-react';
+import InlineEditableText from '@/components/admin/inline-editor/InlineEditableText';
 
-const ModuleTourSection: React.FC = () => {
+interface ModuleTourSectionProps {
+  editMode?: boolean;
+}
+
+const ModuleTourSection: React.FC<ModuleTourSectionProps> = ({ editMode = false }) => {
   const modules = [
     {
       icon: BarChart3,
@@ -45,12 +50,32 @@ const ModuleTourSection: React.FC = () => {
     <section id="modulos" className="w-full py-16 sm:py-20 lg:py-24 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Módulos completos para seu negócio
-          </h2>
-          <p className="text-lg max-w-2xl mx-auto">
-            Todas as ferramentas que você precisa para gerenciar suas finanças pessoais ou empresariais
-          </p>
+          {editMode ? (
+            <InlineEditableText
+              value="Módulos completos para seu negócio"
+              onChange={() => {}} // Static content for now
+              element="h2"
+              className="text-3xl md:text-4xl font-bold mb-4"
+              placeholder="Título da seção"
+            />
+          ) : (
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Módulos completos para seu negócio
+            </h2>
+          )}
+          {editMode ? (
+            <InlineEditableText
+              value="Todas as ferramentas que você precisa para gerenciar suas finanças pessoais ou empresariais"
+              onChange={() => {}} // Static content for now
+              element="p"
+              className="text-lg max-w-2xl mx-auto"
+              placeholder="Subtítulo da seção"
+            />
+          ) : (
+            <p className="text-lg max-w-2xl mx-auto">
+              Todas as ferramentas que você precisa para gerenciar suas finanças pessoais ou empresariais
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

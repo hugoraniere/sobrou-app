@@ -11,10 +11,9 @@ import {
   HelpCircle, 
   Megaphone 
 } from 'lucide-react';
-import type { SectionData } from '@/pages/admin/VisualLandingPageEditor';
 
 interface SectionSelectorProps {
-  sections: SectionData[];
+  sections: any[];
   selectedSection: string;
   onSectionSelect: (sectionKey: string) => void;
 }

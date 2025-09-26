@@ -11,11 +11,10 @@ import FAQEditor from '@/components/admin/landing/FAQEditor';
 import CtaEditor from '@/components/admin/landing/CtaEditor';
 import SectionVisibilityManager from '@/components/admin/landing/SectionVisibilityManager';
 import { Settings, Eye, EyeOff } from 'lucide-react';
-import type { SectionData } from '@/pages/admin/VisualLandingPageEditor';
 
 interface ContextualEditorProps {
   selectedSection: string;
-  sections: SectionData[];
+  sections: any[];
   onConfigChange: () => void;
 }
 

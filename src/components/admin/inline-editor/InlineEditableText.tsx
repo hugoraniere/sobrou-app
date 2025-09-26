@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import FormattingToolbar from './FormattingToolbar';
 
@@ -9,8 +9,20 @@ interface InlineEditableTextProps {
   className?: string;
   placeholder?: string;
   multiline?: boolean;
-  element?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
+  element?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div';
 }
+
+// Debounce hook
+const useDebounce = (callback: Function, delay: number) => {
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  
+  return useCallback((...args: any[]) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => callback(...args), delay);
+  }, [callback, delay]);
+};
 
 const InlineEditableText: React.FC<InlineEditableTextProps> = ({
   children,
@@ -23,9 +35,21 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
+  const [currentValue, setCurrentValue] = useState(value);
   const [selection, setSelection] = useState<Selection | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const Element = element as any;
+
+  // Debounced save
+  const debouncedSave = useDebounce((newValue: string) => {
+    if (newValue !== value) {
+      onChange(newValue);
+    }
+  }, 500);
+
+  useEffect(() => {
+    setCurrentValue(value);
+  }, [value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -49,6 +73,7 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
       setTimeout(() => {
         if (contentRef.current) {
           contentRef.current.focus();
+          // Select all text
           const range = document.createRange();
           range.selectNodeContents(contentRef.current);
           const sel = window.getSelection();
@@ -64,9 +89,16 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
     setShowToolbar(false);
     if (contentRef.current) {
       const newValue = contentRef.current.textContent || '';
-      if (newValue !== value) {
-        onChange(newValue);
-      }
+      setCurrentValue(newValue);
+      debouncedSave(newValue);
+    }
+  };
+
+  const handleInput = () => {
+    if (contentRef.current) {
+      const newValue = contentRef.current.textContent || '';
+      setCurrentValue(newValue);
+      debouncedSave(newValue);
     }
   };
 
@@ -91,9 +123,21 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
   };
 
   const applyFormatting = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
+    if (command === 'foreColor') {
+      // Modern approach for color
+      document.execCommand(command, false, value);
+    } else if (command === 'fontSize') {
+      document.execCommand(command, false, value);
+    } else {
+      document.execCommand(command, false, value);
+    }
+    
     if (contentRef.current) {
       contentRef.current.focus();
+      // Update value after formatting
+      const newValue = contentRef.current.innerHTML;
+      setCurrentValue(newValue);
+      debouncedSave(newValue);
     }
   };
 
@@ -106,14 +150,15 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
           suppressContentEditableWarning
           className={cn(
             'outline-none border-2 border-primary/50 rounded-md px-2 py-1 bg-background/80 backdrop-blur-sm',
-            'focus:border-primary transition-colors duration-200',
+            'focus:border-primary transition-colors duration-200 min-h-[2em]',
             className
           )}
           onBlur={handleBlur}
+          onInput={handleInput}
           onKeyDown={handleKeyDown}
           onMouseUp={handleSelect}
           onKeyUp={handleSelect}
-          dangerouslySetInnerHTML={{ __html: value }}
+          dangerouslySetInnerHTML={{ __html: currentValue }}
         />
         
         {showToolbar && selection && (
@@ -131,12 +176,12 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
     <Element
       className={cn(
         'cursor-pointer hover:bg-accent/20 hover:outline hover:outline-2 hover:outline-primary/30 rounded-md transition-all duration-200',
-        'relative group',
+        'relative group min-h-[2em]',
         className
       )}
       onClick={handleClick}
     >
-      {value || (
+      {currentValue || (
         <span className="text-muted-foreground italic">
           {placeholder}
         </span>

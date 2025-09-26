@@ -9,7 +9,6 @@ import AutomationAISection from '@/components/landing/AutomationAISection';
 import SecurityPrivacySection from '@/components/landing/SecurityPrivacySection';
 import FAQSection from '@/components/landing/FAQSection';
 import CtaSection from '@/components/landing/CtaSection';
-import type { SectionData } from '@/pages/admin/VisualLandingPageEditor';
 
 type ViewportSize = 'desktop' | 'tablet' | 'mobile';
 
@@ -17,7 +16,7 @@ interface LandingPagePreviewProps {
   selectedSection: string;
   onSectionSelect: (sectionKey: string) => void;
   viewportSize: ViewportSize;
-  sections: SectionData[];
+  sections: any[];
 }
 
 const LandingPagePreview: React.FC<LandingPagePreviewProps> = ({
