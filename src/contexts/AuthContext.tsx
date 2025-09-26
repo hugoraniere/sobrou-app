@@ -16,7 +16,7 @@ export interface UserProfile {
   };
 }
 
-type AuthContextType = {
+export type AuthContextType = {
   user: UserProfile | null;
   session: Session | null;
   isAuthenticated: boolean;
@@ -28,7 +28,7 @@ type AuthContextType = {
   logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -281,6 +281,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
+    // During development, provide more helpful debugging
+    console.error('useAuth must be used within an AuthProvider. Component tree:', {
+      pathname: window.location.pathname,
+      timestamp: new Date().toISOString()
+    });
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
