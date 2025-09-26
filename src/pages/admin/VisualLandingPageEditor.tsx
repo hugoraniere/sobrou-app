@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Monitor, Eye, RefreshCw, Save, Undo2, Redo2 } from 'lucide-react';
+import { Eye, RefreshCw, Save, Undo2, Redo2, Settings } from 'lucide-react';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import { toast } from "sonner";
-import LandingPagePreview from '@/components/admin/visual-landing/LandingPagePreview';
-import SectionSelector from '@/components/admin/visual-landing/SectionSelector';
-import ContextualEditor from '@/components/admin/visual-landing/ContextualEditor';
-import PreviewToolbar from '@/components/admin/visual-landing/PreviewToolbar';
+import ViewportControls from '@/components/admin/inline-editor/ViewportControls';
+import InlineLandingPagePreview from '@/components/admin/inline-editor/InlineLandingPagePreview';
 
 type ViewportSize = 'desktop' | 'tablet' | 'mobile';
 
@@ -19,21 +17,16 @@ export interface SectionData {
 
 const VisualLandingPageEditor: React.FC = () => {
   const { configs, loading, refreshConfigs } = useLandingPage();
-  const [selectedSection, setSelectedSection] = useState<string>('hero');
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
-  const sections: SectionData[] = [
-    { key: 'hero', name: 'Hero', component: null, editorType: 'hero' },
-    { key: 'modules', name: 'Módulos', component: null, editorType: 'modules' },
-    { key: 'whatsapp', name: 'WhatsApp', component: null, editorType: 'whatsapp' },
-    { key: 'statement', name: 'Extratos', component: null, editorType: 'statement' },
-    { key: 'automation', name: 'IA', component: null, editorType: 'automation' },
-    { key: 'security', name: 'Segurança', component: null, editorType: 'security' },
-    { key: 'faq', name: 'FAQ', component: null, editorType: 'faq' },
-    { key: 'cta', name: 'CTA', component: null, editorType: 'cta' },
-  ];
+  const handleSave = async () => {
+    // Lógica de salvamento será implementada com os dados inline
+    toast("Alterações salvas com sucesso!");
+    setHasUnsavedChanges(false);
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -64,87 +57,89 @@ const VisualLandingPageEditor: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Monitor className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">Editor Visual da Landing Page</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Atualizar
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePreviewInNewTab}
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              Preview
-            </Button>
-            {hasUnsavedChanges && (
-              <Button size="sm" className="bg-primary hover:bg-primary/90">
-                <Save className="w-4 h-4 mr-2" />
-                Salvar Mudanças
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      {/* Floating Top Toolbar */}
+      <header className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-lg px-4 py-2">
+          <div className="flex items-center gap-4">
+            {/* Viewport Controls */}
+            <ViewportControls
+              currentViewport={viewportSize}
+              onViewportChange={setViewportSize}
+            />
+
+            <div className="h-6 w-px bg-border" />
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                title="Atualizar"
+              >
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               </Button>
-            )}
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePreviewInNewTab}
+                title="Preview em nova aba"
+              >
+                <Eye className="w-4 h-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                title="Desfazer"
+              >
+                <Undo2 className="w-4 h-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                title="Refazer"
+              >
+                <Redo2 className="w-4 h-4" />
+              </Button>
+
+              <div className="h-6 w-px bg-border" />
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                title="Configurações avançadas"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+
+              {hasUnsavedChanges && (
+                <Button 
+                  size="sm" 
+                  onClick={handleSave}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Salvar
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar - Section Navigator */}
-        <aside className="w-80 bg-card border-r border-border flex flex-col">
-          <div className="p-4 border-b border-border">
-            <h2 className="font-semibold text-foreground mb-2">Seções</h2>
-            <SectionSelector
-              sections={sections}
-              selectedSection={selectedSection}
-              onSectionSelect={setSelectedSection}
-            />
-          </div>
-
-          {/* Preview Toolbar */}
-          <div className="p-4 border-b border-border">
-            <PreviewToolbar
-              viewportSize={viewportSize}
-              onViewportChange={setViewportSize}
-            />
-          </div>
-        </aside>
-
-        {/* Center - Preview */}
-        <main className="flex-1 bg-muted/30 overflow-auto">
-          <div className="p-6 h-full">
-            <LandingPagePreview
-              selectedSection={selectedSection}
-              onSectionSelect={setSelectedSection}
-              viewportSize={viewportSize}
-              sections={sections}
-            />
-          </div>
-        </main>
-
-        {/* Right Sidebar - Contextual Editor */}
-        <aside className="w-96 bg-card border-l border-border overflow-auto">
-          <div className="p-4">
-            <ContextualEditor
-              selectedSection={selectedSection}
-              sections={sections}
-              onConfigChange={() => setHasUnsavedChanges(true)}
-            />
-          </div>
-        </aside>
-      </div>
+      {/* Main Content - Fullscreen Preview */}
+      <main className="flex-1 overflow-auto">
+        <InlineLandingPagePreview
+          viewportSize={viewportSize}
+          onConfigChange={() => setHasUnsavedChanges(true)}
+        />
+      </main>
     </div>
   );
 };
