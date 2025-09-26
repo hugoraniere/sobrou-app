@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { ProductTourStep, UserTourProgress, TourEvent, TourSettings, TourEventType } from "@/types/product-tour";
+import { ProductTourStep, UserTourProgress, TourEvent, TourSettings, TourEventType, TourConfig } from "@/types/product-tour";
 
 export class ProductTourService {
   
@@ -170,6 +170,37 @@ export class ProductTourService {
   }
 
   // Check if user should start tour automatically
+  // Update tour configuration
+  static async updateTourConfig(config: Partial<TourConfig>): Promise<void> {
+    const { error } = await supabase
+      .from('tour_settings')
+      .upsert([
+        {
+          setting_key: 'tour_config',
+          setting_value: config,
+          is_active: true
+        }
+      ]);
+
+    if (error) throw error;
+  }
+
+  // Update individual tour step
+  static async updateTourStep(stepId: string, updates: Partial<ProductTourStep>): Promise<ProductTourStep> {
+    const { data, error } = await supabase
+      .from('product_tour_steps')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', stepId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as ProductTourStep;
+  }
+
   static async shouldAutoStartTour(userId: string): Promise<boolean> {
     try {
       const settings = await this.getTourSettings();

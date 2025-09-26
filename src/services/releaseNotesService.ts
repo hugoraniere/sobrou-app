@@ -10,6 +10,7 @@ export interface ReleaseNote {
   size: 'small' | 'medium' | 'large';
   cta_text?: string;
   cta_url?: string;
+  cta_action?: 'open_link' | 'close';
   secondary_button_text: string;
   secondary_button_action: 'close' | 'custom_link';
   secondary_button_url?: string;

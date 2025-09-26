@@ -36,7 +36,7 @@ import AdminContent from "./pages/AdminContent";
 import AdminSupport from "./pages/AdminSupport";
 import AdminLandingPage from "./pages/admin/VisualLandingPageEditor";
 import AdminUsers from "./pages/AdminUsers";
-import OnboardingAdmin from "./pages/admin/OnboardingAdmin";
+import OnboardingManager from "./pages/admin/OnboardingManager";
 import DesignSystem from "./pages/admin/DesignSystem";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Gallery from "./pages/admin/Gallery";
@@ -143,16 +143,16 @@ const App = () => {
                                </ProtectedRoute>
                              } 
                            />
-                           <Route 
-                             path="/admin/onboarding" 
-                             element={
-                               <ProtectedRoute>
-                                 <AdminLayout>
-                                   <OnboardingAdmin />
-                                 </AdminLayout>
-                               </ProtectedRoute>
-                             } 
-                           />
+        <Route 
+          path="/admin/onboarding" 
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <OnboardingManager />
+              </AdminLayout>
+            </ProtectedRoute>
+          } 
+        />
                            <Route 
                              path="/admin/users" 
                              element={

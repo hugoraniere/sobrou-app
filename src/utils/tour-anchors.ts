@@ -3,7 +3,7 @@ export type TourAnchor = {
   label: string;           // humano: 'Nova transação'
   selector: string;        // preferir [data-tour-id="..."]; fallback: #id, .class
   description?: string;    // explicação breve pro tour
-  action?: 'click'|'hover'|'none';
+  action?: 'click'|'hover'|'none'|'highlight';
   visibleWhen?: string;    // condição simples (ex: 'lista>0', 'adminOnly', etc.)
   scrollOffset?: number;   // px para ajustar spotlight
 };
@@ -11,6 +11,32 @@ export type TourAnchor = {
 export type TourAnchorsManifest = Record<string /*routeKey*/, TourAnchor[]>;
 
 export const tourAnchorsManifest: TourAnchorsManifest = {
+  '/': [
+    {
+      id: 'main-navigation',
+      label: 'Menu Principal',
+      selector: '[data-tour-id="main-navigation"]',
+      description: 'Menu de navegação principal do sistema',
+      action: 'highlight',
+      scrollOffset: -100
+    },
+    {
+      id: 'welcome-banner',
+      label: 'Banner de Boas-vindas',
+      selector: '[data-tour-id="welcome-banner"]',
+      description: 'Banner principal de boas-vindas na dashboard',
+      action: 'highlight',
+      scrollOffset: -100
+    },
+    {
+      id: 'quick-stats',
+      label: 'Estatísticas Rápidas',
+      selector: '[data-tour-id="quick-stats"]',
+      description: 'Cards com estatísticas financeiras resumidas',
+      action: 'highlight',
+      scrollOffset: -50
+    }
+  ],
   dashboard: [
     {
       id: 'dashboard.header.add-transaction-btn',
