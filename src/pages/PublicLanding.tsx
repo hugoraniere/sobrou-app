@@ -1,6 +1,6 @@
 import React from 'react';
 import { LandingPageProvider } from '@/contexts/LandingPageContext';
-import TransparentHeader from '../components/header/TransparentHeader';
+import SiteNavbar from '../components/navigation/SiteNavbar';
 import HeroSection from '../components/landing/HeroSection';
 import ModuleTourSection from '../components/landing/ModuleTourSection';
 import WhatsAppVoiceSection from '../components/landing/WhatsAppVoiceSection';
@@ -15,7 +15,7 @@ const PublicLanding: React.FC = () => {
   return (
     <div className="bg-background min-h-screen">
       <LandingPageProvider>
-        <TransparentHeader />
+        <SiteNavbar />
 
         <main>
           <HeroSection />

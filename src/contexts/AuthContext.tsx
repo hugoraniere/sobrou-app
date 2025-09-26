@@ -128,15 +128,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const strictlyPublicRoutes = ['/auth'];
     
     // Rotas que são acessíveis tanto para usuários autenticados quanto não autenticados
-    const publicAccessibleRoutes = ['/reset-password', '/erro'];
+    const publicAccessibleRoutes = ['/reset-password', '/erro', '/blog', '/suporte'];
     
     // Verificamos se o usuário está na página de autenticação e já está autenticado
     const isOnStrictlyPublicRoute = strictlyPublicRoutes.includes(location.pathname);
     const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
+    const isOnRootRoute = location.pathname === '/';
     
     // Se o usuário está autenticado e tem um redirect, redirecionamos para lá
     if (isAuthenticated && isOnStrictlyPublicRoute && redirectTo) {
       navigate(redirectTo, { replace: true });
+    }
+    // Redireciona usuários autenticados da página inicial para o dashboard
+    else if (isAuthenticated && isOnRootRoute) {
+      navigate('/dashboard', { replace: true });
     }
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
     // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
