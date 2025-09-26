@@ -8,7 +8,7 @@ import { useAdminNavigationPages } from '@/hooks/useAdminNavigationPages';
 export function AdminSidebar() {
   const location = useLocation();
   const { state, toggleSidebar } = useSidebar();
-  const { adminPages } = useAdminNavigationPages();
+  const { adminGroups } = useAdminNavigationPages();
   const isExpanded = state === 'expanded';
 
   const isActivePath = (path: string) => {
@@ -41,39 +41,61 @@ export function AdminSidebar() {
       </div>
 
       {/* Menu items */}
-      <nav className="flex-1">
-        <div className="space-y-1 py-2">
-          {adminPages.map((item) => {
-            const isActive = isActivePath(item.url);
-            return (
-              <Link
-                key={item.title}
-                to={item.url}
-                className={cn(
-                  "flex items-center transition-all duration-200 group relative mx-1",
-                  isExpanded ? "px-3 py-3 rounded-xl" : "px-3 py-3 justify-center rounded-xl",
-                  isActive 
-                    ? "bg-primary text-white shadow-sm" 
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                )}
-                title={!isExpanded ? item.title : undefined}
-              >
-                <item.icon className={cn("h-5 w-5 flex-shrink-0", isExpanded && "mr-3")} />
-                {isExpanded && (
-                  <span className="font-medium text-sm whitespace-nowrap">
-                    {item.title}
-                  </span>
-                )}
-                
-                {/* Tooltip for collapsed state */}
-                {!isExpanded && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                    {item.title}
+      <nav className="flex-1 overflow-y-auto">
+        <div className="py-2 space-y-4">
+          {adminGroups.map((group, groupIndex) => (
+            <div key={group.label}>
+              {/* Group label */}
+              {isExpanded && (
+                <div className="px-3 mb-2">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                    <span>{group.emoji}</span>
+                    <span>{group.label}</span>
                   </div>
-                )}
-              </Link>
-            );
-          })}
+                </div>
+              )}
+              
+              {/* Group items */}
+              <div className="space-y-1 px-1">
+                {group.pages.map((item) => {
+                  const isActive = isActivePath(item.url);
+                  return (
+                    <Link
+                      key={item.title}
+                      to={item.url}
+                      className={cn(
+                        "flex items-center transition-all duration-200 group relative",
+                        isExpanded ? "px-3 py-2.5 rounded-lg" : "px-3 py-2.5 justify-center rounded-lg",
+                        isActive 
+                          ? "bg-primary text-white shadow-sm" 
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                      title={!isExpanded ? item.title : undefined}
+                    >
+                      <item.icon className={cn("h-4 w-4 flex-shrink-0", isExpanded && "mr-3")} />
+                      {isExpanded && (
+                        <span className="font-medium text-sm whitespace-nowrap">
+                          {item.title}
+                        </span>
+                      )}
+                      
+                      {/* Tooltip for collapsed state */}
+                      {!isExpanded && (
+                        <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                          {item.title}
+                        </div>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+              
+              {/* Divider between groups (except last) */}
+              {groupIndex < adminGroups.length - 1 && (
+                <div className="mx-3 mt-4 border-t border-gray-100"></div>
+              )}
+            </div>
+          ))}
         </div>
       </nav>
     </div>

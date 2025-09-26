@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { galleryService, GalleryImage } from '@/services/galleryService';
+import { ImagePreviewModal } from '@/components/admin/ImagePreviewModal';
 import { 
   Upload, 
   Search, 
@@ -16,7 +17,7 @@ import {
   Image as ImageIcon,
   Loader2,
   AlertCircle,
-  ExternalLink
+  Eye
 } from 'lucide-react';
 
 const Gallery: React.FC = () => {
@@ -29,6 +30,8 @@ const Gallery: React.FC = () => {
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [newFileName, setNewFileName] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewImageIndex, setPreviewImageIndex] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -190,6 +193,11 @@ const Gallery: React.FC = () => {
     setRenameModalOpen(true);
   };
 
+  const openPreviewModal = (imageIndex: number) => {
+    setPreviewImageIndex(imageIndex);
+    setIsPreviewModalOpen(true);
+  };
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
@@ -329,7 +337,7 @@ const Gallery: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredImages.map((image) => (
+              {filteredImages.map((image, index) => (
                 <Card key={image.id} className="group overflow-hidden">
                   <div className="relative aspect-square">
                     <img
@@ -343,9 +351,9 @@ const Gallery: React.FC = () => {
                       <Button
                         size="icon"
                         variant="secondary"
-                        onClick={() => window.open(image.publicUrl, '_blank')}
+                        onClick={() => openPreviewModal(index)}
                       >
-                        <ExternalLink className="w-4 h-4" />
+                        <Eye className="w-4 h-4" />
                       </Button>
                       <Button
                         size="icon"
@@ -441,6 +449,15 @@ const Gallery: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Image Preview Modal */}
+      <ImagePreviewModal
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        images={filteredImages}
+        currentIndex={previewImageIndex}
+        onNavigate={setPreviewImageIndex}
+      />
     </div>
   );
 };

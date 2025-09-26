@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { LayoutDashboard, FileText, Users, MessageSquare, Monitor, Images, Settings, Palette } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, MessageSquare, Monitor, Images, Flag, Palette } from 'lucide-react';
 
 export interface AdminNavigationPage {
   title: string;
@@ -7,51 +7,87 @@ export interface AdminNavigationPage {
   icon: React.ComponentType<any>;
 }
 
+export interface AdminNavigationGroup {
+  label: string;
+  emoji: string;
+  pages: AdminNavigationPage[];
+}
+
 export const useAdminNavigationPages = () => {
-  const adminPages: AdminNavigationPage[] = useMemo(() => [
+  const adminGroups: AdminNavigationGroup[] = useMemo(() => [
     {
-      title: 'Dashboard',
-      url: '/admin/dashboard',
-      icon: LayoutDashboard,
+      label: 'Administração',
+      emoji: '📊',
+      pages: [
+        {
+          title: 'Dashboard',
+          url: '/admin/dashboard',
+          icon: LayoutDashboard,
+        },
+        {
+          title: 'Gerenciar Usuários',
+          url: '/admin/users',
+          icon: Users,
+        },
+      ],
     },
     {
-      title: 'Landing Page',
-      url: '/admin/landing',
-      icon: Monitor,
+      label: 'Conteúdo',
+      emoji: '📚',
+      pages: [
+        {
+          title: 'Gerenciar Conteúdo',
+          url: '/admin/content',
+          icon: FileText,
+        },
+        {
+          title: 'Galeria',
+          url: '/admin/gallery',
+          icon: Images,
+        },
+      ],
     },
     {
-      title: 'Gerenciar Conteúdo',
-      url: '/admin/content',
-      icon: FileText,
+      label: 'Suporte e Experiência',
+      emoji: '🛠️',
+      pages: [
+        {
+          title: 'Central de Ajuda',
+          url: '/admin/support',
+          icon: MessageSquare,
+        },
+        {
+          title: 'Onboarding',
+          url: '/admin/onboarding',
+          icon: Flag,
+        },
+      ],
     },
     {
-      title: 'Central de Ajuda',
-      url: '/admin/support',
-      icon: MessageSquare,
-    },
-    {
-      title: 'Galeria',
-      url: '/admin/gallery',
-      icon: Images,
-    },
-    {
-      title: 'Onboarding',
-      url: '/admin/onboarding',
-      icon: Settings,
-    },
-    {
-      title: 'Design System',
-      url: '/admin/design-system',
-      icon: Palette,
-    },
-    {
-      title: 'Gerenciar Usuários',
-      url: '/admin/users',
-      icon: Users,
+      label: 'Configuração e Design',
+      emoji: '🎨',
+      pages: [
+        {
+          title: 'Landing Page',
+          url: '/admin/landing',
+          icon: Monitor,
+        },
+        {
+          title: 'Design System',
+          url: '/admin/design-system',
+          icon: Palette,
+        },
+      ],
     },
   ], []);
 
+  // Flatten groups to maintain backward compatibility
+  const adminPages: AdminNavigationPage[] = useMemo(() => 
+    adminGroups.flatMap(group => group.pages), [adminGroups]
+  );
+
   return {
     adminPages,
+    adminGroups,
   };
 };
