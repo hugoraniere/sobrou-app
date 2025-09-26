@@ -37,9 +37,10 @@ type ResetPasswordFormValues = { email: string };
 
 interface LoginFormProps {
   setActiveTab: (tab: string) => void;
+  redirectTo?: string;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab, redirectTo }) => {
   const { login, requestPasswordReset, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
@@ -66,7 +67,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
   const onSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true);
-      await login(values.email, values.password);
+      await login(values.email, values.password, redirectTo);
     } catch (error: any) {
       toast.error(error.message);
     } finally {

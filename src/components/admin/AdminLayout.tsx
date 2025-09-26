@@ -71,7 +71,7 @@ interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={true}>
       <AdminLayoutContent>{children}</AdminLayoutContent>
     </SidebarProvider>
   );

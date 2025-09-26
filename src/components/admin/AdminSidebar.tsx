@@ -10,6 +10,10 @@ export function AdminSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const { adminGroups } = useAdminNavigationPages();
   const isExpanded = state === 'expanded';
+  
+  // Temporary debug logs
+  console.log('AdminSidebar - Total groups:', adminGroups.length);
+  console.log('AdminSidebar - Total pages:', adminGroups.reduce((acc, group) => acc + group.pages.length, 0));
 
   const isActivePath = (path: string) => {
     return location.pathname === path;
