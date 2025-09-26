@@ -6,9 +6,13 @@ export interface ReleaseNote {
   title: string;
   description?: string;
   image_url?: string;
+  image_position: 'left' | 'center' | 'right';
   size: 'small' | 'medium' | 'large';
   cta_text?: string;
   cta_url?: string;
+  secondary_button_text: string;
+  secondary_button_action: 'close' | 'custom_link';
+  secondary_button_url?: string;
   is_active: boolean;
   version: string;
   display_behavior: 'once' | 'every_login' | 'on_dismiss';

@@ -1152,9 +1152,13 @@ export type Database = {
           description: string | null
           display_behavior: string | null
           id: string
+          image_position: string | null
           image_url: string | null
           is_active: boolean
           name: string
+          secondary_button_action: string | null
+          secondary_button_text: string | null
+          secondary_button_url: string | null
           size: string
           title: string
           updated_at: string
@@ -1167,9 +1171,13 @@ export type Database = {
           description?: string | null
           display_behavior?: string | null
           id?: string
+          image_position?: string | null
           image_url?: string | null
           is_active?: boolean
           name: string
+          secondary_button_action?: string | null
+          secondary_button_text?: string | null
+          secondary_button_url?: string | null
           size?: string
           title: string
           updated_at?: string
@@ -1182,9 +1190,13 @@ export type Database = {
           description?: string | null
           display_behavior?: string | null
           id?: string
+          image_position?: string | null
           image_url?: string | null
           is_active?: boolean
           name?: string
+          secondary_button_action?: string | null
+          secondary_button_text?: string | null
+          secondary_button_url?: string | null
           size?: string
           title?: string
           updated_at?: string
