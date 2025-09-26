@@ -387,7 +387,9 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
         isOpen={showMediaLibrary}
         onClose={() => setShowMediaLibrary(false)}
         onImageSelect={handleImageSelect}
-        onImageUpload={handleMediaLibraryUpload}
+        onUploadNew={() => {
+          document.getElementById('image-upload')?.click();
+        }}
       />
     </div>
   );

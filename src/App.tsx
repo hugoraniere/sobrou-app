@@ -40,7 +40,6 @@ import OnboardingAdmin from "./pages/admin/OnboardingAdmin";
 import DesignSystem from "./pages/admin/DesignSystem";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Gallery from "./pages/admin/Gallery";
-const ReleaseNotesAdmin = React.lazy(() => import("./pages/admin/ReleaseNotesAdmin"));
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
@@ -184,26 +183,16 @@ const App = () => {
                                  </ProtectedRoute>
                                } 
                              />
-                              <Route 
-                                path="/admin/gallery" 
-                                element={
-                                  <ProtectedRoute>
-                                    <AdminLayout>
-                                      <Gallery />
-                                    </AdminLayout>
-                                  </ProtectedRoute>
-                                } 
-                              />
-                              <Route 
-                                path="/admin/release-notes" 
-                                element={
-                                  <ProtectedRoute>
-                                    <AdminLayout>
-                                      <React.Suspense fallback={null}><ReleaseNotesAdmin /></React.Suspense>
-                                    </AdminLayout>
-                                  </ProtectedRoute>
-                                } 
-                              />
+                               <Route 
+                                 path="/admin/gallery" 
+                                 element={
+                                   <ProtectedRoute>
+                                     <AdminLayout>
+                                       <Gallery />
+                                     </AdminLayout>
+                                   </ProtectedRoute>
+                                 } 
+                               />
                           
                           {/* Protected routes */}
                           <Route

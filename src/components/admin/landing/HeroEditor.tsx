@@ -195,7 +195,12 @@ const HeroEditor: React.FC = () => {
                     id="hero-image-upload"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && config) {
+                        handleMediaLibraryUpload(file);
+                      }
+                    }}
                     className="hidden"
                   />
                 </div>
@@ -271,7 +276,9 @@ const HeroEditor: React.FC = () => {
         isOpen={showMediaLibrary}
         onClose={() => setShowMediaLibrary(false)}
         onImageSelect={handleImageSelect}
-        onImageUpload={handleMediaLibraryUpload}
+        onUploadNew={() => {
+          document.getElementById('hero-image-upload')?.click();
+        }}
       />
     </div>
   );
