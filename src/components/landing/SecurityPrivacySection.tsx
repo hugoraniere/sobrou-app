@@ -57,7 +57,7 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
   };
 
   return (
-    <section className="py-20 bg-card">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           {editMode ? (
@@ -65,11 +65,11 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
               value={config.title}
               onChange={(value) => handleConfigChange({ ...config, title: value })}
               element="h2"
-              className="text-3xl md:text-4xl font-bold text-foreground mb-6"
+              className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
               placeholder="Título da seção"
             />
           ) : (
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               {config.title}
             </h2>
           )}
@@ -78,11 +78,11 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
               value={config.subtitle}
               onChange={(value) => handleConfigChange({ ...config, subtitle: value })}
               element="p"
-              className="text-xl text-muted-foreground max-w-3xl mx-auto"
+              className="text-lg text-gray-600 max-w-3xl mx-auto"
               placeholder="Subtítulo da seção"
             />
           ) : (
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               {config.subtitle}
             </p>
           )}
@@ -91,12 +91,10 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {config.features.map((feature, index) => {
             const IconComponent = getIconComponent(feature.icon);
-            const iconColors = ['text-green-600', 'text-blue-600', 'text-purple-600', 'text-orange-600'];
-            const bgColors = ['bg-green-500/10', 'bg-blue-500/10', 'bg-purple-500/10', 'bg-orange-500/10'];
             
             return (
               <div key={index} className="text-center">
-                <div className={`w-16 h-16 ${bgColors[index % bgColors.length]} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   {editMode ? (
                     <InlineEditableIcon
                       iconName={feature.icon}
@@ -105,10 +103,10 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
                         updatedFeatures[index] = { ...feature, icon: newIcon };
                         handleConfigChange({ ...config, features: updatedFeatures });
                       }}
-                      className={`w-8 h-8 ${iconColors[index % iconColors.length]}`}
+                      className="w-8 h-8 text-primary"
                     />
                   ) : (
-                    <IconComponent className={`w-8 h-8 ${iconColors[index % iconColors.length]}`} />
+                    <IconComponent className="w-8 h-8 text-primary" />
                   )}
                 </div>
                 {editMode ? (
@@ -120,11 +118,11 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
                       handleConfigChange({ ...config, features: updatedFeatures });
                     }}
                     element="h3"
-                    className="text-lg font-semibold text-foreground mb-3"
+                    className="text-lg font-semibold text-gray-900 mb-3"
                     placeholder="Título do recurso"
                   />
                 ) : (
-                  <h3 className="text-lg font-semibold text-foreground mb-3">{feature.title}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
                 )}
                 {editMode ? (
                   <InlineEditableText
@@ -135,42 +133,39 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
                       handleConfigChange({ ...config, features: updatedFeatures });
                     }}
                     element="p"
-                    className="text-muted-foreground text-sm"
+                    className="text-gray-600 text-sm leading-relaxed"
                     placeholder="Descrição do recurso"
                   />
                 ) : (
-                  <p className="text-muted-foreground text-sm">{feature.description}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
                 )}
               </div>
             );
           })}
         </div>
 
-        <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl p-8 text-center border border-border/30">
-          <div className="flex items-center justify-center mb-4">
-            <FileCheck className="w-8 h-8 text-primary" />
-          </div>
+        <div className="bg-gray-50 rounded-2xl p-8 text-center">
           {editMode ? (
             <InlineEditableText
               value={config.calloutTitle}
               onChange={(value) => handleConfigChange({ ...config, calloutTitle: value })}
               element="h3"
-              className="text-xl font-semibold text-foreground mb-4"
+              className="text-xl font-semibold text-gray-900 mb-4"
               placeholder="Título do destaque"
             />
           ) : (
-            <h3 className="text-xl font-semibold text-foreground mb-4">{config.calloutTitle}</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">{config.calloutTitle}</h3>
           )}
           {editMode ? (
             <InlineEditableText
               value={config.calloutText}
               onChange={(value) => handleConfigChange({ ...config, calloutText: value })}
               element="p"
-              className="text-muted-foreground max-w-2xl mx-auto"
+              className="text-gray-600 max-w-2xl mx-auto leading-relaxed"
               placeholder="Texto do destaque"
             />
           ) : (
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
               {config.calloutText}
             </p>
           )}

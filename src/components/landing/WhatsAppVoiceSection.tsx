@@ -56,7 +56,7 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
   };
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -65,11 +65,11 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                 value={config.title}
                 onChange={(value) => handleConfigChange({ ...config, title: value })}
                 element="h2"
-                className="text-3xl md:text-4xl font-bold text-foreground mb-6"
+                className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
                 placeholder="Título da seção"
               />
             ) : (
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 {config.title}
               </h2>
             )}
@@ -78,11 +78,11 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                 value={config.subtitle}
                 onChange={(value) => handleConfigChange({ ...config, subtitle: value })}
                 element="p"
-                className="text-xl text-muted-foreground mb-8"
+                className="text-lg text-gray-600 mb-8 leading-relaxed"
                 placeholder="Subtítulo da seção"
               />
             ) : (
-              <p className="text-xl text-muted-foreground mb-8">
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                 {config.subtitle}
               </p>
             )}
@@ -92,7 +92,7 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                 const IconComponent = getIconComponent(feature.icon);
                 return (
                   <div key={index} className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                       {editMode ? (
                         <InlineEditableIcon
                           iconName={feature.icon}
@@ -117,11 +117,11 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                             handleConfigChange({ ...config, features: updatedFeatures });
                           }}
                           element="h3"
-                          className="text-lg font-semibold text-foreground mb-2"
+                          className="text-lg font-semibold text-gray-900 mb-2"
                           placeholder="Título do recurso"
                         />
                       ) : (
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
                       )}
                       {editMode ? (
                         <InlineEditableText
@@ -132,11 +132,11 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                             handleConfigChange({ ...config, features: updatedFeatures });
                           }}
                           element="p"
-                          className="text-muted-foreground"
+                          className="text-gray-600 leading-relaxed"
                           placeholder="Descrição do recurso"
                         />
                       ) : (
-                        <p className="text-muted-foreground">{feature.description}</p>
+                        <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                       )}
                     </div>
                   </div>
@@ -152,11 +152,11 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                 alt="WhatsApp e Comandos de Voz"
                 onImageChange={handleImageChange}
                 section="whatsapp"
-                containerClassName="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl"
+                containerClassName="aspect-square bg-gray-200 rounded-2xl"
                 className="w-full h-full object-cover rounded-2xl"
               />
             ) : (
-              <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl flex items-center justify-center">
+              <div className="aspect-square bg-gray-200 rounded-2xl flex items-center justify-center">
                 {config.image ? (
                   <img 
                     src={config.image} 
@@ -164,9 +164,7 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 ) : (
-                  <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center">
-                    <Phone className="w-16 h-16 text-primary" />
-                  </div>
+                  <div className="text-gray-400 text-8xl">📱</div>
                 )}
               </div>
             )}

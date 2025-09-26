@@ -62,22 +62,22 @@ const { getConfig, updateConfig } = useLandingPage();
   };
 
   return (
-    <section id="hero" className="w-full lg:h-[90vh] py-12 bg-green-50/30 overflow-x-visible flex items-center justify-center relative">
-      <div className="h-full grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-16 overflow-visible">
-        {/* Div 1 - Conteúdo */}
-        <div className="flex flex-col justify-center items-center text-center lg:text-left lg:items-start">
-          <div className="max-w-2xl mx-auto lg:mx-0">
+    <section id="hero" className="w-full py-12 lg:py-24 overflow-x-visible bg-white relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+          {/* Content */}
+          <div className="space-y-8">
             {editMode ? (
               <InlineEditableText
                 value={config.title}
                 onChange={(value) => handleConfigUpdate('title', value)}
                 element="h1"
-                className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl"
+                className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
                 placeholder="Digite o título principal"
               />
             ) : (
               <h1 
-                className="font-alliance-n2 text-4xl lg:text-[3.21515625rem] font-semibold leading-[1.3] mb-6 md:text-5xl"
+                className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
                 dangerouslySetInnerHTML={{ __html: config.title }}
               />
             )}
@@ -87,19 +87,20 @@ const { getConfig, updateConfig } = useLandingPage();
                 value={config.subtitle}
                 onChange={(value) => handleConfigUpdate('subtitle', value)}
                 element="div"
-                className="font-alliance text-gray-600 mb-8 text-lg font-light"
+                className="text-lg lg:text-xl text-gray-600 leading-relaxed"
                 placeholder="Digite o subtítulo"
                 multiline
               />
             ) : (
               <div 
-                className="font-alliance text-gray-600 mb-8 text-lg font-light"
+                className="text-lg lg:text-xl text-gray-600 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: config.subtitle }}
               />
             )}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+
+            <div>
               <Link to={config.cta_url || "/auth"}>
-                <Button size="lg" className="bg-primary hover:bg-primary-hover text-white font-alliance-n2 text-lg px-4 w-full sm:w-auto">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg rounded-full">
                   {editMode ? (
                     <InlineEditableText
                       value={config.cta_text}
@@ -114,15 +115,16 @@ const { getConfig, updateConfig } = useLandingPage();
                 </Button>
               </Link>
             </div>
-            <div className="flex items-center gap-2 mt-6 text-gray-600 justify-center lg:justify-start">
+
+            <div className="flex items-center gap-2 text-gray-600">
               <CheckCircle2 className="text-primary h-5 w-5" />
-              <span className="font-alliance">Comece em menos de 2 minutos</span>
+              <span>Comece em menos de 2 minutos</span>
             </div>
             
-            {/* Benefícios */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 w-full">
+            {/* Benefits */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {config.benefits.map((benefit, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-green-100">
+                <div key={index} className="flex items-center gap-3">
                   <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     {renderIcon(benefit.icon)}
                   </div>
@@ -132,73 +134,40 @@ const { getConfig, updateConfig } = useLandingPage();
                         value={benefit.title}
                         onChange={(value) => handleBenefitUpdate(index, 'title', value)}
                         element="span"
-                        className="font-alliance text-sm font-medium text-gray-900 block"
+                        className="text-sm font-medium text-gray-900 block"
                         placeholder="Título do benefício"
                       />
                     ) : (
-                      <span className="font-alliance text-sm font-medium text-gray-900 block">{benefit.title}</span>
-                    )}
-                    {editMode ? (
-                      <InlineEditableText
-                        value={benefit.description}
-                        onChange={(value) => handleBenefitUpdate(index, 'description', value)}
-                        element="span"
-                        className="font-alliance text-xs text-gray-600"
-                        placeholder="Descrição do benefício"
-                      />
-                    ) : (
-                      <span className="font-alliance text-xs text-gray-600">{benefit.description}</span>
+                      <span className="text-sm font-medium text-gray-900 block">{benefit.title}</span>
                     )}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Div 2 - Imagem - Normal em mobile */}
-        <div className="lg:hidden">
-          {editMode ? (
-            <InlineEditableImage
-              src={config.background_image}
-              alt="Dashboard do Sobrou mostrando controle financeiro completo"
-              onImageChange={(src) => handleConfigUpdate('background_image', src)}
-              section="hero"
-              className="w-full h-auto object-contain object-center shadow-2xl rounded-lg"
-            />
-          ) : (
-            <LazyImage 
-              src={config.background_image}
-              alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-              className="w-full h-auto object-contain object-center shadow-2xl rounded-lg"
-              priority
-              width={800}
-              height={600}
-            />
-          )}
+          {/* Image */}
+          <div className="relative">
+            {editMode ? (
+              <InlineEditableImage
+                src={config.background_image}
+                alt="Dashboard do Sobrou mostrando controle financeiro completo"
+                onImageChange={(src) => handleConfigUpdate('background_image', src)}
+                section="hero"
+                className="w-full h-auto object-contain rounded-lg shadow-2xl"
+              />
+            ) : (
+              <LazyImage 
+                src={config.background_image}
+                alt="Dashboard do Sobrou mostrando controle financeiro completo" 
+                className="w-full h-auto object-contain rounded-lg shadow-2xl"
+                priority
+                width={800}
+                height={600}
+              />
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* Imagem sangrando para a direita - Apenas desktop */}
-      <div className="hidden lg:block absolute right-0 top-[10%] bottom-[10%] w-1/2 pointer-events-none overflow-hidden flex items-center justify-start">
-        {editMode ? (
-          <InlineEditableImage
-            src={config.background_image}
-            alt="Dashboard do Sobrou mostrando controle financeiro completo"
-            onImageChange={(src) => handleConfigUpdate('background_image', src)}
-            section="hero"
-            className="max-h-full w-auto object-contain object-center shadow-2xl"
-          />
-        ) : (
-          <LazyImage 
-            src={config.background_image}
-            alt="Dashboard do Sobrou mostrando controle financeiro completo" 
-            className="max-h-full w-auto object-contain object-center shadow-2xl"
-            priority
-            width={1200}
-            height={800}
-          />
-        )}
       </div>
     </section>
   );
