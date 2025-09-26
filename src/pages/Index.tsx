@@ -8,8 +8,9 @@ import { useTranslation } from 'react-i18next';
 import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import AddTransactionDialog from '@/components/transactions/AddTransactionDialog';
+import { Plus, Upload } from 'lucide-react';
+import AddTransactionTabbedDialog from '@/components/transactions/AddTransactionTabbedDialog';
+import ImportBankStatementButton from '@/components/transactions/import/ImportBankStatementButton';
 
 // Onboarding Components
 import { WelcomeModal } from '../components/onboarding/WelcomeModal';
@@ -56,14 +57,26 @@ const Index = () => {
         title={t('dashboard.title')}
         description={t('dashboard.subtitle')}
       >
-        <Button
-          onClick={() => setShowAddTransaction(true)}
-          className="flex items-center gap-2"
-          data-tour-id="dashboard.header.add-transaction-btn"
-        >
-          <Plus className="h-4 w-4" />
-          {t('transactions.add', 'Adicionar Transação')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setShowAddTransaction(true)}
+            className="flex items-center gap-2"
+            data-tour-id="dashboard.header.add-transaction-btn"
+          >
+            <Plus className="h-4 w-4" />
+            {t('transactions.add', 'Adicionar Transação')}
+          </Button>
+          
+          <ImportBankStatementButton 
+            onTransactionsAdded={handleTransactionAdded}
+            redirectToTransactions={true}
+            variant="outline"
+            size="icon"
+            className="shrink-0"
+          >
+            <Upload className="h-4 w-4" />
+          </ImportBankStatementButton>
+        </div>
       </ResponsivePageHeader>
 
       <TourBanner />
@@ -84,7 +97,7 @@ const Index = () => {
         onSavingGoalUpdated={fetchData}
       />
 
-      <AddTransactionDialog
+      <AddTransactionTabbedDialog
         open={showAddTransaction}
         onOpenChange={setShowAddTransaction}
         onTransactionAdded={handleTransactionAdded}

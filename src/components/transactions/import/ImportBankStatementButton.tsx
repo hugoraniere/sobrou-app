@@ -1,6 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -13,13 +14,24 @@ import { useResponsive } from '@/hooks/useResponsive';
 
 interface ImportBankStatementButtonProps {
   onTransactionsAdded: () => void;
+  redirectToTransactions?: boolean;
+  variant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'link' | 'destructive';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  className?: string;
+  children?: React.ReactNode;
 }
 
 const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({ 
-  onTransactionsAdded 
+  onTransactionsAdded,
+  redirectToTransactions = false,
+  variant = 'outline',
+  size = 'default',
+  className = '',
+  children
 }) => {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isUploading, setIsUploading] = useState(false);
@@ -157,6 +169,11 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
         
         // Importante: Garantir que a lista de transações seja atualizada
         onTransactionsAdded();
+        
+        // Redirecionar para página de transações se solicitado
+        if (redirectToTransactions) {
+          navigate('/transactions');
+        }
       } else {
         toast.error(result.message || "Erro ao importar transações", { id: importToastId });
       }
@@ -180,24 +197,28 @@ const ImportBankStatementButton: React.FC<ImportBankStatementButtonProps> = ({
       />
       
       <Button
-        variant="outline"
-        className="rounded-full"
+        variant={variant}
+        size={size}
+        className={`${size === 'icon' ? '' : 'rounded-full'} ${className}`}
         onClick={() => fileInputRef.current?.click()}
         disabled={isUploading}
+        title={t('transactions.importStatement', 'Importar Extrato')}
       >
         {isUploading ? (
           <>
             <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-            {processingStep ? processingStep : t('common.processing', 'Processando...')}
+            {size !== 'icon' && (processingStep ? processingStep : t('common.processing', 'Processando...'))}
           </>
         ) : (
-          <>
-            <Upload className="h-4 w-4 mr-2" />
-            {isMobile 
-              ? t('transactions.importStatementShort', 'Importar.')
-              : t('transactions.importStatement', 'Importar Extrato')
-            }
-          </>
+          children || (
+            <>
+              <Upload className="h-4 w-4 mr-2" />
+              {isMobile 
+                ? t('transactions.importStatementShort', 'Importar.')
+                : t('transactions.importStatement', 'Importar Extrato')
+              }
+            </>
+          )
         )}
       </Button>
 
