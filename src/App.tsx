@@ -302,12 +302,6 @@ const App = () => {
                         <TourManager />
                         <InstallPrompt />
                         <ReleaseNotesModal />
-                        {isDevMode && (
-                          <>
-                            <TourDevOverlay enabled={isDevMode} />
-                            <TourAnchorHighlighter />
-                          </>
-                        )}
                       </div>
                       </NavigationProvider>
                     </WhatsAppButtonProvider>
