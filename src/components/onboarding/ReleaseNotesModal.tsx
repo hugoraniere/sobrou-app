@@ -4,16 +4,20 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { ReleaseNotesService, ReleaseNote } from '@/services/releaseNotesService';
 import { AnalyticsService } from '@/services/AnalyticsService';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 const ReleaseNotesModal: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [activeNote, setActiveNote] = useState<ReleaseNote | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   
 
   useEffect(() => {
-    loadActiveNote();
-  }, []);
+    if (isAuthenticated) {
+      loadActiveNote();
+    }
+  }, [isAuthenticated]);
 
   const loadActiveNote = async () => {
     try {
@@ -46,16 +50,28 @@ const ReleaseNotesModal: React.FC = () => {
   const handleCTAClick = async () => {
     if (!activeNote) return;
     
-    if (activeNote.cta_text && activeNote.cta_url) {
-      await AnalyticsService.trackReleaseNoteCTAClicked(
-        activeNote.id, 
-        activeNote.cta_text, 
-        activeNote.cta_url, 
-        activeNote.version
-      );
-      window.open(activeNote.cta_url, '_blank');
+    if (activeNote.cta_text) {
+      if (activeNote.cta_action === 'close') {
+        // CTA button action is close
+        await AnalyticsService.trackReleaseNoteCTAClicked(
+          activeNote.id, 
+          activeNote.cta_text, 
+          null, 
+          activeNote.version
+        );
+        await handleDismiss('cta');
+      } else if (activeNote.cta_url) {
+        // CTA button action is link (default)
+        await AnalyticsService.trackReleaseNoteCTAClicked(
+          activeNote.id, 
+          activeNote.cta_text, 
+          activeNote.cta_url, 
+          activeNote.version
+        );
+        window.open(activeNote.cta_url, '_blank');
+        await handleDismiss('cta');
+      }
     }
-    await handleDismiss('cta');
   };
 
   if (!activeNote) return null;
@@ -121,24 +137,17 @@ const ReleaseNotesModal: React.FC = () => {
             )}
             <Button 
               variant="outline" 
-              onClick={activeNote.secondary_button_action === 'custom_link' ? async () => {
+              onClick={async () => {
+                const actionType = activeNote.secondary_button_action === 'custom_link' ? 'custom_link' : 'close';
                 await AnalyticsService.trackReleaseNoteSecondaryButtonClicked(
                   activeNote.id, 
-                  'custom_link', 
+                  actionType, 
                   activeNote.secondary_button_url || null, 
                   activeNote.version
                 );
-                if (activeNote.secondary_button_url) {
+                if (actionType === 'custom_link' && activeNote.secondary_button_url) {
                   window.open(activeNote.secondary_button_url, '_blank');
                 }
-                await handleDismiss('secondary');
-              } : async () => {
-                await AnalyticsService.trackReleaseNoteSecondaryButtonClicked(
-                  activeNote.id, 
-                  'close', 
-                  null, 
-                  activeNote.version
-                );
                 await handleDismiss('secondary');
               }}
             >

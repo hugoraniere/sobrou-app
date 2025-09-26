@@ -79,24 +79,15 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
     try {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Analisando suas finanças...' }])
 
-      const { data, error } = await supabase.functions.invoke('process-chat', {
-        body: { 
-          prompt: userMessage, 
-          userId: user?.id,
-          transactions: transactionsToSend 
-        }
-      })
-
-      if (error) {
-        console.error('Error from Edge Function:', error);
-        throw new Error(error.message || 'Erro ao processar mensagem');
-      }
-
-      if (!data || !data.response) {
-        throw new Error('Resposta inválida do servidor');
-      }
-
-      setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: data.response }])
+      // Check if user has pro plan - for now, show upgrade message for all users
+      // This can be updated later to check actual subscription status
+      const upgradeMessage = 'Para ter acesso a essa funcionalidade, assine o plano Pro e tenha acesso ilimitado às análises com IA do Sobrou.';
+      
+      // Remove the loading message and add the upgrade message
+      setMessages(prev => {
+        const withoutLoading = prev.slice(0, -1); // Remove loading message
+        return [...withoutLoading, { role: 'assistant', content: upgradeMessage }];
+      });
     } catch (error) {
       console.error('Error processing chat:', error);
       toast.error('Erro ao processar mensagem');

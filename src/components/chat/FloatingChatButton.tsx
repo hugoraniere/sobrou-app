@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from "@/lib/utils";
 import { PiStarFourFill } from "react-icons/pi";
 import { useAIChat } from '@/contexts/AIChatContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface FloatingChatButtonProps {
   isOpen: boolean;
@@ -11,8 +12,9 @@ interface FloatingChatButtonProps {
 
 const FloatingChatButton = ({ isOpen, onClick, className }: FloatingChatButtonProps) => {
   const { isEnabled } = useAIChat();
+  const { isAuthenticated } = useAuth();
 
-  if (!isEnabled) return null;
+  if (!isEnabled || !isAuthenticated) return null;
 
   return (
     <button

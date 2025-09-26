@@ -302,7 +302,6 @@ const App = () => {
                         <TourManager />
                         <InstallPrompt />
                         <ReleaseNotesModal />
-                        <ReleaseNotesModal />
                         {isDevMode && (
                           <>
                             <TourDevOverlay enabled={isDevMode} />
