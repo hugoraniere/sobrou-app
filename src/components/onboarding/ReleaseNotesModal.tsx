@@ -3,12 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { ReleaseNotesService, ReleaseNote } from '@/services/releaseNotesService';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const ReleaseNotesModal: React.FC = () => {
   const [activeNote, setActiveNote] = useState<ReleaseNote | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
+  
 
   useEffect(() => {
     loadActiveNote();
@@ -35,10 +35,7 @@ const ReleaseNotesModal: React.FC = () => {
       setActiveNote(null);
     } catch (error) {
       console.error('Error dismissing release note:', error);
-      toast({
-        description: "Erro ao fechar release note",
-        variant: "destructive"
-      });
+      toast.error("Erro ao fechar release note");
     }
   };
 

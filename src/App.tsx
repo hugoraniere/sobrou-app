@@ -1,5 +1,7 @@
 
 import React from "react";
+import './index.css';
+import './i18n/config';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
@@ -38,6 +40,7 @@ import OnboardingAdmin from "./pages/admin/OnboardingAdmin";
 import DesignSystem from "./pages/admin/DesignSystem";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Gallery from "./pages/admin/Gallery";
+import ReleaseNotesAdmin from "./pages/admin/ReleaseNotesAdmin";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
@@ -47,6 +50,7 @@ import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import InstallPrompt from './components/pwa/InstallPrompt';
+import ReleaseNotesModal from './components/onboarding/ReleaseNotesModal';
 import Error from "./pages/Error";
 import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
@@ -200,6 +204,16 @@ const App = () => {
                                   </ProtectedRoute>
                                 } 
                               />
+                              <Route 
+                                path="/admin/release-notes" 
+                                element={
+                                  <ProtectedRoute>
+                                    <AdminLayout>
+                                      <ReleaseNotesAdmin />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
+                                } 
+                              />
                           
                           {/* Protected routes */}
                           <Route
@@ -308,6 +322,7 @@ const App = () => {
                         <WhatsAppChatButton />
                         <TourManager />
                         <InstallPrompt />
+                        <ReleaseNotesModal />
                         <ReleaseNotesModal />
                         {isDevMode && (
                           <>

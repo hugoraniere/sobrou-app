@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { 
   Palette, 
   Type, 
@@ -23,17 +23,14 @@ import { iconLibrary, iconCategories, searchIcons } from '@/utils/iconLibrary';
 const DesignSystem: React.FC = () => {
   const [selectedIconCategory, setSelectedIconCategory] = useState<string>('all');
   const [iconSearchTerm, setIconSearchTerm] = useState('');
-  const { toast } = useToast();
+  
 
   const filteredIcons = searchIcons(iconSearchTerm, selectedIconCategory);
 
   const copyIconCode = (iconName: string) => {
     const code = `import { ${iconName} } from 'lucide-react';\n<${iconName} className="w-4 h-4" />`;
     navigator.clipboard.writeText(code);
-    toast({
-      message: `Código do ícone ${iconName} copiado!`,
-      type: 'success'
-    });
+    toast.success(`Código do ícone ${iconName} copiado!`);
   };
   const colorTokens = [
     { name: 'Primary', var: '--primary', class: 'bg-primary' },

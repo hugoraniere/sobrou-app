@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Edit2, Trash2, Upload, Eye, EyeOff } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { ReleaseNotesService, ReleaseNote } from '@/services/releaseNotesService';
 
 const ReleaseNotesAdmin: React.FC = () => {
@@ -17,7 +17,7 @@ const ReleaseNotesAdmin: React.FC = () => {
   const [editingNote, setEditingNote] = useState<ReleaseNote | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
-  const { toast } = useToast();
+  
 
   const [formData, setFormData] = useState({
     name: '',
@@ -41,10 +41,7 @@ const ReleaseNotesAdmin: React.FC = () => {
       setNotes(data);
     } catch (error) {
       console.error('Error loading release notes:', error);
-      toast({
-        description: "Erro ao carregar release notes",
-        variant: "destructive"
-      });
+      toast.error("Erro ao carregar release notes");
     }
   };
 
@@ -55,14 +52,10 @@ const ReleaseNotesAdmin: React.FC = () => {
     try {
       if (editingNote) {
         await ReleaseNotesService.updateReleaseNote(editingNote.id, formData);
-        toast({
-          description: "Release note atualizada com sucesso"
-        });
+        toast.success("Release note atualizada com sucesso");
       } else {
         await ReleaseNotesService.createReleaseNote(formData);
-        toast({
-          description: "Release note criada com sucesso"
-        });
+        toast.success("Release note criada com sucesso");
       }
 
       await loadNotes();
@@ -70,10 +63,7 @@ const ReleaseNotesAdmin: React.FC = () => {
       resetForm();
     } catch (error) {
       console.error('Error saving release note:', error);
-      toast({
-        description: "Erro ao salvar release note",
-        variant: "destructive"
-      });
+      toast.error("Erro ao salvar release note");
     } finally {
       setIsLoading(false);
     }
@@ -101,15 +91,10 @@ const ReleaseNotesAdmin: React.FC = () => {
     try {
       await ReleaseNotesService.deleteReleaseNote(id);
       await loadNotes();
-      toast({
-        description: "Release note excluída com sucesso"
-      });
+      toast.success("Release note excluída com sucesso");
     } catch (error) {
       console.error('Error deleting release note:', error);
-      toast({
-        description: "Erro ao excluir release note",
-        variant: "destructive"
-      });
+      toast.error("Erro ao excluir release note");
     }
   };
 
@@ -126,15 +111,10 @@ const ReleaseNotesAdmin: React.FC = () => {
       await ReleaseNotesService.updateReleaseNote(note.id, { is_active: !note.is_active });
       await loadNotes();
       
-      toast({
-        description: `Release note ${!note.is_active ? 'ativada' : 'desativada'} com sucesso`
-      });
+      toast.success(`Release note ${!note.is_active ? 'ativada' : 'desativada'} com sucesso`);
     } catch (error) {
       console.error('Error toggling note status:', error);
-      toast({
-        description: "Erro ao alterar status da release note",
-        variant: "destructive"
-      });
+      toast.error("Erro ao alterar status da release note");
     }
   };
 
@@ -146,15 +126,10 @@ const ReleaseNotesAdmin: React.FC = () => {
     try {
       const imageUrl = await ReleaseNotesService.uploadImage(file);
       setFormData(prev => ({ ...prev, image_url: imageUrl }));
-      toast({
-        description: "Imagem enviada com sucesso"
-      });
+      toast.success("Imagem enviada com sucesso");
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast({
-        description: "Erro ao enviar imagem",
-        variant: "destructive"
-      });
+      toast.error("Erro ao enviar imagem");
     } finally {
       setImageUploading(false);
     }
