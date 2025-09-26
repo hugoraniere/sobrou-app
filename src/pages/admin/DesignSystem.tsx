@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Palette, 
   Type, 
@@ -12,10 +14,27 @@ import {
   Circle,
   Square,
   Triangle,
-  Star
+  Star,
+  Search,
+  Copy
 } from 'lucide-react';
+import { iconLibrary, iconCategories, searchIcons } from '@/utils/iconLibrary';
 
 const DesignSystem: React.FC = () => {
+  const [selectedIconCategory, setSelectedIconCategory] = useState<string>('all');
+  const [iconSearchTerm, setIconSearchTerm] = useState('');
+  const { toast } = useToast();
+
+  const filteredIcons = searchIcons(iconSearchTerm, selectedIconCategory);
+
+  const copyIconCode = (iconName: string) => {
+    const code = `import { ${iconName} } from 'lucide-react';\n<${iconName} className="w-4 h-4" />`;
+    navigator.clipboard.writeText(code);
+    toast({
+      message: `Código do ícone ${iconName} copiado!`,
+      type: 'success'
+    });
+  };
   const colorTokens = [
     { name: 'Primary', var: '--primary', class: 'bg-primary' },
     { name: 'Primary Foreground', var: '--primary-foreground', class: 'bg-primary-foreground' },
@@ -297,6 +316,123 @@ const DesignSystem: React.FC = () => {
             <p className="text-xs text-muted-foreground">
               Atualizado automaticamente conforme alterações nos tokens de design
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Biblioteca de Ícones */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="w-5 h-5" />
+            Biblioteca de Ícones
+          </CardTitle>
+          <CardDescription>
+            Todos os ícones disponíveis no sistema, organizados por categoria.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            <Badge
+              variant={selectedIconCategory === 'all' ? 'default' : 'outline'}
+              className="cursor-pointer"
+              onClick={() => setSelectedIconCategory('all')}
+            >
+              Todos ({iconLibrary.length})
+            </Badge>
+            {Object.entries(iconCategories).map(([key, label]) => {
+              const count = iconLibrary.filter(icon => icon.category === key).length;
+              return (
+                <Badge
+                  key={key}
+                  variant={selectedIconCategory === key ? 'default' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedIconCategory(key)}
+                >
+                  {label} ({count})
+                </Badge>
+              );
+            })}
+          </div>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar ícones..."
+              value={iconSearchTerm}
+              onChange={(e) => setIconSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <ScrollArea className="h-96">
+            <div className="grid grid-cols-8 gap-4">
+              {filteredIcons.map((icon) => {
+                const IconComponent = icon.component;
+                return (
+                  <div
+                    key={icon.name}
+                    className="group flex flex-col items-center p-3 rounded-lg border hover:bg-muted transition-colors cursor-pointer"
+                    onClick={() => copyIconCode(icon.name)}
+                    title={`${icon.name} - ${iconCategories[icon.category as keyof typeof iconCategories]}`}
+                  >
+                    <IconComponent className="w-6 h-6 mb-2" />
+                    <span className="text-xs text-center truncate w-full">
+                      {icon.name}
+                    </span>
+                    
+                    {/* Keywords como tags */}
+                    <div className="hidden group-hover:flex flex-wrap justify-center gap-1 mt-2">
+                      {icon.keywords.slice(0, 2).map((keyword) => (
+                        <Badge key={keyword} variant="outline" className="text-[10px] px-1 py-0">
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                    
+                    {/* Botão de copiar */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyIconCode(icon.name);
+                        }}
+                      >
+                        <Copy className="w-3 h-3 mr-1" />
+                        Copiar
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {filteredIcons.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <Star className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-2">Nenhum ícone encontrado</p>
+                <p className="text-sm">
+                  Tente uma busca diferente ou selecione outra categoria
+                </p>
+              </div>
+            )}
+          </ScrollArea>
+
+          <Separator />
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h4 className="text-sm font-medium mb-2">Como usar os ícones:</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="font-mono bg-background rounded px-2 py-1">
+                import &#123; IconName &#125; from 'lucide-react';
+              </div>
+              <div className="font-mono bg-background rounded px-2 py-1">
+                &lt;IconName className="w-4 h-4" /&gt;
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -3,6 +3,7 @@ import { Upload, FileText, Zap, CheckCircle, AlertTriangle } from 'lucide-react'
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import InlineEditableText from '@/components/admin/inline-editor/InlineEditableText';
 import InlineEditableImage from '@/components/admin/inline-editor/InlineEditableImage';
+import InlineEditableIcon from '@/components/admin/inline-editor/InlineEditableIcon';
 
 interface StatementImportSectionProps {
   editMode?: boolean;
@@ -117,10 +118,22 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
               {config.features.map((feature, index) => {
                 const IconComponent = getIconComponent(feature.icon);
                 return (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                      <IconComponent className="w-6 h-6 text-blue-600" />
-                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                        {editMode ? (
+                          <InlineEditableIcon
+                            iconName={feature.icon}
+                            onIconChange={(iconName) => {
+                              const updatedFeatures = [...config.features];
+                              updatedFeatures[index] = { ...feature, icon: iconName };
+                              handleConfigChange({ ...config, features: updatedFeatures });
+                            }}
+                            className="w-6 h-6 text-blue-600"
+                          />
+                        ) : (
+                          <IconComponent className="w-6 h-6 text-blue-600" />
+                        )}
+                      </div>
                     <div>
                       {editMode ? (
                         <InlineEditableText
