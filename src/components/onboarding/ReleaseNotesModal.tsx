@@ -63,19 +63,9 @@ const ReleaseNotesModal: React.FC = () => {
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className={`${getSizeClasses(activeNote.size)} max-h-[90vh] overflow-y-auto`}>
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-bold">
-              {activeNote.title}
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-xl font-bold">
+            {activeNote.title}
+          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">

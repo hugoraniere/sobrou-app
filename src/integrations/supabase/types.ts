@@ -1078,6 +1078,7 @@ export type Database = {
           cta_text: string | null
           cta_url: string | null
           description: string | null
+          display_behavior: string | null
           id: string
           image_url: string | null
           is_active: boolean
@@ -1092,6 +1093,7 @@ export type Database = {
           cta_text?: string | null
           cta_url?: string | null
           description?: string | null
+          display_behavior?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -1106,6 +1108,7 @@ export type Database = {
           cta_text?: string | null
           cta_url?: string | null
           description?: string | null
+          display_behavior?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean

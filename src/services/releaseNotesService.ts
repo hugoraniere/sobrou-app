@@ -11,6 +11,7 @@ export interface ReleaseNote {
   cta_url?: string;
   is_active: boolean;
   version: string;
+  display_behavior: 'once' | 'every_login' | 'on_dismiss';
   created_at: string;
   updated_at: string;
 }
@@ -136,6 +137,16 @@ export class ReleaseNotesService {
     const activeNote = await this.getActiveReleaseNote();
     if (!activeNote) return null;
 
+    // Handle different display behaviors
+    if (activeNote.display_behavior === 'every_login') {
+      return activeNote; // Always show on every login
+    }
+    
+    if (activeNote.display_behavior === 'on_dismiss') {
+      return activeNote; // Always show until user dismisses
+    }
+    
+    // Default behavior: show once per user
     const isDismissed = await this.isReleaseNoteDismissed(activeNote.id);
     return isDismissed ? null : activeNote;
   }

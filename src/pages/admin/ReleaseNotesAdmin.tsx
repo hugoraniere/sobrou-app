@@ -1,35 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Plus, Edit2, Trash2, Upload, Eye, EyeOff } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Edit, Trash2, Plus } from 'lucide-react';
+import { ReleaseNote, ReleaseNotesService } from '@/services/releaseNotesService';
 import { toast } from 'sonner';
-import { ReleaseNotesService, ReleaseNote } from '@/services/releaseNotesService';
+import ReleaseNoteForm from '@/components/admin/release-notes/ReleaseNoteForm';
 
-const ReleaseNotesAdmin: React.FC = () => {
+const ReleaseNotesAdmin = () => {
   const [notes, setNotes] = useState<ReleaseNote[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editingNote, setEditingNote] = useState<ReleaseNote | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [imageUploading, setImageUploading] = useState(false);
-  
-
-  const [formData, setFormData] = useState({
-    name: '',
-    title: '',
-    description: '',
-    image_url: '',
-    size: 'medium' as 'small' | 'medium' | 'large',
-    cta_text: '',
-    cta_url: '',
-    is_active: false,
-    version: '1.0'
-  });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadNotes();
@@ -42,47 +24,33 @@ const ReleaseNotesAdmin: React.FC = () => {
     } catch (error) {
       console.error('Error loading release notes:', error);
       toast.error("Erro ao carregar release notes");
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      if (editingNote) {
-        await ReleaseNotesService.updateReleaseNote(editingNote.id, formData);
-        toast.success("Release note atualizada com sucesso");
-      } else {
-        await ReleaseNotesService.createReleaseNote(formData);
-        toast.success("Release note criada com sucesso");
-      }
-
-      await loadNotes();
-      setIsModalOpen(false);
-      resetForm();
-    } catch (error) {
-      console.error('Error saving release note:', error);
-      toast.error("Erro ao salvar release note");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleSave = async (data: Partial<ReleaseNote>) => {
+    try {
+      if (editingNote) {
+        const updated = await ReleaseNotesService.updateReleaseNote(editingNote.id, data);
+        setNotes(prev => prev.map(note => note.id === editingNote.id ? updated : note));
+        toast.success('Release note atualizado com sucesso!');
+      } else {
+        const created = await ReleaseNotesService.createReleaseNote(data as Omit<ReleaseNote, 'id' | 'created_at' | 'updated_at'>);
+        setNotes(prev => [created, ...prev]);
+        toast.success('Release note criado com sucesso!');
+      }
+      
+      handleCloseForm();
+    } catch (error) {
+      console.error('Error saving release note:', error);
+      toast.error('Erro ao salvar release note');
+    }
+  };
+
   const handleEdit = (note: ReleaseNote) => {
     setEditingNote(note);
-    setFormData({
-      name: note.name,
-      title: note.title,
-      description: note.description || '',
-      image_url: note.image_url || '',
-      size: note.size,
-      cta_text: note.cta_text || '',
-      cta_url: note.cta_url || '',
-      is_active: note.is_active,
-      version: note.version
-    });
-    setIsModalOpen(true);
+    setShowForm(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -90,7 +58,7 @@ const ReleaseNotesAdmin: React.FC = () => {
 
     try {
       await ReleaseNotesService.deleteReleaseNote(id);
-      await loadNotes();
+      setNotes(prev => prev.filter(note => note.id !== id));
       toast.success("Release note excluída com sucesso");
     } catch (error) {
       console.error('Error deleting release note:', error);
@@ -100,276 +68,186 @@ const ReleaseNotesAdmin: React.FC = () => {
 
   const handleToggleActive = async (note: ReleaseNote) => {
     try {
-      // If activating this note, deactivate all others first
+      // Se estamos ativando esta nota, desativa todas as outras primeiro
       if (!note.is_active) {
-        const activeNotes = notes.filter(n => n.is_active);
+        const activeNotes = notes.filter(n => n.is_active && n.id !== note.id);
         for (const activeNote of activeNotes) {
           await ReleaseNotesService.updateReleaseNote(activeNote.id, { is_active: false });
         }
       }
-
-      await ReleaseNotesService.updateReleaseNote(note.id, { is_active: !note.is_active });
-      await loadNotes();
       
-      toast.success(`Release note ${!note.is_active ? 'ativada' : 'desativada'} com sucesso`);
+      const updated = await ReleaseNotesService.updateReleaseNote(note.id, { 
+        is_active: !note.is_active 
+      });
+      
+      setNotes(prev => prev.map(n => 
+        n.id === note.id 
+          ? updated 
+          : (!note.is_active ? { ...n, is_active: false } : n)
+      ));
+      
+      toast.success(`Release note ${!note.is_active ? 'ativado' : 'desativado'} com sucesso!`);
     } catch (error) {
-      console.error('Error toggling note status:', error);
-      toast.error("Erro ao alterar status da release note");
+      console.error('Error toggling release note status:', error);
+      toast.error('Erro ao alterar status do release note');
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setImageUploading(true);
-    try {
-      const imageUrl = await ReleaseNotesService.uploadImage(file);
-      setFormData(prev => ({ ...prev, image_url: imageUrl }));
-      toast.success("Imagem enviada com sucesso");
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast.error("Erro ao enviar imagem");
-    } finally {
-      setImageUploading(false);
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      title: '',
-      description: '',
-      image_url: '',
-      size: 'medium',
-      cta_text: '',
-      cta_url: '',
-      is_active: false,
-      version: '1.0'
-    });
+  const handleCloseForm = () => {
     setEditingNote(null);
+    setShowForm(false);
   };
 
-  const getSizeLabel = (size: string) => {
-    switch (size) {
-      case 'small': return 'Pequeno';
-      case 'medium': return 'Médio';
-      case 'large': return 'Grande';
-      default: return size;
+  const getDisplayBehaviorLabel = (behavior: string) => {
+    switch (behavior) {
+      case 'once': return 'Uma vez';
+      case 'every_login': return 'Todo login';
+      case 'on_dismiss': return 'Até fechar';
+      default: return behavior;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-background-base">
+        <main className="w-full px-4 md:px-8 py-6 md:py-8">
+          <div className="flex justify-center items-center h-64">
+            <p>Carregando release notes...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (showForm) {
+    return (
+      <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-background-base">
+        <main className="w-full px-4 md:px-8 py-6 md:py-8">
+          <ReleaseNoteForm
+            initialData={editingNote || undefined}
+            onSave={handleSave}
+            onCancel={handleCloseForm}
+          />
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Release Notes</h1>
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm}>
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Release Note
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingNote ? 'Editar' : 'Nova'} Release Note
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Nome</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                />
-              </div>
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-background-base">
+      <main className="w-full px-4 md:px-8 py-6 md:py-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Release Notes</h1>
+            <p className="text-gray-600">Gerencie comunicações sobre novas funcionalidades e melhorias</p>
+          </div>
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Release Note
+          </Button>
+        </div>
 
-              <div>
-                <Label htmlFor="title">Título</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">Descrição</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="size">Tamanho</Label>
-                <Select value={formData.size} onValueChange={(value: 'small' | 'medium' | 'large') => setFormData(prev => ({ ...prev, size: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="small">Pequeno</SelectItem>
-                    <SelectItem value="medium">Médio</SelectItem>
-                    <SelectItem value="large">Grande</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="image">Imagem</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={imageUploading}
-                  />
-                  {imageUploading && <span className="text-sm text-muted-foreground">Enviando...</span>}
-                </div>
-                {formData.image_url && (
-                  <img src={formData.image_url} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded" />
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="cta_text">Texto do CTA</Label>
-                <Input
-                  id="cta_text"
-                  value={formData.cta_text}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cta_text: e.target.value }))}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="cta_url">URL do CTA</Label>
-                <Input
-                  id="cta_url"
-                  value={formData.cta_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cta_url: e.target.value }))}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="version">Versão</Label>
-                <Input
-                  id="version"
-                  value={formData.version}
-                  onChange={(e) => setFormData(prev => ({ ...prev, version: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
-                />
-                <Label htmlFor="is_active">Ativa</Label>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Salvando...' : 'Salvar'}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div className="grid gap-4">
-        {notes.map((note) => (
-          <Card key={note.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span>{note.name}</span>
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {getSizeLabel(note.size)}
-                  </span>
-                  {note.is_active ? (
-                    <Eye className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-gray-400" />
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleToggleActive(note)}
-                  >
-                    {note.is_active ? 'Desativar' : 'Ativar'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(note)}
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(note.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
+        {notes.length === 0 ? (
+          <Card className="text-center py-12">
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                  <h3 className="font-semibold">{note.title}</h3>
-                  {note.description && (
-                    <p className="text-sm text-muted-foreground mt-1">{note.description}</p>
-                  )}
-                  {note.cta_text && (
-                    <p className="text-sm mt-2">
-                      <strong>CTA:</strong> {note.cta_text}
-                      {note.cta_url && (
-                        <a href={note.cta_url} target="_blank" rel="noopener noreferrer" className="ml-2 text-primary underline">
-                          {note.cta_url}
-                        </a>
-                      )}
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Versão: {note.version} | Criado em: {new Date(note.created_at).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-                {note.image_url && (
-                  <div className="flex justify-center">
-                    <img 
-                      src={note.image_url} 
-                      alt={note.title}
-                      className="h-24 w-24 object-cover rounded"
-                    />
-                  </div>
-                )}
-              </div>
+              <p className="text-muted-foreground">Nenhuma release note encontrada.</p>
+              <Button className="mt-4" onClick={() => setShowForm(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Criar Primeiro Release Note
+              </Button>
             </CardContent>
           </Card>
-        ))}
-      </div>
-
-      {notes.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Nenhuma release note encontrada.</p>
-        </div>
-      )}
+        ) : (
+          <div className="space-y-4">
+            {notes.map((note) => (
+              <Card key={note.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Badge variant={note.is_active ? "default" : "secondary"}>
+                          {note.is_active ? "Ativo" : "Inativo"}
+                        </Badge>
+                        <Badge variant="outline">{note.size}</Badge>
+                        <Badge variant="outline">
+                          {getDisplayBehaviorLabel(note.display_behavior)}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-xl">{note.name}</CardTitle>
+                      <h3 className="text-lg font-medium text-muted-foreground">{note.title}</h3>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={note.is_active ? "destructive" : "default"}
+                        size="sm"
+                        onClick={() => handleToggleActive(note)}
+                      >
+                        {note.is_active ? 'Desativar' : 'Ativar'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(note)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(note.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="md:col-span-2 space-y-3">
+                      {note.description && (
+                        <p className="text-sm text-muted-foreground">{note.description}</p>
+                      )}
+                      
+                      {note.cta_text && note.cta_url && (
+                        <div className="p-3 bg-muted rounded-lg">
+                          <p className="text-sm font-medium">Call-to-Action:</p>
+                          <p className="text-sm">
+                            <strong>{note.cta_text}</strong>
+                            <a 
+                              href={note.cta_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="ml-2 text-primary underline"
+                            >
+                              {note.cta_url}
+                            </a>
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <p>Versão: {note.version}</p>
+                        <p>Criado em: {new Date(note.created_at).toLocaleDateString('pt-BR')}</p>
+                        <p>Atualizado em: {new Date(note.updated_at).toLocaleDateString('pt-BR')}</p>
+                      </div>
+                    </div>
+                    
+                    {note.image_url && (
+                      <div className="flex justify-center md:justify-end">
+                        <img 
+                          src={note.image_url} 
+                          alt={note.title}
+                          className="h-32 w-32 object-cover rounded-lg shadow-md"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   );
 };
