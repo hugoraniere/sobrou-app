@@ -77,6 +77,11 @@ export const useAdminNavigationPages = () => {
           url: '/admin/design-system',
           icon: Palette,
         },
+        {
+          title: 'Configurações',
+          url: '/admin/settings',
+          icon: Palette,
+        },
       ],
     },
   ], []);

@@ -22,15 +22,8 @@ import {
 
 const DesignSystem: React.FC = () => {
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Design System</h1>
-          <p className="text-muted-foreground">
-            Componentes, cores e padrões de design da aplicação
-          </p>
-        </div>
-      </div>
+    <AdminPageLayout title="Design System" subtitle="Componentes, cores e padrões de design da aplicação">
+      <div className="space-y-6">
 
       <Tabs defaultValue="colors" className="space-y-4">
         <TabsList className="grid w-full grid-cols-5">
@@ -248,7 +241,8 @@ const DesignSystem: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AdminPageLayout>
   );
 };
 
