@@ -230,40 +230,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-          skipBrowserRedirect: true
+          redirectTo: `${window.location.origin}/dashboard`
         }
       });
       
       if (error) throw error;
-      
-      // Open Google auth in new tab/window to avoid iframe issues
-      if (data.url) {
-        const popup = window.open(data.url, 'google-auth', 'width=500,height=600,scrollbars=yes,resizable=yes');
-        
-        // Listen for auth completion
-        const checkClosed = setInterval(() => {
-          if (popup?.closed) {
-            clearInterval(checkClosed);
-            // Check if auth was successful after popup closed
-            setTimeout(() => {
-              supabase.auth.getSession().then(({ data: { session } }) => {
-                if (!session) {
-                  // Auth failed or was cancelled, redirect to error page
-                  navigate('/erro?message=auth_failed&source=google');
-                }
-              });
-            }, 1000);
-          }
-        }, 1000);
-      }
     } catch (error: any) {
       console.error('Google auth error:', error);
-      // Redirect to error page with specific error info
-      navigate('/erro?message=auth_error&source=google&details=' + encodeURIComponent(error.message));
+      toast.error('Erro ao fazer login com Google. Tente novamente.');
     }
   };
 

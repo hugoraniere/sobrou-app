@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download, X } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
+import { AdminSettingsService } from '@/services/adminSettingsService';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -18,8 +19,21 @@ const InstallPrompt: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [pwaPromptEnabled, setPwaPromptEnabled] = useState(false);
 
   useEffect(() => {
+    const loadPwaSettings = async () => {
+      try {
+        const enabled = await AdminSettingsService.getSetting('pwa_prompt_enabled');
+        setPwaPromptEnabled(enabled === true || enabled === 'true');
+      } catch (error) {
+        console.error('Error loading PWA settings:', error);
+        setPwaPromptEnabled(false); // Default to disabled
+      }
+    };
+
+    loadPwaSettings();
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -65,8 +79,8 @@ const InstallPrompt: React.FC = () => {
     localStorage.setItem('pwa-prompt-dismissed', Date.now().toString());
   };
 
-  // Don't show if already installed or dismissed recently
-  if (isInstalled || !showPrompt || !deferredPrompt) {
+  // Don't show if already installed, dismissed recently, or disabled by admin
+  if (isInstalled || !showPrompt || !deferredPrompt || !pwaPromptEnabled) {
     return null;
   }
 
