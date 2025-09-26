@@ -67,22 +67,36 @@ export class ReleaseNotesService {
     if (error) throw error;
   }
 
+  // Função de upload de imagem atualizada para usar otimização
   static async uploadImage(file: File): Promise<string> {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('bucketName', 'landing-page');
+      formData.append('uploadSource', 'release-notes');
+      formData.append('category', 'release-notes');
+      formData.append('altText', 'Release note image');
+      formData.append('tags', JSON.stringify(['release-notes', 'announcement']));
 
-    const { error: uploadError } = await supabase.storage
-      .from('release-notes')
-      .upload(filePath, file);
+      const { data, error } = await supabase.functions.invoke('optimize-image', {
+        body: formData
+      });
 
-    if (uploadError) throw uploadError;
+      if (error) {
+        console.error('Error in optimize-image function:', error);
+        throw new Error('Erro ao fazer upload da imagem');
+      }
 
-    const { data } = supabase.storage
-      .from('release-notes')
-      .getPublicUrl(filePath);
+      if (!data.success) {
+        console.error('Optimization failed:', data.error);
+        throw new Error(data.error);
+      }
 
-    return data.publicUrl;
+      return data.data.publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
   }
 
   // Public functions

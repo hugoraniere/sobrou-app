@@ -578,6 +578,78 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_images: {
+        Row: {
+          alt_text: string | null
+          bucket_name: string
+          caption: string | null
+          category: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number
+          formats_available: Json | null
+          height: number | null
+          id: string
+          is_optimized: boolean | null
+          mime_type: string
+          optimization_level: string | null
+          original_name: string
+          seo_score: number | null
+          tags: string[] | null
+          updated_at: string
+          upload_source: string | null
+          uploaded_by: string | null
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          bucket_name?: string
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size: number
+          formats_available?: Json | null
+          height?: number | null
+          id?: string
+          is_optimized?: boolean | null
+          mime_type: string
+          optimization_level?: string | null
+          original_name: string
+          seo_score?: number | null
+          tags?: string[] | null
+          updated_at?: string
+          upload_source?: string | null
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          bucket_name?: string
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          formats_available?: Json | null
+          height?: number | null
+          id?: string
+          is_optimized?: boolean | null
+          mime_type?: string
+          optimization_level?: string | null
+          original_name?: string
+          seo_score?: number | null
+          tags?: string[] | null
+          updated_at?: string
+          upload_source?: string | null
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Relationships: []
+      }
       ingredients: {
         Row: {
           created_at: string | null
