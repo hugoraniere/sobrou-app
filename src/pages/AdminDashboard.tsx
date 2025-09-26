@@ -4,9 +4,11 @@ import AdminPageLayout from '@/components/admin/AdminPageLayout';
 
 const AdminDashboard = () => {
   return (
-    <AdminPageLayout title="Dashboard Administrativo" subtitle="Visão geral e métricas do sistema">
-      <SobrouDashboard />
-    </AdminPageLayout>
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-background">
+      <main className="w-full px-4 md:px-8 py-6 md:py-8">
+        <SobrouDashboard />
+      </main>
+    </div>
   );
 };
 
