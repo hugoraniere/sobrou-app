@@ -18,6 +18,7 @@ import { OnboardingConfigService } from '@/services/OnboardingConfigService';
 import { GetStartedEditor } from '@/components/admin/onboarding/GetStartedEditor';
 import { GetStartedStepper } from '@/components/onboarding/GetStartedStepper';
 import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
+import ReleaseNotesManager from './ReleaseNotesManager';
 
 const OnboardingAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('progress');
@@ -82,12 +83,9 @@ const OnboardingAdmin: React.FC = () => {
               Em breve
             </span>
           </TabsTrigger>
-          <TabsTrigger value="release-notes" className="flex items-center gap-2 relative">
+          <TabsTrigger value="release-notes" className="flex items-center gap-2">
             <Settings className="w-4 h-4" />
             Release Notes
-            <span className="ml-1 px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full">
-              Em breve
-            </span>
           </TabsTrigger>
         </TabsList>
 
@@ -116,23 +114,7 @@ const OnboardingAdmin: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="release-notes" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Release Notes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Settings className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-medium mb-2">Release Notes</h3>
-                <p className="text-muted-foreground mb-4">
-                  Gerencie notas de versão e novidades para manter usuários informados
-                </p>
-                <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-sm">
-                  🚧 Em desenvolvimento
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ReleaseNotesManager />
         </TabsContent>
       </Tabs>
 

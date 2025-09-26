@@ -70,7 +70,11 @@ const ReleaseNotesModal: React.FC = () => {
         
         <div className="space-y-4">
           {activeNote.image_url && (
-            <div className="flex justify-center">
+            <div className={`flex ${
+              activeNote.image_position === 'left' ? 'justify-start' :
+              activeNote.image_position === 'right' ? 'justify-end' :
+              'justify-center'
+            }`}>
               <img
                 src={activeNote.image_url}
                 alt={activeNote.title}
@@ -86,7 +90,11 @@ const ReleaseNotesModal: React.FC = () => {
           )}
           
           {activeNote.description && (
-            <div className="text-center">
+            <div className={`${
+              activeNote.image_position === 'left' ? 'text-left' :
+              activeNote.image_position === 'right' ? 'text-right' :
+              'text-center'
+            }`}>
               <p className="text-muted-foreground whitespace-pre-wrap">
                 {activeNote.description}
               </p>
@@ -99,8 +107,16 @@ const ReleaseNotesModal: React.FC = () => {
                 {activeNote.cta_text}
               </Button>
             )}
-            <Button variant="outline" onClick={handleDismiss}>
-              Fechar
+            <Button 
+              variant="outline" 
+              onClick={activeNote.secondary_button_action === 'custom_link' ? () => {
+                if (activeNote.secondary_button_url) {
+                  window.open(activeNote.secondary_button_url, '_blank');
+                }
+                handleDismiss();
+              } : handleDismiss}
+            >
+              {activeNote.secondary_button_text || 'Fechar'}
             </Button>
           </div>
           

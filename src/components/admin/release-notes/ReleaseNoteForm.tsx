@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, Upload, X } from 'lucide-react';
+import { Eye, Upload, X, Images } from 'lucide-react';
 import { ReleaseNote, ReleaseNotesService } from '@/services/releaseNotesService';
 import { toast } from 'sonner';
 import ReleaseNotePreview from './ReleaseNotePreview';
+import MediaLibraryModal from '@/components/admin/media/MediaLibraryModal';
 
 interface ReleaseNoteFormProps {
   initialData?: Partial<ReleaseNote>;
@@ -27,9 +28,13 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
     title: '',
     description: '',
     image_url: '',
+    image_position: 'center',
     size: 'medium',
     cta_text: '',
     cta_url: '',
+    secondary_button_text: 'Fechar',
+    secondary_button_action: 'close',
+    secondary_button_url: '',
     version: '1.0',
     display_behavior: 'once',
     is_active: false,
@@ -38,6 +43,7 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
 
   const [imageUploading, setImageUploading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
 
   const handleInputChange = (field: keyof ReleaseNote, value: any) => {
     setFormData(prev => ({
@@ -74,6 +80,26 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
 
   const removeImage = () => {
     handleInputChange('image_url', '');
+  };
+
+  const handleMediaLibraryUpload = async (file: File) => {
+    setImageUploading(true);
+    try {
+      const imageUrl = await ReleaseNotesService.uploadImage(file);
+      handleInputChange('image_url', imageUrl);
+      toast.success('Imagem enviada com sucesso!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Erro ao enviar imagem');
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  const handleImageSelect = (imageUrl: string) => {
+    handleInputChange('image_url', imageUrl);
+    setShowMediaLibrary(false);
+    toast.success('Imagem selecionada da galeria!');
   };
 
   return (
@@ -224,36 +250,68 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
                 </Button>
               </div>
             ) : (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center space-y-4">
                 <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <div className="mt-4">
-                  <label htmlFor="image-upload" className="cursor-pointer">
-                    <span className="mt-2 block text-sm font-medium text-gray-900">
-                      Clique para enviar uma imagem
-                    </span>
-                  </label>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowMediaLibrary(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Images className="h-4 w-4" />
+                    Escolher da Galeria
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('image-upload')?.click()}
                     disabled={imageUploading}
-                    className="hidden"
-                  />
+                    className="flex items-center gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Enviar Nova
+                  </Button>
                 </div>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={imageUploading}
+                  className="hidden"
+                />
               </div>
             )}
+            
+            <div>
+              <Label htmlFor="image_position">Posição da Imagem</Label>
+              <Select 
+                value={formData.image_position} 
+                onValueChange={(value) => handleInputChange('image_position', value as 'left' | 'center' | 'right')}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="left">Alinhada à Esquerda</SelectItem>
+                  <SelectItem value="center">Centralizada</SelectItem>
+                  <SelectItem value="right">Alinhada à Direita</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             {imageUploading && <p className="text-sm text-gray-500">Enviando imagem...</p>}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Call-to-Action (Opcional)</CardTitle>
+            <CardTitle>Botões de Ação</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="cta_text">Texto do Botão</Label>
+              <Label htmlFor="cta_text">Texto do Botão Principal (Opcional)</Label>
               <Input
                 id="cta_text"
                 value={formData.cta_text || ''}
@@ -263,7 +321,7 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="cta_url">URL do Botão</Label>
+              <Label htmlFor="cta_url">URL do Botão Principal</Label>
               <Input
                 id="cta_url"
                 value={formData.cta_url || ''}
@@ -271,6 +329,49 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
                 placeholder="https://exemplo.com"
                 type="url"
               />
+            </div>
+
+            <div className="border-t pt-4 space-y-4">
+              <h4 className="font-medium">Botão Secundário</h4>
+              
+              <div>
+                <Label htmlFor="secondary_button_text">Texto do Botão Secundário</Label>
+                <Input
+                  id="secondary_button_text"
+                  value={formData.secondary_button_text || ''}
+                  onChange={(e) => handleInputChange('secondary_button_text', e.target.value)}
+                  placeholder="Ex: Fechar, Pular, Mais tarde"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="secondary_button_action">Ação do Botão</Label>
+                <Select 
+                  value={formData.secondary_button_action} 
+                  onValueChange={(value) => handleInputChange('secondary_button_action', value as 'close' | 'custom_link')}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="close">Fechar Modal</SelectItem>
+                    <SelectItem value="custom_link">Link Personalizado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {formData.secondary_button_action === 'custom_link' && (
+                <div>
+                  <Label htmlFor="secondary_button_url">URL do Botão Secundário</Label>
+                  <Input
+                    id="secondary_button_url"
+                    value={formData.secondary_button_url || ''}
+                    onChange={(e) => handleInputChange('secondary_button_url', e.target.value)}
+                    placeholder="https://exemplo.com"
+                    type="url"
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -280,6 +381,13 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
         note={formData}
         isOpen={showPreview}
         onClose={() => setShowPreview(false)}
+      />
+
+      <MediaLibraryModal
+        isOpen={showMediaLibrary}
+        onClose={() => setShowMediaLibrary(false)}
+        onImageSelect={handleImageSelect}
+        onImageUpload={handleMediaLibraryUpload}
       />
     </div>
   );
