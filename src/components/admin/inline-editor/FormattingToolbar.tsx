@@ -1,14 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Bold, 
-  Italic, 
-  Underline,
-  Palette,
-  Type,
-  X
-} from 'lucide-react';
+import { Bold, Italic, Underline, Palette, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ColorPickerModal from './ColorPickerModal';
 
 interface FormattingToolbarProps {
   selection: Selection;
@@ -22,7 +16,7 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
   onClose
 }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showColorModal, setShowColorModal] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   const colors = [
@@ -53,7 +47,7 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
 
   const handleColorChange = (color: string) => {
     onApplyFormatting('foreColor', color);
-    setShowColorPicker(false);
+    setShowColorModal(false);
   };
 
   const handleFontSizeChange = (size: string) => {
@@ -100,41 +94,15 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
 
         <div className="h-6 w-px bg-border mx-1" />
 
-        <div className="relative">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowColorPicker(!showColorPicker)}
-            className="p-2"
-          >
-            <Palette className="w-4 h-4" />
-          </Button>
-          
-          {showColorPicker && (
-            <div className="absolute top-full left-0 mt-2 bg-card border border-border rounded-lg shadow-lg p-3 grid grid-cols-7 gap-1 min-w-[200px]">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
-                  style={{ backgroundColor: color }}
-                  onClick={() => handleColorChange(color)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        <select
-          className="text-sm bg-background border border-border rounded px-2 py-1"
-          onChange={(e) => handleFontSizeChange(e.target.value)}
-          defaultValue="3"
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowColorModal(true)}
+          className="p-1"
+          title="Cor do texto"
         >
-          {fontSizes.map((size) => (
-            <option key={size.value} value={size.value}>
-              {size.label}
-            </option>
-          ))}
-        </select>
+          <Palette className="w-4 h-4" />
+        </Button>
 
         <div className="h-6 w-px bg-border mx-1" />
 
@@ -142,11 +110,18 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="p-2"
+          className="p-1"
+          title="Fechar"
         >
           <X className="w-4 h-4" />
         </Button>
       </div>
+      
+      <ColorPickerModal
+        isOpen={showColorModal}
+        onClose={() => setShowColorModal(false)}
+        onColorSelect={handleColorChange}
+      />
     </>
   );
 };

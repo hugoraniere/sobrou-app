@@ -34,12 +34,11 @@ const VisualLandingPageEditor: React.FC = () => {
     lastSaved: null
   });
 
-  // Auto-save indicator
+  // Auto-save indicator (sem toast)
   useEffect(() => {
     if (editorState.isDirty && !editorState.isSaving) {
       const timer = setTimeout(() => {
         setEditorState(prev => ({ ...prev, isDirty: false, lastSaved: new Date() }));
-        toast("Alterações salvas automaticamente", { duration: 2000 });
       }, 1000);
       return () => clearTimeout(timer);
     }

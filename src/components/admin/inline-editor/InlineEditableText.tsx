@@ -84,23 +84,23 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
     }
   };
 
-  const handleBlur = () => {
+  const handleBlur = useCallback(() => {
     setIsEditing(false);
     setShowToolbar(false);
     if (contentRef.current) {
-      const newValue = contentRef.current.textContent || '';
+      const newValue = contentRef.current.innerHTML;
       setCurrentValue(newValue);
       debouncedSave(newValue);
     }
-  };
+  }, [debouncedSave]);
 
-  const handleInput = () => {
+  const handleInput = useCallback(() => {
     if (contentRef.current) {
-      const newValue = contentRef.current.textContent || '';
+      const newValue = contentRef.current.innerHTML;
       setCurrentValue(newValue);
       debouncedSave(newValue);
     }
-  };
+  }, [debouncedSave]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !multiline) {
@@ -122,24 +122,66 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
     }
   };
 
-  const applyFormatting = (command: string, value?: string) => {
+  const applyFormatting = useCallback((command: string, value?: string) => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+
+    const range = sel.getRangeAt(0);
+    
     if (command === 'foreColor') {
-      // Modern approach for color
-      document.execCommand(command, false, value);
-    } else if (command === 'fontSize') {
-      document.execCommand(command, false, value);
-    } else {
-      document.execCommand(command, false, value);
+      // Criar um span com a cor
+      const span = document.createElement('span');
+      span.style.color = value || '#000000';
+      
+      try {
+        range.surroundContents(span);
+      } catch (e) {
+        // Se não conseguir envolver, extrair o conteúdo
+        const contents = range.extractContents();
+        span.appendChild(contents);
+        range.insertNode(span);
+      }
+    } else if (command === 'bold') {
+      const strong = document.createElement('strong');
+      try {
+        range.surroundContents(strong);
+      } catch (e) {
+        const contents = range.extractContents();
+        strong.appendChild(contents);
+        range.insertNode(strong);
+      }
+    } else if (command === 'italic') {
+      const em = document.createElement('em');
+      try {
+        range.surroundContents(em);
+      } catch (e) {
+        const contents = range.extractContents();
+        em.appendChild(contents);
+        range.insertNode(em);
+      }
+    } else if (command === 'underline') {
+      const u = document.createElement('u');
+      try {
+        range.surroundContents(u);
+      } catch (e) {
+        const contents = range.extractContents();
+        u.appendChild(contents);
+        range.insertNode(u);
+      }
     }
+    
+    // Limpar seleção
+    sel.removeAllRanges();
     
     if (contentRef.current) {
       contentRef.current.focus();
-      // Update value after formatting
       const newValue = contentRef.current.innerHTML;
       setCurrentValue(newValue);
       debouncedSave(newValue);
     }
-  };
+    
+    setShowToolbar(false);
+  }, [debouncedSave]);
 
   if (isEditing) {
     return (
@@ -181,7 +223,9 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
       )}
       onClick={handleClick}
     >
-      {currentValue || (
+{currentValue ? (
+        <div dangerouslySetInnerHTML={{ __html: currentValue }} />
+      ) : (
         <span className="text-muted-foreground italic">
           {placeholder}
         </span>
