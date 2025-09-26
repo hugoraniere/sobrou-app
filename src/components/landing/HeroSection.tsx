@@ -18,26 +18,21 @@ const { getConfig, updateConfig } = useLandingPage();
 
   // Fallback data em caso de não carregar a configuração
   const config = heroConfig?.content || {
-    title: "Organize suas finanças com linguagem natural",
-    subtitle: "Diga adeus às planilhas complicadas. Com nossa IA, você organiza suas finanças falando naturalmente, como se fosse uma conversa.",
-    cta_text: "Começar gratuitamente",
+    title: "Organize suas finanças, <span style='color: #22c55e;'>é só digitar</span>",
+    subtitle: "Chega de planilhas complexas. Digite seus gastos em linguagem natural e deixe nossa IA organizar tudo automaticamente.",
+    cta_text: "Começar agora",
     cta_url: "/auth",
     background_image: "/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png",
     benefits: [
       {
-        icon: "Zap",
-        title: "Configuração em 5 minutos",
-        description: "Comece a usar imediatamente"
-      },
-      {
         icon: "Shield",
-        title: "Dados 100% seguros",
-        description: "Criptografia de ponta a ponta"
+        title: "Segurança dos seus dados em primeiro lugar",
+        description: "Proteção avançada para suas informações"
       },
       {
-        icon: "Smartphone",
-        title: "Acesso multiplataforma",
-        description: "Web, mobile e desktop"
+        icon: "Smartphone", 
+        title: "Acesse quando quiser, no celular ou computador",
+        description: "Disponível em todos os dispositivos"
       }
     ]
   };

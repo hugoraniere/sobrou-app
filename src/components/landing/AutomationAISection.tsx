@@ -14,33 +14,33 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
 
   // Fallback data
   const config = automationConfig?.content || {
-    title: "Automação Financeira com IA",
-    subtitle: "Nossa inteligência artificial trabalha 24/7 para otimizar suas finanças e identificar oportunidades de economia",
-    callout: "A IA continua aprendendo com seus hábitos para oferecer sugestões cada vez mais precisas e personalizadas.",
+    title: "Inteligência Artificial a seu favor",
+    subtitle: "Deixe nossa IA trabalhar por você: insights automáticos, alertas inteligentes e sugestões personalizadas",
+    callout: "IA que aprende com você e evolui constantemente",
     features: [
       {
         icon: "Lightbulb",
         title: "Insights Automáticos",
-        description: "Análise de padrões de gastos para identificar oportunidades de economia e tendências financeiras",
-        quote: "Você gasta 23% mais com delivery nos fins de semana. Considere cozinhar em casa para economizar R$ 180/mês."
+        description: "Nossa IA analisa seus padrões de gastos e identifica oportunidades de economia, tendências preocupantes e comportamentos financeiros.",
+        quote: "Seus gastos com delivery aumentaram 30% este mês. Considere cozinhar mais em casa para economizar R$ 200."
       },
       {
         icon: "Bell",
         title: "Alertas Inteligentes", 
-        description: "Notificações proativas sobre gastos incomuns, metas próximas do limite e contas a vencer",
-        quote: "Atenção: Gasto com cartão de crédito 40% acima da média. Considere revisar as compras deste mês."
+        description: "Receba notificações proativas sobre gastos incomuns, metas em risco, contas próximas do vencimento e oportunidades de economia.",
+        quote: "⚠️ Você gastou 80% do orçamento de entretenimento em apenas 15 dias do mês."
       },
       {
         icon: "TrendingUp",
         title: "Previsões Financeiras",
-        description: "Simulações de cenários futuros baseados em seus hábitos atuais e metas estabelecidas",
-        quote: "Com o padrão atual, você atingirá sua meta de R$ 10.000 em aproximadamente 8 meses."
+        description: "Simulações automáticas de cenários futuros baseados em seus padrões atuais. Visualize o impacto de mudanças nos seus hábitos.",
+        quote: "Mantendo este padrão, você economizará R$ 1.200 até o final do ano."
       },
       {
         icon: "Target",
         title: "Metas Adaptativas",
-        description: "Ajuste automático de metas de economia baseado no seu desempenho e sugestões realistas",
-        quote: "Sua meta de economia foi ajustada para R$ 800/mês (anteriormente R$ 1.200) com base no seu histórico."
+        description: "Nossas metas se ajustam automaticamente baseadas no seu desempenho, sugerindo valores realistas e estratégias personalizadas.",
+        quote: "Baseado no seu histórico, sugerimos aumentar sua meta de economia para R$ 800/mês."
       }
     ]
   };

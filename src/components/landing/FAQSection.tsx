@@ -18,8 +18,8 @@ const FAQSection: React.FC<FAQSectionProps> = ({ editMode = false }) => {
 
   // Fallback data em caso de não carregar a configuração
   const config = faqConfig?.content || {
-    title: "Perguntas frequentes",
-    subtitle: "Tire suas dúvidas sobre nossa plataforma",
+    title: "Perguntas Frequentes",
+    subtitle: "Tire suas dúvidas sobre o Sobrou e descubra como transformar seu controle financeiro",
     questions: [
       {
         question: "Como funciona a integração com WhatsApp?",
@@ -104,6 +104,16 @@ const FAQSection: React.FC<FAQSectionProps> = ({ editMode = false }) => {
               </AccordionItem>
             ))}
           </Accordion>
+          
+          <div className="mt-12 text-center">
+            <p className="text-gray-600 mb-4">Ainda tem dúvidas?</p>
+            <a 
+              href="mailto:suporte@sobrou.app" 
+              className="text-primary hover:text-primary/80 font-medium transition-colors duration-200"
+            >
+              Entre em contato conosco →
+            </a>
+          </div>
         </div>
       </div>
     </section>

@@ -15,24 +15,24 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
 
   // Fallback data
   const config = statementConfig?.content || {
-    title: "Importação Automática de Extratos",
-    subtitle: "Conecte suas contas bancárias e cartões de crédito para importação automática e categorização inteligente",
+    title: "Importação inteligente de extratos",
+    subtitle: "Economize horas de trabalho manual. Importe extratos bancários e deixe nossa IA organizar tudo.",
     image: "",
     features: [
       {
-        icon: "Upload",
-        title: "Importação Automática",
-        description: "Conecte-se com mais de 100 bancos e cartões para sincronização automática"
+        icon: "FileText",
+        title: "Múltiplos Formatos",
+        description: "Suporte para PDF, CSV, Excel e outros formatos comuns de extratos bancários. Reconhecimento automático do layout."
       },
       {
         icon: "Zap",
-        title: "Categorização IA",
-        description: "Nossa IA categoriza suas transações automaticamente com 95% de precisão"
+        title: "Categorização Automática",
+        description: "Nossa IA analisa históricos e padrões para categorizar automaticamente suas transações com alta precisão."
       },
       {
         icon: "CheckCircle",
-        title: "Conciliação Inteligente",
-        description: "Identificamos duplicatas e reconciliamos transações automaticamente"
+        title: "Processamento Rápido",
+        description: "Centenas de transações processadas em segundos. Revisão fácil e ajustes rápidos quando necessário."
       }
     ]
   };

@@ -14,30 +14,30 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
 
   // Fallback data
   const config = securityConfig?.content || {
-    title: "Segurança e Privacidade",
-    subtitle: "Seus dados financeiros protegidos com os mais altos padrões de segurança bancária",
-    calloutTitle: "Transparência Total",
-    calloutText: "Estamos comprometidos com a transparência total sobre como seus dados são utilizados, seguindo rigorosamente as normas da LGPD e melhores práticas internacionais.",
+    title: "Seus dados protegidos e privados",
+    subtitle: "Segurança bancária e privacidade total. Seus dados financeiros ficam apenas com você.",
+    calloutTitle: "Compromisso com a Transparência",
+    calloutText: "Seguimos rigorosamente a LGPD (Lei Geral de Proteção de Dados). Você pode exportar, editar ou excluir todos os seus dados a qualquer momento. Nossa política de privacidade é clara e acessível, sem letras miúdas ou armadilhas.",
     features: [
       {
         icon: "Shield",
         title: "Criptografia Total",
-        description: "Todos os dados são criptografados com AES-256, o mesmo padrão usado por bancos e instituições financeiras"
+        description: "Todos os dados são criptografados com padrão bancário AES-256. Suas informações ficam totalmente protegidas."
       },
       {
         icon: "Lock",
         title: "Acesso Seguro",
-        description: "Autenticação de dois fatores e biometria para garantir que apenas você acesse suas informações"
+        description: "Autenticação multifator, sessões seguras e controle total sobre quem acessa suas informações."
       },
       {
         icon: "Eye",
         title: "Privacidade por Design",
-        description: "Não vendemos seus dados. Coletamos apenas o necessário para oferecer os melhores insights financeiros"
+        description: "Não vendemos nem compartilhamos seus dados. Você tem controle total sobre suas informações pessoais."
       },
       {
         icon: "Server",
         title: "Infraestrutura Confiável",
-        description: "Hospedagem em servidores certificados com backup automático e monitoramento 24/7"
+        description: "Hospedagem em servidores seguros, backup automático e alta disponibilidade garantida."
       }
     ]
   };

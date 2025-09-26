@@ -15,24 +15,24 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
 
   // Fallback data
   const config = whatsappConfig?.content || {
-    title: "Conecte-se via WhatsApp & Voz",
-    subtitle: "Controle suas finanças de forma natural e intuitiva através de comandos de voz e mensagens no WhatsApp",
+    title: "Registre gastos por WhatsApp e voz",
+    subtitle: "A forma mais rápida e natural de controlar suas finanças. Sem complicação, sem perder tempo.",
     image: "",
     features: [
       {
         icon: "MessageCircle",
-        title: "WhatsApp Bot",
-        description: "Registre gastos e consulte saldo através do WhatsApp de forma simples e rápida"
+        title: "WhatsApp Integrado",
+        description: "Envie mensagens diretamente pelo WhatsApp: \"Gastei 80 reais com combustível\". Nossa IA processa e categoriza automaticamente."
       },
       {
         icon: "Mic", 
         title: "Comando de Voz",
-        description: "Fale naturalmente suas transações e deixe a IA processar automaticamente"
+        description: "Grave áudios no app ou WhatsApp. Transcrição automática e processamento inteligente de múltiplas transações em uma única gravação."
       },
       {
-        icon: "Zap",
-        title: "Resposta Instantânea",
-        description: "Receba confirmações e relatórios em tempo real, onde quer que esteja"
+        icon: "Smartphone",
+        title: "PWA Mobile",
+        description: "Instale como app nativo no seu celular. Funciona offline e sincroniza quando conectar."
       }
     ]
   };
