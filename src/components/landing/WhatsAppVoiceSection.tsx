@@ -3,6 +3,7 @@ import { MessageCircle, Phone, Mic, Zap, Shield, Clock } from 'lucide-react';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import InlineEditableText from '@/components/admin/inline-editor/InlineEditableText';
 import InlineEditableImage from '@/components/admin/inline-editor/InlineEditableImage';
+import InlineEditableIcon from '@/components/admin/inline-editor/InlineEditableIcon';
 
 interface WhatsAppVoiceSectionProps {
   editMode?: boolean;
@@ -92,7 +93,19 @@ const WhatsAppVoiceSection: React.FC<WhatsAppVoiceSectionProps> = ({ editMode = 
                 return (
                   <div key={index} className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <IconComponent className="w-6 h-6 text-primary" />
+                      {editMode ? (
+                        <InlineEditableIcon
+                          iconName={feature.icon}
+                          onIconChange={(newIcon) => {
+                            const updatedFeatures = [...config.features];
+                            updatedFeatures[index] = { ...feature, icon: newIcon };
+                            handleConfigChange({ ...config, features: updatedFeatures });
+                          }}
+                          className="w-6 h-6 text-primary"
+                        />
+                      ) : (
+                        <IconComponent className="w-6 h-6 text-primary" />
+                      )}
                     </div>
                     <div>
                       {editMode ? (

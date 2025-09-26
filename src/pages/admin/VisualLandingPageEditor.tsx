@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import ViewportControls from '@/components/admin/inline-editor/ViewportControls';
 import { EditorButton } from '@/components/ui/editor-button';
 import StatusIndicator from '@/components/ui/status-indicator';
+import { SectionManagementProvider } from '@/contexts/SectionManagementContext';
+import SectionToolbar from '@/components/admin/section-toolbar/SectionToolbar';
 
 // Import original landing page components
 import HeroSection from '@/components/landing/HeroSection';
@@ -101,7 +103,8 @@ const VisualLandingPageEditor: React.FC = () => {
   }
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <SectionManagementProvider>
+      <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Fixed Top Toolbar */}
       <header className="bg-card/95 backdrop-blur-sm border-b border-border px-6 py-3 flex-shrink-0">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -181,7 +184,11 @@ const VisualLandingPageEditor: React.FC = () => {
           </div>
         </div>
       </main>
+      
+      {/* Section Management Toolbar */}
+      <SectionToolbar />
     </div>
+  </SectionManagementProvider>
   );
 };
 

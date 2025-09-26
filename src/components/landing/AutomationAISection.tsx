@@ -2,6 +2,7 @@ import React from 'react';
 import { Brain, TrendingUp, Bell, Target, Lightbulb } from 'lucide-react';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import InlineEditableText from '@/components/admin/inline-editor/InlineEditableText';
+import InlineEditableIcon from '@/components/admin/inline-editor/InlineEditableIcon';
 
 interface AutomationAISectionProps {
   editMode?: boolean;
@@ -104,7 +105,19 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
             return (
               <div key={index} className="bg-card/50 backdrop-blur-sm rounded-xl p-8 border border-border/50">
                 <div className={`w-16 h-16 bg-gradient-to-br ${gradientColors[index % gradientColors.length]} rounded-xl flex items-center justify-center mb-6`}>
-                  <IconComponent className={`w-8 h-8 ${iconColors[index % iconColors.length]}`} />
+                  {editMode ? (
+                    <InlineEditableIcon
+                      iconName={feature.icon}
+                      onIconChange={(newIcon) => {
+                        const updatedFeatures = [...config.features];
+                        updatedFeatures[index] = { ...feature, icon: newIcon };
+                        handleConfigChange({ ...config, features: updatedFeatures });
+                      }}
+                      className={`w-8 h-8 ${iconColors[index % iconColors.length]}`}
+                    />
+                  ) : (
+                    <IconComponent className={`w-8 h-8 ${iconColors[index % iconColors.length]}`} />
+                  )}
                 </div>
                 {editMode ? (
                   <InlineEditableText

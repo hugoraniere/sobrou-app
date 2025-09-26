@@ -100,11 +100,23 @@ class LandingPageService {
     }
   }
 
-  async updateConfig(sectionKey: string, content: any, isVisible?: boolean): Promise<boolean> {
+  async updateConfig(sectionKey: string, content: any, isVisible?: boolean, order?: number, displayName?: string): Promise<boolean> {
     try {
-      const updateData: any = { content };
+      const updateData: any = {
+        content,
+        updated_at: new Date().toISOString()
+      };
+
       if (isVisible !== undefined) {
         updateData.is_visible = isVisible;
+      }
+
+      if (order !== undefined) {
+        updateData.section_order = order;
+      }
+
+      if (displayName !== undefined) {
+        updateData.display_name = displayName;
       }
 
       // Try to update first

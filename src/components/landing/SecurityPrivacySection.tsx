@@ -2,6 +2,7 @@ import React from 'react';
 import { Shield, Lock, Eye, Server, FileCheck } from 'lucide-react';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import InlineEditableText from '@/components/admin/inline-editor/InlineEditableText';
+import InlineEditableIcon from '@/components/admin/inline-editor/InlineEditableIcon';
 
 interface SecurityPrivacySectionProps {
   editMode?: boolean;
@@ -96,7 +97,19 @@ const SecurityPrivacySection: React.FC<SecurityPrivacySectionProps> = ({ editMod
             return (
               <div key={index} className="text-center">
                 <div className={`w-16 h-16 ${bgColors[index % bgColors.length]} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                  <IconComponent className={`w-8 h-8 ${iconColors[index % iconColors.length]}`} />
+                  {editMode ? (
+                    <InlineEditableIcon
+                      iconName={feature.icon}
+                      onIconChange={(newIcon) => {
+                        const updatedFeatures = [...config.features];
+                        updatedFeatures[index] = { ...feature, icon: newIcon };
+                        handleConfigChange({ ...config, features: updatedFeatures });
+                      }}
+                      className={`w-8 h-8 ${iconColors[index % iconColors.length]}`}
+                    />
+                  ) : (
+                    <IconComponent className={`w-8 h-8 ${iconColors[index % iconColors.length]}`} />
+                  )}
                 </div>
                 {editMode ? (
                   <InlineEditableText
