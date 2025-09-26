@@ -58,17 +58,22 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
     <>
       <div
         ref={toolbarRef}
+        data-formatting-toolbar
         className="fixed z-50 bg-card border border-border rounded-lg shadow-lg p-2 flex items-center gap-1"
         style={{ 
           top: `${position.top}px`, 
           left: `${position.left}px`,
           minWidth: '300px'
         }}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onApplyFormatting('bold')}
+          onClick={(e) => {
+            e.stopPropagation();
+            onApplyFormatting('bold');
+          }}
           className="p-2"
         >
           <Bold className="w-4 h-4" />
@@ -77,7 +82,10 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onApplyFormatting('italic')}
+          onClick={(e) => {
+            e.stopPropagation();
+            onApplyFormatting('italic');
+          }}
           className="p-2"
         >
           <Italic className="w-4 h-4" />
@@ -86,7 +94,10 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onApplyFormatting('underline')}
+          onClick={(e) => {
+            e.stopPropagation();
+            onApplyFormatting('underline');
+          }}
           className="p-2"
         >
           <Underline className="w-4 h-4" />
@@ -97,7 +108,10 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setShowColorModal(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowColorModal(true);
+          }}
           className="p-1"
           title="Cor do texto"
         >
@@ -109,7 +123,10 @@ const FormattingToolbar: React.FC<FormattingToolbarProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           className="p-1"
           title="Fechar"
         >

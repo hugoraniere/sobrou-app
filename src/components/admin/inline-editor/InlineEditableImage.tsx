@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Trash2 } from 'lucide-react';
+import { Upload, Trash2, Image } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import ImagePlaceholder from '@/components/ui/image-placeholder';
 import { EditorButton } from '@/components/ui/editor-button';
+import MediaLibraryModal from '@/components/admin/media/MediaLibraryModal';
 
 interface InlineEditableImageProps {
   src?: string;
@@ -28,6 +29,7 @@ const InlineEditableImage: React.FC<InlineEditableImageProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadImage } = useLandingPage();
 
@@ -79,6 +81,8 @@ const InlineEditableImage: React.FC<InlineEditableImageProps> = ({
           title="Clique para adicionar imagem"
           subtitle="JPG, PNG, WebP até 5MB"
           isLoading={isUploading}
+          showLibraryButton
+          onLibraryClick={() => setShowMediaLibrary(true)}
         />
         <input
           ref={fileInputRef}
@@ -86,6 +90,12 @@ const InlineEditableImage: React.FC<InlineEditableImageProps> = ({
           accept="image/jpeg,image/png,image/webp"
           onChange={handleFileInputChange}
           className="hidden"
+        />
+        <MediaLibraryModal
+          isOpen={showMediaLibrary}
+          onClose={() => setShowMediaLibrary(false)}
+          onImageSelect={onImageChange}
+          onUploadNew={() => fileInputRef.current?.click()}
         />
       </div>
     );
@@ -122,8 +132,15 @@ const InlineEditableImage: React.FC<InlineEditableImageProps> = ({
               variant="toolbar"
               size="icon"
               onClick={() => fileInputRef.current?.click()}
-              title="Substituir imagem"
+              title="Upload nova imagem"
               icon={<Upload className="w-4 h-4" />}
+            />
+            <EditorButton
+              variant="toolbar"
+              size="icon"
+              onClick={() => setShowMediaLibrary(true)}
+              title="Escolher da biblioteca"
+              icon={<Image className="w-4 h-4" />}
             />
             <EditorButton
               variant="destructive"
@@ -142,6 +159,13 @@ const InlineEditableImage: React.FC<InlineEditableImageProps> = ({
         accept="image/jpeg,image/png,image/webp"
         onChange={handleFileInputChange}
         className="hidden"
+      />
+      
+      <MediaLibraryModal
+        isOpen={showMediaLibrary}
+        onClose={() => setShowMediaLibrary(false)}
+        onImageSelect={onImageChange}
+        onUploadNew={() => fileInputRef.current?.click()}
       />
     </div>
   );

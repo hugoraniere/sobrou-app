@@ -13,6 +13,8 @@ interface ImagePlaceholderProps {
   isDragOver?: boolean;
   isLoading?: boolean;
   showUploadIcon?: boolean;
+  showLibraryButton?: boolean;
+  onLibraryClick?: () => void;
 }
 
 const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
@@ -24,7 +26,9 @@ const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
   subtitle = 'JPG, PNG, WebP até 5MB',
   isDragOver = false,
   isLoading = false,
-  showUploadIcon = false
+  showUploadIcon = false,
+  showLibraryButton = false,
+  onLibraryClick
 }) => {
   const handleClick = () => {
     if (!isLoading && onImageSelect) {
@@ -81,9 +85,24 @@ const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
             <p className="text-base font-medium text-gray-600 group-hover:text-gray-800 mb-1">
               {title}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-3">
               {subtitle}
             </p>
+            
+            {/* Library button */}
+            {showLibraryButton && onLibraryClick && (
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLibraryClick();
+                  }}
+                  className="text-sm text-primary hover:text-primary-hover transition-colors duration-200"
+                >
+                  ou escolher da biblioteca
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Drag indicator */}

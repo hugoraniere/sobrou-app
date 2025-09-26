@@ -53,8 +53,21 @@ const InlineEditableText: React.FC<InlineEditableTextProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (contentRef.current && !contentRef.current.contains(event.target as Node)) {
-        handleBlur();
+      const target = event.target as Node;
+      if (contentRef.current && !contentRef.current.contains(target)) {
+        // Check if click is on formatting toolbar
+        const toolbars = document.querySelectorAll('[data-formatting-toolbar]');
+        let isClickOnToolbar = false;
+        
+        toolbars.forEach(toolbar => {
+          if (toolbar.contains(target)) {
+            isClickOnToolbar = true;
+          }
+        });
+        
+        if (!isClickOnToolbar) {
+          handleBlur();
+        }
       }
     };
 

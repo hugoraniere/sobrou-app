@@ -7,7 +7,6 @@ import { EditorButton } from '@/components/ui/editor-button';
 import StatusIndicator from '@/components/ui/status-indicator';
 
 // Import original landing page components
-import { LandingPageProvider } from '@/contexts/LandingPageContext';
 import HeroSection from '@/components/landing/HeroSection';
 import ModuleTourSection from '@/components/landing/ModuleTourSection';
 import WhatsAppVoiceSection from '@/components/landing/WhatsAppVoiceSection';
@@ -169,18 +168,16 @@ const VisualLandingPageEditor: React.FC = () => {
             className="bg-white shadow-xl transition-all duration-300"
             style={getViewportStyles()}
           >
-            <LandingPageProvider>
-              <div className="min-h-full">
-                <HeroSection editMode />
-                <ModuleTourSection editMode />
-                <WhatsAppVoiceSection editMode />
-                <StatementImportSection editMode />
-                <AutomationAISection editMode />
-                <SecurityPrivacySection editMode />
-                <FAQSection editMode />
-                <CtaSection editMode />
-              </div>
-            </LandingPageProvider>
+            <div className="min-h-full">
+              <HeroSection editMode />
+              <ModuleTourSection editMode />
+              <WhatsAppVoiceSection editMode />
+              <StatementImportSection editMode />
+              <AutomationAISection editMode />
+              <SecurityPrivacySection editMode />
+              <FAQSection editMode />
+              <CtaSection editMode />
+            </div>
           </div>
         </div>
       </main>
