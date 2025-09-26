@@ -63,8 +63,8 @@ const CtaSection: React.FC<CtaSectionProps> = ({ editMode = false }) => {
           <Button 
             asChild 
             size="lg" 
-            variant="secondary"
-            className="hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+            variant="default"
+            className="bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             <Link to={config.cta_url}>
               <CheckCircle2 className="w-5 h-5 mr-2" />

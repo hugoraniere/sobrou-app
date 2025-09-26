@@ -8,7 +8,7 @@ import { useSectionManagement } from '@/contexts/SectionManagementContext';
 import SectionList from './SectionList';
 
 const SectionToolbar: React.FC = () => {
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
   const { sections } = useSectionManagement();
 
