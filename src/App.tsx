@@ -32,7 +32,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminContent from "./pages/AdminContent";
 import AdminSupport from "./pages/AdminSupport";
-import AdminLandingPage from "./pages/admin/LandingPageAdmin";
+import AdminLandingPage from "./pages/admin/VisualLandingPageEditor";
 import AdminUsers from "./pages/AdminUsers";
 import OnboardingAdmin from "./pages/admin/OnboardingAdmin";
 import EmailVerification from "./pages/EmailVerification";
