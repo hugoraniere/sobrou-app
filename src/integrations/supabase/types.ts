@@ -1043,6 +1043,80 @@ export type Database = {
         }
         Relationships: []
       }
+      release_note_dismissals: {
+        Row: {
+          dismissed_at: string
+          id: string
+          release_note_id: string
+          user_id: string
+        }
+        Insert: {
+          dismissed_at?: string
+          id?: string
+          release_note_id: string
+          user_id: string
+        }
+        Update: {
+          dismissed_at?: string
+          id?: string
+          release_note_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "release_note_dismissals_release_note_id_fkey"
+            columns: ["release_note_id"]
+            isOneToOne: false
+            referencedRelation: "release_notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      release_notes: {
+        Row: {
+          created_at: string
+          cta_text: string | null
+          cta_url: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          size: string
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          cta_text?: string | null
+          cta_url?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          size?: string
+          title: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          created_at?: string
+          cta_text?: string | null
+          cta_url?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          size?: string
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       saving_goals: {
         Row: {
           completed: boolean

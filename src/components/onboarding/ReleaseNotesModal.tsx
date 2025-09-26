@@ -1,0 +1,131 @@
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { ReleaseNotesService, ReleaseNote } from '@/services/releaseNotesService';
+import { useToast } from '@/hooks/use-toast';
+
+const ReleaseNotesModal: React.FC = () => {
+  const [activeNote, setActiveNote] = useState<ReleaseNote | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadActiveNote();
+  }, []);
+
+  const loadActiveNote = async () => {
+    try {
+      const note = await ReleaseNotesService.getUndismissedActiveReleaseNote();
+      if (note) {
+        setActiveNote(note);
+        setIsOpen(true);
+      }
+    } catch (error) {
+      console.error('Error loading active release note:', error);
+    }
+  };
+
+  const handleDismiss = async () => {
+    if (!activeNote) return;
+
+    try {
+      await ReleaseNotesService.dismissReleaseNote(activeNote.id);
+      setIsOpen(false);
+      setActiveNote(null);
+    } catch (error) {
+      console.error('Error dismissing release note:', error);
+      toast({
+        description: "Erro ao fechar release note",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCTAClick = () => {
+    if (activeNote?.cta_url) {
+      window.open(activeNote.cta_url, '_blank');
+    }
+    handleDismiss();
+  };
+
+  if (!activeNote) return null;
+
+  const getSizeClasses = (size: string) => {
+    switch (size) {
+      case 'small':
+        return 'max-w-md';
+      case 'large':
+        return 'max-w-4xl';
+      default: // medium
+        return 'max-w-2xl';
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={() => {}}>
+      <DialogContent className={`${getSizeClasses(activeNote.size)} max-h-[90vh] overflow-y-auto`}>
+        <DialogHeader>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl font-bold">
+              {activeNote.title}
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDismiss}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          {activeNote.image_url && (
+            <div className="flex justify-center">
+              <img
+                src={activeNote.image_url}
+                alt={activeNote.title}
+                className={`rounded-lg object-cover ${
+                  activeNote.size === 'small' 
+                    ? 'h-32 w-32' 
+                    : activeNote.size === 'large'
+                    ? 'h-64 w-full'
+                    : 'h-48 w-full'
+                }`}
+              />
+            </div>
+          )}
+          
+          {activeNote.description && (
+            <div className="text-center">
+              <p className="text-muted-foreground whitespace-pre-wrap">
+                {activeNote.description}
+              </p>
+            </div>
+          )}
+          
+          <div className="flex justify-center gap-3">
+            {activeNote.cta_text && activeNote.cta_url && (
+              <Button onClick={handleCTAClick}>
+                {activeNote.cta_text}
+              </Button>
+            )}
+            <Button variant="outline" onClick={handleDismiss}>
+              Fechar
+            </Button>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">
+              Versão {activeNote.version}
+            </p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ReleaseNotesModal;

@@ -180,16 +180,26 @@ const App = () => {
                                  </ProtectedRoute>
                                } 
                              />
-                             <Route 
-                               path="/admin/gallery" 
-                               element={
-                                 <ProtectedRoute>
-                                   <AdminLayout>
-                                     <Gallery />
-                                   </AdminLayout>
-                                 </ProtectedRoute>
-                               } 
-                             />
+                              <Route 
+                                path="/admin/gallery" 
+                                element={
+                                  <ProtectedRoute>
+                                    <AdminLayout>
+                                      <Gallery />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
+                                } 
+                              />
+                              <Route 
+                                path="/admin/release-notes" 
+                                element={
+                                  <ProtectedRoute>
+                                    <AdminLayout>
+                                      <ReleaseNotesAdmin />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
+                                } 
+                              />
                           
                           {/* Protected routes */}
                           <Route
@@ -298,6 +308,7 @@ const App = () => {
                         <WhatsAppChatButton />
                         <TourManager />
                         <InstallPrompt />
+                        <ReleaseNotesModal />
                         {isDevMode && (
                           <>
                             <TourDevOverlay enabled={isDevMode} />
