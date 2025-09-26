@@ -322,15 +322,15 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
 
             <div>
               <Label htmlFor="cta_action">Ação do Botão Principal</Label>
-              <Select 
-                value={formData.cta_action || 'link'} 
-                onValueChange={(value) => handleInputChange('cta_action', value as 'link' | 'close')}
+                <Select 
+                value={formData.cta_action || 'open_link'}
+                onValueChange={(value) => handleInputChange('cta_action', value as 'open_link' | 'close')}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="link">Abrir Link</SelectItem>
+                  <SelectItem value="open_link">Abrir Link</SelectItem>
                   <SelectItem value="close">Fechar Modal</SelectItem>
                 </SelectContent>
               </Select>

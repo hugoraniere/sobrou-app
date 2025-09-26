@@ -50,7 +50,7 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         const tourEnabled = await ProductTourService.isTourEnabled();
         const shouldAutoStart = await ProductTourService.shouldAutoStartTour(user.id);
         
-        setCanShowTour(tourEnabled && (shouldAutoStart || progress?.started_at));
+        setCanShowTour(tourEnabled && (shouldAutoStart || !!progress?.started_at));
       } catch (error) {
         console.error('Error checking release notes and tour status:', error);
       }
