@@ -173,12 +173,12 @@ const VisualLandingPageEditor: React.FC = () => {
               <div className="min-h-full">
                 <HeroSection editMode />
                 <ModuleTourSection editMode />
-                <WhatsAppVoiceSection />
-                <StatementImportSection />
-                <AutomationAISection />
-                <SecurityPrivacySection />
+                <WhatsAppVoiceSection editMode />
+                <StatementImportSection editMode />
+                <AutomationAISection editMode />
+                <SecurityPrivacySection editMode />
                 <FAQSection editMode />
-                <CtaSection />
+                <CtaSection editMode />
               </div>
             </LandingPageProvider>
           </div>

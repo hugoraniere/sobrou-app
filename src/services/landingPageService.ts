@@ -107,13 +107,30 @@ class LandingPageService {
         updateData.is_visible = isVisible;
       }
 
-      const { error } = await supabase
+      // Try to update first
+      const { data: updateResult, error: updateError } = await supabase
         .from('landing_page_config')
         .update(updateData)
-        .eq('section_key', sectionKey);
+        .eq('section_key', sectionKey)
+        .select();
 
-      if (error) {
-        console.error('Error updating landing page config:', error);
+      // If no rows were updated, insert new record (upsert behavior)
+      if (!updateError && (!updateResult || updateResult.length === 0)) {
+        const { error: insertError } = await supabase
+          .from('landing_page_config')
+          .insert({
+            section_key: sectionKey,
+            content,
+            is_visible: isVisible !== undefined ? isVisible : true
+          });
+
+        if (insertError) {
+          console.error('Error inserting landing page config:', insertError);
+          toast("Não foi possível salvar as alterações. Tente novamente.");
+          return false;
+        }
+      } else if (updateError) {
+        console.error('Error updating landing page config:', updateError);
         toast("Não foi possível salvar as alterações. Tente novamente.");
         return false;
       }
@@ -121,12 +138,10 @@ class LandingPageService {
       // Clear cache to force refetch
       this.cache.delete(sectionKey);
       
-      toast("As alterações foram salvas.");
-      
       return true;
     } catch (error) {
       console.error('Error in updateConfig:', error);
-        toast("Ocorreu um erro inesperado. Tente novamente.");
+      toast("Ocorreu um erro inesperado. Tente novamente.");
       return false;
     }
   }
