@@ -62,11 +62,11 @@ const { getConfig, updateConfig } = useLandingPage();
   };
 
   return (
-    <section id="hero" className="w-full py-12 lg:py-24 overflow-x-visible bg-white relative">
+    <section id="hero" className="w-full py-16 lg:py-24 overflow-x-visible bg-main-bg-color relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Content */}
-          <div className="space-y-8">
+          <div className="space-y-8 text-center lg:text-left">
             {editMode ? (
               <InlineEditableText
                 value={config.title}
@@ -122,7 +122,7 @@ const { getConfig, updateConfig } = useLandingPage();
             </div>
             
             {/* Benefits */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 max-w-md mx-auto lg:mx-0">
               {config.benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -147,7 +147,7 @@ const { getConfig, updateConfig } = useLandingPage();
           </div>
 
           {/* Image */}
-          <div className="relative">
+          <div className="relative mx-auto lg:mx-0">
             {editMode ? (
               <InlineEditableImage
                 src={config.background_image}
