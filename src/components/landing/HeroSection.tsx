@@ -94,7 +94,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
             
             {/* Benefits */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 max-w-lg mx-auto lg:mx-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 max-w-lg mx-auto lg:mx-0 bg-white p-4 rounded-lg shadow-sm">
               {config.benefits.map((benefit, index) => <div key={index} className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
                     {renderIcon(benefit.icon)}
