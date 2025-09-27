@@ -194,16 +194,26 @@ const App = () => {
                                  </ProtectedRoute>
                                } 
                              />
-                               <Route 
-                                 path="/admin/gallery" 
-                                 element={
-                                   <ProtectedRoute>
-                                     <AdminLayout>
-                                       <Gallery />
-                                     </AdminLayout>
-                                   </ProtectedRoute>
-                                 } 
-                               />
+                                <Route 
+                                  path="/admin/gallery" 
+                                  element={
+                                    <ProtectedRoute>
+                                      <AdminLayout>
+                                        <Gallery />
+                                      </AdminLayout>
+                                    </ProtectedRoute>
+                                  } 
+                                />
+                                <Route 
+                                  path="/admin/product-tour" 
+                                  element={
+                                    <ProtectedRoute>
+                                      <AdminLayout>
+                                        <OnboardingManager />
+                                      </AdminLayout>
+                                    </ProtectedRoute>
+                                  } 
+                                />
                           
                           {/* Protected routes */}
                           <Route

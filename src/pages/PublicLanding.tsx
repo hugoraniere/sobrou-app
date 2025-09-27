@@ -14,22 +14,20 @@ import Footer from '../components/landing/Footer';
 const PublicLanding: React.FC = () => {
   return (
     <div className="bg-background min-h-screen">
-      <LandingPageProvider>
-        <SiteNavbar />
+      <SiteNavbar />
 
-        <main>
-          <HeroSection />
-          <ModuleTourSection />
-          <WhatsAppVoiceSection />
-          <StatementImportSection />
-          <AutomationAISection />
-          <SecurityPrivacySection />
-          <FAQSection />
-          <CtaSection />
-        </main>
+      <main>
+        <HeroSection />
+        <ModuleTourSection />
+        <WhatsAppVoiceSection />
+        <StatementImportSection />
+        <AutomationAISection />
+        <SecurityPrivacySection />
+        <FAQSection />
+        <CtaSection />
+      </main>
 
-        <Footer />
-      </LandingPageProvider>
+      <Footer />
     </div>
   );
 };
