@@ -116,27 +116,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [location.pathname, isAuthenticated, isLoading, user]);
 
-  // Completamente reescrita para evitar redirecionamentos em loops
+  // Routing logic - permite que usuários autenticados vejam /auth para trocar de conta
   useEffect(() => {
     // Só executamos esta lógica depois que a verificação de autenticação inicial estiver concluída
     if (isLoading) return;
 
     const searchParams = new URLSearchParams(location.search);
     const redirectTo = searchParams.get('redirect');
-
-    // Lista de rotas que são exclusivamente públicas (não fazem sentido para usuários autenticados)
-    const strictlyPublicRoutes = ['/auth'];
-    
-    // Rotas que são acessíveis tanto para usuários autenticados quanto não autenticados
-    const publicAccessibleRoutes = ['/reset-password', '/erro', '/blog', '/suporte'];
-    
-    // Verificamos se o usuário está na página de autenticação e já está autenticado
-    const isOnStrictlyPublicRoute = strictlyPublicRoutes.includes(location.pathname);
-    const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
     const isOnRootRoute = location.pathname === '/';
     
-    // Se o usuário está autenticado e tem um redirect, redirecionamos para lá
-    if (isAuthenticated && isOnStrictlyPublicRoute && redirectTo) {
+    // Se o usuário está autenticado e tem um redirect específico, redirecionamos para lá
+    if (isAuthenticated && redirectTo && location.pathname === '/auth') {
       navigate(redirectTo, { replace: true });
     }
     // Redireciona usuários autenticados da página inicial para o dashboard
@@ -144,11 +134,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     else if (isAuthenticated && isOnRootRoute && !searchParams.has('stay')) {
       navigate('/dashboard', { replace: true });
     }
-    // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
-    // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
-    else if (isAuthenticated && isOnStrictlyPublicRoute && !isOnPasswordResetRoute) {
-      navigate('/dashboard', { replace: true });
-    }
+    // Permitir que usuários autenticados acessem /auth para trocar de conta
+    // Não redirecionamos automaticamente da página de auth
   }, [isAuthenticated, isLoading, location.pathname, location.search, navigate]);
 
   const login = async (email: string, password: string, redirectTo?: string) => {

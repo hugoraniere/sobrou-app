@@ -83,7 +83,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
         )}
         <DropdownMenuItem onClick={handleTutorial} className="flex items-center">
           <BookOpen className="mr-2 h-4 w-4" />
-          Tutorial do sistema
+          Fazer tour
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="text-red-600 flex items-center">
