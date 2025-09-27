@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { cn } from '@/lib/utils';
-
+import { LandingPageProvider } from '@/contexts/LandingPageContext';
 import HeroSection from '@/components/landing/HeroSection';
 import ModuleTourSection from '@/components/landing/ModuleTourSection';
 import WhatsAppVoiceSection from '@/components/landing/WhatsAppVoiceSection';
@@ -79,7 +79,7 @@ const LandingPagePreview: React.FC<LandingPagePreviewProps> = ({
         style={getViewportStyles()}
         className="bg-white"
       >
-        
+        <LandingPageProvider>
           {sections.map((section) => {
             const SectionComponent = sectionComponents[section.key as keyof typeof sectionComponents];
             
@@ -116,7 +116,7 @@ const LandingPagePreview: React.FC<LandingPagePreviewProps> = ({
               </div>
             );
           })}
-        
+        </LandingPageProvider>
       </div>
     </div>
   );

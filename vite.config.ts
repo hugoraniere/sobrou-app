@@ -19,9 +19,6 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB - Increased for large bundles
-        cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\./,
@@ -50,7 +47,7 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: false, // Using custom manifest.json
       devOptions: {
-        enabled: false // Disabled in dev to prevent cache conflicts
+        enabled: true
       }
     })
   ].filter(Boolean),
