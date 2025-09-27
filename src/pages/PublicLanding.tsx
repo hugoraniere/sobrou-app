@@ -1,5 +1,4 @@
 import React from 'react';
-import { LandingPageProvider } from '@/contexts/LandingPageContext';
 import SiteNavbar from '../components/navigation/SiteNavbar';
 import HeroSection from '../components/landing/HeroSection';
 import ModuleTourSection from '../components/landing/ModuleTourSection';

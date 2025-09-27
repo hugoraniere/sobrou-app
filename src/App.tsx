@@ -55,6 +55,7 @@ import Error from "./pages/Error";
 import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
 import NewTicket from "./pages/support/NewTicket";
+import PWAResetButton from "./components/debug/PWAResetButton";
 const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 
 
@@ -323,6 +324,8 @@ const App = () => {
                         <TourManager />
                         <InstallPrompt />
                         <ReleaseNotesModal />
+                        {import.meta.env.DEV && <PWAResetButton />}
+
                       </div>
                       </NavigationProvider>
                     </WhatsAppButtonProvider>
