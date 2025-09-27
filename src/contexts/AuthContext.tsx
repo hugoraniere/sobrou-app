@@ -170,8 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         AdminAnalyticsService.trackAppEvent('login', { timestamp: new Date().toISOString() });
       }, 0);
 
-      // Always redirect to dashboard after successful login
-      navigate('/dashboard', { replace: true });
+      navigate(redirectTo || '/dashboard');
       return;
     } catch (error: any) {
       console.error('Login failed:', error);
@@ -237,8 +236,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      toast.info('Conectando com Google...', { duration: 2000 });
-      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

@@ -17,7 +17,7 @@ const PublicLanding: React.FC = () => {
       <LandingPageProvider>
         <SiteNavbar />
 
-        <main className="pt-20">
+        <main>
           <HeroSection />
           <ModuleTourSection />
           <WhatsAppVoiceSection />
