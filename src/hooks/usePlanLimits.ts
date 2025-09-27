@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSafeAuth } from './useSafeAuth';
 import { toast } from 'sonner';
 
 export interface PlanLimit {
@@ -19,7 +19,7 @@ export interface PlanLimits {
 export const usePlanLimits = () => {
   const [limits, setLimits] = useState<PlanLimits>({});
   const [loading, setLoading] = useState(true);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useSafeAuth();
 
   const fetchLimits = async () => {
     if (!isAuthenticated || !user) {

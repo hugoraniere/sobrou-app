@@ -1,4 +1,5 @@
 import React from 'react';
+import { LandingPageProvider } from '@/contexts/LandingPageContext';
 import SiteNavbar from '../components/navigation/SiteNavbar';
 import HeroSection from '../components/landing/HeroSection';
 import ModuleTourSection from '../components/landing/ModuleTourSection';
@@ -13,20 +14,22 @@ import Footer from '../components/landing/Footer';
 const PublicLanding: React.FC = () => {
   return (
     <div className="bg-background min-h-screen">
-      <SiteNavbar />
+      <LandingPageProvider>
+        <SiteNavbar />
 
-      <main className="pt-20">
-        <HeroSection />
-        <ModuleTourSection />
-        <WhatsAppVoiceSection />
-        <StatementImportSection />
-        <AutomationAISection />
-        <SecurityPrivacySection />
-        <FAQSection />
-        <CtaSection />
-      </main>
+        <main className="pt-20">
+          <HeroSection />
+          <ModuleTourSection />
+          <WhatsAppVoiceSection />
+          <StatementImportSection />
+          <AutomationAISection />
+          <SecurityPrivacySection />
+          <FAQSection />
+          <CtaSection />
+        </main>
 
-      <Footer />
+        <Footer />
+      </LandingPageProvider>
     </div>
   );
 };
