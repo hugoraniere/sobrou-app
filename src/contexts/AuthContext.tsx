@@ -64,6 +64,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               });
             }, 100);
           }
+
+          // Lidar com redirect após login (especialmente OAuth)
+          if (event === 'SIGNED_IN') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            const isOAuth = urlParams.get('oauth');
+            
+            if (redirect) {
+              navigate(decodeURIComponent(redirect));
+            } else if (isOAuth && location.pathname === '/auth') {
+              navigate('/dashboard');
+            }
+          }
         } else {
           setUser(null);
         }
@@ -73,7 +86,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           navigate('/reset-password');
         }
 
-        setIsLoading(false);
+        // Só marca como não carregando se ainda não foi marcado
+        // Isso evita corridas entre getSession e onAuthStateChange
+        if (isLoading) {
+          setIsLoading(false);
+        }
       }
     );
 
@@ -103,7 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, location.pathname, isLoading]);
 
   // Track page navigation for authenticated users
   useEffect(() => {
@@ -135,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       navigate('/dashboard', { replace: true });
     }
     // Permitir que usuários autenticados acessem /auth para trocar de conta
-    // Não redirecionamos automaticamente da página de auth
+    // Não redirecionamos automaticamente da página de auth se não há redirect
   }, [isAuthenticated, isLoading, location.pathname, location.search, navigate]);
 
   const login = async (email: string, password: string, redirectTo?: string) => {
@@ -157,8 +174,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         AdminAnalyticsService.trackAppEvent('login', { timestamp: new Date().toISOString() });
       }, 0);
 
-      // Always redirect to dashboard after successful login
-      navigate('/dashboard', { replace: true });
+      // Se há redirectTo, usar ele; senão, ir para dashboard
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+      
       return;
     } catch (error: any) {
       console.error('Login failed:', error);
@@ -226,10 +248,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       toast.info('Conectando com Google...', { duration: 2000 });
       
+      // Preservar redirect da URL atual se existir
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirect = urlParams.get('redirect');
+      const redirectParam = redirect ? `&redirect=${encodeURIComponent(redirect)}` : '';
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: `${window.location.origin}/auth?oauth=1${redirectParam}`
         }
       });
       
