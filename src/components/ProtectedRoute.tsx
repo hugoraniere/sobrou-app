@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { useSafeAuth } from '@/hooks/useSafeAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useSafeAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/suporte';
 
