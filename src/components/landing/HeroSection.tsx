@@ -116,7 +116,7 @@ const { getConfig, updateConfig } = useLandingPage();
               </Link>
             </div>
 
-            <div className="inline-flex items-center justify-center lg:justify-start gap-2 text-gray-600 mx-auto lg:mx-0">
+            <div className="inline-flex w-fit items-center justify-center lg:justify-start gap-2 text-gray-600 mx-auto lg:mx-0">
               <CheckCircle2 className="text-primary h-5 w-5" />
               <span>Comece em menos de 2 minutos</span>
             </div>
