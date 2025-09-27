@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import MainNavbar from '../navigation/MainNavbar';
-import { OnboardingProvider } from '@/contexts/OnboardingContext';
+
 import FloatingChatButton from '../chat/FloatingChatButton';
 import ChatWindow from '../chat/ChatWindow';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
+
+import AppFooter from './AppFooter';
 
 interface AppLayoutContentProps {
   children: React.ReactNode;
@@ -27,7 +29,7 @@ const AppLayoutContent: React.FC<AppLayoutContentProps> = ({ children }) => {
       {/* Main content area with responsive margin */}
       <div 
         className={cn(
-          "flex-1 flex flex-col transition-all duration-300 ease-in-out",
+          "flex-1 flex flex-col transition-all duration-300 ease-in-out min-h-screen",
           !isMobile && (isExpanded ? "ml-64" : "ml-16")
         )}
       >
@@ -50,6 +52,9 @@ const AppLayoutContent: React.FC<AppLayoutContentProps> = ({ children }) => {
             onClose={() => setIsChatOpen(false)}
           />
         </main>
+        
+        {/* Footer */}
+        <AppFooter />
       </div>
     </div>
   );
@@ -62,9 +67,7 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={false}>
-      <OnboardingProvider>
-        <AppLayoutContent>{children}</AppLayoutContent>
-      </OnboardingProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
     </SidebarProvider>
   );
 };
