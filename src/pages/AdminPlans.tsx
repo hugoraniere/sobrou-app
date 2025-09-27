@@ -17,7 +17,7 @@ import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import PlanFeatureManager from '@/components/admin/plans/PlanFeatureManager';
 import PlanComparisonTable from '@/components/admin/plans/PlanComparisonTable';
 import PlanUsersModal from '@/components/admin/plans/PlanUsersModal';
-import { FEATURE_MODULES } from '@/constants/planFeatures';
+import { FEATURE_MODULES, getAllFeatures, USER_PERMISSIONS } from '@/constants/planFeatures';
 import PlanLimitsManager from '@/components/admin/plans/PlanLimitsManager';
 import TrialConfigManager from '@/components/admin/plans/TrialConfigManager';
 

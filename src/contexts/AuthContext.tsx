@@ -140,7 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       navigate(redirectTo, { replace: true });
     }
     // Redireciona usuários autenticados da página inicial para o dashboard
-    else if (isAuthenticated && isOnRootRoute) {
+    // UNLESS there's a query parameter to stay on landing page
+    else if (isAuthenticated && isOnRootRoute && !searchParams.has('stay')) {
       navigate('/dashboard', { replace: true });
     }
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar

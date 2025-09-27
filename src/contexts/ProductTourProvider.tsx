@@ -39,9 +39,11 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
 
       try {
         const activeReleaseNote = await ReleaseNotesService.getUndismissedActiveReleaseNote();
+        console.log('🎯 Product Tour Debug - Active release note:', activeReleaseNote);
         
         // If there's an active release note, prevent tour from starting
         if (activeReleaseNote) {
+          console.log('🛑 Product Tour blocked by active release note');
           setCanShowTour(false);
           return;
         }
@@ -49,8 +51,11 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         // Check if tour should be shown
         const tourEnabled = await ProductTourService.isTourEnabled();
         const shouldAutoStart = await ProductTourService.shouldAutoStartTour(user.id);
+        console.log('🎯 Product Tour Debug - Tour enabled:', tourEnabled, 'Should auto start:', shouldAutoStart, 'Progress:', progress);
         
-        setCanShowTour(tourEnabled && (shouldAutoStart || !!progress?.started_at));
+        const canShow = tourEnabled && (shouldAutoStart || !!progress?.started_at);
+        console.log('🎯 Product Tour Debug - Can show tour:', canShow);
+        setCanShowTour(canShow);
       } catch (error) {
         console.error('Error checking release notes and tour status:', error);
       }
@@ -77,6 +82,7 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
 
     try {
       setIsLoading(true);
+      console.log('🎯 Product Tour Debug - Loading tour data for user:', user.id);
       
       // Load tour steps and user progress in parallel
       const [tourSteps, userProgress] = await Promise.all([
@@ -84,6 +90,7 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
         ProductTourService.getUserProgress(user.id)
       ]);
 
+      console.log('🎯 Product Tour Debug - Loaded steps:', tourSteps.length, 'User progress:', userProgress);
       setSteps(tourSteps);
       setProgress(userProgress);
 
@@ -95,6 +102,7 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
           if (stepIndex !== -1) {
             setCurrentStepIndex(stepIndex);
             setCurrentStep(tourSteps[stepIndex]);
+            console.log('🎯 Product Tour Debug - Resuming from step:', currentStepKey);
             // Don't auto-start the tour here, let it be controlled by the UI
           }
         }
