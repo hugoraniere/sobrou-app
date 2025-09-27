@@ -59,18 +59,18 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="relative max-w-lg mx-auto lg:max-w-none">
+          <div className="relative">
             {editMode ? (
               <InlineEditableImage
                 src={config.image}
                 alt="Importação de Extratos"
                 onImageChange={handleImageChange}
                 section="statement"
-                containerClassName="aspect-[4/5] sm:aspect-square lg:aspect-[4/5] bg-gray-200 rounded-2xl max-h-[400px] sm:max-h-[500px]"
+                containerClassName="aspect-square bg-gray-200 rounded-2xl"
                 className="w-full h-full object-cover rounded-2xl"
               />
             ) : (
-              <div className="aspect-[4/5] sm:aspect-square lg:aspect-[4/5] bg-gray-200 rounded-2xl flex items-center justify-center max-h-[400px] sm:max-h-[500px]">
+              <div className="aspect-square bg-gray-200 rounded-2xl flex items-center justify-center">
                 {config.image ? (
                   <img 
                     src={config.image} 
@@ -78,7 +78,7 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 ) : (
-                  <div className="text-gray-400 text-6xl sm:text-8xl">📄</div>
+                  <div className="text-gray-400 text-8xl">📄</div>
                 )}
               </div>
             )}

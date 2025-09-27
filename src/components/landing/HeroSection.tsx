@@ -61,27 +61,23 @@ const { getConfig, updateConfig } = useLandingPage();
     await updateConfig('hero', updatedConfig);
   };
 
-  const handleImageChange = async (imageUrl: string | null) => {
-    if (!editMode) return;
-    await handleConfigUpdate('background_image', imageUrl);
-  };
-
   return (
     <section id="hero" className="w-full py-12 lg:py-24 overflow-x-visible bg-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          <div className="space-y-6 lg:space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+          {/* Content */}
+          <div className="space-y-8">
             {editMode ? (
               <InlineEditableText
                 value={config.title}
                 onChange={(value) => handleConfigUpdate('title', value)}
                 element="h1"
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900"
+                className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
                 placeholder="Digite o título principal"
               />
             ) : (
               <h1 
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900"
+                className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
                 dangerouslySetInnerHTML={{ __html: config.title }}
               />
             )}
@@ -91,20 +87,20 @@ const { getConfig, updateConfig } = useLandingPage();
                 value={config.subtitle}
                 onChange={(value) => handleConfigUpdate('subtitle', value)}
                 element="div"
-                className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed"
+                className="text-lg lg:text-xl text-gray-600 leading-relaxed"
                 placeholder="Digite o subtítulo"
                 multiline
               />
             ) : (
               <div 
-                className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed"
+                className="text-lg lg:text-xl text-gray-600 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: config.subtitle }}
               />
             )}
 
             <div>
               <Link to={config.cta_url || "/auth"}>
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-6 py-3 sm:px-8 text-base sm:text-lg rounded-full w-full sm:w-auto">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg rounded-full">
                   {editMode ? (
                     <InlineEditableText
                       value={config.cta_text}
@@ -115,21 +111,21 @@ const { getConfig, updateConfig } = useLandingPage();
                   ) : (
                     config.cta_text
                   )}
-                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
             </div>
 
-            <div className="flex items-center gap-2 text-gray-600 justify-center sm:justify-start">
-              <CheckCircle2 className="text-primary h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="text-sm sm:text-base">Comece em menos de 2 minutos</span>
+            <div className="flex items-center gap-2 text-gray-600">
+              <CheckCircle2 className="text-primary h-5 w-5" />
+              <span>Comece em menos de 2 minutos</span>
             </div>
             
             {/* Benefits */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {config.benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     {renderIcon(benefit.icon)}
                   </div>
                   <div className="text-left">
@@ -138,11 +134,11 @@ const { getConfig, updateConfig } = useLandingPage();
                         value={benefit.title}
                         onChange={(value) => handleBenefitUpdate(index, 'title', value)}
                         element="span"
-                        className="text-xs sm:text-sm font-medium text-gray-900 block"
+                        className="text-sm font-medium text-gray-900 block"
                         placeholder="Título do benefício"
                       />
                     ) : (
-                      <span className="text-xs sm:text-sm font-medium text-gray-900 block">{benefit.title}</span>
+                      <span className="text-sm font-medium text-gray-900 block">{benefit.title}</span>
                     )}
                   </div>
                 </div>
@@ -151,29 +147,25 @@ const { getConfig, updateConfig } = useLandingPage();
           </div>
 
           {/* Image */}
-          <div className="relative mt-8 lg:mt-0">
-            <div className="aspect-square lg:aspect-[4/5] max-w-md mx-auto lg:max-w-none max-h-[400px] sm:max-h-[500px] lg:max-h-[600px]">
-              {editMode ? (
-                <InlineEditableImage
-                  src={config.background_image}
-                  alt="Hero Image"
-                  onImageChange={handleImageChange}
-                  section="hero"
-                  containerClassName="w-full h-full bg-gray-200 rounded-2xl"
-                  className="w-full h-full object-cover rounded-2xl"
-                />
-              ) : config.background_image ? (
-                <LazyImage 
-                  src={config.background_image} 
-                  alt="Hero Image"
-                  className="w-full h-full object-cover rounded-2xl"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 rounded-2xl flex items-center justify-center">
-                  <div className="text-gray-400 text-4xl sm:text-6xl">🚀</div>
-                </div>
-              )}
-            </div>
+          <div className="relative">
+            {editMode ? (
+              <InlineEditableImage
+                src={config.background_image}
+                alt="Dashboard do Sobrou mostrando controle financeiro completo"
+                onImageChange={(src) => handleConfigUpdate('background_image', src)}
+                section="hero"
+                className="w-full h-auto object-contain rounded-lg shadow-2xl"
+              />
+            ) : (
+              <LazyImage 
+                src={config.background_image}
+                alt="Dashboard do Sobrou mostrando controle financeiro completo" 
+                className="w-full h-auto object-contain rounded-lg shadow-2xl"
+                priority
+                width={800}
+                height={600}
+              />
+            )}
           </div>
         </div>
       </div>
