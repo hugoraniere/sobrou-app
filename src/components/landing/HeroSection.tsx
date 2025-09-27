@@ -129,31 +129,49 @@ const HeroSection: React.FC<HeroSectionProps> = ({ editMode = false }) => {
               <span>Comece em menos de 2 minutos</span>
             </div>
 
-            {/* Benefits - agora como cards lado a lado */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 max-w-2xl mx-auto lg:mx-0">
+            {/* Benefits - grid simplificado e consistente */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full lg:w-[35rem] mx-auto lg:mx-0">
               {config.benefits.map((benefit, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm ring-1 ring-black/5"
+                  className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-md ring-1 ring-black/5 border border-gray-100"
                 >
                   <div className="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
                     {renderIcon(benefit.icon)}
                   </div>
-                  <div className="text-left">
+                  <div className="text-left flex-1">
                     {editMode ? (
-                      <InlineEditableText
-                        value={benefit.title}
-                        onChange={(value) =>
-                          handleBenefitUpdate(index, 'title', value)
-                        }
-                        element="span"
-                        className="text-base font-medium text-gray-900 block"
-                        placeholder="Título do benefício"
-                      />
+                      <>
+                        <InlineEditableText
+                          value={benefit.title}
+                          onChange={(value) =>
+                            handleBenefitUpdate(index, 'title', value)
+                          }
+                          element="span"
+                          className="text-base font-medium text-gray-900 block mb-1"
+                          placeholder="Título do benefício"
+                        />
+                        <InlineEditableText
+                          value={benefit.description || ''}
+                          onChange={(value) =>
+                            handleBenefitUpdate(index, 'description', value)
+                          }
+                          element="span"
+                          className="text-sm text-gray-600 block"
+                          placeholder="Descrição do benefício"
+                        />
+                      </>
                     ) : (
-                      <span className="text-base font-medium text-gray-900 block">
-                        {benefit.title}
-                      </span>
+                      <>
+                        <span className="text-base font-medium text-gray-900 block mb-1">
+                          {benefit.title}
+                        </span>
+                        {benefit.description && (
+                          <span className="text-sm text-gray-600 block">
+                            {benefit.description}
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

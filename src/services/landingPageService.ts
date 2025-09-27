@@ -40,33 +40,42 @@ class LandingPageService {
   private lastFetch: number = 0;
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-  async getConfig(sectionKey: string): Promise<LandingPageConfig | null> {
-    // Check cache first
+  async getConfig(sectionKey: string, forceRefresh: boolean = false): Promise<LandingPageConfig | null> {
+    // Check cache first (skip if force refresh)
     const cachedConfig = this.cache.get(sectionKey);
     const now = Date.now();
     
-    if (cachedConfig && (now - this.lastFetch) < this.CACHE_DURATION) {
+    if (!forceRefresh && cachedConfig && (now - this.lastFetch) < this.CACHE_DURATION) {
+      console.log(`[LandingPageService] Using cached config for ${sectionKey}`, { cachedConfig });
       return cachedConfig;
     }
 
     try {
+      console.log(`[LandingPageService] Fetching fresh config for ${sectionKey}, forceRefresh: ${forceRefresh}`);
+      
+      // Add timestamp to force cache busting
+      const timestamp = Date.now();
       const { data, error } = await supabase
         .from('landing_page_config')
         .select('*')
         .eq('section_key', sectionKey)
-        .single();
+        .limit(1)
+        .order('updated_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching landing page config:', error);
         return null;
       }
 
-      if (data) {
-        this.cache.set(sectionKey, data);
+      const config = data?.[0] || null;
+      console.log(`[LandingPageService] Fetched config for ${sectionKey}:`, { config });
+
+      if (config) {
+        this.cache.set(sectionKey, config);
         this.lastFetch = now;
       }
 
-      return data;
+      return config;
     } catch (error) {
       console.error('Error in getConfig:', error);
       return null;

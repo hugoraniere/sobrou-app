@@ -33,7 +33,9 @@ export function LandingPageProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const getConfig = (sectionKey: string): LandingPageConfig | null => {
-    return configs.find(config => config.section_key === sectionKey) || null;
+    const config = configs.find(config => config.section_key === sectionKey) || null;
+    console.log(`[LandingPageContext] Getting config for ${sectionKey}:`, { config, totalConfigs: configs.length });
+    return config;
   };
 
   const updateConfig = async (sectionKey: string, content: any, isVisible?: boolean): Promise<boolean> => {
