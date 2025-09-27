@@ -72,12 +72,12 @@ const { getConfig, updateConfig } = useLandingPage();
                 value={config.title}
                 onChange={(value) => handleConfigUpdate('title', value)}
                 element="h1"
-                className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
+                className="text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
                 placeholder="Digite o título principal"
               />
             ) : (
               <h1 
-                className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
+                className="text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900"
                 dangerouslySetInnerHTML={{ __html: config.title }}
               />
             )}
@@ -116,16 +116,16 @@ const { getConfig, updateConfig } = useLandingPage();
               </Link>
             </div>
 
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center justify-center lg:justify-start gap-2 text-gray-600">
               <CheckCircle2 className="text-primary h-5 w-5" />
               <span>Comece em menos de 2 minutos</span>
             </div>
             
             {/* Benefits */}
-            <div className="grid grid-cols-1 gap-4 max-w-md mx-auto lg:mx-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 max-w-lg mx-auto lg:mx-0">
               {config.benefits.map((benefit, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <div key={index} className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm">
+                  <div className="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
                     {renderIcon(benefit.icon)}
                   </div>
                   <div className="text-left">
@@ -134,11 +134,11 @@ const { getConfig, updateConfig } = useLandingPage();
                         value={benefit.title}
                         onChange={(value) => handleBenefitUpdate(index, 'title', value)}
                         element="span"
-                        className="text-sm font-medium text-gray-900 block"
+                        className="text-base font-medium text-gray-900 block"
                         placeholder="Título do benefício"
                       />
                     ) : (
-                      <span className="text-sm font-medium text-gray-900 block">{benefit.title}</span>
+                      <span className="text-base font-medium text-gray-900 block">{benefit.title}</span>
                     )}
                   </div>
                 </div>
