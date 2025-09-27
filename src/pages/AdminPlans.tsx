@@ -8,12 +8,19 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Star } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Plus, Edit, Trash2, Star, Copy, Users, Shield, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import AdminPageLayout from '@/components/admin/AdminPageLayout';
+import PlanFeatureManager from '@/components/admin/plans/PlanFeatureManager';
+import PlanComparisonTable from '@/components/admin/plans/PlanComparisonTable';
+import PlanUsersModal from '@/components/admin/plans/PlanUsersModal';
+import { FEATURE_MODULES, getAllFeatures, USER_PERMISSIONS } from '@/constants/planFeatures';
 
-interface PlanFeature {
-  name: string;
+interface PlanFeatureData {
+  id: string;
   enabled: boolean;
   limit?: string;
 }
@@ -25,7 +32,7 @@ interface Plan {
   price: number;
   currency: string;
   billing_cycle: string;
-  features: PlanFeature[];
+  features: any[];
   is_active: boolean;
   is_featured: boolean;
   display_order: number;
@@ -39,9 +46,10 @@ const BILLING_CYCLES = [
   { value: 'one_time', label: 'Pagamento Único' }
 ];
 
-const DEFAULT_FEATURES = [
+// Legacy features for backwards compatibility
+const LEGACY_FEATURES = [
   'Transações',
-  'Análises básicas',
+  'Análises básicas', 
   'Análises avançadas',
   'Metas de economia',
   'Chat IA',
@@ -57,13 +65,17 @@ const AdminPlans = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
+  const [selectedPlanForUsers, setSelectedPlanForUsers] = useState<Plan | null>(null);
+  const [activeTab, setActiveTab] = useState('manage');
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: 0,
     currency: 'BRL',
     billing_cycle: 'monthly',
-    features: DEFAULT_FEATURES.map(name => ({ name, enabled: false, limit: '' })),
+    features: [] as PlanFeatureData[],
     is_active: true,
     is_featured: false,
     display_order: 0
@@ -97,7 +109,11 @@ const AdminPlans = () => {
     try {
       const planData = {
         ...formData,
-        features: formData.features.filter(f => f.enabled)
+        features: formData.features.filter(f => f.enabled).map(f => ({
+          id: f.id,
+          enabled: f.enabled,
+          limit: f.limit || null
+        }))
       };
 
       if (selectedPlan) {
@@ -149,13 +165,20 @@ const AdminPlans = () => {
 
   const handleEdit = (plan: Plan) => {
     setSelectedPlan(plan);
-    const allFeatures = [...DEFAULT_FEATURES];
     
-    // Add existing features that might not be in defaults
-    plan.features.forEach(feature => {
-      if (!allFeatures.includes(feature.name)) {
-        allFeatures.push(feature.name);
-      }
+    // Convert plan features to the new format
+    const allFeatures = getAllFeatures();
+    const planFeatureData: PlanFeatureData[] = allFeatures.map(feature => {
+      const existingFeature = plan.features.find(f => 
+        (typeof f === 'object' && (f.id === feature.id || f.name === feature.name)) ||
+        (typeof f === 'string' && f === feature.name)
+      );
+      
+      return {
+        id: feature.id,
+        enabled: !!existingFeature,
+        limit: typeof existingFeature === 'object' ? existingFeature.limit || '' : ''
+      };
     });
 
     setFormData({
@@ -164,14 +187,7 @@ const AdminPlans = () => {
       price: plan.price,
       currency: plan.currency,
       billing_cycle: plan.billing_cycle,
-      features: allFeatures.map(name => {
-        const existingFeature = plan.features.find(f => f.name === name);
-        return {
-          name,
-          enabled: !!existingFeature,
-          limit: existingFeature?.limit || ''
-        };
-      }),
+      features: planFeatureData,
       is_active: plan.is_active,
       is_featured: plan.is_featured,
       display_order: plan.display_order
@@ -180,13 +196,18 @@ const AdminPlans = () => {
   };
 
   const resetForm = () => {
+    const allFeatures = getAllFeatures();
     setFormData({
       name: '',
       description: '',
       price: 0,
       currency: 'BRL',
       billing_cycle: 'monthly',
-      features: DEFAULT_FEATURES.map(name => ({ name, enabled: false, limit: '' })),
+      features: allFeatures.map(feature => ({ 
+        id: feature.id, 
+        enabled: false, 
+        limit: '' 
+      })),
       is_active: true,
       is_featured: false,
       display_order: plans.length
@@ -199,13 +220,32 @@ const AdminPlans = () => {
     setIsDialogOpen(true);
   };
 
-  const updateFeature = (index: number, field: keyof PlanFeature, value: any) => {
+  const handleFeatureChange = (featureId: string, enabled: boolean, limit?: string) => {
     setFormData(prev => ({
       ...prev,
-      features: prev.features.map((feature, i) => 
-        i === index ? { ...feature, [field]: value } : feature
+      features: prev.features.map(feature =>
+        feature.id === featureId
+          ? { ...feature, enabled, limit: limit || '' }
+          : feature
       )
     }));
+  };
+
+  const handleViewUsers = (plan: Plan) => {
+    setSelectedPlanForUsers(plan);
+    setIsUsersModalOpen(true);
+  };
+
+  const handleDuplicatePlan = (plan: Plan) => {
+    const duplicatedPlan = {
+      ...plan,
+      name: `${plan.name} (Cópia)`,
+      display_order: plans.length
+    };
+    delete (duplicatedPlan as any).id; // Remove ID so it creates a new plan
+    
+    handleEdit(duplicatedPlan as Plan);
+    setSelectedPlan(null); // Clear selected plan so it creates new instead of updating
   };
 
   if (isLoading && plans.length === 0) {
@@ -221,97 +261,259 @@ const AdminPlans = () => {
   }
 
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-background">
-      <main className="w-full px-4 md:px-8 py-6 md:py-8">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Gerenciar Planos</h1>
-            <p className="text-muted-foreground">
-              Configure os planos de assinatura disponíveis para os usuários
-            </p>
-          </div>
-          <Button onClick={handleNewPlan} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Novo Plano
-          </Button>
-        </div>
+    <AdminPageLayout
+      title="Administração de Planos"
+      subtitle="Configure planos de assinatura e permissões de usuário"
+    >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="manage" className="flex items-center gap-2">
+            <Edit className="h-4 w-4" />
+            Gerenciar Planos
+          </TabsTrigger>
+          <TabsTrigger value="compare" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Comparar Planos
+          </TabsTrigger>
+          <TabsTrigger value="permissions" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Permissões vs Planos
+          </TabsTrigger>
+        </TabsList>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {plans.map((plan) => (
-            <Card key={plan.id} className={`relative ${plan.is_featured ? 'ring-2 ring-primary' : ''}`}>
-              {plan.is_featured && (
-                <Badge className="absolute -top-2 -right-2 flex items-center gap-1">
-                  <Star className="h-3 w-3" />
-                  Destaque
-                </Badge>
-              )}
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-xl">{plan.name}</CardTitle>
-                    {plan.description && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {plan.description}
-                      </p>
+        <TabsContent value="manage" className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-lg font-semibold">Planos de Usuário</h2>
+                <p className="text-sm text-muted-foreground">
+                  Definem quais funcionalidades os usuários podem acessar baseado em sua assinatura
+                </p>
+              </div>
+            </div>
+            <Button onClick={handleNewPlan} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Novo Plano
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {plans.map((plan) => (
+              <Card key={plan.id} className={`relative ${plan.is_featured ? 'ring-2 ring-primary' : ''}`}>
+                {plan.is_featured && (
+                  <Badge className="absolute -top-2 -right-2 flex items-center gap-1">
+                    <Star className="h-3 w-3" />
+                    Destaque
+                  </Badge>
+                )}
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-xl">{plan.name}</CardTitle>
+                      {plan.description && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {plan.description}
+                        </p>
+                      )}
+                    </div>
+                    <Badge variant={plan.is_active ? "default" : "secondary"}>
+                      {plan.is_active ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </div>
+                  <div className="text-2xl font-bold">
+                    {plan.price > 0 ? (
+                      <>
+                        R$ {plan.price.toFixed(2)}
+                        <span className="text-sm font-normal text-muted-foreground">
+                          /{plan.billing_cycle === 'monthly' ? 'mês' : 
+                            plan.billing_cycle === 'yearly' ? 'ano' : 'única'}
+                        </span>
+                      </>
+                    ) : (
+                      'Gratuito'
                     )}
                   </div>
-                  <Badge variant={plan.is_active ? "default" : "secondary"}>
-                    {plan.is_active ? 'Ativo' : 'Inativo'}
-                  </Badge>
-                </div>
-                <div className="text-2xl font-bold">
-                  {plan.price > 0 ? (
-                    <>
-                      R$ {plan.price.toFixed(2)}
-                      <span className="text-sm font-normal text-muted-foreground">
-                        /{plan.billing_cycle === 'monthly' ? 'mês' : 
-                          plan.billing_cycle === 'yearly' ? 'ano' : 'única'}
-                      </span>
-                    </>
-                  ) : (
-                    'Gratuito'
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 mb-4">
-                  <h4 className="font-medium text-sm">Funcionalidades:</h4>
-                  <div className="space-y-1">
-                    {plan.features.map((feature, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
-                        <span>{feature.name}</span>
-                        {feature.limit && (
-                          <Badge variant="outline" className="text-xs">
-                            {feature.limit}
-                          </Badge>
-                        )}
-                      </div>
-                    ))}
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 mb-4">
+                    <h4 className="font-medium text-sm">Funcionalidades:</h4>
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {plan.features.slice(0, 5).map((feature, index) => (
+                        <div key={index} className="flex items-center justify-between text-sm">
+                          <span>
+                            {typeof feature === 'object' 
+                              ? (feature.name || feature.id) 
+                              : feature}
+                          </span>
+                          {typeof feature === 'object' && feature.limit && (
+                            <Badge variant="outline" className="text-xs">
+                              {feature.limit}
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                      {plan.features.length > 5 && (
+                        <p className="text-xs text-muted-foreground">
+                          +{plan.features.length - 5} funcionalidades
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(plan)}
-                    className="flex-1"
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(plan.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(plan)}
+                        className="flex-1"
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Editar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(plan.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDuplicatePlan(plan)}
+                        className="flex-1"
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Duplicar
+                      </Button>
+                      <Button
+                        variant="outline"  
+                        size="sm"
+                        onClick={() => handleViewUsers(plan)}
+                        className="flex-1"
+                      >
+                        <Users className="h-3 w-3 mr-1" />
+                        Usuários
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="compare" className="space-y-6">
+          <PlanComparisonTable
+            plans={plans}
+            onEditPlan={handleEdit}
+            onDuplicatePlan={handleDuplicatePlan}
+            onViewUsers={handleViewUsers}
+          />
+        </TabsContent>
+
+        <TabsContent value="permissions" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-blue-600" />
+                  Planos de Usuário
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Controlam quais <strong>funcionalidades</strong> o usuário pode acessar baseado em sua assinatura
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {plans.map((plan) => (
+                  <div key={plan.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <div className="font-medium">{plan.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {plan.features.length} funcionalidades
+                      </div>
+                    </div>
+                    <Badge variant={plan.is_active ? "default" : "secondary"}>
+                      {plan.is_active ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </div>
+                ))}
               </CardContent>
             </Card>
-          ))}
-        </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-green-600" />
+                  Permissões de Sistema
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Controlam o <strong>nível de acesso</strong> do usuário às áreas administrativas
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {USER_PERMISSIONS.map((permission) => (
+                  <div key={permission.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <div className="font-medium">{permission.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {permission.description}
+                      </div>
+                    </div>
+                    <Badge 
+                      variant={
+                        permission.level === 'admin' ? 'destructive' :
+                        permission.level === 'support' ? 'default' :
+                        permission.level === 'content' ? 'secondary' : 'outline'
+                      }
+                    >
+                      {permission.level}
+                    </Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Diferença Entre Planos e Permissões</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-blue-600 flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Planos de Usuário
+                  </h4>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• Definem funcionalidades do produto</li>
+                    <li>• Relacionados à monetização</li>
+                    <li>• Controlam recursos como IA, exportação, etc.</li>
+                    <li>• Usuário pode ter apenas 1 plano ativo</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-green-600 flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Permissões de Sistema
+                  </h4>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• Definem acesso administrativo</li>
+                    <li>• Relacionados à gestão do sistema</li>
+                    <li>• Controlam áreas como blog, suporte, admin</li>
+                    <li>• Usuário pode ter múltiplas permissões</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -399,26 +601,10 @@ const AdminPlans = () => {
               </div>
 
               <div className="space-y-4">
-                <Label>Funcionalidades</Label>
-                <div className="space-y-3 max-h-40 overflow-y-auto border rounded-md p-3">
-                  {formData.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <Switch
-                        checked={feature.enabled}
-                        onCheckedChange={(checked) => updateFeature(index, 'enabled', checked)}
-                      />
-                      <span className="flex-1 text-sm">{feature.name}</span>
-                      {feature.enabled && (
-                        <Input
-                          placeholder="Limite (opcional)"
-                          value={feature.limit}
-                          onChange={(e) => updateFeature(index, 'limit', e.target.value)}
-                          className="w-32 text-xs"
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <PlanFeatureManager
+                  selectedFeatures={formData.features}
+                  onFeatureChange={handleFeatureChange}
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -459,9 +645,17 @@ const AdminPlans = () => {
             </form>
           </DialogContent>
         </Dialog>
-      </main>
-    </div>
-  );
-};
+
+        <PlanUsersModal
+          plan={selectedPlanForUsers}
+          isOpen={isUsersModalOpen}
+          onClose={() => {
+            setIsUsersModalOpen(false);
+            setSelectedPlanForUsers(null);
+          }}
+        />
+      </AdminPageLayout>
+    );
+  };
 
 export default AdminPlans;
