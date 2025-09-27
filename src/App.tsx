@@ -40,6 +40,7 @@ import OnboardingManager from "./pages/admin/OnboardingManager";
 import DesignSystem from "./pages/admin/DesignSystem";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Gallery from "./pages/admin/Gallery";
+import AdminPlans from "./pages/AdminPlans";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
@@ -153,6 +154,16 @@ const App = () => {
             </ProtectedRoute>
           } 
         />
+                           <Route 
+                             path="/admin/plans" 
+                             element={
+                               <ProtectedRoute>
+                                 <AdminLayout>
+                                   <AdminPlans />
+                                 </AdminLayout>
+                               </ProtectedRoute>
+                             } 
+                           />
                            <Route 
                              path="/admin/users" 
                              element={

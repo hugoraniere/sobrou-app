@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
-  Eye, 
   Settings,
   Users,
   MessageSquare,
@@ -27,8 +26,6 @@ import ReleaseNotesManager from './ReleaseNotesManager';
 
 const OnboardingManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState('progress');
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [previewType, setPreviewType] = useState<'welcome' | 'stepper'>('welcome');
   const [configs, setConfigs] = useState<any>({});
 
   useEffect(() => {
@@ -48,31 +45,13 @@ const OnboardingManager: React.FC = () => {
     }
   };
 
-  const handlePreview = (type: 'welcome' | 'stepper') => {
-    setPreviewType(type);
-    setIsPreviewOpen(true);
-  };
-
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Administração do Onboarding</h1>
-          <p className="text-muted-foreground">
-            Configure a experiência de onboarding dos novos usuários
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button onClick={() => handlePreview('welcome')} variant="outline">
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Modal
-          </Button>
-          <Button onClick={() => handlePreview('stepper')} variant="outline">
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Stepper
-          </Button>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Onboarding</h1>
+        <p className="text-muted-foreground">
+          Configure a experiência de onboarding dos novos usuários
+        </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -137,12 +116,6 @@ const OnboardingManager: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-
-      <PreviewDialog 
-        isOpen={isPreviewOpen} 
-        onClose={() => setIsPreviewOpen(false)}
-        type={previewType}
-      />
     </div>
   );
 };
@@ -189,31 +162,5 @@ const VisibilityManager: React.FC<{configs: any, onUpdate: () => void}> = ({ con
     </Card>
   );
 };
-
-const PreviewDialog: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  type: 'welcome' | 'stepper';
-}> = ({ isOpen, onClose, type }) => (
-  <Dialog open={isOpen} onOpenChange={onClose}>
-    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle>
-          Preview - {type === 'welcome' ? 'Modal de Boas-vindas' : 'Get Started Stepper'}
-        </DialogTitle>
-      </DialogHeader>
-      
-      <div className="bg-muted/30 p-4 rounded-lg">
-        {type === 'welcome' ? (
-          <div className="flex items-center justify-center min-h-[200px]">
-            <div className="text-muted-foreground">Preview do modal em desenvolvimento</div>
-          </div>
-        ) : (
-          <GetStartedStepper />
-        )}
-      </div>
-    </DialogContent>
-  </Dialog>
-);
 
 export default OnboardingManager;

@@ -4,8 +4,6 @@ import { AdminSidebar } from './AdminSidebar';
 import MainNavbar from '../navigation/MainNavbar';
 import AdminMobileNavigation from './AdminMobileNavigation';
 
-import FloatingChatButton from '../chat/FloatingChatButton';
-import ChatWindow from '../chat/ChatWindow';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +12,6 @@ interface AdminLayoutContentProps {
 }
 
 const AdminLayoutContent: React.FC<AdminLayoutContentProps> = ({ children }) => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const { state } = useSidebar();
   const { isMobile } = useResponsive();
   const isExpanded = state === 'expanded';
@@ -49,16 +46,6 @@ const AdminLayoutContent: React.FC<AdminLayoutContentProps> = ({ children }) => 
           <div className="w-full mx-auto">
             {children}
           </div>
-
-          {/* Chat Components */}
-          <FloatingChatButton 
-            isOpen={isChatOpen}
-            onClick={() => setIsChatOpen(!isChatOpen)}
-          />
-          <ChatWindow
-            isOpen={isChatOpen}
-            onClose={() => setIsChatOpen(false)}
-          />
         </main>
       </div>
     </div>
