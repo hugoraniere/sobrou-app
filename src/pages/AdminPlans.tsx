@@ -17,7 +17,9 @@ import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import PlanFeatureManager from '@/components/admin/plans/PlanFeatureManager';
 import PlanComparisonTable from '@/components/admin/plans/PlanComparisonTable';
 import PlanUsersModal from '@/components/admin/plans/PlanUsersModal';
-import { FEATURE_MODULES, getAllFeatures, USER_PERMISSIONS } from '@/constants/planFeatures';
+import { FEATURE_MODULES } from '@/constants/planFeatures';
+import PlanLimitsManager from '@/components/admin/plans/PlanLimitsManager';
+import TrialConfigManager from '@/components/admin/plans/TrialConfigManager';
 
 interface PlanFeatureData {
   id: string;
@@ -407,9 +409,25 @@ const AdminPlans = () => {
           </div>
         </TabsContent>
 
+        <TabsContent value="limits" className="space-y-6">
+          <PlanLimitsManager onLimitsChange={fetchPlans} />
+        </TabsContent>
+
+        <TabsContent value="trials" className="space-y-6">
+          <TrialConfigManager />
+        </TabsContent>
+
+        <TabsContent value="limits" className="space-y-6">
+          <PlanLimitsManager onLimitsChange={fetchPlans} />
+        </TabsContent>
+
+        <TabsContent value="trials" className="space-y-6">
+          <TrialConfigManager />
+        </TabsContent>
+
         <TabsContent value="compare" className="space-y-6">
-          <PlanComparisonTable
-            plans={plans}
+          <PlanComparisonTable 
+            plans={plans} 
             onEditPlan={handleEdit}
             onDuplicatePlan={handleDuplicatePlan}
             onViewUsers={handleViewUsers}
