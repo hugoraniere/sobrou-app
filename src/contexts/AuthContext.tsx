@@ -41,13 +41,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
-        // Para debug: identificar eventos de autenticação
-        console.log('Auth event:', event);
+        console.log('[AUTH] Auth event:', event, 'Has session:', !!currentSession);
         
         setSession(currentSession);
         setIsAuthenticated(!!currentSession);
         
         if (currentSession?.user) {
+          console.log('[AUTH] Setting user data for:', currentSession.user.email);
           setUser({
             id: currentSession.user.id,
             email: currentSession.user.email || '',
@@ -65,11 +65,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }, 100);
           }
         } else {
+          console.log('[AUTH] Clearing user data');
           setUser(null);
         }
 
         // Identificar se estamos em um fluxo de recuperação de senha
         if (event === 'PASSWORD_RECOVERY') {
+          console.log('[AUTH] Password recovery detected, redirecting');
           navigate('/reset-password');
         }
 
@@ -135,18 +137,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
     const isOnRootRoute = location.pathname === '/';
     
+    // Tratamento especial para sucesso do Google OAuth
+    const isGoogleSuccess = searchParams.get('success') === 'google';
+    if (isAuthenticated && isGoogleSuccess) {
+      console.log('[AUTH] Google OAuth success detected, redirecting to dashboard');
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+
     // Se o usuário está autenticado e tem um redirect, redirecionamos para lá
     if (isAuthenticated && isOnStrictlyPublicRoute && redirectTo) {
+      console.log('[AUTH] Redirecting to:', redirectTo);
       navigate(redirectTo, { replace: true });
     }
     // Redireciona usuários autenticados da página inicial para o dashboard
     // UNLESS there's a query parameter to stay on landing page
     else if (isAuthenticated && isOnRootRoute && !searchParams.has('stay')) {
+      console.log('[AUTH] Redirecting authenticated user from root to dashboard');
       navigate('/dashboard', { replace: true });
     }
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
     // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
     else if (isAuthenticated && isOnStrictlyPublicRoute && !isOnPasswordResetRoute) {
+      console.log('[AUTH] Redirecting from public route to dashboard');
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, isLoading, location.pathname, location.search, navigate]);
@@ -236,16 +249,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
+      console.log('[AUTH] Starting Google OAuth flow');
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: `${window.location.origin}/auth?success=google`
         }
       });
       
       if (error) throw error;
+      console.log('[AUTH] Google OAuth initiated successfully');
     } catch (error: any) {
-      console.error('Google auth error:', error);
+      console.error('[AUTH] Google auth error:', error);
       toast.error('Erro ao fazer login com Google. Tente novamente.');
     }
   };
