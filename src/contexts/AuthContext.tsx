@@ -150,12 +150,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('[AUTH] Redirecting to:', redirectTo);
       navigate(redirectTo, { replace: true });
     }
-    // Redireciona usuários autenticados da página inicial para o dashboard
-    // UNLESS there's a query parameter to stay on landing page
-    else if (isAuthenticated && isOnRootRoute && !searchParams.has('stay')) {
-      console.log('[AUTH] Redirecting authenticated user from root to dashboard');
-      navigate('/dashboard', { replace: true });
-    }
+    // REMOVIDO: Não redirecionamos mais usuários logados de "/" para "/dashboard"
+    // Isso permite que vejam a landing page personalizada com os botões corretos
+    
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
     // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
     else if (isAuthenticated && isOnStrictlyPublicRoute && !isOnPasswordResetRoute) {
