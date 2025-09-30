@@ -578,78 +578,6 @@ export type Database = {
         }
         Relationships: []
       }
-      gallery_images: {
-        Row: {
-          alt_text: string | null
-          bucket_name: string
-          caption: string | null
-          category: string | null
-          created_at: string
-          file_name: string
-          file_path: string
-          file_size: number
-          formats_available: Json | null
-          height: number | null
-          id: string
-          is_optimized: boolean | null
-          mime_type: string
-          optimization_level: string | null
-          original_name: string
-          seo_score: number | null
-          tags: string[] | null
-          updated_at: string
-          upload_source: string | null
-          uploaded_by: string | null
-          width: number | null
-        }
-        Insert: {
-          alt_text?: string | null
-          bucket_name?: string
-          caption?: string | null
-          category?: string | null
-          created_at?: string
-          file_name: string
-          file_path: string
-          file_size: number
-          formats_available?: Json | null
-          height?: number | null
-          id?: string
-          is_optimized?: boolean | null
-          mime_type: string
-          optimization_level?: string | null
-          original_name: string
-          seo_score?: number | null
-          tags?: string[] | null
-          updated_at?: string
-          upload_source?: string | null
-          uploaded_by?: string | null
-          width?: number | null
-        }
-        Update: {
-          alt_text?: string | null
-          bucket_name?: string
-          caption?: string | null
-          category?: string | null
-          created_at?: string
-          file_name?: string
-          file_path?: string
-          file_size?: number
-          formats_available?: Json | null
-          height?: number | null
-          id?: string
-          is_optimized?: boolean | null
-          mime_type?: string
-          optimization_level?: string | null
-          original_name?: string
-          seo_score?: number | null
-          tags?: string[] | null
-          updated_at?: string
-          upload_source?: string | null
-          uploaded_by?: string | null
-          width?: number | null
-        }
-        Relationships: []
-      }
       ingredients: {
         Row: {
           created_at: string | null
@@ -1150,15 +1078,10 @@ export type Database = {
           cta_text: string | null
           cta_url: string | null
           description: string | null
-          display_behavior: string | null
           id: string
-          image_position: string | null
           image_url: string | null
           is_active: boolean
           name: string
-          secondary_button_action: string | null
-          secondary_button_text: string | null
-          secondary_button_url: string | null
           size: string
           title: string
           updated_at: string
@@ -1169,15 +1092,10 @@ export type Database = {
           cta_text?: string | null
           cta_url?: string | null
           description?: string | null
-          display_behavior?: string | null
           id?: string
-          image_position?: string | null
           image_url?: string | null
           is_active?: boolean
           name: string
-          secondary_button_action?: string | null
-          secondary_button_text?: string | null
-          secondary_button_url?: string | null
           size?: string
           title: string
           updated_at?: string
@@ -1188,15 +1106,10 @@ export type Database = {
           cta_text?: string | null
           cta_url?: string | null
           description?: string | null
-          display_behavior?: string | null
           id?: string
-          image_position?: string | null
           image_url?: string | null
           is_active?: boolean
           name?: string
-          secondary_button_action?: string | null
-          secondary_button_text?: string | null
-          secondary_button_url?: string | null
           size?: string
           title?: string
           updated_at?: string

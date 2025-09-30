@@ -63,18 +63,24 @@ const ReleaseNotesModal: React.FC = () => {
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className={`${getSizeClasses(activeNote.size)} max-h-[90vh] overflow-y-auto`}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
-            {activeNote.title}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl font-bold">
+              {activeNote.title}
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDismiss}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="space-y-4">
           {activeNote.image_url && (
-            <div className={`flex ${
-              activeNote.image_position === 'left' ? 'justify-start' :
-              activeNote.image_position === 'right' ? 'justify-end' :
-              'justify-center'
-            }`}>
+            <div className="flex justify-center">
               <img
                 src={activeNote.image_url}
                 alt={activeNote.title}
@@ -90,11 +96,7 @@ const ReleaseNotesModal: React.FC = () => {
           )}
           
           {activeNote.description && (
-            <div className={`${
-              activeNote.image_position === 'left' ? 'text-left' :
-              activeNote.image_position === 'right' ? 'text-right' :
-              'text-center'
-            }`}>
+            <div className="text-center">
               <p className="text-muted-foreground whitespace-pre-wrap">
                 {activeNote.description}
               </p>
@@ -107,16 +109,8 @@ const ReleaseNotesModal: React.FC = () => {
                 {activeNote.cta_text}
               </Button>
             )}
-            <Button 
-              variant="outline" 
-              onClick={activeNote.secondary_button_action === 'custom_link' ? () => {
-                if (activeNote.secondary_button_url) {
-                  window.open(activeNote.secondary_button_url, '_blank');
-                }
-                handleDismiss();
-              } : handleDismiss}
-            >
-              {activeNote.secondary_button_text || 'Fechar'}
+            <Button variant="outline" onClick={handleDismiss}>
+              Fechar
             </Button>
           </div>
           

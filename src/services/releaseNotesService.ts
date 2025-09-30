@@ -6,16 +6,11 @@ export interface ReleaseNote {
   title: string;
   description?: string;
   image_url?: string;
-  image_position: 'left' | 'center' | 'right';
   size: 'small' | 'medium' | 'large';
   cta_text?: string;
   cta_url?: string;
-  secondary_button_text: string;
-  secondary_button_action: 'close' | 'custom_link';
-  secondary_button_url?: string;
   is_active: boolean;
   version: string;
-  display_behavior: 'once' | 'every_login' | 'on_dismiss';
   created_at: string;
   updated_at: string;
 }
@@ -71,36 +66,22 @@ export class ReleaseNotesService {
     if (error) throw error;
   }
 
-  // Função de upload de imagem atualizada para usar otimização
   static async uploadImage(file: File): Promise<string> {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('bucketName', 'landing-page');
-      formData.append('uploadSource', 'release-notes');
-      formData.append('category', 'release-notes');
-      formData.append('altText', 'Release note image');
-      formData.append('tags', JSON.stringify(['release-notes', 'announcement']));
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
 
-      const { data, error } = await supabase.functions.invoke('optimize-image', {
-        body: formData
-      });
+    const { error: uploadError } = await supabase.storage
+      .from('release-notes')
+      .upload(filePath, file);
 
-      if (error) {
-        console.error('Error in optimize-image function:', error);
-        throw new Error('Erro ao fazer upload da imagem');
-      }
+    if (uploadError) throw uploadError;
 
-      if (!data.success) {
-        console.error('Optimization failed:', data.error);
-        throw new Error(data.error);
-      }
+    const { data } = supabase.storage
+      .from('release-notes')
+      .getPublicUrl(filePath);
 
-      return data.data.publicUrl;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      throw error;
-    }
+    return data.publicUrl;
   }
 
   // Public functions
@@ -155,16 +136,6 @@ export class ReleaseNotesService {
     const activeNote = await this.getActiveReleaseNote();
     if (!activeNote) return null;
 
-    // Handle different display behaviors
-    if (activeNote.display_behavior === 'every_login') {
-      return activeNote; // Always show on every login
-    }
-    
-    if (activeNote.display_behavior === 'on_dismiss') {
-      return activeNote; // Always show until user dismisses
-    }
-    
-    // Default behavior: show once per user
     const isDismissed = await this.isReleaseNoteDismissed(activeNote.id);
     return isDismissed ? null : activeNote;
   }

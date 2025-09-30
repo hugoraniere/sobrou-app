@@ -246,9 +246,9 @@ serve(async (req) => {
     }
 
   } catch (error) {
-    console.error("Erro no webhook do WhatsApp:", error instanceof Error ? error.message : error);
+    console.error("Erro no webhook do WhatsApp:", error.message);
     return new Response(
-      JSON.stringify({ status: 'error', message: error instanceof Error ? error.message : 'Erro desconhecido' }),
+      JSON.stringify({ status: 'error', message: error.message }),
       { 
         status: 200, // Sempre responder com 200 para webhooks, mesmo em erro
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

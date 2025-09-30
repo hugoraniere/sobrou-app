@@ -62,8 +62,7 @@ const Gallery: React.FC = () => {
     }
 
     const filtered = images.filter(image =>
-      image.original_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      image.alt_text?.toLowerCase().includes(searchTerm.toLowerCase())
+      image.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredImages(filtered);
   };
@@ -126,10 +125,10 @@ const Gallery: React.FC = () => {
   const handleRename = async () => {
     if (!selectedImage || !newFileName.trim()) return;
 
-    const fileExtension = selectedImage.file_name.split('.').pop();
+    const fileExtension = selectedImage.name.split('.').pop();
     const finalName = newFileName.includes('.') ? newFileName : `${newFileName}.${fileExtension}`;
 
-    const success = await galleryService.renameImage(selectedImage.file_name, finalName);
+    const success = await galleryService.renameImage(selectedImage.name, finalName);
     
     if (success) {
       toast({
@@ -150,9 +149,9 @@ const Gallery: React.FC = () => {
   };
 
   const handleDelete = async (image: GalleryImage) => {
-    if (!confirm(`Tem certeza que deseja deletar "${image.original_name}"?`)) return;
+    if (!confirm(`Tem certeza que deseja deletar "${image.name}"?`)) return;
 
-    const success = await galleryService.deleteImage(image.file_name);
+    const success = await galleryService.deleteImage(image.name);
     
     if (success) {
       toast({
@@ -186,7 +185,7 @@ const Gallery: React.FC = () => {
 
   const openRenameModal = (image: GalleryImage) => {
     setSelectedImage(image);
-    setNewFileName(image.original_name.split('.')[0]); // Remove extensão para facilitar edição
+    setNewFileName(image.name.split('.')[0]); // Remove extensão para facilitar edição
     setRenameModalOpen(true);
   };
 
@@ -247,7 +246,7 @@ const Gallery: React.FC = () => {
               <Upload className="w-8 h-8 text-green-600" />
               <div>
                 <p className="text-2xl font-bold">
-                  {formatFileSize(images.reduce((total, img) => total + img.file_size, 0))}
+                  {formatFileSize(images.reduce((total, img) => total + img.size, 0))}
                 </p>
                 <p className="text-sm text-muted-foreground">Espaço Utilizado</p>
               </div>
@@ -330,11 +329,11 @@ const Gallery: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredImages.map((image) => (
-                <Card key={image.id} className="group overflow-hidden">
+                <Card key={image.name} className="group overflow-hidden">
                   <div className="relative aspect-square">
                     <img
                       src={image.publicUrl}
-                      alt={image.alt_text || image.original_name}
+                      alt={image.name}
                       className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     />
                     
@@ -372,13 +371,13 @@ const Gallery: React.FC = () => {
                   </div>
                   
                   <CardContent className="p-3">
-                    <p className="font-medium text-sm truncate" title={image.original_name}>
-                      {image.original_name}
+                    <p className="font-medium text-sm truncate" title={image.name}>
+                      {image.name}
                     </p>
                     <div className="flex justify-between items-center mt-2 text-xs text-muted-foreground">
-                      <span>{formatFileSize(image.file_size)}</span>
+                      <span>{formatFileSize(image.size)}</span>
                       <Badge variant="outline" className="text-xs">
-                        {image.mime_type.split('/')[1]?.toUpperCase() || 'IMG'}
+                        {image.metadata?.mimetype?.split('/')[1]?.toUpperCase() || 'IMG'}
                       </Badge>
                     </div>
                   </CardContent>
@@ -401,11 +400,11 @@ const Gallery: React.FC = () => {
               <div className="text-center">
                 <img
                   src={selectedImage.publicUrl}
-                  alt={selectedImage.alt_text || selectedImage.original_name}
+                  alt={selectedImage.name}
                   className="w-32 h-32 object-cover rounded-lg mx-auto mb-2"
                 />
                 <p className="text-sm text-muted-foreground">
-                  Nome atual: {selectedImage.original_name}
+                  Nome atual: {selectedImage.name}
                 </p>
               </div>
             )}
