@@ -28,11 +28,6 @@ export default {
           base: '#F8F8F8', // Cinza neutro
           surface: '#F2F2F2' // Cinza neutro mais claro
         },
-        main: {
-          bg: {
-            color: '#f0fdf4'
-          }
-        },
         foreground: 'hsl(var(--foreground))',
         primary: {
           DEFAULT: '#09983D',

@@ -45,7 +45,7 @@ const SiteNavbar = () => {
 
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-main-bg-color/95 backdrop-blur-sm shadow-sm border-b border-border/40' : 'bg-main-bg-color'
+      isScrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm border-b border-border/40' : 'bg-transparent'
     }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">

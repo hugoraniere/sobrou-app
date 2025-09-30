@@ -11,7 +11,7 @@ const Logo = React.forwardRef<HTMLImageElement, LogoProps>(({ className, size = 
   const sizeClasses = {
     xs: 'h-5',
     sm: 'h-7',
-    md: 'h-8',
+    md: 'h-10',
     lg: 'h-20'
   };
 

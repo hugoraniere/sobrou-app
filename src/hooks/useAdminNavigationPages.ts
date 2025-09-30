@@ -71,11 +71,6 @@ export const useAdminNavigationPages = () => {
           url: '/admin/onboarding',
           icon: Flag,
         },
-        {
-          title: 'Tour do Produto',
-          url: '/admin/product-tour',
-          icon: Monitor,
-        },
       ],
     },
     {
