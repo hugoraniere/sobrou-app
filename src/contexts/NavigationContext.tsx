@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useSafeAuth } from '@/hooks/useSafeAuth';
+import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UserPreferences {
@@ -13,7 +13,7 @@ interface NavigationContextValue {
   isLoading: boolean;
 }
 
-export const NavigationContext = createContext<NavigationContextValue | undefined>(undefined);
+const NavigationContext = createContext<NavigationContextValue | undefined>(undefined);
 
 export const useNavigation = () => {
   const context = useContext(NavigationContext);
@@ -28,7 +28,7 @@ interface NavigationProviderProps {
 }
 
 export const NavigationProvider: React.FC<NavigationProviderProps> = ({ children }) => {
-  const { user } = useSafeAuth();
+  const { user } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences>({
     restaurant_calculator: false,
   });

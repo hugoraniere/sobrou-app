@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useSafeAuth } from '@/hooks/useSafeAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderAuthButtonsProps {
   isMobile?: boolean;
@@ -12,7 +12,7 @@ const HeaderAuthButtons: React.FC<HeaderAuthButtonsProps> = ({
   isMobile = false, 
   variant = 'default' 
 }) => {
-  const { user, logout } = useSafeAuth();
+  const { user, logout } = useAuth();
 
   if (user) {
     return (

@@ -3,21 +3,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { ReleaseNotesService, ReleaseNote } from '@/services/releaseNotesService';
-import { AnalyticsService } from '@/services/AnalyticsService';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 const ReleaseNotesModal: React.FC = () => {
-  const { isAuthenticated } = useAuth();
   const [activeNote, setActiveNote] = useState<ReleaseNote | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadActiveNote();
-    }
-  }, [isAuthenticated]);
+    loadActiveNote();
+  }, []);
 
   const loadActiveNote = async () => {
     try {
@@ -25,20 +20,17 @@ const ReleaseNotesModal: React.FC = () => {
       if (note) {
         setActiveNote(note);
         setIsOpen(true);
-        // Track release note shown
-        await AnalyticsService.trackReleaseNoteShown(note.id, note.version, 'modal');
       }
     } catch (error) {
       console.error('Error loading active release note:', error);
     }
   };
 
-  const handleDismiss = async (dismissType: 'cta' | 'secondary' | 'overlay' = 'overlay') => {
+  const handleDismiss = async () => {
     if (!activeNote) return;
 
     try {
       await ReleaseNotesService.dismissReleaseNote(activeNote.id);
-      await AnalyticsService.trackReleaseNoteDismissed(activeNote.id, dismissType, activeNote.version);
       setIsOpen(false);
       setActiveNote(null);
     } catch (error) {
@@ -47,31 +39,11 @@ const ReleaseNotesModal: React.FC = () => {
     }
   };
 
-  const handleCTAClick = async () => {
-    if (!activeNote) return;
-    
-    if (activeNote.cta_text) {
-      if (activeNote.cta_action === 'close') {
-        // CTA button action is close
-        await AnalyticsService.trackReleaseNoteCTAClicked(
-          activeNote.id, 
-          activeNote.cta_text, 
-          null, 
-          activeNote.version
-        );
-        await handleDismiss('cta');
-      } else if (activeNote.cta_url) {
-        // CTA button action is link (default)
-        await AnalyticsService.trackReleaseNoteCTAClicked(
-          activeNote.id, 
-          activeNote.cta_text, 
-          activeNote.cta_url, 
-          activeNote.version
-        );
-        window.open(activeNote.cta_url, '_blank');
-        await handleDismiss('cta');
-      }
+  const handleCTAClick = () => {
+    if (activeNote?.cta_url) {
+      window.open(activeNote.cta_url, '_blank');
     }
+    handleDismiss();
   };
 
   if (!activeNote) return null;
@@ -137,19 +109,12 @@ const ReleaseNotesModal: React.FC = () => {
             )}
             <Button 
               variant="outline" 
-              onClick={async () => {
-                const actionType = activeNote.secondary_button_action === 'custom_link' ? 'custom_link' : 'close';
-                await AnalyticsService.trackReleaseNoteSecondaryButtonClicked(
-                  activeNote.id, 
-                  actionType, 
-                  activeNote.secondary_button_url || null, 
-                  activeNote.version
-                );
-                if (actionType === 'custom_link' && activeNote.secondary_button_url) {
+              onClick={activeNote.secondary_button_action === 'custom_link' ? () => {
+                if (activeNote.secondary_button_url) {
                   window.open(activeNote.secondary_button_url, '_blank');
                 }
-                await handleDismiss('secondary');
-              }}
+                handleDismiss();
+              } : handleDismiss}
             >
               {activeNote.secondary_button_text || 'Fechar'}
             </Button>

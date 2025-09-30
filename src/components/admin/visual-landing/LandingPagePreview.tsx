@@ -31,21 +31,21 @@ const LandingPagePreview: React.FC<LandingPagePreviewProps> = ({
     switch (viewportSize) {
       case 'mobile':
         return {
-          width: '390px',
-          height: '844px',
+          width: '375px',
+          minHeight: '100%',
           margin: '0 auto',
           border: '1px solid hsl(var(--border))',
           borderRadius: '12px',
-          overflow: 'auto',
+          overflow: 'hidden',
         };
       case 'tablet':
         return {
-          width: '820px',
-          height: '1180px',
+          width: '768px',
+          minHeight: '100%',
           margin: '0 auto',
           border: '1px solid hsl(var(--border))',
           borderRadius: '12px',
-          overflow: 'auto',
+          overflow: 'hidden',
         };
       default:
         return {

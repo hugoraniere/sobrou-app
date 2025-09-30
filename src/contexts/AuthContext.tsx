@@ -16,7 +16,7 @@ export interface UserProfile {
   };
 }
 
-export type AuthContextType = {
+type AuthContextType = {
   user: UserProfile | null;
   session: Session | null;
   isAuthenticated: boolean;
@@ -28,7 +28,7 @@ export type AuthContextType = {
   logout: () => Promise<void>;
 };
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -128,21 +128,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const strictlyPublicRoutes = ['/auth'];
     
     // Rotas que são acessíveis tanto para usuários autenticados quanto não autenticados
-    const publicAccessibleRoutes = ['/reset-password', '/erro', '/blog', '/suporte'];
+    const publicAccessibleRoutes = ['/reset-password', '/erro'];
     
     // Verificamos se o usuário está na página de autenticação e já está autenticado
     const isOnStrictlyPublicRoute = strictlyPublicRoutes.includes(location.pathname);
     const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
-    const isOnRootRoute = location.pathname === '/';
     
     // Se o usuário está autenticado e tem um redirect, redirecionamos para lá
     if (isAuthenticated && isOnStrictlyPublicRoute && redirectTo) {
       navigate(redirectTo, { replace: true });
-    }
-    // Redireciona usuários autenticados da página inicial para o dashboard
-    // UNLESS there's a query parameter to stay on landing page
-    else if (isAuthenticated && isOnRootRoute && !searchParams.has('stay')) {
-      navigate('/dashboard', { replace: true });
     }
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
     // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
@@ -282,11 +276,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    // During development, provide more helpful debugging
-    console.error('useAuth must be used within an AuthProvider. Component tree:', {
-      pathname: window.location.pathname,
-      timestamp: new Date().toISOString()
-    });
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

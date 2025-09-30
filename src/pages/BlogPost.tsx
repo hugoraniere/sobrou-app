@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
-import SiteNavbar from '@/components/navigation/SiteNavbar';
+import MainNavbar from '@/components/navigation/MainNavbar';
 import BlogBreadcrumb from '@/components/blog/BlogBreadcrumb';
 import BlogSidebar from '@/components/blog/BlogSidebar';
 import RelatedPostsCarousel from '@/components/blog/RelatedPostsCarousel';
@@ -117,7 +117,7 @@ const BlogPost: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
-        <SiteNavbar />
+        <MainNavbar />
         <div className="pt-16">
           <div className="container mx-auto px-4 py-8">
             <div className="animate-pulse">
@@ -140,7 +140,7 @@ const BlogPost: React.FC = () => {
   if (!post) {
     return (
       <div className="min-h-screen bg-white">
-        <SiteNavbar />
+        <MainNavbar />
         <div className="pt-16">
           <div className="container mx-auto px-4 py-8">
             <div className="mb-6">
@@ -168,7 +168,7 @@ const BlogPost: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <SiteNavbar />
+      <MainNavbar />
       
       <div className="pt-16">
         {/* Breadcrumb */}

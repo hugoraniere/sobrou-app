@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { 
   Palette, 
   Type, 
@@ -22,8 +21,15 @@ import {
 
 const DesignSystem: React.FC = () => {
   return (
-    <AdminPageLayout title="Design System" subtitle="Componentes, cores e padrões de design da aplicação">
-      <div className="space-y-6">
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Design System</h1>
+          <p className="text-muted-foreground">
+            Componentes, cores e padrões de design da aplicação
+          </p>
+        </div>
+      </div>
 
       <Tabs defaultValue="colors" className="space-y-4">
         <TabsList className="grid w-full grid-cols-5">
@@ -241,8 +247,7 @@ const DesignSystem: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      </div>
-    </AdminPageLayout>
+    </div>
   );
 };
 

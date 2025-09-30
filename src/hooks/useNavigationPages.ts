@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { LayoutDashboard, FileText, Calendar, Target, TrendingUp, Calculator, CreditCard, BookOpen, HelpCircle } from 'lucide-react';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { useNavigation } from '@/contexts/NavigationContext';
 
 export interface NavigationPage {
   title: string;
@@ -12,7 +12,7 @@ export interface NavigationPage {
 }
 
 export const useNavigationPages = () => {
-  const { preferences, isLoading } = useSafeNavigation();
+  const { preferences, isLoading } = useNavigation();
 
   const allPages: NavigationPage[] = useMemo(() => [
     {

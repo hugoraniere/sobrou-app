@@ -1,31 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit2, Trash2, Power, PowerOff, Eye, BarChart3 } from 'lucide-react';
-import { ReleaseNotesService, ReleaseNote } from '@/services/releaseNotesService';
-import { AnalyticsService } from '@/services/AnalyticsService';
-import { supabase } from '@/integrations/supabase/client';
+import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { ReleaseNote, ReleaseNotesService } from '@/services/releaseNotesService';
 import { toast } from 'sonner';
 import ReleaseNoteForm from '@/components/admin/release-notes/ReleaseNoteForm';
-import ReleaseNotePreview from '@/components/admin/release-notes/ReleaseNotePreview';
-
-interface ReleaseNoteMetrics {
-  views: number;
-  ctaClicks: number;
-  secondaryClicks: number;
-  dismissals: number;
-  ctr: number;
-}
 
 const ReleaseNotesManager: React.FC = () => {
   const [notes, setNotes] = useState<ReleaseNote[]>([]);
-  const [metrics, setMetrics] = useState<Record<string, ReleaseNoteMetrics>>({});
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingNote, setEditingNote] = useState<ReleaseNote | null>(null);
-  const [previewNote, setPreviewNote] = useState<ReleaseNote | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     loadNotes();
@@ -33,55 +19,15 @@ const ReleaseNotesManager: React.FC = () => {
 
   const loadNotes = async () => {
     try {
-      setLoading(true);
-      const data = await ReleaseNotesService.getAllReleaseNotes();
-      setNotes(data);
-      await loadMetrics(data);
+      setIsLoading(true);
+      const allNotes = await ReleaseNotesService.getAllReleaseNotes();
+      setNotes(allNotes);
     } catch (error) {
       console.error('Error loading release notes:', error);
-      toast.error("Erro ao carregar release notes");
+      toast.error('Erro ao carregar release notes');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
-
-  const loadMetrics = async (releaseNotes: ReleaseNote[]) => {
-    const metricsData: Record<string, ReleaseNoteMetrics> = {};
-    
-    for (const note of releaseNotes) {
-      try {
-        // Get analytics events for this release note
-        const { data: events } = await supabase
-          .from('analytics_events')
-          .select('event_name, event_params')
-          .eq('event_params->>releaseNoteId', note.id);
-
-        // Get dismissals count
-        const { count: dismissalsCount } = await supabase
-          .from('release_note_dismissals')
-          .select('*', { count: 'exact', head: true })
-          .eq('release_note_id', note.id);
-
-        const views = events?.filter(e => e.event_name === 'release_note_shown').length || 0;
-        const ctaClicks = events?.filter(e => e.event_name === 'release_note_cta_clicked').length || 0;
-        const secondaryClicks = events?.filter(e => e.event_name === 'release_note_secondary_clicked').length || 0;
-        const dismissals = dismissalsCount || 0;
-        const ctr = views > 0 ? (ctaClicks / views) * 100 : 0;
-
-        metricsData[note.id] = {
-          views,
-          ctaClicks,
-          secondaryClicks,
-          dismissals,
-          ctr
-        };
-      } catch (error) {
-        console.error(`Error loading metrics for note ${note.id}:`, error);
-        metricsData[note.id] = { views: 0, ctaClicks: 0, secondaryClicks: 0, dismissals: 0, ctr: 0 };
-      }
-    }
-    
-    setMetrics(metricsData);
   };
 
   const handleSave = async (noteData: Partial<ReleaseNote>) => {
@@ -121,10 +67,11 @@ const ReleaseNotesManager: React.FC = () => {
     }
   };
 
-  const handleToggleActive = async (id: string, isActive: boolean) => {
+  const handleToggleActive = async (note: ReleaseNote) => {
     try {
-      await ReleaseNotesService.updateReleaseNote(id, { is_active: isActive });
-      toast.success(`Release note ${isActive ? 'ativada' : 'desativada'} com sucesso!`);
+      const updatedNote = { ...note, is_active: !note.is_active };
+      await ReleaseNotesService.updateReleaseNote(note.id, updatedNote);
+      toast.success(`Release note ${updatedNote.is_active ? 'ativada' : 'desativada'} com sucesso!`);
       loadNotes();
     } catch (error) {
       console.error('Error toggling release note:', error);
@@ -132,27 +79,29 @@ const ReleaseNotesManager: React.FC = () => {
     }
   };
 
-  const handlePreview = async (note: ReleaseNote) => {
-    setPreviewNote(note);
-    setShowPreview(true);
-    // Track preview
-    await AnalyticsService.trackReleaseNoteShown(note.id, note.version, 'preview');
-  };
-
   const getDisplayBehaviorLabel = (behavior: string) => {
     switch (behavior) {
-      case 'once':
-        return 'Uma vez';
-      case 'every_login':
-        return 'Todo login';
-      case 'on_dismiss':
-        return 'Até descartar';
-      default:
-        return 'Uma vez';
+      case 'once': return 'Uma vez';
+      case 'every_login': return 'Todo login';
+      case 'on_dismiss': return 'Até fechar';
+      default: return behavior;
     }
   };
 
-  if (loading) {
+  if (showForm) {
+    return (
+      <ReleaseNoteForm
+        initialData={editingNote || {}}
+        onSave={handleSave}
+        onCancel={() => {
+          setShowForm(false);
+          setEditingNote(null);
+        }}
+      />
+    );
+  }
+
+  if (isLoading) {
     return <div>Carregando...</div>;
   }
 
@@ -186,113 +135,65 @@ const ReleaseNotesManager: React.FC = () => {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {notes.map((note) => {
-            const noteMetrics = metrics[note.id] || { views: 0, ctaClicks: 0, secondaryClicks: 0, dismissals: 0, ctr: 0 };
-            
-            return (
-              <Card key={note.id} className="relative">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{note.title}</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={note.is_active ? "default" : "secondary"}>
-                        {note.is_active ? "Ativo" : "Inativo"}
-                      </Badge>
+          {notes.map((note) => (
+            <Card key={note.id}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      {note.title}
+                      {note.is_active && <Badge variant="default">Ativo</Badge>}
                       <Badge variant="outline">v{note.version}</Badge>
-                    </div>
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {note.name} • {getDisplayBehaviorLabel(note.display_behavior)} • {note.size}
+                    </p>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p><strong>Nome:</strong> {note.name}</p>
-                    <p><strong>Comportamento:</strong> {getDisplayBehaviorLabel(note.display_behavior)}</p>
-                    <p><strong>Tamanho:</strong> {note.size}</p>
-                  </div>
-                  
-                  {/* Métricas */}
-                  <div className="mt-4 p-3 bg-muted/30 rounded-lg">
-                    <div className="flex items-center gap-1 mb-2">
-                      <BarChart3 className="w-4 h-4" />
-                      <span className="text-sm font-medium">Métricas</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Visualizações:</span>
-                        <Badge variant="outline">{noteMetrics.views}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">CTR:</span>
-                        <Badge variant="outline">{noteMetrics.ctr.toFixed(1)}%</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Cliques CTA:</span>
-                        <Badge variant="outline">{noteMetrics.ctaClicks}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Fechamentos:</span>
-                        <Badge variant="outline">{noteMetrics.dismissals}</Badge>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 mt-4">
+                  <div className="flex items-center gap-2">
                     <Button
+                      variant="outline"
                       size="sm"
-                      variant={note.is_active ? "destructive" : "default"}
-                      onClick={() => handleToggleActive(note.id, !note.is_active)}
+                      onClick={() => handleToggleActive(note)}
                     >
                       {note.is_active ? (
                         <>
-                          <PowerOff className="w-4 h-4 mr-1" />
+                          <EyeOff className="h-4 w-4 mr-2" />
                           Desativar
                         </>
                       ) : (
                         <>
-                          <Power className="w-4 h-4 mr-1" />
+                          <Eye className="h-4 w-4 mr-2" />
                           Ativar
                         </>
                       )}
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handlePreview(note)}>
-                      <Eye className="w-4 h-4 mr-1" />
-                      Preview
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(note)}>
-                      <Edit2 className="w-4 h-4 mr-1" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(note)}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
                       Editar
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(note.id)}>
-                      <Trash2 className="w-4 h-4 mr-1" />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(note.id)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
                       Excluir
                     </Button>
                   </div>
+                </div>
+              </CardHeader>
+              {note.description && (
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{note.description}</p>
                 </CardContent>
-              </Card>
-            );
-          })}
+              )}
+            </Card>
+          ))}
         </div>
-      )}
-
-      {showForm && (
-        <ReleaseNoteForm
-          initialData={editingNote || {}}
-          onSave={handleSave}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingNote(null);
-          }}
-        />
-      )}
-
-      {showPreview && previewNote && (
-        <ReleaseNotePreview
-          note={previewNote}
-          isOpen={showPreview}
-          onClose={() => {
-            setShowPreview(false);
-            setPreviewNote(null);
-          }}
-        />
       )}
     </div>
   );

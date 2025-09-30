@@ -60,7 +60,7 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
   };
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-3xl mx-auto mb-16">
           {editMode ? (
@@ -68,11 +68,11 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
               value={config.title}
               onChange={(value) => handleConfigChange({ ...config, title: value })}
               element="h2"
-              className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
+              className="text-3xl md:text-4xl font-bold text-foreground mb-6"
               placeholder="Título da seção"
             />
           ) : (
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
               {config.title}
             </h2>
           )}
@@ -81,11 +81,11 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
               value={config.subtitle}
               onChange={(value) => handleConfigChange({ ...config, subtitle: value })}
               element="p"
-              className="text-lg text-gray-600"
+              className="text-xl text-muted-foreground"
               placeholder="Subtítulo da seção"
             />
           ) : (
-            <p className="text-lg text-gray-600">
+            <p className="text-xl text-muted-foreground">
               {config.subtitle}
             </p>
           )}
@@ -94,10 +94,17 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {config.features.map((feature, index) => {
             const IconComponent = getIconComponent(feature.icon);
+            const gradientColors = [
+              'from-yellow-500/20 to-orange-500/20',
+              'from-blue-500/20 to-purple-500/20',
+              'from-green-500/20 to-teal-500/20',
+              'from-purple-500/20 to-pink-500/20'
+            ];
+            const iconColors = ['text-yellow-600', 'text-blue-600', 'text-green-600', 'text-purple-600'];
             
             return (
-              <div key={index} className="bg-white rounded-xl p-8 border border-gray-100 text-left">
-                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6">
+              <div key={index} className="bg-card/50 backdrop-blur-sm rounded-xl p-8 border border-border/50">
+                <div className={`w-16 h-16 bg-gradient-to-br ${gradientColors[index % gradientColors.length]} rounded-xl flex items-center justify-center mb-6`}>
                   {editMode ? (
                     <InlineEditableIcon
                       iconName={feature.icon}
@@ -106,10 +113,10 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
                         updatedFeatures[index] = { ...feature, icon: newIcon };
                         handleConfigChange({ ...config, features: updatedFeatures });
                       }}
-                      className="w-8 h-8 text-primary"
+                      className={`w-8 h-8 ${iconColors[index % iconColors.length]}`}
                     />
                   ) : (
-                    <IconComponent className="w-8 h-8 text-primary" />
+                    <IconComponent className={`w-8 h-8 ${iconColors[index % iconColors.length]}`} />
                   )}
                 </div>
                 {editMode ? (
@@ -121,11 +128,11 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
                       handleConfigChange({ ...config, features: updatedFeatures });
                     }}
                     element="h3"
-                    className="text-xl font-semibold text-gray-900 mb-4"
+                    className="text-xl font-semibold text-foreground mb-4"
                     placeholder="Título do recurso"
                   />
                 ) : (
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">{feature.title}</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">{feature.title}</h3>
                 )}
                 {editMode ? (
                   <InlineEditableText
@@ -136,13 +143,13 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
                       handleConfigChange({ ...config, features: updatedFeatures });
                     }}
                     element="p"
-                    className="text-gray-600 mb-6 leading-relaxed"
+                    className="text-muted-foreground mb-6"
                     placeholder="Descrição do recurso"
                   />
                 ) : (
-                  <p className="text-gray-600 mb-6 leading-relaxed">{feature.description}</p>
+                  <p className="text-muted-foreground mb-6">{feature.description}</p>
                 )}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-muted/30 rounded-lg p-4">
                   {editMode ? (
                     <InlineEditableText
                       value={feature.quote}
@@ -152,11 +159,11 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
                         handleConfigChange({ ...config, features: updatedFeatures });
                       }}
                       element="p"
-                      className="text-sm text-gray-600 italic"
+                      className="text-sm text-muted-foreground italic"
                       placeholder="Exemplo de insight"
                     />
                   ) : (
-                    <p className="text-sm text-gray-600 italic">"{feature.quote}"</p>
+                    <p className="text-sm text-muted-foreground italic">"{feature.quote}"</p>
                   )}
                 </div>
               </div>
@@ -164,7 +171,7 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
           })}
         </div>
 
-        <div className="bg-green-50 rounded-2xl p-8">
+        <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-8">
           <div className="flex items-center justify-center mb-4">
             <Brain className="w-8 h-8 text-primary" />
           </div>
@@ -173,11 +180,11 @@ const AutomationAISection: React.FC<AutomationAISectionProps> = ({ editMode = fa
               value={config.callout}
               onChange={(value) => handleConfigChange({ ...config, callout: value })}
               element="p"
-              className="text-center text-lg text-gray-700 max-w-3xl mx-auto"
+              className="text-center text-lg text-muted-foreground max-w-3xl mx-auto"
               placeholder="Texto de destaque sobre a IA"
             />
           ) : (
-            <p className="text-center text-lg text-gray-700 max-w-3xl mx-auto">
+            <p className="text-center text-lg text-muted-foreground max-w-3xl mx-auto">
               {config.callout}
             </p>
           )}

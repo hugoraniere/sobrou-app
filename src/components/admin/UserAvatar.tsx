@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { LogOut, Settings, BookOpen } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAvatar } from '@/contexts/AvatarContext';
-import { useProductTour } from '@/contexts/ProductTourProvider';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -18,14 +18,10 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const { avatarUrl } = useAvatar();
-  const { startTour } = useProductTour();
-  const navigate = useNavigate();
+  const { setWelcomeModalOpen } = useOnboarding();
 
-  const handleTutorial = async () => {
-    // Navigate to dashboard first
-    navigate('/dashboard');
-    // Start the product tour
-    await startTour();
+  const handleTutorial = () => {
+    setWelcomeModalOpen(true);
   };
 
   const handleLogout = async () => {

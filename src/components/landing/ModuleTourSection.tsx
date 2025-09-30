@@ -86,7 +86,7 @@ const ModuleTourSection: React.FC<ModuleTourSectionProps> = ({ editMode = false 
   }
 
   return (
-    <section id="modulos" className="w-full py-16 sm:py-20 lg:py-24 bg-white">
+    <section id="modulos" className="w-full py-16 sm:py-20 lg:py-24 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center mb-12 sm:mb-16">
           {editMode ? (
@@ -94,11 +94,11 @@ const ModuleTourSection: React.FC<ModuleTourSectionProps> = ({ editMode = false 
               value={title}
               onChange={(value) => handleConfigChange('title', value)}
               element="h2"
-              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+              className="text-3xl md:text-4xl font-bold mb-4"
               placeholder="Título da seção"
             />
           ) : (
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
               {title}
             </h2>
           )}
@@ -107,11 +107,11 @@ const ModuleTourSection: React.FC<ModuleTourSectionProps> = ({ editMode = false 
               value={subtitle}
               onChange={(value) => handleConfigChange('subtitle', value)}
               element="p"
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              className="text-lg max-w-2xl mx-auto"
               placeholder="Subtítulo da seção"
             />
           ) : (
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg max-w-2xl mx-auto">
               {subtitle}
             </p>
           )}
@@ -121,9 +121,9 @@ const ModuleTourSection: React.FC<ModuleTourSectionProps> = ({ editMode = false 
           {modules.map((module: any) => {
             const IconComponent = getIconComponent(module.iconName);
             return (
-              <div key={module.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="mb-6">
-                  <div className="bg-green-100 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+              <div key={module.id} className="bg-card rounded-2xl p-6 shadow-sm border border-border-subtle hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
                     {editMode ? (
                       <InlineEditableIcon
                         iconName={module.iconName}
@@ -135,33 +135,35 @@ const ModuleTourSection: React.FC<ModuleTourSectionProps> = ({ editMode = false 
                       IconComponent && <IconComponent className="text-primary h-6 w-6" />
                     )}
                   </div>
-                  {editMode ? (
-                    <InlineEditableText
-                      value={module.title}
-                      onChange={(value) => handleModuleChange(module.id, 'title', value)}
-                      element="h3"
-                      className="text-lg font-semibold text-gray-900 mb-3"
-                      placeholder="Título do módulo"
-                    />
-                  ) : (
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      {module.title}
-                    </h3>
-                  )}
-                  {editMode ? (
-                    <InlineEditableText
-                      value={module.description}
-                      onChange={(value) => handleModuleChange(module.id, 'description', value)}
-                      element="p"
-                      className="text-gray-600 text-sm leading-relaxed mb-6"
-                      placeholder="Descrição do módulo"
-                      multiline
-                    />
-                  ) : (
-                    <p className="text-gray-600 text-sm leading-relaxed mb-6">
-                      {module.description}
-                    </p>
-                  )}
+                  <div className="flex-1">
+                    {editMode ? (
+                      <InlineEditableText
+                        value={module.title}
+                        onChange={(value) => handleModuleChange(module.id, 'title', value)}
+                        element="h3"
+                        className="font-montserrat text-lg font-semibold text-text-primary mb-2"
+                        placeholder="Título do módulo"
+                      />
+                    ) : (
+                      <h3 className="font-montserrat text-lg font-semibold text-text-primary mb-2">
+                        {module.title}
+                      </h3>
+                    )}
+                    {editMode ? (
+                      <InlineEditableText
+                        value={module.description}
+                        onChange={(value) => handleModuleChange(module.id, 'description', value)}
+                        element="p"
+                        className="text-text-secondary text-sm"
+                        placeholder="Descrição do módulo"
+                        multiline
+                      />
+                    ) : (
+                      <p className="text-text-secondary text-sm">
+                        {module.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="relative">
                   {editMode ? (
@@ -170,20 +172,14 @@ const ModuleTourSection: React.FC<ModuleTourSectionProps> = ({ editMode = false 
                       alt={`Interface do módulo ${module.title}`}
                       onImageChange={(imageUrl) => handleModuleChange(module.id, 'image', imageUrl)}
                       section="modules"
-                      className="w-full h-40 object-cover rounded-lg bg-gray-100"
+                      className="w-full h-40 object-cover rounded-lg"
                     />
                   ) : (
-                    <div className="w-full h-40 object-cover rounded-lg bg-gray-100 flex items-center justify-center">
-                      {module.image && module.image !== "/placeholder.svg" ? (
-                        <img
-                          src={module.image}
-                          alt={`Interface do módulo ${module.title}`}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      ) : (
-                        <div className="text-gray-400 text-6xl">📊</div>
-                      )}
-                    </div>
+                    <img
+                      src={module.image}
+                      alt={`Interface do módulo ${module.title}`}
+                      className="w-full h-40 object-cover rounded-lg bg-background-surface"
+                    />
                   )}
                 </div>
               </div>

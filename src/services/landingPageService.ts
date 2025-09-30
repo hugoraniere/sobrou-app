@@ -160,31 +160,25 @@ class LandingPageService {
 
   async uploadImage(file: File, section: string): Promise<string | null> {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('bucketName', 'landing-page');
-      formData.append('uploadSource', `landing-page-${section}`);
-      formData.append('category', section);
-      formData.append('altText', `${section} image`);
-      formData.append('tags', JSON.stringify([section, 'landing-page']));
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${section}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-      const { data, error } = await supabase.functions.invoke('optimize-image', {
-        body: formData
-      });
+      const { error: uploadError } = await supabase.storage
+        .from('landing-page')
+        .upload(filePath, file);
 
-      if (error) {
-        console.error('Error in optimize-image function:', error);
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
         toast("Não foi possível fazer upload da imagem.");
         return null;
       }
 
-      if (!data.success) {
-        console.error('Optimization failed:', data.error);
-        toast(data.error || "Erro ao processar imagem.");
-        return null;
-      }
+      const { data: publicUrl } = supabase.storage
+        .from('landing-page')
+        .getPublicUrl(filePath);
 
-      return data.data.publicUrl;
+      return publicUrl.publicUrl;
     } catch (error) {
       console.error('Error in uploadImage:', error);
       toast("Ocorreu um erro inesperado no upload.");

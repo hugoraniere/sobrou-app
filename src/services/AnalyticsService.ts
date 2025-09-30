@@ -27,41 +27,6 @@ export class AnalyticsService {
     }
   }
 
-  // Release Notes Analytics
-  static async trackReleaseNoteShown(releaseNoteId: string, version: string, context: 'modal' | 'preview' = 'modal'): Promise<void> {
-    return this.trackEvent('release_note_shown', { 
-      releaseNoteId, 
-      version, 
-      context 
-    });
-  }
-
-  static async trackReleaseNoteCTAClicked(releaseNoteId: string, ctaText: string, ctaUrl: string, version: string): Promise<void> {
-    return this.trackEvent('release_note_cta_clicked', {
-      releaseNoteId,
-      ctaText,
-      ctaUrl,
-      version
-    });
-  }
-
-  static async trackReleaseNoteSecondaryButtonClicked(releaseNoteId: string, action: string, url: string | null, version: string): Promise<void> {
-    return this.trackEvent('release_note_secondary_clicked', {
-      releaseNoteId,
-      action,
-      url,
-      version
-    });
-  }
-
-  static async trackReleaseNoteDismissed(releaseNoteId: string, dismissType: 'cta' | 'secondary' | 'overlay', version: string): Promise<void> {
-    return this.trackEvent('release_note_dismissed', {
-      releaseNoteId,
-      dismissType,
-      version
-    });
-  }
-
   // Onboarding specific events
   static trackOnboardingStarted(goal?: string, effort?: number): Promise<void> {
     return this.trackEvent('onboarding_started', { goal, effort_minutes: effort });

@@ -39,14 +39,9 @@ const Auth = () => {
   }, [searchParams]);
   useEffect(() => {
     if (!isLoading && user) {
-      const redirectTo = searchParams.get('redirect');
-      if (redirectTo) {
-        navigate(decodeURIComponent(redirectTo));
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
     }
-  }, [user, isLoading, navigate, searchParams]);
+  }, [user, isLoading, navigate]);
   return <div className="min-h-screen bg-gray-50">
       {/* Back button */}
       <div className="absolute top-4 left-4 z-10">
@@ -90,10 +85,7 @@ const Auth = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <LoginForm 
-                    setActiveTab={setActiveTab} 
-                    redirectTo={searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')!) : undefined}
-                  />
+                  <LoginForm setActiveTab={setActiveTab} />
                 </CardContent>
               </Card>
             </TabsContent>

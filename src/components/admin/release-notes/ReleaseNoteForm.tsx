@@ -321,33 +321,15 @@ const ReleaseNoteForm: React.FC<ReleaseNoteFormProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="cta_action">Ação do Botão Principal</Label>
-                <Select 
-                value={formData.cta_action || 'open_link'}
-                onValueChange={(value) => handleInputChange('cta_action', value as 'open_link' | 'close')}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="open_link">Abrir Link</SelectItem>
-                  <SelectItem value="close">Fechar Modal</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="cta_url">URL do Botão Principal</Label>
+              <Input
+                id="cta_url"
+                value={formData.cta_url || ''}
+                onChange={(e) => handleInputChange('cta_url', e.target.value)}
+                placeholder="https://exemplo.com"
+                type="url"
+              />
             </div>
-
-            {formData.cta_action !== 'close' && (
-              <div>
-                <Label htmlFor="cta_url">URL do Botão Principal</Label>
-                <Input
-                  id="cta_url"
-                  value={formData.cta_url || ''}
-                  onChange={(e) => handleInputChange('cta_url', e.target.value)}
-                  placeholder="https://exemplo.com"
-                  type="url"
-                />
-              </div>
-            )}
 
             <div className="border-t pt-4 space-y-4">
               <h4 className="font-medium">Botão Secundário</h4>

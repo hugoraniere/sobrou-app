@@ -37,10 +37,9 @@ type ResetPasswordFormValues = { email: string };
 
 interface LoginFormProps {
   setActiveTab: (tab: string) => void;
-  redirectTo?: string;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab, redirectTo }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab }) => {
   const { login, requestPasswordReset, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
@@ -67,7 +66,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab, redirectTo }) => {
   const onSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true);
-      await login(values.email, values.password, redirectTo);
+      await login(values.email, values.password);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -109,21 +108,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ setActiveTab, redirectTo }) => {
         <Button 
           type="button"
           variant="outline" 
-          className="w-full flex items-center justify-center gap-3 h-11 hover:bg-background-surface hover:border-primary/20 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-3 h-11"
           onClick={handleGoogleSignIn}
           disabled={isLoading || isGoogleLoading}
         >
           {isGoogleLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Conectando...</span>
-            </>
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <>
-              <GoogleIcon />
-              <span>Continuar com Google</span>
-            </>
+            <GoogleIcon />
           )}
+          Continuar com Google
         </Button>
         
         <div className="relative">

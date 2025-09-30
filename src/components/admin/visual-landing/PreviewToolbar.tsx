@@ -26,13 +26,13 @@ const PreviewToolbar: React.FC<PreviewToolbarProps> = ({
       key: 'tablet' as const,
       label: 'Tablet',
       icon: Tablet,
-      width: '820px',
+      width: '768px',
     },
     {
       key: 'mobile' as const,
       label: 'Mobile',
       icon: Smartphone,
-      width: '390px',
+      width: '375px',
     },
   ];
 

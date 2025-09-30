@@ -10,7 +10,7 @@ interface OnboardingProviderProps {
 }
 
 export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
   const [eventCounts, setEventCounts] = useState<Record<string, number>>({});
@@ -20,19 +20,19 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
 
   // Load initial data
   useEffect(() => {
-    if (user && isAuthenticated) {
+    if (user) {
       loadOnboardingData();
     } else {
       setLoading(false);
     }
-  }, [user, isAuthenticated]);
+  }, [user]);
 
   // Auto-complete steps based on event counts
   useEffect(() => {
-    if (user && isAuthenticated && steps.length > 0 && Object.keys(eventCounts).length > 0) {
+    if (user && steps.length > 0 && Object.keys(eventCounts).length > 0) {
       autoCompleteSteps();
     }
-  }, [steps, eventCounts, user, isAuthenticated]);
+  }, [steps, eventCounts, user]);
 
   const loadOnboardingData = async () => {
     if (!user) return;
