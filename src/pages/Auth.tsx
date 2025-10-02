@@ -39,9 +39,27 @@ const Auth = () => {
   }, [searchParams]);
   useEffect(() => {
     if (!isLoading && user) {
-      navigate('/dashboard');
+      console.log('[AUTH PAGE] User is authenticated, redirecting from /auth');
+      const redirectTo = searchParams.get('redirect');
+      if (redirectTo) {
+        navigate(decodeURIComponent(redirectTo));
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, searchParams]);
+  // Se o usuário está logado, não mostramos a página de auth
+  if (user && !isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecionando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return <div className="min-h-screen bg-gray-50">
       {/* Back button */}
       <div className="absolute top-4 left-4 z-10">
@@ -85,7 +103,10 @@ const Auth = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <LoginForm setActiveTab={setActiveTab} />
+                  <LoginForm 
+                    setActiveTab={setActiveTab} 
+                    redirectTo={searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')!) : undefined}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>

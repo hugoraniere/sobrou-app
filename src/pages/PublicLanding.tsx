@@ -1,6 +1,5 @@
 import React from 'react';
-import { LandingPageProvider } from '@/contexts/LandingPageContext';
-import TransparentHeader from '../components/header/TransparentHeader';
+import SiteNavbar from '../components/navigation/SiteNavbar';
 import HeroSection from '../components/landing/HeroSection';
 import ModuleTourSection from '../components/landing/ModuleTourSection';
 import WhatsAppVoiceSection from '../components/landing/WhatsAppVoiceSection';
@@ -12,24 +11,24 @@ import CtaSection from '../components/landing/CtaSection';
 import Footer from '../components/landing/Footer';
 
 const PublicLanding: React.FC = () => {
+  console.log('[PUBLIC LANDING] Rendering PublicLanding component');
+  
   return (
     <div className="bg-background min-h-screen">
-      <LandingPageProvider>
-        <TransparentHeader />
+      <SiteNavbar />
 
-        <main>
-          <HeroSection />
-          <ModuleTourSection />
-          <WhatsAppVoiceSection />
-          <StatementImportSection />
-          <AutomationAISection />
-          <SecurityPrivacySection />
-          <FAQSection />
-          <CtaSection />
-        </main>
+      <main>
+        <HeroSection />
+        <ModuleTourSection />
+        <WhatsAppVoiceSection />
+        <StatementImportSection />
+        <AutomationAISection />
+        <SecurityPrivacySection />
+        <FAQSection />
+        <CtaSection />
+      </main>
 
-        <Footer />
-      </LandingPageProvider>
+      <Footer />
     </div>
   );
 };

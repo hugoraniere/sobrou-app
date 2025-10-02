@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search } from 'lucide-react';
-import MainNavbar from '@/components/navigation/MainNavbar';
+import SiteNavbar from '@/components/navigation/SiteNavbar';
 import BlogBreadcrumb from '@/components/blog/BlogBreadcrumb';
 import BlogSidebar from '@/components/blog/BlogSidebar';
 import FeaturedPostHero from '@/components/blog/FeaturedPostHero';
@@ -263,7 +263,7 @@ const Blog: React.FC = () => {
       {/* Organization Structured Data */}
       <StructuredData type="organization" data={{}} />
       
-      <MainNavbar />
+      <SiteNavbar />
       
       <div className="pt-16">
         <div className="container mx-auto px-4 py-8">

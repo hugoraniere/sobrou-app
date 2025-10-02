@@ -16,7 +16,7 @@ export interface UserProfile {
   };
 }
 
-type AuthContextType = {
+export type AuthContextType = {
   user: UserProfile | null;
   session: Session | null;
   isAuthenticated: boolean;
@@ -28,7 +28,7 @@ type AuthContextType = {
   logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -41,13 +41,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
-        // Para debug: identificar eventos de autenticação
-        console.log('Auth event:', event);
+        console.log('[AUTH] Auth event:', event, 'Has session:', !!currentSession);
         
         setSession(currentSession);
         setIsAuthenticated(!!currentSession);
         
         if (currentSession?.user) {
+          console.log('[AUTH] Setting user data for:', currentSession.user.email);
           setUser({
             id: currentSession.user.id,
             email: currentSession.user.email || '',
@@ -65,11 +65,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }, 100);
           }
         } else {
+          console.log('[AUTH] Clearing user data');
           setUser(null);
         }
 
         // Identificar se estamos em um fluxo de recuperação de senha
         if (event === 'PASSWORD_RECOVERY') {
+          console.log('[AUTH] Password recovery detected, redirecting');
           navigate('/reset-password');
         }
 
@@ -128,19 +130,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const strictlyPublicRoutes = ['/auth'];
     
     // Rotas que são acessíveis tanto para usuários autenticados quanto não autenticados
-    const publicAccessibleRoutes = ['/reset-password', '/erro'];
+    const publicAccessibleRoutes = ['/reset-password', '/erro', '/blog', '/suporte'];
     
     // Verificamos se o usuário está na página de autenticação e já está autenticado
     const isOnStrictlyPublicRoute = strictlyPublicRoutes.includes(location.pathname);
     const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
+    const isOnRootRoute = location.pathname === '/';
     
+    // Tratamento especial para sucesso do Google OAuth
+    const isGoogleSuccess = searchParams.get('success') === 'google';
+    if (isAuthenticated && isGoogleSuccess) {
+      console.log('[AUTH] Google OAuth success detected, redirecting to dashboard');
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+
     // Se o usuário está autenticado e tem um redirect, redirecionamos para lá
     if (isAuthenticated && isOnStrictlyPublicRoute && redirectTo) {
+      console.log('[AUTH] Redirecting to:', redirectTo);
       navigate(redirectTo, { replace: true });
     }
+    // REMOVIDO: Não redirecionamos mais usuários logados de "/" para "/dashboard"
+    // Isso permite que vejam a landing page personalizada com os botões corretos
+    
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
     // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
     else if (isAuthenticated && isOnStrictlyPublicRoute && !isOnPasswordResetRoute) {
+      console.log('[AUTH] Redirecting from public route to dashboard');
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, isLoading, location.pathname, location.search, navigate]);
@@ -230,16 +246,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
+      console.log('[AUTH] Starting Google OAuth flow');
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: `${window.location.origin}/auth?success=google`
         }
       });
       
       if (error) throw error;
+      console.log('[AUTH] Google OAuth initiated successfully');
     } catch (error: any) {
-      console.error('Google auth error:', error);
+      console.error('[AUTH] Google auth error:', error);
       toast.error('Erro ao fazer login com Google. Tente novamente.');
     }
   };
@@ -276,6 +294,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
+    // During development, provide more helpful debugging
+    console.error('useAuth must be used within an AuthProvider. Component tree:', {
+      pathname: window.location.pathname,
+      timestamp: new Date().toISOString()
+    });
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

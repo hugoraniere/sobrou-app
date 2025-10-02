@@ -66,7 +66,7 @@ serve(async (req) => {
       JSON.stringify({ 
         status: 'error', 
         message: 'Erro ao verificar número de WhatsApp',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
       }),
       { 
         status: 500, 

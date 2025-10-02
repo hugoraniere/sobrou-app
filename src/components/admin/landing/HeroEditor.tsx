@@ -6,16 +6,18 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLandingPage } from '@/contexts/LandingPageContext';
 import { HeroConfig } from '@/services/landingPageService';
-import { Save, Upload, Trash2, Plus } from 'lucide-react';
+import { Save, Upload, Trash2, Plus, Images } from 'lucide-react';
 import { toast } from "sonner";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import MediaLibraryModal from '@/components/admin/media/MediaLibraryModal';
 
 const HeroEditor: React.FC = () => {
   const { getConfig, updateConfig, uploadImage } = useLandingPage();
   const [config, setConfig] = useState<HeroConfig | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
 
   useEffect(() => {
     const heroConfig = getConfig('hero');
@@ -37,19 +39,24 @@ const HeroEditor: React.FC = () => {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !config) return;
+  const handleImageSelect = (imageUrl: string) => {
+    if (!config) return;
+    setConfig({ ...config, background_image: imageUrl });
+    setShowMediaLibrary(false);
+    toast.success('Imagem selecionada da galeria!');
+  };
 
+  const handleMediaLibraryUpload = async (file: File) => {
     setUploading(true);
     try {
       const imageUrl = await uploadImage(file, 'hero');
-      if (imageUrl) {
+      if (imageUrl && config) {
         setConfig({ ...config, background_image: imageUrl });
-        toast("A imagem foi carregada com sucesso.");
+        toast.success('Imagem enviada com sucesso!');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
+      toast.error('Erro ao enviar imagem');
     } finally {
       setUploading(false);
     }
@@ -149,44 +156,57 @@ const HeroEditor: React.FC = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <Label>Imagem de Fundo</Label>
-            <div className="space-y-2">
-              <div className="border rounded-lg p-4 bg-muted">
-                {config.background_image ? (
-                  <img 
-                    src={config.background_image} 
-                    alt="Preview" 
-                    className="w-full h-32 object-cover rounded"
+          <div className="space-y-4">
+            <div>
+              <Label>Imagem de Fundo</Label>
+              <div className="space-y-2">
+                <div className="border rounded-lg p-4 bg-muted">
+                  {config.background_image ? (
+                    <img 
+                      src={config.background_image} 
+                      alt="Preview" 
+                      className="w-full h-32 object-cover rounded"
+                    />
+                  ) : (
+                    <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
+                      <span className="text-muted-foreground">Nenhuma imagem</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowMediaLibrary(true)}
+                  >
+                    <Images className="w-4 h-4 mr-2" />
+                    Escolher da Galeria
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('hero-image-upload')?.click()}
+                    disabled={uploading}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {uploading ? 'Carregando...' : 'Carregar Imagem'}
+                  </Button>
+                  <input
+                    id="hero-image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && config) {
+                        handleMediaLibraryUpload(file);
+                      }
+                    }}
+                    className="hidden"
                   />
-                ) : (
-                  <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
-                    <span className="text-muted-foreground">Nenhuma imagem</span>
-                  </div>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById('hero-image-upload')?.click()}
-                  disabled={uploading}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {uploading ? 'Carregando...' : 'Carregar Imagem'}
-                </Button>
-                <input
-                  id="hero-image-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
+                </div>
               </div>
             </div>
           </div>
-        </div>
       </div>
 
       <Card>
@@ -251,6 +271,15 @@ const HeroEditor: React.FC = () => {
           {loading ? 'Salvando...' : 'Salvar Alterações'}
         </Button>
       </div>
+
+      <MediaLibraryModal
+        isOpen={showMediaLibrary}
+        onClose={() => setShowMediaLibrary(false)}
+        onImageSelect={handleImageSelect}
+        onUploadNew={() => {
+          document.getElementById('hero-image-upload')?.click();
+        }}
+      />
     </div>
   );
 };

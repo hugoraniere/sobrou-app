@@ -56,7 +56,7 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
   };
 
   return (
-    <section className="py-20 bg-card">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
@@ -66,11 +66,11 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
                 alt="Importação de Extratos"
                 onImageChange={handleImageChange}
                 section="statement"
-                containerClassName="aspect-square bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-2xl"
+                containerClassName="aspect-square bg-gray-200 rounded-2xl"
                 className="w-full h-full object-cover rounded-2xl"
               />
             ) : (
-              <div className="aspect-square bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-2xl flex items-center justify-center">
+              <div className="aspect-square bg-gray-200 rounded-2xl flex items-center justify-center">
                 {config.image ? (
                   <img 
                     src={config.image} 
@@ -78,9 +78,7 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 ) : (
-                  <div className="w-32 h-32 bg-blue-500/10 rounded-full flex items-center justify-center">
-                    <Upload className="w-16 h-16 text-blue-600" />
-                  </div>
+                  <div className="text-gray-400 text-8xl">📄</div>
                 )}
               </div>
             )}
@@ -92,11 +90,11 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
                 value={config.title}
                 onChange={(value) => handleConfigChange({ ...config, title: value })}
                 element="h2"
-                className="text-3xl md:text-4xl font-bold text-foreground mb-6"
+                className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
                 placeholder="Título da seção"
               />
             ) : (
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 {config.title}
               </h2>
             )}
@@ -105,11 +103,11 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
                 value={config.subtitle}
                 onChange={(value) => handleConfigChange({ ...config, subtitle: value })}
                 element="p"
-                className="text-xl text-muted-foreground mb-8"
+                className="text-lg text-gray-600 mb-8 leading-relaxed"
                 placeholder="Subtítulo da seção"
               />
             ) : (
-              <p className="text-xl text-muted-foreground mb-8">
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                 {config.subtitle}
               </p>
             )}
@@ -118,22 +116,22 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
               {config.features.map((feature, index) => {
                 const IconComponent = getIconComponent(feature.icon);
                 return (
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                        {editMode ? (
-                          <InlineEditableIcon
-                            iconName={feature.icon}
-                            onIconChange={(iconName) => {
-                              const updatedFeatures = [...config.features];
-                              updatedFeatures[index] = { ...feature, icon: iconName };
-                              handleConfigChange({ ...config, features: updatedFeatures });
-                            }}
-                            className="w-6 h-6 text-blue-600"
-                          />
-                        ) : (
-                          <IconComponent className="w-6 h-6 text-blue-600" />
-                        )}
-                      </div>
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                      {editMode ? (
+                        <InlineEditableIcon
+                          iconName={feature.icon}
+                          onIconChange={(iconName) => {
+                            const updatedFeatures = [...config.features];
+                            updatedFeatures[index] = { ...feature, icon: iconName };
+                            handleConfigChange({ ...config, features: updatedFeatures });
+                          }}
+                          className="w-6 h-6 text-primary"
+                        />
+                      ) : (
+                        <IconComponent className="w-6 h-6 text-primary" />
+                      )}
+                    </div>
                     <div>
                       {editMode ? (
                         <InlineEditableText
@@ -144,11 +142,11 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
                             handleConfigChange({ ...config, features: updatedFeatures });
                           }}
                           element="h3"
-                          className="text-lg font-semibold text-foreground mb-2"
+                          className="text-lg font-semibold text-gray-900 mb-2"
                           placeholder="Título do recurso"
                         />
                       ) : (
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
                       )}
                       {editMode ? (
                         <InlineEditableText
@@ -159,11 +157,11 @@ const StatementImportSection: React.FC<StatementImportSectionProps> = ({ editMod
                             handleConfigChange({ ...config, features: updatedFeatures });
                           }}
                           element="p"
-                          className="text-muted-foreground"
+                          className="text-gray-600 leading-relaxed"
                           placeholder="Descrição do recurso"
                         />
                       ) : (
-                        <p className="text-muted-foreground">{feature.description}</p>
+                        <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                       )}
                     </div>
                   </div>

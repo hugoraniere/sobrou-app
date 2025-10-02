@@ -38,17 +38,20 @@ serve(async (req) => {
     }
 
     // Busca o perfil do usuário pelo email
-    const { data: user, error: userError } = await supabase
+    const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
+    const user = users.users?.find(u => u.email === email);
+    
+    const { data: profile, error: userError } = await supabase
       .from('profiles')
       .select('full_name')
-      .eq('id', (await supabase.auth.admin.getUserByEmail(email)).data.user?.id)
+      .eq('id', user?.id)
       .single();
 
     if (userError) {
       console.error('Error fetching user profile:', userError);
     }
 
-    const userName = user?.full_name || 'Usuário';
+    const userName = profile?.full_name || 'Usuário';
     
     let subject = '';
     let content = '';
@@ -93,7 +96,7 @@ serve(async (req) => {
     console.error('Error sending password email:', error);
     
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Erro desconhecido' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

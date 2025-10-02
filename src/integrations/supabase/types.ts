@@ -578,6 +578,78 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_images: {
+        Row: {
+          alt_text: string | null
+          bucket_name: string
+          caption: string | null
+          category: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number
+          formats_available: Json | null
+          height: number | null
+          id: string
+          is_optimized: boolean | null
+          mime_type: string
+          optimization_level: string | null
+          original_name: string
+          seo_score: number | null
+          tags: string[] | null
+          updated_at: string
+          upload_source: string | null
+          uploaded_by: string | null
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          bucket_name?: string
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size: number
+          formats_available?: Json | null
+          height?: number | null
+          id?: string
+          is_optimized?: boolean | null
+          mime_type: string
+          optimization_level?: string | null
+          original_name: string
+          seo_score?: number | null
+          tags?: string[] | null
+          updated_at?: string
+          upload_source?: string | null
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          bucket_name?: string
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          formats_available?: Json | null
+          height?: number | null
+          id?: string
+          is_optimized?: boolean | null
+          mime_type?: string
+          optimization_level?: string | null
+          original_name?: string
+          seo_score?: number | null
+          tags?: string[] | null
+          updated_at?: string
+          upload_source?: string | null
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Relationships: []
+      }
       ingredients: {
         Row: {
           created_at: string | null
@@ -977,6 +1049,110 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_limits: {
+        Row: {
+          created_at: string | null
+          feature_key: string
+          id: string
+          limit_type: string
+          limit_value: number | null
+          metadata: Json | null
+          plan_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          feature_key: string
+          id?: string
+          limit_type?: string
+          limit_value?: number | null
+          metadata?: Json | null
+          plan_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          feature_key?: string
+          id?: string
+          limit_type?: string
+          limit_value?: number | null
+          metadata?: Json | null
+          plan_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_limits_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          billing_cycle: string
+          created_at: string
+          currency: string
+          description: string | null
+          display_order: number
+          features: Json
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          max_ai_messages: number | null
+          max_exports: number | null
+          max_transactions: number | null
+          name: string
+          price: number
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          trial_days: number | null
+          updated_at: string
+        }
+        Insert: {
+          billing_cycle?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          max_ai_messages?: number | null
+          max_exports?: number | null
+          max_transactions?: number | null
+          name: string
+          price?: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          trial_days?: number | null
+          updated_at?: string
+        }
+        Update: {
+          billing_cycle?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          max_ai_messages?: number | null
+          max_exports?: number | null
+          max_transactions?: number | null
+          name?: string
+          price?: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          trial_days?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_tour_steps: {
         Row: {
           anchor_id: string
@@ -1075,13 +1251,19 @@ export type Database = {
       release_notes: {
         Row: {
           created_at: string
+          cta_action: string | null
           cta_text: string | null
           cta_url: string | null
           description: string | null
+          display_behavior: string | null
           id: string
+          image_position: string | null
           image_url: string | null
           is_active: boolean
           name: string
+          secondary_button_action: string | null
+          secondary_button_text: string | null
+          secondary_button_url: string | null
           size: string
           title: string
           updated_at: string
@@ -1089,13 +1271,19 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          cta_action?: string | null
           cta_text?: string | null
           cta_url?: string | null
           description?: string | null
+          display_behavior?: string | null
           id?: string
+          image_position?: string | null
           image_url?: string | null
           is_active?: boolean
           name: string
+          secondary_button_action?: string | null
+          secondary_button_text?: string | null
+          secondary_button_url?: string | null
           size?: string
           title: string
           updated_at?: string
@@ -1103,13 +1291,19 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          cta_action?: string | null
           cta_text?: string | null
           cta_url?: string | null
           description?: string | null
+          display_behavior?: string | null
           id?: string
+          image_position?: string | null
           image_url?: string | null
           is_active?: boolean
           name?: string
+          secondary_button_action?: string | null
+          secondary_button_text?: string | null
+          secondary_button_url?: string | null
           size?: string
           title?: string
           updated_at?: string
@@ -1246,29 +1440,44 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          conversion_source: string | null
           created_at: string
           expires_at: string | null
           id: string
+          is_trial: boolean | null
           plan: string
           status: string
+          trial_end_date: string | null
+          trial_start_date: string | null
+          trial_used: boolean | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          conversion_source?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean | null
           plan?: string
           status?: string
+          trial_end_date?: string | null
+          trial_start_date?: string | null
+          trial_used?: boolean | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          conversion_source?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean | null
           plan?: string
           status?: string
+          trial_end_date?: string | null
+          trial_start_date?: string | null
+          trial_used?: boolean | null
           updated_at?: string
           user_id?: string
         }
@@ -1634,6 +1843,80 @@ export type Database = {
           recurrence_end_date?: string | null
           recurrence_frequency?: string | null
           type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trial_config: {
+        Row: {
+          created_at: string | null
+          email_sequence: Json | null
+          id: string
+          is_active: boolean | null
+          trial_duration_days: number
+          trial_plan_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_sequence?: Json | null
+          id?: string
+          is_active?: boolean | null
+          trial_duration_days?: number
+          trial_plan_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email_sequence?: Json | null
+          id?: string
+          is_active?: boolean | null
+          trial_duration_days?: number
+          trial_plan_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trial_config_trial_plan_id_fkey"
+            columns: ["trial_plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usage_tracking: {
+        Row: {
+          created_at: string | null
+          feature_type: string
+          id: string
+          metadata: Json | null
+          period_end: string
+          period_start: string
+          updated_at: string | null
+          usage_count: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          feature_type: string
+          id?: string
+          metadata?: Json | null
+          period_end?: string
+          period_start?: string
+          updated_at?: string | null
+          usage_count?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          feature_type?: string
+          id?: string
+          metadata?: Json | null
+          period_end?: string
+          period_start?: string
+          updated_at?: string | null
+          usage_count?: number | null
           user_id?: string
         }
         Relationships: []
@@ -2103,6 +2386,14 @@ export type Database = {
           total_users: number
         }[]
       }
+      get_user_plan_limits: {
+        Args: { target_user_id: string }
+        Returns: {
+          current_usage: number
+          feature_key: string
+          limit_value: number
+        }[]
+      }
       get_user_retention_cohorts: {
         Args: { weeks_back?: number }
         Returns: {
@@ -2176,6 +2467,14 @@ export type Database = {
           ip_address_param?: string
           target_post_id: string
           user_id_param?: string
+        }
+        Returns: boolean
+      }
+      track_feature_usage: {
+        Args: {
+          feature_name: string
+          target_user_id: string
+          usage_amount?: number
         }
         Returns: boolean
       }

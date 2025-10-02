@@ -36,11 +36,11 @@ import AdminContent from "./pages/AdminContent";
 import AdminSupport from "./pages/AdminSupport";
 import AdminLandingPage from "./pages/admin/VisualLandingPageEditor";
 import AdminUsers from "./pages/AdminUsers";
-import OnboardingAdmin from "./pages/admin/OnboardingAdmin";
+import OnboardingManager from "./pages/admin/OnboardingManager";
 import DesignSystem from "./pages/admin/DesignSystem";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Gallery from "./pages/admin/Gallery";
-const ReleaseNotesAdmin = React.lazy(() => import("./pages/admin/ReleaseNotesAdmin"));
+import AdminPlans from "./pages/AdminPlans";
 import EmailVerification from "./pages/EmailVerification";
 import WhatsAppIntegration from "./pages/WhatsAppIntegration";
 import WhatsAppChatButton from "./components/chat/WhatsAppChatButton";
@@ -49,12 +49,12 @@ import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
 import { NavigationProvider } from '@/contexts/NavigationContext';
-import InstallPrompt from './components/pwa/InstallPrompt';
 import ReleaseNotesModal from './components/onboarding/ReleaseNotesModal';
 import Error from "./pages/Error";
 import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
 import NewTicket from "./pages/support/NewTicket";
+import CacheResetButton from "./components/debug/CacheResetButton";
 const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 
 
@@ -144,12 +144,22 @@ const App = () => {
                                </ProtectedRoute>
                              } 
                            />
+        <Route 
+          path="/admin/onboarding" 
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <OnboardingManager />
+              </AdminLayout>
+            </ProtectedRoute>
+          } 
+        />
                            <Route 
-                             path="/admin/onboarding" 
+                             path="/admin/plans" 
                              element={
                                <ProtectedRoute>
                                  <AdminLayout>
-                                   <OnboardingAdmin />
+                                   <AdminPlans />
                                  </AdminLayout>
                                </ProtectedRoute>
                              } 
@@ -184,26 +194,26 @@ const App = () => {
                                  </ProtectedRoute>
                                } 
                              />
-                              <Route 
-                                path="/admin/gallery" 
-                                element={
-                                  <ProtectedRoute>
-                                    <AdminLayout>
-                                      <Gallery />
-                                    </AdminLayout>
-                                  </ProtectedRoute>
-                                } 
-                              />
-                              <Route 
-                                path="/admin/release-notes" 
-                                element={
-                                  <ProtectedRoute>
-                                    <AdminLayout>
-                                      <React.Suspense fallback={null}><ReleaseNotesAdmin /></React.Suspense>
-                                    </AdminLayout>
-                                  </ProtectedRoute>
-                                } 
-                              />
+                                <Route 
+                                  path="/admin/gallery" 
+                                  element={
+                                    <ProtectedRoute>
+                                      <AdminLayout>
+                                        <Gallery />
+                                      </AdminLayout>
+                                    </ProtectedRoute>
+                                  } 
+                                />
+                                <Route 
+                                  path="/admin/product-tour" 
+                                  element={
+                                    <ProtectedRoute>
+                                      <AdminLayout>
+                                        <OnboardingManager />
+                                      </AdminLayout>
+                                    </ProtectedRoute>
+                                  } 
+                                />
                           
                           {/* Protected routes */}
                           <Route
@@ -311,15 +321,9 @@ const App = () => {
                         
                         <WhatsAppChatButton />
                         <TourManager />
-                        <InstallPrompt />
                         <ReleaseNotesModal />
-                        <ReleaseNotesModal />
-                        {isDevMode && (
-                          <>
-                            <TourDevOverlay enabled={isDevMode} />
-                            <TourAnchorHighlighter />
-                          </>
-                        )}
+                        {import.meta.env.DEV && <CacheResetButton />}
+
                       </div>
                       </NavigationProvider>
                     </WhatsAppButtonProvider>

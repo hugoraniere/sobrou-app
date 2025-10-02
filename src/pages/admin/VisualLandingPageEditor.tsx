@@ -83,9 +83,9 @@ const VisualLandingPageEditor: React.FC = () => {
   const getViewportStyles = () => {
     switch (viewportSize) {
       case 'mobile':
-        return { width: '375px', minHeight: '100vh' };
+        return { width: '390px', height: '844px', overflow: 'auto' };
       case 'tablet':
-        return { width: '768px', minHeight: '100vh' };
+        return { width: '820px', height: '1180px', overflow: 'auto' };
       default:
         return { width: '100%', minHeight: '100vh' };
     }

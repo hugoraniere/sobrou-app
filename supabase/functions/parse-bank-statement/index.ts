@@ -54,7 +54,7 @@ serve(async (req) => {
         console.log("Recuperado do erro de parsing usando o corpo bruto como textContent");
       } else {
         return new Response(
-          JSON.stringify({ error: "Formato de requisição inválido: " + error.message }),
+          JSON.stringify({ error: "Formato de requisição inválido: " + (error instanceof Error ? error.message : 'Erro desconhecido') }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -104,7 +104,7 @@ serve(async (req) => {
     
     // Garantir que todos os erros retornem com os cabeçalhos CORS
     return new Response(
-      JSON.stringify({ error: error.message || "Erro ao processar extrato bancário" }),
+      JSON.stringify({ error: (error instanceof Error ? error.message : null) || "Erro ao processar extrato bancário" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
@@ -135,7 +135,7 @@ async function processExtractContent(textContent: string, corsHeaders: Record<st
   } catch (error) {
     console.error("Erro ao processar conteúdo:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Erro ao processar conteúdo do extrato" }),
+      JSON.stringify({ error: (error instanceof Error ? error.message : null) || "Erro ao processar conteúdo do extrato" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

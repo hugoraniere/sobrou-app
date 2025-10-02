@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { ProductTourService } from '@/services/productTourService';
+import { ReleaseNotesService } from '@/services/releaseNotesService';
 import { ProductTourStep, UserTourProgress, TourContextType } from '@/types/product-tour';
 
 const ProductTourContext = createContext<TourContextType | null>(null);
@@ -19,390 +20,315 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState<ProductTourStep | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [totalSteps, setTotalSteps] = useState(0);
+  const [steps, setSteps] = useState<ProductTourStep[]>([]);
   const [progress, setProgress] = useState<UserTourProgress | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [steps, setSteps] = useState<ProductTourStep[]>([]);
-  const [sessionId] = useState(() => crypto.randomUUID());
+  const [canShowTour, setCanShowTour] = useState(false);
 
-  // Derived state
-  const isFirstStep = currentStepIndex === 0;
-  const isLastStep = currentStepIndex === totalSteps - 1;
-  const canNavigate = !isLoading;
-
-  // Load tour steps
-  const loadTourSteps = useCallback(async () => {
-    try {
-      const tourSteps = await ProductTourService.getTourSteps();
-      setSteps(tourSteps);
-      setTotalSteps(tourSteps.length);
-      return tourSteps;
-    } catch (error) {
-      console.error('Error loading tour steps:', error);
-      return [];
-    }
-  }, []);
-
-  // Load user progress
-  const loadUserProgress = useCallback(async () => {
-    if (!user?.id) return null;
-    
-    try {
-      const userProgress = await ProductTourService.getUserProgress(user.id);
-      setProgress(userProgress);
-      return userProgress;
-    } catch (error) {
-      console.error('Error loading user progress:', error);
-      return null;
+  // Load tour data
+  useEffect(() => {
+    if (user?.id) {
+      loadTourData();
     }
   }, [user?.id]);
 
-  // Find step by key
-  const findStepByKey = useCallback((stepKey: string) => {
-    return steps.find(step => step.step_key === stepKey);
-  }, [steps]);
+  // Integration with Release Notes - prevent multiple modals
+  useEffect(() => {
+    const checkReleaseNotes = async () => {
+      if (!user?.id) return;
 
-  // Find step index
-  const findStepIndex = useCallback((stepKey: string) => {
-    return steps.findIndex(step => step.step_key === stepKey);
-  }, [steps]);
-
-  // Navigate to page if needed
-  const navigateToStepPage = useCallback(async (step: ProductTourStep) => {
-    const currentPath = location.pathname;
-    const targetPath = step.page_route;
-    
-    if (currentPath !== targetPath) {
-      await ProductTourService.logEvent('navigation_required', {
-        userId: user?.id,
-        sessionId,
-        stepKey: step.step_key,
-        pageRoute: targetPath,
-        eventData: { from: currentPath, to: targetPath }
-      });
-      
-      navigate(targetPath);
-      
-      // Wait for navigation and DOM to settle
-      return new Promise<void>((resolve) => {
-        setTimeout(resolve, 1000);
-      });
-    }
-  }, [location.pathname, navigate, user?.id, sessionId]);
-
-  // Wait for element to be available
-  const waitForElement = useCallback((anchorId: string, maxAttempts = 20): Promise<Element | null> => {
-    return new Promise((resolve) => {
-      let attempts = 0;
-      
-      const checkElement = () => {
-        const element = document.querySelector(`[data-tour-id="${anchorId}"]`);
+      try {
+        const activeReleaseNote = await ReleaseNotesService.getUndismissedActiveReleaseNote();
+        console.log('🎯 Product Tour Debug - Active release note:', activeReleaseNote);
         
-        if (element) {
-          resolve(element);
+        // If there's an active release note, prevent tour from starting
+        if (activeReleaseNote) {
+          console.log('🛑 Product Tour blocked by active release note');
+          setCanShowTour(false);
           return;
         }
-        
-        attempts++;
-        if (attempts >= maxAttempts) {
-          console.warn(`Element with tour-id "${anchorId}" not found after ${maxAttempts} attempts`);
-          resolve(null);
-          return;
-        }
-        
-        setTimeout(checkElement, 250);
-      };
-      
-      checkElement();
-    });
-  }, []);
 
-  // Start tour
-  const startTour = useCallback(async () => {
-    if (!user?.id) return;
-    
-    setIsLoading(true);
-    
-    try {
-      const tourSteps = steps.length > 0 ? steps : await loadTourSteps();
-      
-      if (tourSteps.length === 0) {
-        console.warn('No tour steps available');
-        return;
+        // Check if tour should be shown
+        const tourEnabled = await ProductTourService.isTourEnabled();
+        const shouldAutoStart = await ProductTourService.shouldAutoStartTour(user.id);
+        console.log('🎯 Product Tour Debug - Tour enabled:', tourEnabled, 'Should auto start:', shouldAutoStart, 'Progress:', progress);
+        
+        const canShow = tourEnabled && (shouldAutoStart || !!progress?.started_at);
+        console.log('🎯 Product Tour Debug - Can show tour:', canShow);
+        setCanShowTour(canShow);
+      } catch (error) {
+        console.error('Error checking release notes and tour status:', error);
       }
+    };
 
-      // Initialize progress
-      const newProgress = await ProductTourService.startTour(user.id, tourSteps.length);
-      setProgress(newProgress);
+    checkReleaseNotes();
+  }, [user?.id, progress]);
+
+  // Handle route changes during tour
+  useEffect(() => {
+    if (isActive && currentStep) {
+      const currentRoute = location.pathname;
       
-      // Log tour start
-      await ProductTourService.logEvent('tour_started', {
-        userId: user.id,
-        sessionId,
-        eventData: { total_steps: tourSteps.length }
-      });
+      // If we're on the wrong page for the current step, we might need to navigate
+      if (currentStep.page_route !== currentRoute) {
+        // For now, we'll just continue the tour on any page
+        // In a more sophisticated implementation, we might pause or redirect
+      }
+    }
+  }, [location.pathname, isActive, currentStep]);
 
-      // Set first step
-      const firstStep = tourSteps[0];
-      setCurrentStep(firstStep);
+  const loadTourData = useCallback(async () => {
+    if (!user?.id) return;
+
+    try {
+      setIsLoading(true);
+      console.log('🎯 Product Tour Debug - Loading tour data for user:', user.id);
+      
+      // Load tour steps and user progress in parallel
+      const [tourSteps, userProgress] = await Promise.all([
+        ProductTourService.getTourSteps(),
+        ProductTourService.getUserProgress(user.id)
+      ]);
+
+      console.log('🎯 Product Tour Debug - Loaded steps:', tourSteps.length, 'User progress:', userProgress);
+      setSteps(tourSteps);
+      setProgress(userProgress);
+
+      // If user has started but not completed tour, resume from current step
+      if (userProgress?.started_at && !userProgress.completed_at && !userProgress.skipped_at) {
+        const currentStepKey = userProgress.current_step_key;
+        if (currentStepKey) {
+          const stepIndex = tourSteps.findIndex(step => step.step_key === currentStepKey);
+          if (stepIndex !== -1) {
+            setCurrentStepIndex(stepIndex);
+            setCurrentStep(tourSteps[stepIndex]);
+            console.log('🎯 Product Tour Debug - Resuming from step:', currentStepKey);
+            // Don't auto-start the tour here, let it be controlled by the UI
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading tour data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  const startTour = useCallback(async () => {
+    if (!user?.id || steps.length === 0) return;
+
+    try {
+      setIsLoading(true);
+
+      // Start tour in database
+      const newProgress = await ProductTourService.startTour(user.id, steps.length);
+      setProgress(newProgress);
+
+      // Set tour as active and start from first step
       setCurrentStepIndex(0);
+      setCurrentStep(steps[0]);
       setIsActive(true);
 
-      // Navigate to first step page if needed
-      await navigateToStepPage(firstStep);
-      
+      // Navigate to first step's page if needed
+      if (steps[0].page_route !== location.pathname) {
+        navigate(steps[0].page_route);
+      }
+
+      // Log tour start event
+      await ProductTourService.logEvent('tour_started', {
+        userId: user.id,
+        pageRoute: location.pathname
+      });
+
     } catch (error) {
       console.error('Error starting tour:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id, steps, loadTourSteps, sessionId, navigateToStepPage]);
+  }, [user?.id, steps, location.pathname, navigate]);
 
-  // Go to specific step
-  const goToStep = useCallback(async (stepKey: string) => {
-    if (!user?.id || !canNavigate) return;
-    
-    const step = findStepByKey(stepKey);
-    const stepIndex = findStepIndex(stepKey);
-    
-    if (!step || stepIndex === -1) {
-      console.warn(`Step "${stepKey}" not found`);
-      return;
-    }
-
-    setIsLoading(true);
+  const nextStep = useCallback(async () => {
+    if (!user?.id || !currentStep) return;
 
     try {
-      // Navigate to step page if needed
-      await navigateToStepPage(step);
+      const nextIndex = currentStepIndex + 1;
       
-      // Wait for element
-      const element = await waitForElement(step.anchor_id);
-      
-      if (!element) {
-        console.warn(`Element for step "${stepKey}" not found, skipping to next step`);
-        // Skip to next step if element not found
-        if (stepIndex < steps.length - 1) {
-          const nextStep = steps[stepIndex + 1];
-          await goToStep(nextStep.step_key);
-        }
+      // Log current step completion
+      await ProductTourService.logEvent('step_completed', {
+        userId: user.id,
+        stepKey: currentStep.step_key,
+        pageRoute: location.pathname
+      });
+
+      if (nextIndex >= steps.length) {
+        // Tour is complete
+        await completeTour();
         return;
       }
 
-      // Update progress
-      await ProductTourService.updateCurrentStep(user.id, stepKey, stepIndex + 1);
+      const nextTourStep = steps[nextIndex];
       
-      // Log step view
-      await ProductTourService.logEvent('step_viewed', {
-        userId: user.id,
-        sessionId,
-        stepKey,
-        pageRoute: step.page_route,
-        eventData: { step_index: stepIndex + 1 }
-      });
+      // Update progress in database
+      await ProductTourService.updateCurrentStep(
+        user.id,
+        nextTourStep.step_key,
+        nextIndex
+      );
 
-      // Update state
-      setCurrentStep(step);
-      setCurrentStepIndex(stepIndex);
-      
-      // Scroll element into view
-      element.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center',
-        inline: 'center'
-      });
+      // Update local state
+      setCurrentStepIndex(nextIndex);
+      setCurrentStep(nextTourStep);
 
-    } catch (error) {
-      console.error(`Error going to step "${stepKey}":`, error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.id, canNavigate, findStepByKey, findStepIndex, navigateToStepPage, waitForElement, steps, sessionId]);
-
-  // Next step
-  const nextStep = useCallback(async () => {
-    if (!currentStep || isLastStep || !canNavigate) return;
-    
-    // Log current step completion
-    await ProductTourService.logEvent('step_completed', {
-      userId: user?.id,
-      sessionId,
-      stepKey: currentStep.step_key,
-      pageRoute: currentStep.page_route,
-      eventData: { step_index: currentStepIndex + 1 }
-    });
-
-    const nextStepIndex = currentStepIndex + 1;
-    const nextStepObj = steps[nextStepIndex];
-    
-    if (nextStepObj) {
-      await goToStep(nextStepObj.step_key);
-    }
-  }, [currentStep, isLastStep, canNavigate, user?.id, sessionId, currentStepIndex, steps, goToStep]);
-
-  // Previous step
-  const previousStep = useCallback(async () => {
-    if (!currentStep || isFirstStep || !canNavigate) return;
-    
-    const prevStepIndex = currentStepIndex - 1;
-    const prevStepObj = steps[prevStepIndex];
-    
-    if (prevStepObj) {
-      await goToStep(prevStepObj.step_key);
-    }
-  }, [currentStep, isFirstStep, canNavigate, currentStepIndex, steps, goToStep]);
-
-  // Complete tour
-  const completeTour = useCallback(async () => {
-    if (!user?.id) return;
-    
-    try {
-      // Log current step completion if there's a current step
-      if (currentStep) {
-        await ProductTourService.logEvent('step_completed', {
-          userId: user.id,
-          sessionId,
-          stepKey: currentStep.step_key,
-          pageRoute: currentStep.page_route,
-          eventData: { step_index: currentStepIndex + 1 }
-        });
+      // Navigate to next step's page if different
+      if (nextTourStep.page_route !== location.pathname) {
+        navigate(nextTourStep.page_route);
       }
 
-      // Update progress
-      await ProductTourService.completeTour(user.id);
-      
-      // Log tour completion
-      await ProductTourService.logEvent('tour_completed', {
+      // Log step view event
+      await ProductTourService.logEvent('step_viewed', {
         userId: user.id,
-        sessionId,
-        eventData: { 
-          total_steps: totalSteps,
-          completed_steps: totalSteps
-        }
+        stepKey: nextTourStep.step_key,
+        pageRoute: nextTourStep.page_route
       });
 
-      // Reset state
-      setIsActive(false);
-      setCurrentStep(null);
-      setCurrentStepIndex(0);
-      
-      // Reload progress
-      await loadUserProgress();
-      
     } catch (error) {
-      console.error('Error completing tour:', error);
+      console.error('Error proceeding to next step:', error);
     }
-  }, [user?.id, currentStep, sessionId, currentStepIndex, totalSteps, loadUserProgress]);
+  }, [user?.id, currentStep, currentStepIndex, steps, location.pathname, navigate]);
 
-  // Skip tour
+  const previousStep = useCallback(async () => {
+    if (!user?.id || !currentStep || currentStepIndex === 0) return;
+
+    try {
+      const prevIndex = currentStepIndex - 1;
+      const prevTourStep = steps[prevIndex];
+
+      // Update progress in database
+      await ProductTourService.updateCurrentStep(
+        user.id,
+        prevTourStep.step_key,
+        prevIndex
+      );
+
+      // Update local state
+      setCurrentStepIndex(prevIndex);
+      setCurrentStep(prevTourStep);
+
+      // Navigate to previous step's page if different
+      if (prevTourStep.page_route !== location.pathname) {
+        navigate(prevTourStep.page_route);
+      }
+
+      // Log step view event
+      await ProductTourService.logEvent('step_viewed', {
+        userId: user.id,
+        stepKey: prevTourStep.step_key,
+        pageRoute: prevTourStep.page_route
+      });
+
+    } catch (error) {
+      console.error('Error going to previous step:', error);
+    }
+  }, [user?.id, currentStep, currentStepIndex, steps, location.pathname, navigate]);
+
   const skipTour = useCallback(async () => {
     if (!user?.id) return;
-    
+
     try {
-      // Update progress
       await ProductTourService.skipTour(user.id);
       
-      // Log tour skip
+      // Log skip event
       await ProductTourService.logEvent('tour_skipped', {
         userId: user.id,
-        sessionId,
         stepKey: currentStep?.step_key,
-        pageRoute: currentStep?.page_route,
-        eventData: { 
-          step_index: currentStepIndex + 1,
-          total_steps: totalSteps
-        }
+        pageRoute: location.pathname
       });
 
-      // Reset state
+      // Reset tour state
       setIsActive(false);
       setCurrentStep(null);
       setCurrentStepIndex(0);
       
-      // Reload progress
-      await loadUserProgress();
-      
+      // Reload progress to reflect skip
+      await loadTourData();
+
     } catch (error) {
       console.error('Error skipping tour:', error);
     }
-  }, [user?.id, sessionId, currentStep, currentStepIndex, totalSteps, loadUserProgress]);
+  }, [user?.id, currentStep, location.pathname, loadTourData]);
 
-  // Initialize tour on mount
-  useEffect(() => {
-    const initializeTour = async () => {
-      if (!user?.id) return;
+  const completeTour = useCallback(async () => {
+    if (!user?.id) return;
+
+    try {
+      await ProductTourService.completeTour(user.id);
       
-      setIsLoading(true);
-      try {
-        // Check if tour is enabled globally
-        const tourEnabled = await ProductTourService.isTourEnabled();
-        if (!tourEnabled) {
-          setIsLoading(false);
-          return;
-        }
+      // Log completion event
+      await ProductTourService.logEvent('tour_completed', {
+        userId: user.id,
+        stepKey: currentStep?.step_key,
+        pageRoute: location.pathname
+      });
 
-        // Load all tour steps
-        const allSteps = await ProductTourService.getTourSteps();
-        setSteps(allSteps);
-        setTotalSteps(allSteps.length);
-
-        // Load user progress
-        const userProgress = await ProductTourService.getUserProgress(user.id);
-        setProgress(userProgress);
-
-        // Check if should auto-start tour - delay to ensure dashboard loads
-        setTimeout(async () => {
-          const shouldAutoStart = await ProductTourService.shouldAutoStartTour(user.id);
-          if (shouldAutoStart && allSteps.length > 0) {
-            await startTour();
-          }
-        }, 1500);
-      } catch (error) {
-        console.error('Error initializing tour:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeTour();
-  }, [user?.id]);
-
-  // Handle route changes to continue tour
-  useEffect(() => {
-    if (!isActive || !currentStep || !user?.id) return;
-
-    const handleRouteChange = async () => {
-      const currentPath = location.pathname;
+      // Reset tour state
+      setIsActive(false);
+      setCurrentStep(null);
+      setCurrentStepIndex(0);
       
-      // If current step is for this page, reposition spotlight
-      if (currentStep.page_route === currentPath) {
-        // Small delay to ensure DOM is ready
-        setTimeout(() => {
-          // Force update by setting step again
-          const stepIndex = steps.findIndex(s => s.id === currentStep.id);
-          if (stepIndex !== -1) {
-            setCurrentStepIndex(stepIndex);
-          }
-        }, 500);
-      } else {
-        // Find next step for current page or continue sequence
-        const nextStepForPage = steps.find(step => 
-          step.page_route === currentPath && 
-          step.step_order > currentStep.step_order
-        );
-        
-        if (nextStepForPage) {
-          await goToStep(nextStepForPage.step_key);
-        }
-      }
-    };
+      // Reload progress to reflect completion
+      await loadTourData();
 
-    handleRouteChange();
-  }, [location.pathname, isActive, currentStep, steps, user?.id, goToStep]);
+    } catch (error) {
+      console.error('Error completing tour:', error);
+    }
+  }, [user?.id, currentStep, location.pathname, loadTourData]);
+
+  const goToStep = useCallback(async (stepKey: string) => {
+    if (!user?.id) return;
+
+    try {
+      const stepIndex = steps.findIndex(step => step.step_key === stepKey);
+      if (stepIndex === -1) return;
+
+      const targetStep = steps[stepIndex];
+
+      // Update progress in database
+      await ProductTourService.updateCurrentStep(
+        user.id,
+        stepKey,
+        stepIndex
+      );
+
+      // Update local state
+      setCurrentStepIndex(stepIndex);
+      setCurrentStep(targetStep);
+
+      // Navigate to step's page if different
+      if (targetStep.page_route !== location.pathname) {
+        navigate(targetStep.page_route);
+      }
+
+      // Log step view event
+      await ProductTourService.logEvent('step_viewed', {
+        userId: user.id,
+        stepKey: stepKey,
+        pageRoute: targetStep.page_route
+      });
+
+    } catch (error) {
+      console.error('Error going to specific step:', error);
+    }
+  }, [user?.id, steps, location.pathname, navigate]);
+
+  // Computed values
+  const totalSteps = steps.length;
+  const isFirstStep = currentStepIndex === 0;
+  const isLastStep = currentStepIndex === totalSteps - 1;
+  const canNavigate = !isLoading;
 
   const contextValue: TourContextType = {
     // State
-    isActive,
+    isActive: isActive && canShowTour,
     currentStep,
     currentStepIndex,
     totalSteps,
@@ -431,7 +357,7 @@ export const ProductTourProvider: React.FC<ProductTourProviderProps> = ({ childr
   );
 };
 
-export const useProductTour = (): TourContextType => {
+export const useProductTour = () => {
   const context = useContext(ProductTourContext);
   if (!context) {
     throw new Error('useProductTour must be used within a ProductTourProvider');

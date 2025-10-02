@@ -10,6 +10,7 @@ import { useDashboardData } from '@/hooks/useDashboardData'
 import { Transaction } from '@/services/transactions'
 import { PiStarFourFill } from "react-icons/pi"
 import { transactionQueryService } from '@/services/transactions/transactionQueryService'
+import PlanModal from '@/components/modals/PlanModal'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -33,6 +34,7 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   const [messages, setMessages] = React.useState<Message[]>([])
   const [input, setInput] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isPlanModalOpen, setIsPlanModalOpen] = React.useState(false)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
   const { user } = useAuth()
   const isMobile = useIsMobile()
@@ -68,35 +70,34 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
+    // Check if user is authenticated
+    if (!user) {
+      toast.error('Você precisa estar logado para usar o chat IA');
+      return;
+    }
+
     const userMessage = input.trim()
     setInput('')
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setIsLoading(true)
 
-    const transactionsToSend = transactions.length > 0 ? transactions : localTransactions;
-    console.log("Sending transactions to API:", transactionsToSend.length);
-
     try {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Analisando suas finanças...' }])
 
-      const { data, error } = await supabase.functions.invoke('process-chat', {
-        body: { 
-          prompt: userMessage, 
-          userId: user?.id,
-          transactions: transactionsToSend 
-        }
-      })
+      // Check if user has pro plan - for now, show plan modal for all users
+      // This can be updated later to check actual subscription status
+      
+      // Remove the loading message and show plan modal
+      setMessages(prev => {
+        const withoutLoading = prev.slice(0, -1); // Remove loading message
+        return [...withoutLoading, { 
+          role: 'assistant', 
+          content: 'Para acessar as análises com IA, você precisa de um plano premium. Vou mostrar as opções disponíveis!' 
+        }];
+      });
 
-      if (error) {
-        console.error('Error from Edge Function:', error);
-        throw new Error(error.message || 'Erro ao processar mensagem');
-      }
-
-      if (!data || !data.response) {
-        throw new Error('Resposta inválida do servidor');
-      }
-
-      setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: data.response }])
+      // Show plan modal
+      setIsPlanModalOpen(true);
     } catch (error) {
       console.error('Error processing chat:', error);
       toast.error('Erro ao processar mensagem');
@@ -116,13 +117,14 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
   if (!isOpen) return null
 
   return (
-    <div className={cn(
-      "fixed z-50 bg-white shadow-xl border border-gray-200",
-      isMobile 
-        ? "bottom-24 left-4 right-4 w-auto rounded-xl"
-        : "bottom-24 right-6 w-96 rounded-lg",
-      className
-    )}>
+    <>
+      <div className={cn(
+        "fixed z-50 bg-white shadow-xl border border-gray-200",
+        isMobile 
+          ? "bottom-24 left-4 right-4 w-auto rounded-xl"
+          : "bottom-24 right-6 w-96 rounded-lg",
+        className
+      )}>
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center gap-2">
           <PiStarFourFill className="w-5 h-5 text-primary" />
@@ -198,6 +200,12 @@ const ChatWindow = ({ isOpen, onClose, className }: ChatWindowProps) => {
         </div>
       </form>
     </div>
+    
+    <PlanModal 
+      isOpen={isPlanModalOpen} 
+      onClose={() => setIsPlanModalOpen(false)} 
+    />
+  </>
   )
 }
 

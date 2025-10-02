@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { AdminSettingsService } from '@/services/adminSettingsService';
 import { Settings, Save, Loader2 } from 'lucide-react';
+import AdminPageLayout from '@/components/admin/AdminPageLayout';
 
 interface AdminSettingsState {
   pwa_prompt_enabled: boolean;
@@ -62,22 +63,22 @@ const AdminSettings: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <AdminPageLayout 
+        title="Configurações do Sistema" 
+        subtitle="Gerencie as configurações globais da aplicação"
+      >
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </AdminPageLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Settings className="h-6 w-6" />
-        <div>
-          <h1 className="text-2xl font-bold">Configurações do Sistema</h1>
-          <p className="text-muted-foreground">Gerencie as configurações globais da aplicação</p>
-        </div>
-      </div>
-
+    <AdminPageLayout 
+      title="Configurações do Sistema" 
+      subtitle="Gerencie as configurações globais da aplicação"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Funcionalidades do Usuário</CardTitle>
@@ -102,7 +103,7 @@ const AdminSettings: React.FC = () => {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-6">
         <Button 
           onClick={saveSettings} 
           disabled={isSaving}
@@ -121,7 +122,7 @@ const AdminSettings: React.FC = () => {
           )}
         </Button>
       </div>
-    </div>
+    </AdminPageLayout>
   );
 };
 
