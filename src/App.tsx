@@ -77,6 +77,9 @@ const App = () => {
         }
       } finally {
         localStorage.setItem('pwa_purged', '1');
+        setTimeout(() => {
+          window.location.reload();
+        }, 50);
       }
     }
   }, []);
@@ -103,6 +106,8 @@ const App = () => {
                           <Route path="/oauth/callback" element={<OAuthCallback />} />
                           <Route path="/verify" element={<EmailVerification />} />
                           <Route path="/reset-password" element={<PasswordReset />} />
+                          <Route path="/auth" element={<Navigate to="/?auth=1" replace />} />
+                          <Route path="/auth/*" element={<Navigate to="/?auth=1" replace />} />
                           <Route path="/blog" element={<Blog />} />
                           <Route path="/blog/:slug" element={<BlogPost />} />
                           <Route path="/blog/post/:id" element={<BlogPostLegacyRedirect />} />

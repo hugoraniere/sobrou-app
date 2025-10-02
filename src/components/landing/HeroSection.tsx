@@ -107,21 +107,26 @@ const HeroSection: React.FC<HeroSectionProps> = ({ editMode = false }) => {
             )}
 
             <div>
-              <Link to={config.cta_url || '/?auth=1'}>
-                <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg rounded-full">
-                  {editMode ? (
-                    <InlineEditableText
-                      value={config.cta_text}
-                      onChange={(value) => handleConfigUpdate('cta_text', value)}
-                      element="span"
-                      placeholder="Texto do botão"
-                    />
-                  ) : (
-                    config.cta_text
-                  )}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
+              {(() => {
+                const ctaLink = config.cta_url === '/auth' ? '/?auth=1' : (config.cta_url || '/?auth=1');
+                return (
+                  <Link to={ctaLink}>
+                    <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg rounded-full">
+                      {editMode ? (
+                        <InlineEditableText
+                          value={config.cta_text}
+                          onChange={(value) => handleConfigUpdate('cta_text', value)}
+                          element="span"
+                          placeholder="Texto do botão"
+                        />
+                      ) : (
+                        config.cta_text
+                      )}
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                );
+              })()}
             </div>
 
             <div className="inline-flex w-fit items-center justify-center lg:justify-start gap-2 text-gray-600 lg:mx-0 mx-0">

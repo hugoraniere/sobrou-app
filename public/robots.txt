@@ -3,7 +3,6 @@ Allow: /
 
 Sitemap: https://sobrou.app/sitemap.xml
 
-# Block admin and auth pages
+# Block admin and dashboard pages
 Disallow: /admin
-Disallow: /auth
 Disallow: /dashboard

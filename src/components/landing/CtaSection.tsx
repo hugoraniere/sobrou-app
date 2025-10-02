@@ -65,19 +65,24 @@ const CtaSection: React.FC<CtaSectionProps> = ({ editMode = false }) => {
             size="lg" 
             className="bg-white text-primary hover:bg-gray-100 px-8 py-3 text-lg rounded-full"
           >
-            <Link to={config.cta_url}>
-              <CheckCircle2 className="w-5 h-5 mr-2" />
-              {editMode ? (
-                <InlineEditableText
-                  value={config.cta_text}
-                  onChange={(value) => handleConfigChange({ ...config, cta_text: value })}
-                  element="span"
-                  placeholder="Texto do botão"
-                />
-              ) : (
-                config.cta_text
-              )}
-            </Link>
+            {(() => {
+              const link = config.cta_url === '/auth' ? '/?auth=1' : (config.cta_url || '/?auth=1');
+              return (
+                <Link to={link}>
+                  <CheckCircle2 className="w-5 h-5 mr-2" />
+                  {editMode ? (
+                    <InlineEditableText
+                      value={config.cta_text}
+                      onChange={(value) => handleConfigChange({ ...config, cta_text: value })}
+                      element="span"
+                      placeholder="Texto do botão"
+                    />
+                  ) : (
+                    config.cta_text
+                  )}
+                </Link>
+              );
+            })()}
           </Button>
         </div>
       </div>

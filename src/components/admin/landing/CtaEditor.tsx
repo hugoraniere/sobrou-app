@@ -21,9 +21,15 @@ const CtaEditor: React.FC = () => {
   const handleSave = async () => {
     if (!config) return;
 
+    const normalized = {
+      ...config,
+      cta_url: config.cta_url === '/auth' ? '/?auth=1' : (config.cta_url || '/?auth=1')
+    };
+
     setLoading(true);
     try {
-      await updateConfig('cta', config);
+      await updateConfig('cta', normalized);
+      setConfig(normalized);
     } catch (error) {
       console.error('Error saving CTA config:', error);
     } finally {
@@ -75,7 +81,7 @@ const CtaEditor: React.FC = () => {
               id="cta-url"
               value={config.cta_url}
               onChange={(e) => setConfig({ ...config, cta_url: e.target.value })}
-              placeholder="/auth"
+              placeholder="/?auth=1"
             />
           </div>
         </div>
