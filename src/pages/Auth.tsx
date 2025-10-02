@@ -19,15 +19,6 @@ const Auth = () => {
   } = useAuth();
   const [searchParams] = useSearchParams();
 
-  // Fast redirect for Google OAuth success
-  useEffect(() => {
-    const successGoogle = searchParams.get('success');
-    if (successGoogle === 'google' && user && !isLoading) {
-      console.log('[Auth] Google OAuth success - redirecting immediately');
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, isLoading, searchParams, navigate]);
-
   // Check for verification parameter in URL
   useEffect(() => {
     const verification = searchParams.get('verification');

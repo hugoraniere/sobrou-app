@@ -35,7 +35,7 @@ const HeaderAuthButtons: React.FC<HeaderAuthButtonsProps> = ({
 
   if (isMobile) {
     return (
-      <Link to={variant === 'support' ? "/?auth=1&redirect=/suporte" : "/?tab=signup"}>
+      <Link to={variant === 'support' ? "/auth?redirect=/suporte" : "/auth?tab=signup"}>
         <Button className="bg-primary hover:bg-primary-hover text-white font-outfit text-sm">
           {variant === 'support' ? 'Entrar' : 'Entrar/Cadastrar'}
         </Button>
@@ -45,12 +45,12 @@ const HeaderAuthButtons: React.FC<HeaderAuthButtonsProps> = ({
 
   return (
     <div className="flex items-center gap-2">
-      <Link to={variant === 'support' ? "/?auth=1&redirect=/suporte" : "/?auth=1"}>
+      <Link to={variant === 'support' ? "/auth?redirect=/suporte" : "/auth"}>
         <Button variant="ghost" className="font-outfit text-sm text-gray-700 hover:text-primary">
           Entrar
         </Button>
       </Link>
-      <Link to="/?tab=signup">
+      <Link to="/auth?tab=signup">
         <Button className="bg-primary hover:bg-primary-hover text-white font-outfit text-sm">
           Criar conta grátis
         </Button>
