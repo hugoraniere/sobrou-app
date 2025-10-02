@@ -11,8 +11,6 @@ import CtaSection from '../components/landing/CtaSection';
 import Footer from '../components/landing/Footer';
 
 const PublicLanding: React.FC = () => {
-  console.log('[PUBLIC LANDING] Rendering PublicLanding component');
-  
   return (
     <div className="bg-background min-h-screen">
       <SiteNavbar />

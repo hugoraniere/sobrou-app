@@ -49,12 +49,13 @@ import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
 import { NavigationProvider } from '@/contexts/NavigationContext';
+import InstallPrompt from './components/pwa/InstallPrompt';
 import ReleaseNotesModal from './components/onboarding/ReleaseNotesModal';
 import Error from "./pages/Error";
 import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
 import NewTicket from "./pages/support/NewTicket";
-import CacheResetButton from "./components/debug/CacheResetButton";
+import PWAResetButton from "./components/debug/PWAResetButton";
 const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 
 
@@ -321,8 +322,9 @@ const App = () => {
                         
                         <WhatsAppChatButton />
                         <TourManager />
+                        <InstallPrompt />
                         <ReleaseNotesModal />
-                        {import.meta.env.DEV && <CacheResetButton />}
+                        {import.meta.env.DEV && <PWAResetButton />}
 
                       </div>
                       </NavigationProvider>

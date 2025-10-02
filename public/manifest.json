@@ -1,0 +1,63 @@
+{
+  "name": "Sobrou - Controle Financeiro Inteligente",
+  "short_name": "Sobrou",
+  "description": "Gerencie suas finanças de forma inteligente com IA e integração WhatsApp",
+  "theme_color": "#4F46E5",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/dashboard",
+  "categories": ["finance", "productivity", "business"],
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Adicionar Transação",
+      "short_name": "Nova Transação",
+      "description": "Adicionar nova transação rapidamente",
+      "url": "/transactions?action=add",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Visualizar resumo financeiro",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "display_override": ["window-controls-overlay", "standalone"],
+  "prefer_related_applications": false
+}
