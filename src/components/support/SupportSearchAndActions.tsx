@@ -47,7 +47,7 @@ const SupportSearchAndActions: React.FC<SupportSearchAndActionsProps> = ({
           </Button>
         )}
         
-        <Link to={user ? "/suporte/novo" : "/auth?redirect=/suporte/novo"}>
+        <Link to={user ? "/suporte/novo" : "/?auth=1&redirect=/suporte/novo"}>
           <Button variant="default" size="default" className="shadow-sm">
             <Plus className="h-4 w-4 mr-2" />
             Novo Ticket

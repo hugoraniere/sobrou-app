@@ -58,7 +58,7 @@ const EmailVerification = () => {
               
               // Redirecionar após um pequeno atraso para exibir a mensagem de sucesso
               setTimeout(() => {
-                navigate('/auth?verification=success');
+                navigate('/?auth=1&verification=success');
               }, 3000);
             }
           } else {
@@ -78,7 +78,7 @@ const EmailVerification = () => {
               
               // Redirecionar após um pequeno atraso para exibir a mensagem de sucesso
               setTimeout(() => {
-                navigate('/auth?verification=success');
+                navigate('/?auth=1&verification=success');
               }, 3000);
             }
           }
@@ -114,7 +114,7 @@ const EmailVerification = () => {
 
   // Redirect immediately if no parameters are present and no hash
   if (!searchParams.get('token_hash') && !searchParams.get('type') && !window.location.hash) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/?auth=1" replace />;
   }
 
   return (
@@ -168,7 +168,7 @@ const EmailVerification = () => {
                 
                 <div className="flex flex-col w-full space-y-2 mt-4">
                   <Button 
-                    onClick={() => navigate('/auth')}
+                    onClick={() => navigate('/?auth=1')}
                     className="w-full"
                   >
                     Ir para login

@@ -126,13 +126,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const redirectTo = searchParams.get('redirect');
     const successGoogle = searchParams.get('success');
 
-    // Lista de rotas que são exclusivamente públicas (não fazem sentido para usuários autenticados)
-    const strictlyPublicRoutes = ['/auth'];
+    // Lista de rotas estritamente públicas removida (rota /auth não existe mais)
+    const strictlyPublicRoutes: string[] = [];
     
     // Rotas que são acessíveis tanto para usuários autenticados quanto não autenticados
     const publicAccessibleRoutes = ['/reset-password', '/erro', '/blog', '/suporte'];
     
-    // Verificamos se o usuário está na página de autenticação e já está autenticado
+    // Verificamos se o usuário está na página estritamente pública (nenhuma no momento)
     const isOnStrictlyPublicRoute = strictlyPublicRoutes.includes(location.pathname);
     const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
     const isOnRootRoute = location.pathname === '/';
@@ -196,9 +196,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (fullName: string, email: string, password: string) => {
     try {
-      // Criar URL de redirecionamento completa e absoluta
-      // Usar window.location.origin para obter o domínio atual
-      const emailRedirectTo = `${window.location.origin}/auth?verification=success`;
+      // Redireciona para a landing após verificação de email
+      const emailRedirectTo = `${window.location.origin}/`;
       
       console.log('Signup with emailRedirectTo:', emailRedirectTo);
       
@@ -272,7 +271,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signOut();
       if (error) throw new Error(error.message);
       
-      navigate('/auth');
+      navigate('/');
     } catch (error: any) {
       console.error('Logout failed:', error);
       throw new Error('Logout failed. Please try again.');

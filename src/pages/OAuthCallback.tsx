@@ -28,11 +28,11 @@ const OAuthCallback: React.FC = () => {
         } else {
           // Fallback to login after retries
           console.log('[OAuthCallback] No session after retries, redirecting to login');
-          navigate('/auth?tab=login', { replace: true });
+          navigate('/?auth=1&tab=login', { replace: true });
         }
       } catch (error) {
         console.error('[OAuthCallback] Error:', error);
-        navigate('/auth?tab=login', { replace: true });
+        navigate('/?auth=1&tab=login', { replace: true });
       }
     };
 

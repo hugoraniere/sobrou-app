@@ -44,7 +44,7 @@ const NotFound = () => {
               {!isAuthenticated ? (
                 <Button 
                   variant="outline" 
-                  onClick={() => navigate("/auth")}
+                  onClick={() => navigate("/?auth=1")}
                   className="flex-1"
                 >
                   <LogIn className="h-4 w-4 mr-2" />

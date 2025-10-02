@@ -22,7 +22,6 @@ import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
 import Goals from "./pages/Goals";
 import NotFound from "./pages/NotFound";
-import Auth from "./pages/Auth";
 import PasswordReset from "./pages/PasswordReset";
 import PublicLanding from "./pages/PublicLanding";
 import Blog from './pages/Blog';
@@ -49,37 +48,36 @@ import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
 import { NavigationProvider } from '@/contexts/NavigationContext';
-import InstallPrompt from './components/pwa/InstallPrompt';
 import ReleaseNotesModal from './components/onboarding/ReleaseNotesModal';
 import Error from "./pages/Error";
 import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
 import NewTicket from "./pages/support/NewTicket";
-import PWAResetButton from "./components/debug/PWAResetButton";
 import OAuthCallback from "./pages/OAuthCallback";
-import { clearPWACache, unregisterAllServiceWorkers } from './utils/pwaUtils';
 const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
-
-const BUILD_VERSION = '2025-10-02-1';
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
   const { isDevMode } = useTourDevMode();
 
-  // Force cache purge on version change (one-time)
+  // One-time cleanup for any existing service workers and caches (PWA removed)
   React.useEffect(() => {
-    const storedVersion = localStorage.getItem('build_version');
-    if (storedVersion !== BUILD_VERSION) {
-      console.log('[App] Clearing old PWA cache...');
-      clearPWACache()
-        .then(() => unregisterAllServiceWorkers())
-        .then(() => {
-          localStorage.setItem('build_version', BUILD_VERSION);
-          console.log('[App] Cache cleared, version updated to:', BUILD_VERSION);
-          // Reload after a short delay to allow cache cleanup
-          setTimeout(() => window.location.reload(), 500);
-        })
-        .catch((err) => console.error('[App] Cache cleanup error:', err));
+    const purged = localStorage.getItem('pwa_purged');
+    if (!purged) {
+      try {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations()
+            .then(regs => Promise.all(regs.map(r => r.unregister())))
+            .catch(console.error);
+        }
+        if ('caches' in window) {
+          caches.keys()
+            .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+            .catch(console.error);
+        }
+      } finally {
+        localStorage.setItem('pwa_purged', '1');
+      }
     }
   }, []);
   
@@ -102,7 +100,6 @@ const App = () => {
                         <Routes>
                           {/* Public routes */}
                           <Route path="/" element={<PublicLanding />} />
-                          <Route path="/auth" element={<Auth />} />
                           <Route path="/oauth/callback" element={<OAuthCallback />} />
                           <Route path="/verify" element={<EmailVerification />} />
                           <Route path="/reset-password" element={<PasswordReset />} />
@@ -343,9 +340,7 @@ const App = () => {
                         
                         <WhatsAppChatButton />
                         <TourManager />
-                        <InstallPrompt />
                         <ReleaseNotesModal />
-                        {import.meta.env.DEV && <PWAResetButton />}
 
                       </div>
                       </NavigationProvider>

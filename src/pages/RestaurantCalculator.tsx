@@ -61,7 +61,7 @@ const RestaurantCalculator: React.FC = () => {
               Você precisa estar logado para acessar a calculadora de gastos para restaurantes.
             </p>
             <Button asChild>
-              <a href="/auth">Fazer Login</a>
+              <a href="/?auth=1">Fazer Login</a>
             </Button>
           </div>
         </div>

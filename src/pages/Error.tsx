@@ -61,7 +61,7 @@ const Error = () => {
 
   const handleRetry = () => {
     if (errorInfo.source === 'google') {
-      navigate('/auth');
+      navigate('/?auth=1');
     } else {
       // Try to go back or refresh
       window.location.reload();

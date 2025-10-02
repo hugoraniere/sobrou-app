@@ -23,7 +23,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ editMode = false }) => {
     subtitle:
       'Chega de planilhas complexas. Digite seus gastos em linguagem natural e deixe nossa IA organizar tudo automaticamente.',
     cta_text: 'Começar agora',
-    cta_url: '/auth',
+    cta_url: '/?auth=1',
     background_image:
       '/lovable-uploads/862677f9-9f47-483c-9958-536fd7f15a65.png',
     benefits: [
@@ -107,7 +107,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ editMode = false }) => {
             )}
 
             <div>
-              <Link to={config.cta_url || '/auth'}>
+              <Link to={config.cta_url || '/?auth=1'}>
                 <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg rounded-full">
                   {editMode ? (
                     <InlineEditableText

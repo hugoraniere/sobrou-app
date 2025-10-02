@@ -15,7 +15,7 @@ const SupportHeaderButtons: React.FC = () => {
             Meus Tickets
           </Button>
         </Link>
-        <Link to={user ? "/suporte/novo" : "/auth?redirect=/suporte/novo"}>
+        <Link to={user ? "/suporte/novo" : "/?auth=1&redirect=/suporte/novo"}>
           <Button size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Novo Ticket
@@ -27,13 +27,13 @@ const SupportHeaderButtons: React.FC = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <Link to="/auth?redirect=/suporte/novo">
+      <Link to="/?auth=1&redirect=/suporte/novo">
         <Button variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Novo Ticket
         </Button>
       </Link>
-      <Link to="/auth?redirect=/suporte">
+      <Link to="/?auth=1&redirect=/suporte">
         <Button size="sm">
           Entrar
         </Button>

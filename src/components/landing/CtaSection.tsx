@@ -18,7 +18,7 @@ const CtaSection: React.FC<CtaSectionProps> = ({ editMode = false }) => {
     title: "Comece a organizar suas finanças hoje",
     subtitle: "Junte-se a milhares de usuários que já transformaram sua vida financeira",
     cta_text: "Começar gratuitamente",
-    cta_url: "/auth"
+    cta_url: "/?auth=1"
   };
 
   // Se a seção estiver oculta, não renderizar

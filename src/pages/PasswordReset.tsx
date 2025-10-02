@@ -72,7 +72,7 @@ const PasswordReset: React.FC = () => {
       setUserEmail(user.email);
     } else {
       // Se não há token de recuperação e nem usuário logado, redireciona para a autenticação
-      navigate('/auth');
+      navigate('/?auth=1');
     }
   }, [searchParams, user, navigate]);
 
@@ -104,7 +104,7 @@ const PasswordReset: React.FC = () => {
         }
 
         toast.success('Senha redefinida com sucesso!');
-        navigate('/auth');
+        navigate('/?auth=1');
       } else {
         // Usuário logado alterando a senha
         const { error } = await supabase.auth.updateUser({

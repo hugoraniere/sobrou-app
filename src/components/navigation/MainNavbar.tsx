@@ -49,7 +49,7 @@ const MainNavbar: React.FC<{ isAdminContext?: boolean }> = ({ isAdminContext = f
 
         {/* Right side: Actions */}
         <div className="flex items-center space-x-2">
-          {!user && <Link to="/auth">
+          {!user && <Link to="/?auth=1">
               <Button variant="default" size="sm" className="rounded-full">
                 {t('auth.login', 'Entrar')}
               </Button>

@@ -25,7 +25,7 @@ const Header: React.FC<{ isPublic?: boolean }> = ({ isPublic = false }) => {
           
           <div className="flex items-center space-x-4">
             {!user && (
-              <Link to="/auth">
+              <Link to="/?auth=1">
                 <button className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded">
                   {t('auth.login', 'Entrar')}
                 </button>
