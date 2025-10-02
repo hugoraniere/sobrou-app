@@ -123,6 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const searchParams = new URLSearchParams(location.search);
     const redirectTo = searchParams.get('redirect');
+    const successGoogle = searchParams.get('success');
 
     // Lista de rotas que são exclusivamente públicas (não fazem sentido para usuários autenticados)
     const strictlyPublicRoutes = ['/auth'];
@@ -135,18 +136,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const isOnPasswordResetRoute = publicAccessibleRoutes.includes(location.pathname);
     const isOnRootRoute = location.pathname === '/';
     
+    console.log('[AuthContext] Routing logic:', {
+      isAuthenticated,
+      pathname: location.pathname,
+      redirectTo,
+      successGoogle,
+      isOnStrictlyPublicRoute
+    });
+
+    // Google OAuth success - redirect to dashboard
+    if (isAuthenticated && isOnStrictlyPublicRoute && successGoogle === 'google') {
+      console.log('[AuthContext] Google OAuth success - redirecting to dashboard');
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+
     // Se o usuário está autenticado e tem um redirect, redirecionamos para lá
     if (isAuthenticated && isOnStrictlyPublicRoute && redirectTo) {
+      console.log('[AuthContext] Redirecting to:', redirectTo);
       navigate(redirectTo, { replace: true });
+      return;
     }
-    // Redireciona usuários autenticados da página inicial para o dashboard
-    // UNLESS there's a query parameter to stay on landing page
-    else if (isAuthenticated && isOnRootRoute && !searchParams.has('stay')) {
-      navigate('/dashboard', { replace: true });
-    }
+
+    // REMOVED: Don't force redirect from landing page
+    // Users can view the landing page when logged in (shows "Ir para o app" button)
+    // The landing page HeaderAuthButtons component handles showing appropriate buttons
+    
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
     // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
-    else if (isAuthenticated && isOnStrictlyPublicRoute && !isOnPasswordResetRoute) {
+    if (isAuthenticated && isOnStrictlyPublicRoute && !isOnPasswordResetRoute) {
+      console.log('[AuthContext] Redirecting from strictly public route to dashboard');
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, isLoading, location.pathname, location.search, navigate]);
@@ -236,10 +255,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
+      console.log('[AuthContext] Google OAuth iniciado');
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: `${window.location.origin}/auth?success=google`
         }
       });
       

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -9,15 +10,20 @@ import { toast } from 'sonner';
 
 const ReleaseNotesModal: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
   const [activeNote, setActiveNote] = useState<ReleaseNote | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   
+  // Only show in app routes, never in landing, admin, or public pages
+  const appRoutes = ['/dashboard', '/transactions', '/goals', '/bills-to-pay', '/settings', '/whatsapp-integration', '/financial-planning', '/restaurant-calculator', '/monthly-summary'];
+  const isAppRoute = appRoutes.some(route => location.pathname.startsWith(route));
 
   useEffect(() => {
-    if (isAuthenticated) {
+    console.log('[ReleaseNotesModal] Auth:', isAuthenticated, 'Route:', location.pathname, 'IsAppRoute:', isAppRoute);
+    if (isAuthenticated && isAppRoute) {
       loadActiveNote();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAppRoute, location.pathname]);
 
   const loadActiveNote = async () => {
     try {
@@ -88,7 +94,7 @@ const ReleaseNotesModal: React.FC = () => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleDismiss('overlay'); }}>
       <DialogContent className={`${getSizeClasses(activeNote.size)} max-h-[90vh] overflow-y-auto`}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
