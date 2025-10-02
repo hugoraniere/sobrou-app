@@ -56,12 +56,32 @@ import SupportCenter from "./pages/support/SupportCenter";
 import SupportArticle from "./pages/support/SupportArticle";
 import NewTicket from "./pages/support/NewTicket";
 import PWAResetButton from "./components/debug/PWAResetButton";
+import OAuthCallback from "./pages/OAuthCallback";
+import { clearPWACache, unregisterAllServiceWorkers } from './utils/pwaUtils';
 const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 
+const BUILD_VERSION = '2025-10-02-1';
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
   const { isDevMode } = useTourDevMode();
+
+  // Force cache purge on version change (one-time)
+  React.useEffect(() => {
+    const storedVersion = localStorage.getItem('build_version');
+    if (storedVersion !== BUILD_VERSION) {
+      console.log('[App] Clearing old PWA cache...');
+      clearPWACache()
+        .then(() => unregisterAllServiceWorkers())
+        .then(() => {
+          localStorage.setItem('build_version', BUILD_VERSION);
+          console.log('[App] Cache cleared, version updated to:', BUILD_VERSION);
+          // Reload after a short delay to allow cache cleanup
+          setTimeout(() => window.location.reload(), 500);
+        })
+        .catch((err) => console.error('[App] Cache cleanup error:', err));
+    }
+  }, []);
   
   return (
     <React.StrictMode>
@@ -83,6 +103,7 @@ const App = () => {
                           {/* Public routes */}
                           <Route path="/" element={<PublicLanding />} />
                           <Route path="/auth" element={<Auth />} />
+                          <Route path="/oauth/callback" element={<OAuthCallback />} />
                           <Route path="/verify" element={<EmailVerification />} />
                           <Route path="/reset-password" element={<PasswordReset />} />
                           <Route path="/blog" element={<Blog />} />

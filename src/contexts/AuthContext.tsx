@@ -40,10 +40,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      (event, currentSession) => {
         // Para debug: identificar eventos de autenticação
         console.log('Auth event:', event);
         
+        // Synchronous state updates only
         setSession(currentSession);
         setIsAuthenticated(!!currentSession);
         
@@ -55,14 +56,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             user_metadata: currentSession.user.user_metadata
           });
 
-          // Track user activity for analytics
+          // Track user activity for analytics (deferred)
           if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
             setTimeout(() => {
               AdminAnalyticsService.trackAppEvent('user_activity', { 
                 timestamp: new Date().toISOString(),
                 event: event 
               });
-            }, 100);
+            }, 0);
           }
         } else {
           setUser(null);
@@ -70,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Identificar se estamos em um fluxo de recuperação de senha
         if (event === 'PASSWORD_RECOVERY') {
-          navigate('/reset-password');
+          setTimeout(() => navigate('/reset-password'), 0);
         }
 
         setIsLoading(false);
@@ -144,12 +145,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isOnStrictlyPublicRoute
     });
 
-    // Google OAuth success - redirect to dashboard
-    if (isAuthenticated && isOnStrictlyPublicRoute && successGoogle === 'google') {
-      console.log('[AuthContext] Google OAuth success - redirecting to dashboard');
-      navigate('/dashboard', { replace: true });
-      return;
-    }
+    // Google OAuth success is now handled by /oauth/callback route
+    // Remove this logic since we use dedicated callback page
 
     // Se o usuário está autenticado e tem um redirect, redirecionamos para lá
     if (isAuthenticated && isOnStrictlyPublicRoute && redirectTo) {
@@ -259,7 +256,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth?success=google`
+          redirectTo: `${window.location.origin}/oauth/callback`
         }
       });
       

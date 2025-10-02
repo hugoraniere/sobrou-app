@@ -17,12 +17,24 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'], // Removed .html to prevent caching stale HTML
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB - Increased for large bundles
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 24 * 60 * 60 // 24 hours
+              }
+            }
+          },
           {
             urlPattern: /^https:\/\/api\./,
             handler: 'NetworkFirst',
