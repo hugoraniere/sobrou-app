@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      (event, currentSession) => {
         // Para debug: identificar eventos de autenticação
         console.log('Auth event:', event);
         
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             user_metadata: currentSession.user.user_metadata
           });
 
-          // Track user activity for analytics
+          // Track user activity for analytics (async in setTimeout to avoid blocking)
           if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
             setTimeout(() => {
               AdminAnalyticsService.trackAppEvent('user_activity', { 
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Identificar se estamos em um fluxo de recuperação de senha
         if (event === 'PASSWORD_RECOVERY') {
-          navigate('/reset-password');
+          setTimeout(() => navigate('/reset-password'), 0);
         }
 
         setIsLoading(false);
