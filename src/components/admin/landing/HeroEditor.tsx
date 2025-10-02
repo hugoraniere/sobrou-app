@@ -29,15 +29,9 @@ const HeroEditor: React.FC = () => {
   const handleSave = async () => {
     if (!config) return;
 
-    const normalized = {
-      ...config,
-      cta_url: config.cta_url === '/auth' ? '/?auth=1' : (config.cta_url || '/?auth=1')
-    };
-
     setLoading(true);
     try {
-      await updateConfig('hero', normalized);
-      setConfig(normalized);
+      await updateConfig('hero', config);
     } catch (error) {
       console.error('Error saving hero config:', error);
     } finally {
@@ -156,7 +150,7 @@ const HeroEditor: React.FC = () => {
                 id="cta_url"
                 value={config.cta_url}
                 onChange={(e) => setConfig({ ...config, cta_url: e.target.value })}
-                placeholder="/?auth=1"
+                placeholder="/auth"
               />
             </div>
           </div>

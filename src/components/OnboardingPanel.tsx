@@ -23,7 +23,7 @@ const OnboardingPanel: React.FC<OnboardingPanelProps> = ({ whatsAppConnected }) 
           </div>
           <div className="flex flex-col md:flex-row md:items-center gap-3 flex-grow">
             <span className="font-medium">Create account</span>
-            <Link to="/?auth=1" className="md:ml-2">
+            <Link to="/auth" className="md:ml-2">
               <Button size="sm" variant="outline">
                 Manage Account
                 <ArrowRight className="ml-2 h-4 w-4" />
