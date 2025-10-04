@@ -1,43 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
-
 interface AuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultTab?: 'login' | 'signup';
 }
-
-const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange, defaultTab = 'login' }) => {
+const AuthModal: React.FC<AuthModalProps> = ({
+  open,
+  onOpenChange,
+  defaultTab = 'login'
+}) => {
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab === 'signup' || tab === 'login') {
       setActiveTab(tab);
     }
   }, [searchParams]);
-
   const handleClose = () => {
     onOpenChange(false);
     // Remove auth query params when closing
-    navigate('/', { replace: true });
+    navigate('/', {
+      replace: true
+    });
   };
-
-  return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[480px]">
+  return <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[480px] bg-slate-50">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
             Bem-vindo ao Sobrou
@@ -48,10 +42,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange, defaultTab = 
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Entrar</TabsTrigger>
-            <TabsTrigger value="signup">Cadastrar</TabsTrigger>
-          </TabsList>
+          
 
           <TabsContent value="login" className="mt-6">
             <LoginForm setActiveTab={setActiveTab} />
@@ -62,8 +53,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange, defaultTab = 
           </TabsContent>
         </Tabs>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default AuthModal;
