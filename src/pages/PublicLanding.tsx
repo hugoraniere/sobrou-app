@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Navigate } from 'react-router-dom';
+import { useSafeAuth } from '@/hooks/useSafeAuth';
 import SiteNavbar from '../components/navigation/SiteNavbar';
 import HeroSection from '../components/landing/HeroSection';
 import ModuleTourSection from '../components/landing/ModuleTourSection';
@@ -13,9 +14,15 @@ import Footer from '../components/landing/Footer';
 import AuthModal from '../components/auth/AuthModal';
 
 const PublicLanding: React.FC = () => {
+  const { isAuthenticated, isLoading } = useSafeAuth();
   const [searchParams] = useSearchParams();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [defaultTab, setDefaultTab] = useState<'login' | 'signup'>('login');
+
+  // Redirect authenticated users to dashboard
+  if (!isLoading && isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   useEffect(() => {
     const auth = searchParams.get('auth');

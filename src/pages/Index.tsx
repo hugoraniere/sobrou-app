@@ -80,7 +80,8 @@ const Index = () => {
       </ResponsivePageHeader>
 
       <TourBanner />
-      <GetStartedStepper />
+      {/* GetStartedStepper disabled - using Product Tour only */}
+      {/* <GetStartedStepper /> */}
 
       <DashboardContent
         transactions={transactions}
@@ -103,7 +104,8 @@ const Index = () => {
         onTransactionAdded={handleTransactionAdded}
       />
 
-      <WelcomeModal />
+      {/* WelcomeModal disabled - using Product Tour welcome modal only */}
+      {/* <WelcomeModal /> */}
     </ResponsivePageContainer>
   );
 };

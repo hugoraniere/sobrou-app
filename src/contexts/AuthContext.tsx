@@ -155,9 +155,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    // REMOVED: Don't force redirect from landing page
-    // Users can view the landing page when logged in (shows "Ir para o app" button)
-    // The landing page HeaderAuthButtons component handles showing appropriate buttons
+    // Force redirect authenticated users from landing page to dashboard
+    if (isAuthenticated && isOnRootRoute) {
+      console.log('[AuthContext] Redirecting authenticated user from landing to dashboard');
+      navigate('/dashboard', { replace: true });
+      return;
+    }
     
     // Só redirecionamos para o dashboard se o usuário autenticado estiver tentando acessar
     // uma rota exclusivamente pública (como a página de login) e não uma rota como reset-password
