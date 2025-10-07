@@ -470,6 +470,39 @@ export type Database = {
         }
         Relationships: []
       }
+      budgets: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          id: string
+          month: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          amount?: number
+          category: string
+          created_at?: string
+          id?: string
+          month: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          id?: string
+          month?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       dish_ingredients: {
         Row: {
           created_at: string | null
@@ -713,6 +746,33 @@ export type Database = {
           is_visible?: boolean
           section_key?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      mei_settings: {
+        Row: {
+          annual_limit: number
+          created_at: string
+          id: string
+          tax_reserve_percentage: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annual_limit?: number
+          created_at?: string
+          id?: string
+          tax_reserve_percentage?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annual_limit?: number
+          created_at?: string
+          id?: string
+          tax_reserve_percentage?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1800,6 +1860,8 @@ export type Database = {
         Row: {
           amount: number
           category: string
+          client: string | null
+          competence_date: string | null
           created_at: string
           date: string
           description: string
@@ -1808,14 +1870,22 @@ export type Database = {
           installment_total: number | null
           is_recurring: boolean | null
           next_due_date: string | null
+          payment_method: string | null
+          project: string | null
           recurrence_end_date: string | null
           recurrence_frequency: string | null
+          source_id: string | null
+          source_table: string | null
+          status: string | null
+          tags: string[] | null
           type: string
           user_id: string
         }
         Insert: {
           amount: number
           category: string
+          client?: string | null
+          competence_date?: string | null
           created_at?: string
           date?: string
           description: string
@@ -1824,14 +1894,22 @@ export type Database = {
           installment_total?: number | null
           is_recurring?: boolean | null
           next_due_date?: string | null
+          payment_method?: string | null
+          project?: string | null
           recurrence_end_date?: string | null
           recurrence_frequency?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          status?: string | null
+          tags?: string[] | null
           type: string
           user_id: string
         }
         Update: {
           amount?: number
           category?: string
+          client?: string | null
+          competence_date?: string | null
           created_at?: string
           date?: string
           description?: string
@@ -1840,8 +1918,14 @@ export type Database = {
           installment_total?: number | null
           is_recurring?: boolean | null
           next_due_date?: string | null
+          payment_method?: string | null
+          project?: string | null
           recurrence_end_date?: string | null
           recurrence_frequency?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          status?: string | null
+          tags?: string[] | null
           type?: string
           user_id?: string
         }
@@ -2459,6 +2543,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          last_access: string
           roles: string[]
         }[]
       }

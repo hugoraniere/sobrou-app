@@ -106,6 +106,9 @@ export const billsService = {
   },
 
   async markAsPaid(id: string): Promise<Bill> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     // Buscar a conta atual
     const { data: bill, error: fetchError } = await supabase
       .from('bills_to_pay')
@@ -116,6 +119,27 @@ export const billsService = {
     if (fetchError) {
       console.error('Error fetching bill:', fetchError);
       throw fetchError;
+    }
+
+    // M5: Criar transação vinculada
+    const { error: transactionError } = await supabase
+      .from('transactions')
+      .insert({
+        user_id: user.id,
+        type: 'expense',
+        amount: bill.amount,
+        category: 'outros',
+        description: `Pagamento: ${bill.title}`,
+        date: new Date().toISOString().split('T')[0],
+        competence_date: bill.due_date,
+        status: 'paid',
+        source_id: id,
+        source_table: 'bills_to_pay'
+      });
+
+    if (transactionError) {
+      console.error('Error creating transaction:', transactionError);
+      throw transactionError;
     }
 
     // Marcar como paga
@@ -160,6 +184,18 @@ export const billsService = {
   },
 
   async markAsUnpaid(id: string): Promise<Bill> {
+    // M5: Deletar transação vinculada
+    const { error: deleteError } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('source_id', id)
+      .eq('source_table', 'bills_to_pay');
+
+    if (deleteError) {
+      console.error('Error deleting transaction:', deleteError);
+      throw deleteError;
+    }
+
     const { data, error } = await supabase
       .from('bills_to_pay')
       .update({

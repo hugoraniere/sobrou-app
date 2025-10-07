@@ -1,19 +1,29 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Settings as SettingsIcon, MessageCircle, Layout } from 'lucide-react';
+import { User, Settings as SettingsIcon, MessageCircle, Layout, Building2 } from 'lucide-react';
 import ProfileTab from '@/components/settings/ProfileTab';
 import PreferencesTab from '@/components/settings/PreferencesTab';
 import WhatsAppTab from '@/components/settings/WhatsAppTab';
 import PagesTab from '@/components/settings/PagesTab';
+import { MEITab } from '@/components/settings/MEITab';
 import { useResponsive } from '@/hooks/useResponsive';
 import { cn } from '@/lib/utils';
 
 const Settings = () => {
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('profile');
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location]);
 
   return (
     <div className={cn(
@@ -24,9 +34,9 @@ const Settings = () => {
         <h1 className="text-3xl font-bold">{t('settings.title', 'Configurações')}</h1>
       </div>
       
-      <Tabs defaultValue="profile" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="border-b">
-          <TabsList className="w-full justify-start">
+          <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               {t('settings.tabs.profile', 'Perfil')}
@@ -34,6 +44,10 @@ const Settings = () => {
             <TabsTrigger value="preferences" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
               {t('settings.tabs.preferences', 'Preferências')}
+            </TabsTrigger>
+            <TabsTrigger value="mei" className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              MEI
             </TabsTrigger>
             <TabsTrigger value="pages" className="flex items-center gap-2">
               <Layout className="h-4 w-4" />
@@ -52,6 +66,10 @@ const Settings = () => {
 
         <TabsContent value="preferences">
           <PreferencesTab />
+        </TabsContent>
+
+        <TabsContent value="mei">
+          <MEITab />
         </TabsContent>
 
         <TabsContent value="pages">

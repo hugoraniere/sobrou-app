@@ -17,6 +17,15 @@ export type Transaction = {
   installment_total?: number;
   installment_index?: number;
   repeat_forever?: boolean;
+  // M3: Novos campos MEI
+  competence_date?: string;
+  payment_method?: string;
+  status?: 'paid' | 'pending';
+  client?: string;
+  project?: string;
+  tags?: string[];
+  source_id?: string;
+  source_table?: string;
 };
 
 export interface ParsedExpense {
