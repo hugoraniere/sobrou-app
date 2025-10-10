@@ -130,6 +130,42 @@ export type Database = {
           },
         ]
       }
+      bill_templates: {
+        Row: {
+          category: string | null
+          created_at: string
+          default_amount: number
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          recurrence_frequency: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          default_amount?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          recurrence_frequency?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          default_amount?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          recurrence_frequency?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bill_transactions: {
         Row: {
           amount: number
@@ -178,6 +214,9 @@ export type Database = {
           description: string | null
           due_date: string
           id: string
+          installment_group_id: string | null
+          installment_index: number | null
+          installment_total: number | null
           is_paid: boolean
           is_recurring: boolean | null
           next_due_date: string | null
@@ -194,6 +233,9 @@ export type Database = {
           description?: string | null
           due_date: string
           id?: string
+          installment_group_id?: string | null
+          installment_index?: number | null
+          installment_total?: number | null
           is_paid?: boolean
           is_recurring?: boolean | null
           next_due_date?: string | null
@@ -210,6 +252,9 @@ export type Database = {
           description?: string | null
           due_date?: string
           id?: string
+          installment_group_id?: string | null
+          installment_index?: number | null
+          installment_total?: number | null
           is_paid?: boolean
           is_recurring?: boolean | null
           next_due_date?: string | null

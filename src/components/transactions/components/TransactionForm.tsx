@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import CurrencyInput from './CurrencyInput';
 import TransactionTypeSelector from './TransactionTypeSelector';
 import { useTransactionForm } from '@/hooks/useTransactionForm';
+import { TaxReserveSuggestion } from '../TaxReserveSuggestion';
 
 interface TransactionFormProps {
   onSuccess: () => void;
@@ -17,7 +18,7 @@ interface TransactionFormProps {
 
 const TransactionForm: React.FC<TransactionFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
-  const { form, isSubmitting, handleSubmit } = useTransactionForm(onSuccess);
+  const { form, isSubmitting, handleSubmit, taxSuggestion, dismissTaxSuggestion } = useTransactionForm(onSuccess);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -123,6 +124,15 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSuccess }) => {
           </DialogFooter>
         </form>
       </Form>
+
+      {/* M4: Sugestão de Reserva de Impostos */}
+      {taxSuggestion.show && (
+        <TaxReserveSuggestion
+          amount={taxSuggestion.amount}
+          percentage={taxSuggestion.percentage}
+          onDismiss={dismissTaxSuggestion}
+        />
+      )}
     </div>
   );
 };

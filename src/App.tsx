@@ -47,6 +47,7 @@ import FinancialPlanning from "./pages/FinancialPlanning";
 import RestaurantCalculator from "./pages/RestaurantCalculator";
 import MonthlySummary from "./pages/MonthlySummary";
 import BillsToPay from "./pages/BillsToPay";
+import MEIClosing from "./pages/reports/MEIClosing";
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import ReleaseNotesModal from './components/onboarding/ReleaseNotesModal';
 import Error from "./pages/Error";
