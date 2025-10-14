@@ -335,6 +335,16 @@ const App = () => {
                             }
                           />
                           
+                          <Route
+                            path="/reports/mei-closing"
+                            element={
+                              <ProtectedRoute>
+                                <AppLayout>
+                                  <MEIClosing />
+                                </AppLayout>
+                              </ProtectedRoute>
+                            }
+                          />
                           
                           <Route path="*" element={<NotFound />} />
                         </Routes>

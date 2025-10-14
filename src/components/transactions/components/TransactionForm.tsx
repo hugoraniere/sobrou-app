@@ -1,8 +1,10 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import CategorySelector from '@/components/prompt/CategorySelector';
 import TransactionDatePicker from '@/components/prompt/TransactionDatePicker';
 import { DialogFooter } from '@/components/ui/dialog';
@@ -11,6 +13,9 @@ import CurrencyInput from './CurrencyInput';
 import TransactionTypeSelector from './TransactionTypeSelector';
 import { useTransactionForm } from '@/hooks/useTransactionForm';
 import { TaxReserveSuggestion } from '../TaxReserveSuggestion';
+import { PaymentMethodSelect } from '../PaymentMethodSelect';
+import { StatusRadioGroup } from '../StatusRadioGroup';
+import { TagsInput } from '../TagsInput';
 
 interface TransactionFormProps {
   onSuccess: () => void;
@@ -97,6 +102,134 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSuccess }) => {
                         placeholder={t('transactions.descriptionPlaceholder', 'Ex: Supermercado')} 
                         {...field} 
                         className="text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* M3: Campos MEI */}
+            <Separator className="my-4" />
+            <div className="space-y-4">
+              <p className="text-sm font-semibold text-gray-700">Informações MEI (opcional)</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="competence_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Data de Competência
+                      </FormLabel>
+                      <FormControl>
+                        <TransactionDatePicker 
+                          date={field.value} 
+                          onDateChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="payment_method"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Forma de Pagamento
+                      </FormLabel>
+                      <FormControl>
+                        <PaymentMethodSelect 
+                          value={field.value || ''} 
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700">
+                      Status
+                    </FormLabel>
+                    <FormControl>
+                      <StatusRadioGroup 
+                        value={field.value || 'paid'} 
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="client"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Cliente/Fornecedor
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Ex: João Silva" 
+                          {...field} 
+                          value={field.value || ''}
+                          className="text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="project"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Projeto
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Ex: Projeto XYZ" 
+                          {...field} 
+                          value={field.value || ''}
+                          className="text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700">
+                      Tags
+                    </FormLabel>
+                    <FormControl>
+                      <TagsInput 
+                        value={field.value || []} 
+                        onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage className="text-xs" />

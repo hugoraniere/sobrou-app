@@ -44,6 +44,42 @@ export const billsService = {
       throw new Error('User not authenticated');
     }
 
+    // M7: Se for parcelado, criar múltiplas contas
+    if (billData.installment_total && billData.installment_total > 1) {
+      const installmentGroupId = crypto.randomUUID();
+      const installmentAmount = billData.amount / billData.installment_total;
+      const bills: any[] = [];
+
+      for (let i = 1; i <= billData.installment_total; i++) {
+        const installmentDate = addMonths(new Date(billData.due_date), i - 1);
+        bills.push({
+          ...billData,
+          user_id: user.id,
+          amount: installmentAmount,
+          title: `${billData.title} (${i}/${billData.installment_total})`,
+          due_date: installmentDate.toISOString().split('T')[0],
+          installment_group_id: installmentGroupId,
+          installment_index: i,
+          installment_total: billData.installment_total,
+          is_recurring: false,
+          next_due_date: null,
+        });
+      }
+
+      const { data, error } = await supabase
+        .from('bills_to_pay')
+        .insert(bills)
+        .select();
+
+      if (error) {
+        console.error('Error creating installment bills:', error);
+        throw error;
+      }
+
+      return data[0] as Bill;
+    }
+
+    // Criar conta única
     const nextDueDate = billData.is_recurring && billData.recurrence_frequency
       ? calculateNextDueDate(billData.due_date, billData.recurrence_frequency)
       : null;

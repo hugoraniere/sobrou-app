@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, Edit2, Trash2, Check, X, Repeat, History } from 'lucide-react';
+import { Calendar, Edit2, Trash2, Check, X, Repeat, History, Receipt, Package } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,10 @@ import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { BillTransactionsDialog } from './BillTransactionsDialog';
 import { useBillBalance } from '@/hooks/useBillTransactions';
+import { useLinkedTransaction } from '@/hooks/useLinkedTransaction';
+import { InstallmentSeriesModal } from './InstallmentSeriesModal';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BillCardProps {
   bill: Bill;
@@ -33,8 +37,25 @@ export const BillCard: React.FC<BillCardProps> = ({
   onTogglePaid,
 }) => {
   const [transactionsDialogOpen, setTransactionsDialogOpen] = useState(false);
+  const [installmentSeriesOpen, setInstallmentSeriesOpen] = useState(false);
   
   const { data: balanceData } = useBillBalance(bill.id, bill.amount);
+  const { data: linkedTransaction } = useLinkedTransaction(bill.id, 'bills_to_pay');
+  
+  // Buscar todas as parcelas da série se for parcelado
+  const { data: installmentSeries = [] } = useQuery({
+    queryKey: ['installment-series', bill.installment_group_id],
+    queryFn: async () => {
+      if (!bill.installment_group_id) return [];
+      const { data } = await supabase
+        .from('bills_to_pay')
+        .select('*')
+        .eq('installment_group_id', bill.installment_group_id)
+        .order('installment_index', { ascending: true });
+      return data || [];
+    },
+    enabled: !!bill.installment_group_id,
+  });
   
   const currentBalance = balanceData?.current_balance || bill.amount;
   const hasTransactions = balanceData?.transactions_total !== 0;
@@ -73,6 +94,24 @@ export const BillCard: React.FC<BillCardProps> = ({
               
               {/* Badges maiores */}
               <div className="flex items-center gap-2">
+                {bill.installment_total && (
+                  <Badge 
+                    variant="outline" 
+                    className="text-xs px-2 py-1 border-blue-300 text-blue-600 h-6 cursor-pointer hover:bg-blue-50"
+                    onClick={() => setInstallmentSeriesOpen(true)}
+                  >
+                    <Package className="h-3 w-3 mr-1" />
+                    {bill.installment_index}/{bill.installment_total}
+                  </Badge>
+                )}
+                
+                {linkedTransaction && (
+                  <Badge variant="success" className="text-xs px-2 py-1 h-6">
+                    <Receipt className="h-3 w-3 mr-1" />
+                    Transação criada
+                  </Badge>
+                )}
+                
                 {bill.is_recurring && (
                   <Badge variant="outline" className="text-xs px-2 py-1 border-gray-300 text-gray-600 h-6">
                     <Repeat className="h-3 w-3 mr-1" />
@@ -350,6 +389,14 @@ export const BillCard: React.FC<BillCardProps> = ({
         onOpenChange={setTransactionsDialogOpen}
         bill={bill}
       />
+      
+      {bill.installment_group_id && (
+        <InstallmentSeriesModal
+          open={installmentSeriesOpen}
+          onOpenChange={setInstallmentSeriesOpen}
+          bills={installmentSeries as Bill[]}
+        />
+      )}
     </>
   );
 };
