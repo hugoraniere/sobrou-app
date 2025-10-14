@@ -59,28 +59,6 @@ const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 const queryClient = new QueryClient();
 
 const App = () => {
-
-  // One-time cleanup for any existing service workers and caches (PWA removed)
-  React.useEffect(() => {
-    const purged = localStorage.getItem('pwa_purged');
-    if (!purged) {
-      try {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations()
-            .then(regs => Promise.all(regs.map(r => r.unregister())))
-            .catch(console.error);
-        }
-        if ('caches' in window) {
-          caches.keys()
-            .then(keys => Promise.all(keys.map(k => caches.delete(k))))
-            .catch(console.error);
-        }
-      } finally {
-        localStorage.setItem('pwa_purged', '1');
-      }
-    }
-  }, []);
-  
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
