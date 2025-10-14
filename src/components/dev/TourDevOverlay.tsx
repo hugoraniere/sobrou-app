@@ -111,10 +111,12 @@ export const TourDevOverlay: React.FC<TourDevOverlayProps> = ({ enabled }) => {
 
 // Hook para usar o dev overlay
 export const useTourDevMode = () => {
-  const [isDevMode, setIsDevMode] = useState(() => {
+  const [isDevMode, setIsDevMode] = useState(false);
+
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('tour') === 'dev';
-  });
+    setIsDevMode(urlParams.get('tour') === 'dev');
+  }, []);
 
   return { isDevMode };
 };
