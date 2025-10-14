@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 import ResponsivePageContainer from '@/components/layout/ResponsivePageContainer';
 import ResponsivePageHeader from '@/components/layout/ResponsivePageHeader';
 import { Button } from '@/components/ui/button';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, FileText } from 'lucide-react';
 import AddTransactionTabbedDialog from '@/components/transactions/AddTransactionTabbedDialog';
 import ImportBankStatementButton from '@/components/transactions/import/ImportBankStatementButton';
+import { useNavigate } from 'react-router-dom';
 
 // Onboarding Components
 import { WelcomeModal } from '../components/onboarding/WelcomeModal';
@@ -19,6 +20,7 @@ import { TourBanner } from '../components/tour/TourBanner';
 
 const Index = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [showAddTransaction, setShowAddTransaction] = useState(false);
   
@@ -65,6 +67,15 @@ const Index = () => {
           >
             <Plus className="h-4 w-4" />
             {t('transactions.add', 'Adicionar Transação')}
+          </Button>
+          
+          <Button
+            onClick={() => navigate('/reports/mei-closing')}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            Relatório MEI
           </Button>
           
           <ImportBankStatementButton 

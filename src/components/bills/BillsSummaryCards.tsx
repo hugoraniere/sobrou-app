@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatCurrency } from '@/lib/utils';
-import { Calendar, Clock, AlertTriangle } from 'lucide-react';
 import { Bill } from '@/types/bills';
-import { differenceInDays } from 'date-fns';
+import { formatCurrency } from '@/lib/utils';
+import { Calendar, Clock, AlertCircle } from 'lucide-react';
+import { startOfMonth, endOfMonth, addDays } from 'date-fns';
 
 interface BillsSummaryCardsProps {
   bills: Bill[];
@@ -11,95 +11,81 @@ interface BillsSummaryCardsProps {
 
 export const BillsSummaryCards: React.FC<BillsSummaryCardsProps> = ({ bills }) => {
   const today = new Date();
-  const in15Days = new Date(today.getTime() + 15 * 24 * 60 * 60 * 1000);
+  const thisMonthStart = startOfMonth(today);
+  const thisMonthEnd = endOfMonth(today);
+  const next15Days = addDays(today, 15);
 
-  // Contas deste mês (pendentes)
-  const thisMonthBills = bills.filter((bill) => {
-    if (bill.is_paid) return false;
+  // Filtrar contas não pagas
+  const unpaidBills = bills.filter(bill => !bill.is_paid);
+
+  // Este mês
+  const thisMonthBills = unpaidBills.filter(bill => {
     const dueDate = new Date(bill.due_date);
-    return (
-      dueDate.getMonth() === today.getMonth() &&
-      dueDate.getFullYear() === today.getFullYear()
-    );
+    return dueDate >= thisMonthStart && dueDate <= thisMonthEnd;
   });
-
   const thisMonthTotal = thisMonthBills.reduce((sum, bill) => sum + bill.amount, 0);
 
-  // Contas nos próximos 15 dias (pendentes)
-  const next15DaysBills = bills.filter((bill) => {
-    if (bill.is_paid) return false;
+  // Próximos 15 dias
+  const next15DaysBills = unpaidBills.filter(bill => {
     const dueDate = new Date(bill.due_date);
-    return dueDate >= today && dueDate <= in15Days;
+    return dueDate >= today && dueDate <= next15Days;
   });
-
   const next15DaysTotal = next15DaysBills.reduce((sum, bill) => sum + bill.amount, 0);
 
-  // Contas atrasadas
-  const overdueBills = bills.filter((bill) => {
-    if (bill.is_paid) return false;
+  // Atrasadas
+  const overdueBills = unpaidBills.filter(bill => {
     const dueDate = new Date(bill.due_date);
     return dueDate < today;
   });
-
   const overdueTotal = overdueBills.reduce((sum, bill) => sum + bill.amount, 0);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Este Mês */}
-      <Card className="border-l-4 border-l-blue-500">
+      <Card>
         <CardContent className="p-4">
-          <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-blue-600" />
+            </div>
             <div>
-              <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
-                <Calendar className="h-4 w-4" />
-                <span>Este Mês</span>
-              </div>
-              <div className="text-2xl font-bold text-gray-900">
-                {formatCurrency(thisMonthTotal)}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {thisMonthBills.length} conta{thisMonthBills.length !== 1 ? 's' : ''}
-              </div>
+              <p className="text-xs text-gray-500 mb-1">Este Mês</p>
+              <p className="text-lg font-semibold text-gray-900">{formatCurrency(thisMonthTotal)}</p>
+              <p className="text-xs text-gray-500 mt-1">{thisMonthBills.length} conta{thisMonthBills.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Próximos 15 Dias */}
-      <Card className="border-l-4 border-l-yellow-500">
+      <Card>
         <CardContent className="p-4">
-          <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+              <Clock className="h-5 w-5 text-yellow-600" />
+            </div>
             <div>
-              <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
-                <Clock className="h-4 w-4" />
-                <span>Próximos 15 Dias</span>
-              </div>
-              <div className="text-2xl font-bold text-gray-900">
-                {formatCurrency(next15DaysTotal)}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {next15DaysBills.length} conta{next15DaysBills.length !== 1 ? 's' : ''}
-              </div>
+              <p className="text-xs text-gray-500 mb-1">Próximos 15 Dias</p>
+              <p className="text-lg font-semibold text-gray-900">{formatCurrency(next15DaysTotal)}</p>
+              <p className="text-xs text-gray-500 mt-1">{next15DaysBills.length} conta{next15DaysBills.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Atrasadas */}
-      <Card className="border-l-4 border-l-red-500">
+      <Card className={overdueBills.length > 0 ? 'border-red-200 bg-red-50' : ''}>
         <CardContent className="p-4">
-          <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+            </div>
             <div>
-              <div className="flex items-center gap-2 text-red-600 text-sm mb-1">
-                <AlertTriangle className="h-4 w-4" />
-                <span>Atrasadas</span>
-              </div>
-              <div className="text-2xl font-bold text-red-700">
+              <p className="text-xs text-gray-500 mb-1">Atrasadas</p>
+              <p className={`text-lg font-semibold ${overdueBills.length > 0 ? 'text-red-600' : 'text-gray-900'}`}>
                 {formatCurrency(overdueTotal)}
-              </div>
-              <div className="text-xs text-red-500 mt-1">
-                {overdueBills.length} conta{overdueBills.length !== 1 ? 's' : ''}
-              </div>
+              </p>
+              <p className="text-xs text-gray-500 mt-1">{overdueBills.length} conta{overdueBills.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
         </CardContent>

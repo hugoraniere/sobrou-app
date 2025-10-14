@@ -166,15 +166,28 @@ const TransactionCardMobile: React.FC<TransactionCardMobileProps> = React.memo((
         </span>
         
         {/* Chips */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 flex-wrap">
           <CategoryChip />
           <TransactionStatusChip />
           
           {/* Recurring indicator */}
           {transaction.is_recurring && (
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100">
-              <Repeat className="h-3 w-3 text-blue-600" />
-              <span className="text-xs text-blue-600 font-medium">Recorrente</span>
+            <div className="flex items-center gap-1 px-1 py-0.5 rounded-full bg-blue-100">
+              <Repeat className="h-2 w-2 text-blue-600" />
+              <span className="text-xs text-blue-600 font-medium">Rec.</span>
+            </div>
+          )}
+          
+          {/* M3: MEI Fields Badges - Mobile (compact) */}
+          {transaction.payment_method && (
+            <div className="px-1 py-0.5 rounded-full bg-purple-100">
+              <span className="text-xs text-purple-700 font-medium">{transaction.payment_method}</span>
+            </div>
+          )}
+          
+          {transaction.client && (
+            <div className="px-1 py-0.5 rounded-full bg-orange-100">
+              <span className="text-xs text-orange-700 font-medium">{transaction.client}</span>
             </div>
           )}
         </div>

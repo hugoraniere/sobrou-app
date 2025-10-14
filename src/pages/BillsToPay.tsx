@@ -8,6 +8,7 @@ import { BillBalanceCard } from '@/components/bills/BillBalanceCard';
 import { BillsPeriodFilters, BillsPeriodFilter } from '@/components/bills/BillsPeriodFilters';
 import { BillsSearchAndToggle } from '@/components/bills/BillsSearchAndToggle';
 import { AddBillDialog } from '@/components/bills/AddBillDialog';
+import { BillsSummaryCards } from '@/components/bills/BillsSummaryCards';
 import { useBillsData } from '@/hooks/useBillsData';
 import { useBillFilters } from '@/hooks/useBillFilters';
 import { Bill } from '@/types/bills';
@@ -157,6 +158,9 @@ const BillsToPay = () => {
           totalAmountToPay={billMetrics.totalAmountToPay} 
           totalAmountPaid={billMetrics.totalAmountPaid} 
         />
+
+        {/* 2.5 Summary Cards */}
+        <BillsSummaryCards bills={bills || []} />
 
         {/* 3. Busca + toggle (com espaçamento maior) */}
         <div className="pt-2">

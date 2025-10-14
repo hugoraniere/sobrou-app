@@ -15,6 +15,7 @@ import { useLinkedTransaction } from '@/hooks/useLinkedTransaction';
 import { InstallmentSeriesModal } from './InstallmentSeriesModal';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface BillCardProps {
   bill: Bill;
@@ -36,6 +37,7 @@ export const BillCard: React.FC<BillCardProps> = ({
   onDelete,
   onTogglePaid,
 }) => {
+  const navigate = useNavigate();
   const [transactionsDialogOpen, setTransactionsDialogOpen] = useState(false);
   const [installmentSeriesOpen, setInstallmentSeriesOpen] = useState(false);
   
@@ -176,6 +178,18 @@ export const BillCard: React.FC<BillCardProps> = ({
 
             {/* Seção direita: Ações com melhor espaçamento */}
             <div className="flex items-center gap-1">
+              {linkedTransaction && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/transactions?highlight=${linkedTransaction.id}`)}
+                  className="h-7 px-3 text-xs border-green-300 hover:bg-green-50"
+                >
+                  <Receipt className="h-3 w-3 mr-1" />
+                  Ver Transação
+                </Button>
+              )}
+              
               <Button
                 variant="outline"
                 size="sm"

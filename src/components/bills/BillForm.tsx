@@ -38,11 +38,14 @@ export const BillForm: React.FC<BillFormProps> = ({
   const [recurrenceFrequency, setRecurrenceFrequency] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>(
     initialData?.recurrence_frequency || 'monthly'
   );
+  const [isInstallment, setIsInstallment] = useState(initialData?.is_installment || false);
+  const [installmentTotal, setInstallmentTotal] = useState(initialData?.installment_total || 2);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<BillFormData>({
     resolver: zodResolver(billSchema),
     defaultValues: {
@@ -53,6 +56,8 @@ export const BillForm: React.FC<BillFormProps> = ({
       notes: initialData?.notes || '',
     },
   });
+  
+  const amountValue = watch('amount');
 
   const onFormSubmit = (data: BillFormData) => {
     onSubmit({
@@ -63,6 +68,8 @@ export const BillForm: React.FC<BillFormProps> = ({
       notes: data.notes || undefined,
       is_recurring: isRecurring,
       recurrence_frequency: isRecurring ? recurrenceFrequency : undefined,
+      is_installment: isInstallment,
+      installment_total: isInstallment ? installmentTotal : undefined,
     });
   };
 
@@ -136,7 +143,10 @@ export const BillForm: React.FC<BillFormProps> = ({
           <Switch
             id="is-recurring"
             checked={isRecurring}
-            onCheckedChange={setIsRecurring}
+            onCheckedChange={(checked) => {
+              setIsRecurring(checked);
+              if (checked) setIsInstallment(false);
+            }}
           />
           <Label htmlFor="is-recurring">Conta Recorrente</Label>
         </div>
@@ -158,6 +168,39 @@ export const BillForm: React.FC<BillFormProps> = ({
             <p className="text-xs text-gray-500">
               A próxima conta será criada automaticamente após marcar esta como paga.
             </p>
+          </div>
+        )}
+      </div>
+
+      {/* Controles de Parcelas */}
+      <div className="space-y-4 pt-4 border-t">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="is-installment"
+            checked={isInstallment}
+            onCheckedChange={(checked) => {
+              setIsInstallment(checked);
+              if (checked) setIsRecurring(false);
+            }}
+          />
+          <Label htmlFor="is-installment">Parcelar em vezes</Label>
+        </div>
+
+        {isInstallment && (
+          <div className="space-y-2">
+            <Label>Número de Parcelas</Label>
+            <Input
+              type="number"
+              min={2}
+              max={60}
+              value={installmentTotal}
+              onChange={(e) => setInstallmentTotal(parseInt(e.target.value) || 2)}
+            />
+            {amountValue && (
+              <p className="text-xs text-gray-500">
+                {installmentTotal}× de R$ {(parseFloat(amountValue || '0') / installmentTotal).toFixed(2)}
+              </p>
+            )}
           </div>
         )}
       </div>

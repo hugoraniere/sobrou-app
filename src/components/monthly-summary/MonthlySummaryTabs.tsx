@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { MonthlyTable } from './MonthlyTable';
 import { PlanningTable } from './PlanningTable';
 import { ComparativeTable } from './ComparativeTable';
@@ -22,13 +24,40 @@ export const MonthlySummaryTabs: React.FC<MonthlySummaryTabsProps> = ({ year }) 
     return stored ? JSON.parse(stored) : false; // Por padrão, visão simples
   });
 
+  // M6: Toggle para usar data de competência (MEI) ou data de pagamento
+  const [useCompetenceDate, setUseCompetenceDate] = useState(() => {
+    const stored = localStorage.getItem('useCompetenceDate');
+    return stored ? JSON.parse(stored) : false;
+  });
+
   // Salvar preferência no localStorage
   useEffect(() => {
     localStorage.setItem('planningViewMode', JSON.stringify(isDetailedView));
   }, [isDetailedView]);
 
+  useEffect(() => {
+    localStorage.setItem('useCompetenceDate', JSON.stringify(useCompetenceDate));
+  }, [useCompetenceDate]);
+
   return (
     <div className={cn("w-full", isMobile && "max-w-full overflow-x-hidden")}>
+      {/* M6: Toggle Competência vs Pagamento */}
+      <div className="mb-4 flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <Switch
+          id="competence-toggle"
+          checked={useCompetenceDate}
+          onCheckedChange={setUseCompetenceDate}
+        />
+        <div className="flex-1">
+          <Label htmlFor="competence-toggle" className="font-medium text-sm cursor-pointer">
+            Usar data de competência (MEI)
+          </Label>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Por padrão: data de pagamento. Com competência: considera quando o serviço foi prestado.
+          </p>
+        </div>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
           "w-full mb-4 flex",

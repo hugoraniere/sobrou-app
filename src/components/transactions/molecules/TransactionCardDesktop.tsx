@@ -111,7 +111,7 @@ const TransactionCardDesktop: React.FC<TransactionCardDesktopProps> = ({
       </div>
 
       {/* Centro: Chips */}
-      <div className="flex items-center gap-2 mx-4">
+      <div className="flex items-center gap-2 mx-4 flex-wrap">
         <CategoryChip />
         <TransactionStatusChip />
         
@@ -122,6 +122,31 @@ const TransactionCardDesktop: React.FC<TransactionCardDesktopProps> = ({
             <span className="text-xs text-blue-600 font-medium">Recorrente</span>
           </div>
         )}
+        
+        {/* M3: MEI Fields Badges */}
+        {transaction.payment_method && (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-purple-100">
+            <span className="text-xs text-purple-700 font-medium">{transaction.payment_method}</span>
+          </div>
+        )}
+        
+        {transaction.client && (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-orange-100">
+            <span className="text-xs text-orange-700 font-medium">Cliente: {transaction.client}</span>
+          </div>
+        )}
+        
+        {transaction.project && (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-teal-100">
+            <span className="text-xs text-teal-700 font-medium">Projeto: {transaction.project}</span>
+          </div>
+        )}
+        
+        {transaction.tags && transaction.tags.length > 0 && transaction.tags.map((tag, index) => (
+          <div key={index} className="flex items-center gap-1 px-2 py-1 rounded-full bg-indigo-100">
+            <span className="text-xs text-indigo-700 font-medium">{tag}</span>
+          </div>
+        ))}
       </div>
 
       {/* Lado direito: Valor + Menu */}
