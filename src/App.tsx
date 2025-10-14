@@ -14,8 +14,6 @@ import { AIChatProvider } from "./contexts/AIChatContext";
 import { WhatsAppButtonProvider } from "./contexts/WhatsAppButtonContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { ProductTourProvider } from "./contexts/ProductTourProvider";
-import { TourDevOverlay, useTourDevMode } from './components/dev/TourDevOverlay';
-import { TourAnchorHighlighter } from './components/dev/TourAnchorHighlighter';
 import { TourManager } from './components/tour/TourManager';
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
@@ -57,9 +55,10 @@ import NewTicket from "./pages/support/NewTicket";
 import OAuthCallback from "./pages/OAuthCallback";
 const MyTickets = React.lazy(() => import("./pages/support/MyTickets"));
 
+// Criar QueryClient fora do componente para evitar problemas com HMR
+const queryClient = new QueryClient();
+
 const App = () => {
-  const queryClient = React.useMemo(() => new QueryClient(), []);
-  const { isDevMode } = useTourDevMode();
 
   // One-time cleanup for any existing service workers and caches (PWA removed)
   React.useEffect(() => {
